@@ -11,10 +11,10 @@ class ThemeReader {
     var jsonString = await rootBundle.loadString(jsonFile);
     var colors = jsonDecode(jsonString)["colors"][0];
     return AppColorsExtension(
-      primary: parseColor(colors, "primary")
+      primary: _parseColor(colors, "primary")
     );
   }
 
-  static Color parseColor(dynamic colors, String name) =>
+  static Color _parseColor(dynamic colors, String name) =>
       Color(int.parse(colors[name] ?? "0xFF000000"));
 }
