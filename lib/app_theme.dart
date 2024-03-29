@@ -3,8 +3,12 @@ import 'app_colors_extension.dart';
 import 'theme_reader.dart';
 
 class AppTheme with ChangeNotifier {
-  static final lightAppColors = ThemeReader.readTheme('assets/lightTheme.json');
-  static final darkAppColors = ThemeReader.readTheme('assets/darkTheme.json');
+  static Future<void> loadAllThemes() async {
+    ThemeReader.readTheme('assets/light_theme.json').then((value) => lightAppColors = value);
+    ThemeReader.readTheme('assets/dark_theme.json').then((value) => darkAppColors = value);
+  }
+  static late AppColorsExtension lightAppColors;
+  static late AppColorsExtension darkAppColors;
   static final light = ThemeData.light().copyWith(extensions: [lightAppColors]);
   static final dark = ThemeData.dark().copyWith(extensions: [darkAppColors]);
 

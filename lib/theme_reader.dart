@@ -7,8 +7,8 @@ import 'package:flutter/services.dart';
 import 'app_colors_extension.dart';
 
 class ThemeReader {
-  static AppColorsExtension readTheme(String jsonFile) {
-    String jsonString = File(jsonFile).readAsStringSync();
+  static Future<AppColorsExtension> readTheme(String jsonFile) async {
+    var jsonString = await rootBundle.loadString(jsonFile);
     var colors = jsonDecode(jsonString)["colors"][0];
     return AppColorsExtension(
       primary: parseColor(colors, "primary")

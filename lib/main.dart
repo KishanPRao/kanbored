@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'app_theme.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await AppTheme.loadAllThemes();
   runApp(const App());
 }
 
@@ -14,10 +16,11 @@ class App extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => AppTheme(),
       builder: (context, _) => MaterialApp(
-        title: 'Kanored',
+        title: 'Kanbored',
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         themeMode: context.watch<AppTheme>().themeMode,
+        debugShowCheckedModeBanner: false,
         home: const Home(),
       ),
     );
