@@ -12,6 +12,8 @@ dependencies:
   provider: ^6.0.0
   cupertino_icons: ^1.0.6
   shared_preferences: ^2.2.2
+  http:
+  flutter_secure_storage:
 
 dev_dependencies:
   flutter_test:

@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:kanbored/app_text_style.dart';
 import 'package:kanbored/utils.dart';
 import 'package:provider/provider.dart';
-
-import '../app_data.dart';
-import '../app_theme.dart';
+import 'package:kanbored/app_data.dart';
+import 'package:kanbored/app_theme.dart';
+import 'package:kanbored/constants.dart';
 
 class SettingsUi extends StatefulWidget {
   const SettingsUi({super.key});
@@ -16,9 +16,9 @@ class SettingsUi extends StatefulWidget {
 
 class SettingsUiState extends State<SettingsUi> {
   var theme = AppTheme.strToThemeMode(AppData.theme);
-  var apiUsername = AppData.getString(AppData.prefApiPassword, "");
-  var apiToken = AppData.getString(AppData.prefApiPassword, "");
-  var apiEndpoint = AppData.getString(AppData.prefApiEndpoint, "");
+  var apiUsername = AppData.getString(prefApiPassword, "");
+  var apiToken = AppData.getString(prefApiPassword, "");
+  var apiEndpoint = AppData.getString(prefApiUrl, "");
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +40,7 @@ class SettingsUiState extends State<SettingsUi> {
               "API Token",
               apiToken,
               () => _showDialog("API Token", "Enter the API Token", (token) {
-                    AppData.setString(AppData.prefApiPassword, token);
+                    AppData.setString(prefApiPassword, token);
                     setState(() {
                       apiToken = token;
                     });
@@ -51,7 +51,7 @@ class SettingsUiState extends State<SettingsUi> {
               apiEndpoint,
               () => _showDialog("API Endpoint", "Enter the API Endpoint",
                       (endpoint) {
-                    AppData.setString(AppData.prefApiEndpoint, endpoint);
+                    AppData.setString(prefApiUrl, endpoint);
                     setState(() {
                       apiEndpoint = endpoint;
                     });
