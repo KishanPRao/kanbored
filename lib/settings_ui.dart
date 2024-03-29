@@ -17,12 +17,15 @@ class SettingsUi extends StatefulWidget {
 class SettingsUiState extends State<SettingsUi> {
   var theme =
       AppTheme.strToThemeMode(AppData.getString(AppData.prefTheme, "system"));
+  var apiToken = AppData.getString(AppData.prefApiToken, "");
+  var apiEndpoint = AppData.getString(AppData.prefApiEndpoint, "");
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
+        backgroundColor: context.theme.appColors.primary,
         leading: IconButton(
           onPressed: () => {Navigator.pop(context)},
           icon: const Icon(Icons.arrow_back),
@@ -31,31 +34,85 @@ class SettingsUiState extends State<SettingsUi> {
       body: Column(
         children: [
           buildSettingOption(context, "Theme", AppTheme.themeModeToStr(theme),
-              () async {
-            context.read<AppTheme>().themeMode = (await showDialog<ThemeMode>(
-                context: context,
-                builder: (BuildContext context) {
-                  return SimpleDialog(
-                    title: const Text('Select theme'),
-                    children: ThemeMode.values.map((value) {
-                      return SimpleDialogOption(
-                        onPressed: () {
-                          Navigator.pop(context, value);
-                        },
-                        child: Text(value.name.capitalize()),
-                      );
-                    }).toList(),
-                  );
-                }))!;
-            if (context.mounted) {
-              setState(() {
-                theme = context.read<AppTheme>().themeMode;
-              });
-            }
-          })
+              _showThemeOptions),
+          buildSettingOption(
+              context,
+              "API Token",
+              apiToken,
+              () => _showDialog("API Token", "Enter the API Token", (token) {
+                    AppData.setString(AppData.prefApiToken, token);
+                    setState(() {
+                      apiToken = token;
+                    });
+                  })),
+          buildSettingOption(
+              context,
+              "API Endpoint",
+              apiEndpoint,
+              () => _showDialog("API Endpoint", "Enter the API Endpoint",
+                      (endpoint) {
+                    AppData.setString(AppData.prefApiEndpoint, endpoint);
+                    setState(() {
+                      apiEndpoint = endpoint;
+                    });
+                  })),
         ],
       ),
     );
+  }
+
+  void _showDialog(String title, String content, Function cb) async {
+    TextEditingController _textFieldController = TextEditingController();
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(title),
+          content: TextField(
+            controller: _textFieldController,
+            decoration: InputDecoration(hintText: content),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('CANCEL'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                cb(_textFieldController.text);
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showThemeOptions() async {
+    context.read<AppTheme>().themeMode = (await showDialog<ThemeMode>(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            title: const Text('Select theme'),
+            children: ThemeMode.values.map((value) {
+              return SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context, value);
+                },
+                child: Text(value.name.capitalize()),
+              );
+            }).toList(),
+          );
+        }))!;
+    if (context.mounted) {
+      setState(() {
+        theme = context.read<AppTheme>().themeMode;
+      });
+    }
   }
 
   InkWell buildSettingOption(

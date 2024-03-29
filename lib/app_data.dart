@@ -8,6 +8,8 @@ class AppData {
 
   static late SharedPreferences _preferences;
   static const prefTheme = "theme";
+  static const prefApiToken = "api_token";
+  static const prefApiEndpoint = "api_endpoint";
 
   static String getString(String key, String defaultValue) =>
       _preferences.getString(key) ?? defaultValue;

@@ -57,6 +57,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        backgroundColor: context.theme.appColors.primary,
         actions: [
           IconButton(
               onPressed: () {
