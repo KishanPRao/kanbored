@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kanbored/app_data.dart';
-import 'package:kanbored/settings_ui.dart';
+import 'package:kanbored/pages/login.dart';
+import 'package:kanbored/pages/settings.dart';
 import 'package:provider/provider.dart';
 import 'app_theme.dart';
 
@@ -8,11 +9,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppTheme.loadAllThemes();
   await AppData.loadSharedPreferences();
-  runApp(const App());
+  runApp(App());
 }
 
 class App extends StatelessWidget {
-  const App({super.key});
+  App({super.key});
+  final authenticated = AppData.authenticated;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,11 @@ class App extends StatelessWidget {
         darkTheme: AppTheme.dark,
         themeMode: context.watch<AppTheme>().themeMode,
         debugShowCheckedModeBanner: false,
-        home: const Home(title: 'Kanbored'),
+        initialRoute: authenticated ? 'home' : 'login',
+        routes: {
+          'home': (BuildContext context) => const Home(title: 'Kanbored'),
+          'login': (BuildContext context) => Login(),
+        },
       ),
     );
   }
@@ -40,17 +46,12 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  void updateThemeMode(ThemeMode themeMode) {
-    context.read<AppTheme>().themeMode = themeMode;
-  }
-
-  void toggleTheme() {
-    var newTheme = ThemeMode.light;
-    if (context.read<AppTheme>().themeMode == ThemeMode.light) {
-      newTheme = ThemeMode.dark;
-    }
-    updateThemeMode(newTheme);
-  }
+  final Map<String, dynamic> loginData = {
+    'username': AppData.username,
+    'password': AppData.password,
+    'endpoint': AppData.endpoint,
+    'authenticated': AppData.authenticated
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -72,11 +73,6 @@ class _HomeState extends State<Home> {
       ),
       body: Column(
         children: [
-          TextButton(
-            onPressed: () => toggleTheme(),
-            child: Text('Toggle Theme',
-                style: TextStyle(color: context.theme.appColors.primary)),
-          ),
         ],
       ),
     );

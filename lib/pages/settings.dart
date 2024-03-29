@@ -4,8 +4,8 @@ import 'package:kanbored/app_text_style.dart';
 import 'package:kanbored/utils.dart';
 import 'package:provider/provider.dart';
 
-import 'app_data.dart';
-import 'app_theme.dart';
+import '../app_data.dart';
+import '../app_theme.dart';
 
 class SettingsUi extends StatefulWidget {
   const SettingsUi({super.key});
@@ -15,9 +15,9 @@ class SettingsUi extends StatefulWidget {
 }
 
 class SettingsUiState extends State<SettingsUi> {
-  var theme =
-      AppTheme.strToThemeMode(AppData.getString(AppData.prefTheme, "system"));
-  var apiToken = AppData.getString(AppData.prefApiToken, "");
+  var theme = AppTheme.strToThemeMode(AppData.theme);
+  var apiUsername = AppData.getString(AppData.prefApiPassword, "");
+  var apiToken = AppData.getString(AppData.prefApiPassword, "");
   var apiEndpoint = AppData.getString(AppData.prefApiEndpoint, "");
 
   @override
@@ -40,7 +40,7 @@ class SettingsUiState extends State<SettingsUi> {
               "API Token",
               apiToken,
               () => _showDialog("API Token", "Enter the API Token", (token) {
-                    AppData.setString(AppData.prefApiToken, token);
+                    AppData.setString(AppData.prefApiPassword, token);
                     setState(() {
                       apiToken = token;
                     });
@@ -62,19 +62,19 @@ class SettingsUiState extends State<SettingsUi> {
   }
 
   void _showDialog(String title, String content, Function cb) async {
-    TextEditingController _textFieldController = TextEditingController();
+    TextEditingController textFieldController = TextEditingController();
     return showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: Text(title),
           content: TextField(
-            controller: _textFieldController,
+            controller: textFieldController,
             decoration: InputDecoration(hintText: content),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('CANCEL'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -82,7 +82,7 @@ class SettingsUiState extends State<SettingsUi> {
             TextButton(
               child: const Text('OK'),
               onPressed: () {
-                cb(_textFieldController.text);
+                cb(textFieldController.text);
                 Navigator.pop(context);
               },
             ),

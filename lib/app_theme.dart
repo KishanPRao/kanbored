@@ -15,12 +15,12 @@ class AppTheme with ChangeNotifier {
   static final light = ThemeData.light().copyWith(extensions: [_lightAppColors]);
   static final dark = ThemeData.dark().copyWith(extensions: [_darkAppColors]);
 
-  ThemeMode _themeMode = strToThemeMode(AppData.getString(AppData.prefTheme, "system"));
+  ThemeMode _themeMode = strToThemeMode(AppData.theme);
   ThemeMode get themeMode => _themeMode;
 
   set themeMode(ThemeMode themeMode) {
     _themeMode = themeMode;
-    AppData.setString(AppData.prefTheme, themeModeToStr(themeMode));
+    AppData.theme = themeModeToStr(themeMode);
     notifyListeners();
   }
 
