@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:kanbored/api/authenticator.dart';
+import 'package:kanbored/api/api.dart';
 import 'package:kanbored/app_data.dart';
 import 'package:kanbored/app_theme.dart';
 import 'package:kanbored/constants.dart';
@@ -58,7 +58,7 @@ class LoginState extends State<Login> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     showLoaderDialog(context);
-                    Authenticator.login(url, username, password).then((value) {
+                    Api.login(url, username, password).then((value) {
                       Navigator.pop(context); // dialog
                       setState(() {
                         Navigator.pop(context);

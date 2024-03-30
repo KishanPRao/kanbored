@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:kanbored/app_data.dart';
+import 'package:kanbored/models/model.dart';
+import 'package:kanbored/models/project_model.dart';
 
-class Authenticator {
+class Api {
   static Future<bool> login(
       String url, String username, String password) async {
     String endpoint = url;
@@ -21,7 +23,7 @@ class Authenticator {
 
     final Map<String, dynamic> parameters = {
       "jsonrpc": "2.0",
-      "method": "getmyProjects",
+      "method": "getMe",
       "id": 2134420212
     };
     final credentials = "$username:$password";
@@ -31,6 +33,7 @@ class Authenticator {
       Uri.parse(endpoint),
       headers: <String, String>{"Authorization": "Basic $encoded"},
       body: json.encode(parameters),
+      encoding: Encoding.getByName("utf-8"),
     );
 
     dynamic decodedData;
@@ -52,22 +55,29 @@ class Authenticator {
       return Future.error(error);
     }
     if (decodedData['error'] != null) return Future.error(decodedData['error']);
+    final myUser = decodedData['result'];
     AppData.password = password;
     AppData.username = username;
     AppData.url = url;
     AppData.endpoint = endpoint;
-    final myUser = await getMe();
     AppData.userId = myUser["id"];
     AppData.appRole = myUser["role"];
     AppData.authenticated = true;
     return true;
   }
 
-  static Future getMe() async {
+  // static Future getMe() async => baseApi("getMe", 1718627783);
+  // static Future getMyDashboard() async => baseApi("getMyDashboard", 447898718);
+  // static Future getMyProjectsList() async => baseApi("getMyProjectsList", 987834805);
+  static Future<List<ProjectModel>> getmyProjects() async =>
+      baseApi("getmyProjects", 2134420212, ProjectModel.fromJson);
+
+  static Future<List<T>> baseApi<T extends Model>(String method, int id,
+      T Function(Map<String, dynamic>) constructor) async {
     final Map<String, dynamic> parameters = {
       "jsonrpc": "2.0",
-      "method": "getMe",
-      "id": 1718627783
+      "method": method,
+      "id": id
     };
     final credentials = "${AppData.username}:${AppData.password}";
     Codec<String, String> stringToBase64 = utf8.fuse(base64);
@@ -80,31 +90,15 @@ class Authenticator {
     );
 
     final decodedData = json.decode(utf8.decode(resp.bodyBytes));
-    if (decodedData['error'] != null) return Future.error(decodedData['error']);
-    return decodedData['result'];
-  }
+    print("decodedData: ${decodedData}");
 
-  static Future<int> getUserIdByName(String username) async {
-    final Map<String, dynamic> parameters = {
-      "jsonrpc": "2.0",
-      "method": "getUserByName",
-      "id": 1769674782,
-      "params": {"username": username}
-    };
-    final credentials = "${AppData.username}:${AppData.password}";
-    Codec<String, String> stringToBase64 = utf8.fuse(base64);
-    String encoded = stringToBase64.encode(credentials);
-    final resp = await http.post(
-      Uri.parse(AppData.endpoint),
-      headers: <String, String>{"Authorization": "Basic $encoded"},
-      body: json.encode(parameters),
-      encoding: Encoding.getByName("utf-8"),
-    );
-
-    final decodedData = json.decode(utf8.decode(resp.bodyBytes));
-    if (decodedData == null || decodedData['result'] == null) return 0;
     if (decodedData['error'] != null) return Future.error(decodedData['error']);
-    int result = decodedData['result']['id'];
-    return (result > 0) ? result : 0;
+    final List<dynamic> results = decodedData['result'];
+    final List<T> models = [];
+    for (var data in results) {
+      final model = constructor(data);
+      models.add(model);
+    }
+    return models;
   }
 }
