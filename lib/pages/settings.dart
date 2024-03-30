@@ -27,7 +27,10 @@ class SettingsUiState extends State<SettingsUi> {
         title: const Text("Settings"),
         backgroundColor: context.theme.appColors.primary,
         leading: IconButton(
-          onPressed: () => {Navigator.pop(context)},
+          onPressed: () {
+            print("POP BACK Button");
+            Navigator.pop(context);
+          },
           icon: const Icon(Icons.arrow_back),
         ),
       ),
@@ -56,22 +59,38 @@ class SettingsUiState extends State<SettingsUi> {
                       apiEndpoint = endpoint;
                     });
                   })),
+          buildSettingOption(
+              context,
+              "Logout",
+              "",
+              () => {
+                    _showDialog("Logout?", null, (_) {
+                      AppData.authenticated = false;
+                      Navigator.pop(context); // Pop settings
+                      Navigator.pop(context,
+                          true); // Pop home screen; strange issue, only returns value using this
+                    })
+                  }),
         ],
       ),
     );
   }
 
-  void _showDialog(String title, String content, Function cb) async {
+  void _showDialog(String title, String? content, Function cb) async {
     TextEditingController textFieldController = TextEditingController();
     return showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text(title),
-          content: TextField(
+        Widget? contentWidget;
+        if (content != null) {
+          contentWidget = TextField(
             controller: textFieldController,
             decoration: InputDecoration(hintText: content),
-          ),
+          );
+        }
+        var dialog = AlertDialog(
+          title: Text(title),
+          content: contentWidget,
           actions: <Widget>[
             TextButton(
               child: const Text('Cancel'),
@@ -88,6 +107,7 @@ class SettingsUiState extends State<SettingsUi> {
             ),
           ],
         );
+        return dialog;
       },
     );
   }

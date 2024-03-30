@@ -1,9 +1,9 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:kanbored/app_theme.dart';
 import 'package:kanbored/app_data.dart';
 import 'package:kanbored/constants.dart';
+import 'package:kanbored/pages/login.dart';
+import 'package:kanbored/pages/settings.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key, required this.title});
@@ -30,22 +30,20 @@ class _HomeState extends State<Home> {
         backgroundColor: context.theme.appColors.primary,
         actions: [
           IconButton(
-            onPressed: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => const SettingsUi()),
-              // );
-              setState(() {
-                Navigator.pushNamed(context, routeSettings);
-              });
+            onPressed: () async {
+              Navigator.pushNamed(context, routeSettings).then((value) {
+                if (value?.runtimeType == bool) {
+                  Navigator.pushNamed(context, routeLogin);
+                }
+              }
+              );
             },
             icon: const Icon(Icons.settings),
           )
         ],
       ),
       body: Column(
-        children: [
-        ],
+        children: [],
       ),
     );
   }

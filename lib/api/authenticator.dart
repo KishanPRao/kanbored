@@ -11,7 +11,6 @@ class Authenticator {
       endpoint += '/jsonrpc.php';
     }
     bool? validURL = Uri.tryParse(endpoint)?.isAbsolute;
-    print("_validURL: $validURL; $endpoint");
     if (validURL == null || !validURL) {
       Map<String, String> error = {
         'message':
@@ -52,22 +51,15 @@ class Authenticator {
       };
       return Future.error(error);
     }
-    // Check for errors
-    if (decodedData['error'] != null) {
-      return Future.error(decodedData['error']);
-    }
-
-    final List<dynamic> results = decodedData['result'];
-    print("Result! $endpoint, $url, $username, $password");
+    if (decodedData['error'] != null) return Future.error(decodedData['error']);
     AppData.password = password;
     AppData.username = username;
     AppData.url = url;
     AppData.endpoint = endpoint;
     final myUser = await getMe();
-    print("get me: ${myUser["id"]}, ${myUser["id"].runtimeType}");
     AppData.userId = myUser["id"];
     AppData.appRole = myUser["role"];
-    // _prefs.authenticated = true;
+    AppData.authenticated = true;
     return true;
   }
 
@@ -86,15 +78,9 @@ class Authenticator {
       body: json.encode(parameters),
       encoding: Encoding.getByName("utf-8"),
     );
-    // print("Decoded data: $resp, ${resp.body}, ${resp.statusCode}; ${resp.isRedirect}, ${resp.request}, ${resp.contentLength}, ${resp.reasonPhrase}");
 
     final decodedData = json.decode(utf8.decode(resp.bodyBytes));
-    // Check for errors
-    // print("Decoded data: $decodedData");
-    if (decodedData['error'] != null) {
-      return Future.error(decodedData['error']);
-    }
-    print("Decoded data!: ${decodedData['result']}");
+    if (decodedData['error'] != null) return Future.error(decodedData['error']);
     return decodedData['result'];
   }
 
@@ -114,19 +100,10 @@ class Authenticator {
       body: json.encode(parameters),
       encoding: Encoding.getByName("utf-8"),
     );
-    print("Decoded data: $resp, ${resp.body}, ${resp.statusCode}; ${resp.isRedirect}, ${resp.request}, ${resp.contentLength}, ${resp.reasonPhrase}");
 
     final decodedData = json.decode(utf8.decode(resp.bodyBytes));
-    print("Decoded data=: $decodedData");
     if (decodedData == null || decodedData['result'] == null) return 0;
-    // Check for errors
-    print("Decoded data2: $decodedData");
-    if (decodedData['error'] != null) {
-      return Future.error(decodedData['error']);
-    }
-    print("Decoded data2: ${decodedData['result']}");
-    print("Decoded data2: ${decodedData['result']['id']}");
-    // final result = int.parse(decodedData['result']['id']);
+    if (decodedData['error'] != null) return Future.error(decodedData['error']);
     int result = decodedData['result']['id'];
     return (result > 0) ? result : 0;
   }

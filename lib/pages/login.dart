@@ -30,7 +30,7 @@ class LoginState extends State<Login> {
               _createField(
                   AppData.url,
                   Icons.cloud,
-                  'https://kanboard_url',
+                  'https://kanboard_url.com',
                   'Kanboard URL',
                   'Must specify an URL!',
                   false,
@@ -58,25 +58,20 @@ class LoginState extends State<Login> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     showLoaderDialog(context);
-                    print("login: $url, $username, $password");
                     Authenticator.login(url, username, password).then((value) {
-                      Navigator.pop(context);
+                      Navigator.pop(context); // dialog
                       setState(() {
-                        Navigator.pushNamedAndRemoveUntil(
-                            context, routeHome, (route) => false);
+                        Navigator.pop(context);
+                        Navigator.pushNamed(context, routeHome);
+                        // Navigator.pushNamedAndRemoveUntil(
+                        //     context, routeHome, (route) => false);
                       });
                     }).onError((e, st) {
-                      Navigator.pop(context);
-                      print("Err: $e");
-                      // print("Err: ${(e as dynamic)['message']}");
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content:
-                              Text("Error: $e")));
-                      // SnackBar(content: Text("Error"));
+                      Navigator.pop(context); // dialog
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text("Error: $e")));
                       return Future.error(
                           Error()); // TODO: Handle error when wrong URL etc!
-                      // return null;
-                      // return false;
                     });
                   }
                 },
