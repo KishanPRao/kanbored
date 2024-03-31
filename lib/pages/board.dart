@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/ui/app_theme.dart';
@@ -48,7 +49,7 @@ class _BoardState extends State<Board> {
       ),
       body: Column(
           children: boards
-              .map((board) => Column(
+              .map((board) => Expanded(child: Column(
                     children: [
                       // TODO: move each ui element into a function or class?
                       Card(
@@ -56,18 +57,17 @@ class _BoardState extends State<Board> {
                           child: SizedBox(
                             child: Center(child: Text(board.name)), // swimlane
                           )),
-                      SizedBox(
-                          height: Utils.getHeight(context) * 0.8,
+                      Expanded(
                           child: ListView(
+                            shrinkWrap: true,
                               scrollDirection: Axis.horizontal,
                               children: board.columns
                                   .map((column) => SizedBox(
-                                width: Utils.getWidth(context) * 0.7,
-                                      // height: 500.0,
+                                      width: Utils.getWidth(context) * 0.7,
                                       child: buildBoardColumn(column, context)))
                                   .toList()))
                     ],
-                  ))
+                  )))
               .toList()),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kanbored/models/column_model.dart';
 import 'package:kanbored/models/task_model.dart';
@@ -11,22 +12,17 @@ Widget buildBoardColumn(ColumnModel column, BuildContext context) {
       clipBehavior: Clip.hardEdge,
       child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                Text(column.title) as Widget,
-                SizedBox(
-                    height: Utils.getHeight(context) * 0.7,
-                    child: ListView(
-                      // shrinkWrap: true,
-                        scrollDirection: Axis.vertical,
-                        children: column.tasks
-                            .map((column) => SizedBox(
-                                width: Utils.getWidth(context) * 0.7,
-                                // height: 500.0,
-                                child: buildBoardTask(column, context)))
-                            .toList()))
-              ])));
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(column.title) as Widget,
+            Expanded(
+                child: ListView(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    children: column.tasks
+                        .map((column) =>
+                            SizedBox(child: buildBoardTask(column, context)))
+                        .toList()))
+          ])));
 }
 
 Widget buildBoardTask(TaskModel task, BuildContext context) {
