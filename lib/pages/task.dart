@@ -45,64 +45,53 @@ class _TaskState extends State<Task> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(taskModel.title),
-          backgroundColor: context.theme.appColors.primary,
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(Icons.arrow_back),
-          ),
+      appBar: AppBar(
+        title: Text(taskModel.title),
+        backgroundColor: context.theme.appColors.primary,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back),
         ),
-        body: Column(children: [
-          Expanded(
-            child: Column(children: [
-              Markdown(data: taskModel.description, shrinkWrap: true),
-              Expanded(
-                  // Subtasks
-                  flex: 0,
-                  child: ListView(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.vertical,
-                      children: subtasks
-                          .map((subtask) => Row(children: [
-                                Checkbox(
-                                  checkColor:
-                                      Colors.white, // TODO: themed color!
-                                  fillColor: MaterialStateProperty.resolveWith(
-                                      (states) {
-                                    if (states
-                                        .contains(MaterialState.selected)) {
-                                      return context.theme.appColors.primary;
-                                    }
-                                    return Colors.transparent;
-                                  }),
-                                  value: subtask.status ==
-                                      SubtaskModel.kStatusFinished,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      subtask.status = value!
-                                          ? SubtaskModel.kStatusFinished
-                                          : SubtaskModel.kStatusTodo;
-                                    });
-                                  },
-                                ),
-                                Expanded(child: Text(subtask.title))
-                              ]))
-                          .toList())),
-              Expanded(
-                  // Comments
-                  // flex: 0,
-                  child: ListView(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.vertical,
-                      children: comments
-                          .map((comment) =>
-                              SizedBox(child: Text(comment.comment)))
-                          .toList()))
-            ]),
-          )
-        ]));
+      ),
+      body: Column(children: [
+        Expanded(
+            child: ListView(
+                shrinkWrap: true,
+                scrollDirection: Axis.vertical,
+                children: <Widget>[
+                      Markdown(data: taskModel.description, shrinkWrap: true)
+                    ] +
+                    subtasks
+                        .map((subtask) => Row(children: [
+                              Checkbox(
+                                checkColor: Colors.white, // TODO: themed color!
+                                fillColor:
+                                    MaterialStateProperty.resolveWith((states) {
+                                  if (states.contains(MaterialState.selected)) {
+                                    return context.theme.appColors.primary;
+                                  }
+                                  return Colors.transparent;
+                                }),
+                                value: subtask.status ==
+                                    SubtaskModel.kStatusFinished,
+                                onChanged: (value) {
+                                  setState(() {
+                                    subtask.status = value!
+                                        ? SubtaskModel.kStatusFinished
+                                        : SubtaskModel.kStatusTodo;
+                                  });
+                                },
+                              ),
+                              Expanded(child: Text(subtask.title))
+                            ]))
+                        .toList() +
+                    comments
+                        .map((comment) => SizedBox(child: Text(comment.comment)))
+                        .toList()
+            )),
+      ]),
+    );
   }
 }
