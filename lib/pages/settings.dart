@@ -1,20 +1,19 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:kanbored/app_text_style.dart';
+import 'package:kanbored/ui/app_text_style.dart';
+import 'package:kanbored/ui/app_theme.dart';
 import 'package:kanbored/utils.dart';
 import 'package:provider/provider.dart';
 import 'package:kanbored/app_data.dart';
-import 'package:kanbored/app_theme.dart';
 import 'package:kanbored/constants.dart';
 
-class SettingsUi extends StatefulWidget {
-  const SettingsUi({super.key});
+class Settings extends StatefulWidget {
+  const Settings({super.key});
 
   @override
-  State<StatefulWidget> createState() => SettingsUiState();
+  State<StatefulWidget> createState() => _SettingsState();
 }
 
-class SettingsUiState extends State<SettingsUi> {
+class _SettingsState extends State<Settings> {
   var theme = AppTheme.strToThemeMode(AppData.theme);
   var apiUsername = AppData.getString(prefApiPassword, "");
   var apiToken = AppData.getString(prefApiPassword, "");
@@ -28,7 +27,6 @@ class SettingsUiState extends State<SettingsUi> {
         backgroundColor: context.theme.appColors.primary,
         leading: IconButton(
           onPressed: () {
-            print("POP BACK Button");
             Navigator.pop(context);
           },
           icon: const Icon(Icons.arrow_back),
@@ -36,9 +34,9 @@ class SettingsUiState extends State<SettingsUi> {
       ),
       body: Column(
         children: [
-          buildSettingOption(context, "Theme", AppTheme.themeModeToStr(theme),
+          _buildSettingOption(context, "Theme", AppTheme.themeModeToStr(theme),
               _showThemeOptions),
-          buildSettingOption(
+          _buildSettingOption(
               context,
               "API Token",
               apiToken,
@@ -48,7 +46,7 @@ class SettingsUiState extends State<SettingsUi> {
                       apiToken = token;
                     });
                   })),
-          buildSettingOption(
+          _buildSettingOption(
               context,
               "API Endpoint",
               apiEndpoint,
@@ -59,7 +57,7 @@ class SettingsUiState extends State<SettingsUi> {
                       apiEndpoint = endpoint;
                     });
                   })),
-          buildSettingOption(
+          _buildSettingOption(
               context,
               "Logout",
               "",
@@ -135,7 +133,7 @@ class SettingsUiState extends State<SettingsUi> {
     }
   }
 
-  InkWell buildSettingOption(
+  InkWell _buildSettingOption(
       BuildContext context, String title, String value, Function() onTap) {
     return InkWell(
       onTap: onTap,

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:kanbored/app_data.dart';
 import 'package:kanbored/constants.dart';
+import 'package:kanbored/pages/board.dart';
 import 'package:kanbored/pages/home.dart';
 import 'package:kanbored/pages/login.dart';
 import 'package:kanbored/pages/settings.dart';
+import 'package:kanbored/ui/app_theme.dart';
 import 'package:provider/provider.dart';
-import 'app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,8 +32,9 @@ class App extends StatelessWidget {
         initialRoute: authenticated ? 'home' : 'login',
         routes: {
           routeHome: (BuildContext context) => const Home(title: 'Kanbored'),
-          routeLogin: (BuildContext context) => Login(),
-          routeSettings: (BuildContext context) => const SettingsUi(),
+          routeLogin: (BuildContext context) => const Login(),
+          routeBoard: (BuildContext context) => const Board(),
+          routeSettings: (BuildContext context) => const Settings(),
         },
       ),
     );

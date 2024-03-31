@@ -9,3 +9,4 @@ const prefApiAuth = "api_auth";
 const routeHome = "home";
 const routeSettings = "settings";
 const routeLogin = "login";
+const routeBoard = "board";

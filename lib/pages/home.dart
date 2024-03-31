@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kanbored/api/api.dart';
-import 'package:kanbored/app_theme.dart';
 import 'package:kanbored/constants.dart';
 import 'package:kanbored/models/project_model.dart';
+import 'package:kanbored/ui/app_theme.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key, required this.title});
@@ -56,7 +56,13 @@ class _HomeState extends State<Home> {
                   child: InkWell(
                       splashColor:
                           context.theme.appColors.primary.withAlpha(30),
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          routeBoard,
+                          arguments: project,
+                        );
+                      },
                       child: SizedBox(
                         child: Center(child: Text(project.name)),
                       )),

@@ -43,8 +43,50 @@ class TaskModel implements Model {
     required this.recurrenceParent,
     required this.recurrenceChild,
     required this.priority,
-    required this.url,
+    required this.nbComments,
+    required this.nbFiles,
+    required this.nbLinks,
+    required this.nbExternalLinks,
+    required this.nbSubtasks,
+    required this.nbCompletedSubtasks,
   });
+
+  int id;
+  String title;
+  String description;
+  int dateCreation;
+  String colorId;
+  int projectId;
+  int columnId;
+  int ownerId;
+  int position;
+  int isActive;
+  int? dateCompleted;
+  int? score;
+  int? dateDue;
+  int categoryId;
+  int creatorId;
+  int? dateModification;
+  String? reference;
+  int? dateStarted;
+  int timeSpent;
+  int timeEstimated;
+  int swimlaneId;
+  int dateMoved;
+  int recurrenceStatus;
+  int recurrenceTrigger;
+  int recurrenceFactor;
+  int recurrenceTimeframe;
+  int recurrenceBasedate;
+  int? recurrenceParent;
+  int? recurrenceChild;
+  int priority;
+  int nbComments;
+  int nbFiles;
+  int nbLinks;
+  int nbExternalLinks;
+  int nbSubtasks;
+  int nbCompletedSubtasks;
 
   Map<String, Color> taskColors = {
     "yellow": Colors.yellow.shade600,
@@ -101,38 +143,6 @@ class TaskModel implements Model {
     Colors.amber,
   ];
 
-  String id;
-  String title;
-  String description;
-  String dateCreation;
-  String colorId;
-  String projectId;
-  String columnId;
-  String ownerId;
-  String position;
-  String isActive;
-  String dateCompleted;
-  String score;
-  String dateDue;
-  String categoryId;
-  String creatorId;
-  String dateModification;
-  String reference;
-  String dateStarted;
-  String timeSpent;
-  String timeEstimated;
-  String swimlaneId;
-  String dateMoved;
-  String recurrenceStatus;
-  String recurrenceTrigger;
-  String recurrenceFactor;
-  String recurrenceTimeframe;
-  String recurrenceBasedate;
-  String recurrenceParent;
-  String recurrenceChild;
-  String priority;
-  String url;
-
   Color getTaskColor(String colorName) {
     return taskColors[colorName] ?? Colors.blue;
   }
@@ -176,7 +186,12 @@ class TaskModel implements Model {
         recurrenceParent: json["recurrence_parent"],
         recurrenceChild: json["recurrence_child"],
         priority: json["priority"],
-        url: json["url"],
+        nbComments: json["nb_comments"],
+        nbFiles: json["nb_files"],
+        nbLinks: json["nb_links"],
+        nbExternalLinks: json["nb_external_links"],
+        nbSubtasks: json["nb_subtasks"],
+        nbCompletedSubtasks: json["nb_completed_subtasks"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -210,6 +225,11 @@ class TaskModel implements Model {
         "recurrence_parent": recurrenceParent,
         "recurrence_child": recurrenceChild,
         "priority": priority,
-        "url": url,
+        "nb_comments": nbComments,
+        "nb_files": nbFiles,
+        "nb_links": nbLinks,
+        "nb_external_links": nbExternalLinks,
+        "nb_subtasks": nbSubtasks,
+        "nb_completed_subtasks": nbCompletedSubtasks,
       };
 }

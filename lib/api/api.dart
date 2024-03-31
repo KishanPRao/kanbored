@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:kanbored/app_data.dart';
+import 'package:kanbored/models/board_model.dart';
 import 'package:kanbored/models/model.dart';
 import 'package:kanbored/models/project_model.dart';
+import 'dart:developer';
 
 class Api {
   static Future<bool> login(
@@ -72,12 +74,18 @@ class Api {
   static Future<List<ProjectModel>> getmyProjects() async =>
       baseApi("getmyProjects", 2134420212, ProjectModel.fromJson);
 
-  static Future<List<T>> baseApi<T extends Model>(String method, int id,
-      T Function(Map<String, dynamic>) constructor) async {
+  static Future<List<BoardModel>> getBoard(int projectId) async =>
+      baseApi("getBoard", 827046470, BoardModel.fromJson,
+          params: {"project_id": projectId});
+
+  static Future<List<T>> baseApi<T extends Model>(
+      String method, int id, T Function(Map<String, dynamic>) constructor,
+      {Map<String, Object> params = const {}}) async {
     final Map<String, dynamic> parameters = {
       "jsonrpc": "2.0",
       "method": method,
-      "id": id
+      "id": id,
+      "params": params
     };
     final credentials = "${AppData.username}:${AppData.password}";
     Codec<String, String> stringToBase64 = utf8.fuse(base64);
@@ -90,7 +98,7 @@ class Api {
     );
 
     final decodedData = json.decode(utf8.decode(resp.bodyBytes));
-    print("decodedData: ${decodedData}");
+    // log("decodedData: ${decodedData}");
 
     if (decodedData['error'] != null) return Future.error(decodedData['error']);
     final List<dynamic> results = decodedData['result'];

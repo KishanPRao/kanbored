@@ -2,15 +2,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/app_data.dart';
-import 'package:kanbored/app_theme.dart';
 import 'package:kanbored/constants.dart';
+import 'package:kanbored/ui/app_theme.dart';
 
 class Login extends StatefulWidget {
+  const Login({super.key});
+
   @override
-  State<StatefulWidget> createState() => LoginState();
+  State<StatefulWidget> createState() => _LoginState();
 }
 
-class LoginState extends State<Login> {
+class _LoginState extends State<Login> {
   String url = AppData.url;
   String username = AppData.username;
   String password = AppData.password;
@@ -57,14 +59,12 @@ class LoginState extends State<Login> {
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    showLoaderDialog(context);
+                    _showLoaderDialog(context);
                     Api.login(url, username, password).then((value) {
                       Navigator.pop(context); // dialog
                       setState(() {
-                        Navigator.pop(context);
+                        Navigator.pop(context); // login
                         Navigator.pushNamed(context, routeHome);
-                        // Navigator.pushNamedAndRemoveUntil(
-                        //     context, routeHome, (route) => false);
                       });
                     }).onError((e, st) {
                       Navigator.pop(context); // dialog
@@ -103,7 +103,7 @@ class LoginState extends State<Login> {
     );
   }
 
-  showLoaderDialog(BuildContext context) {
+  _showLoaderDialog(BuildContext context) {
     AlertDialog alert = AlertDialog(
       content: Row(
         children: [
@@ -115,8 +115,7 @@ class LoginState extends State<Login> {
       ),
     );
     showDialog(
-      // TODO: undo
-      barrierDismissible: true,
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
         return alert;
