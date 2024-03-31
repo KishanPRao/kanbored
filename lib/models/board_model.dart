@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final BoardModel = BoardModelFromJson(jsonString);
-
 import 'dart:convert';
 import 'package:kanbored/models/column_model.dart';
 import 'package:kanbored/models/model.dart';

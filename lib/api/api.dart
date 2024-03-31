@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:kanbored/app_data.dart';
 import 'package:kanbored/models/board_model.dart';
+import 'package:kanbored/models/comment_model.dart';
 import 'package:kanbored/models/model.dart';
 import 'package:kanbored/models/project_model.dart';
 import 'dart:developer';
@@ -84,9 +85,9 @@ class Api {
       baseApi("getAllSubtasks", 2087700490, SubtaskModel.fromJson,
           params: {"task_id": taskId});
 
-  // static Future<List<CommentModel>> getAllComments(int taskId) async =>
-  //     baseApi("getAllComments", 148484683, CommentModel.fromJson,
-  //         params: {"task_id": taskId});
+  static Future<List<CommentModel>> getAllComments(int taskId) async =>
+      baseApi("getAllComments", 148484683, CommentModel.fromJson,
+          params: {"task_id": taskId});
 
   static Future<List<T>> baseApi<T extends Model>(
       String method, int id, T Function(Map<String, dynamic>) constructor,

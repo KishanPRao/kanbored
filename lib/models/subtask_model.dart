@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final SubtaskModel = SubtaskModelFromJson(jsonString);
-
 import 'dart:convert';
 import 'package:kanbored/models/model.dart';
 

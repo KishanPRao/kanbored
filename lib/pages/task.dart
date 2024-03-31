@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:kanbored/api/api.dart';
+import 'package:kanbored/models/comment_model.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/ui/app_theme.dart';
@@ -16,8 +17,8 @@ class Task extends StatefulWidget {
 
 class _TaskState extends State<Task> {
   late TaskModel taskModel;
-
   List<SubtaskModel> subtasks = [];
+  List<CommentModel> comments = [];
 
   @override
   void didChangeDependencies() {
@@ -34,10 +35,10 @@ class _TaskState extends State<Task> {
       });
     }
     if (taskModel.nbComments > 0) {
-      // var subtasks = await Api.getAllSubtasks(taskModel.id);
-      // setState(() {
-      //   this.subtasks = subtasks;
-      // });
+      var comments = await Api.getAllComments(taskModel.id);
+      setState(() {
+        this.comments = comments;
+      });
     }
   }
 
@@ -58,7 +59,9 @@ class _TaskState extends State<Task> {
           Expanded(
             child: Column(children: [
               Markdown(data: taskModel.description, shrinkWrap: true),
-              Expanded( // Subtasks
+              Expanded(
+                  // Subtasks
+                  flex: 0,
                   child: ListView(
                       shrinkWrap: true,
                       scrollDirection: Axis.vertical,
@@ -85,14 +88,19 @@ class _TaskState extends State<Task> {
                                     });
                                   },
                                 ),
-                                Text(subtask.title)
+                                Expanded(child: Text(subtask.title))
                               ]))
                           .toList())),
-              Expanded( // Comments
+              Expanded(
+                  // Comments
+                  // flex: 0,
                   child: ListView(
                       shrinkWrap: true,
                       scrollDirection: Axis.vertical,
-                      children: []))
+                      children: comments
+                          .map((comment) =>
+                              SizedBox(child: Text(comment.comment)))
+                          .toList()))
             ]),
           )
         ]));
