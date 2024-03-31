@@ -12,7 +12,8 @@ Widget buildBoardColumn(ColumnModel column, BuildContext context) {
       clipBehavior: Clip.hardEdge,
       child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(column.title) as Widget,
             Expanded(
                 child: ListView(
@@ -32,8 +33,8 @@ Widget buildBoardTask(TaskModel task, BuildContext context) {
       child: InkWell(
           splashColor: context.theme.appColors.primary.withAlpha(30),
           onTap: () {},
-          child: SizedBox(
-            height: 60,
-            child: Center(child: Text(task.title)),
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: SizedBox(height: 50, child: Center(child: Text(task.title))),
           )));
 }
