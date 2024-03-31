@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:kanbored/app_data.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'app_colors_extension.dart';
 import 'theme_reader.dart';
 

@@ -6,6 +6,7 @@ import 'package:kanbored/models/project_model.dart';
 import 'dart:developer';
 
 import 'package:kanbored/ui/board_column.dart';
+import 'package:kanbored/utils.dart';
 
 class Board extends StatefulWidget {
   const Board({super.key});
@@ -47,22 +48,26 @@ class _BoardState extends State<Board> {
       ),
       body: Column(
           children: boards
-              .map(
-                (board) => Column(
-                  children: [
-                    // TODO: move each ui element into a function or class?
-                        Card(
-                            clipBehavior: Clip.hardEdge,
-                            child: SizedBox(
-                              child:
-                                  Center(child: Text(board.name)), // swimlane
-                            )) as Widget
-                      ] +
-                      board.columns
-                          .map((column) => buildBoardColumn(column))
-                          .toList(),
-                ),
-              )
+              .map((board) => Column(
+                    children: [
+                      // TODO: move each ui element into a function or class?
+                      Card(
+                          clipBehavior: Clip.hardEdge,
+                          child: SizedBox(
+                            child: Center(child: Text(board.name)), // swimlane
+                          )),
+                      SizedBox(
+                          height: Utils.getHeight(context) * 0.8,
+                          child: ListView(
+                              scrollDirection: Axis.horizontal,
+                              children: board.columns
+                                  .map((column) => SizedBox(
+                                width: Utils.getWidth(context) * 0.7,
+                                      // height: 500.0,
+                                      child: buildBoardColumn(column, context)))
+                                  .toList()))
+                    ],
+                  ))
               .toList()),
     );
   }

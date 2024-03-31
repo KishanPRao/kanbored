@@ -11,7 +11,9 @@ class ThemeReader {
     var jsonString = await rootBundle.loadString(jsonFile);
     var colors = jsonDecode(jsonString)["colors"][0];
     return AppColorsExtension(
-      primary: _parseColor(colors, "primary")
+      primary: _parseColor(colors, "primary"),
+      pageBg: _parseColor(colors, "pageBg"),
+      cardBg: _parseColor(colors, "cardBg"),
     );
   }
 

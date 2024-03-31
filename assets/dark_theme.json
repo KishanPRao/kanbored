@@ -1,6 +1,8 @@
 {
   "colors": [
     {
+      "cardBg": "0xFF263238",
+      "pageBg": "0xFF212121",
       "primary": "0xFF4169e1"
     }
   ]
