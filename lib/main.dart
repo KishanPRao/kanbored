@@ -5,6 +5,7 @@ import 'package:kanbored/pages/board.dart';
 import 'package:kanbored/pages/home.dart';
 import 'package:kanbored/pages/login.dart';
 import 'package:kanbored/pages/settings.dart';
+import 'package:kanbored/pages/task.dart';
 import 'package:kanbored/ui/app_theme.dart';
 import 'package:provider/provider.dart';
 
@@ -35,6 +36,7 @@ class App extends StatelessWidget {
           routeLogin: (BuildContext context) => const Login(),
           routeBoard: (BuildContext context) => const Board(),
           routeSettings: (BuildContext context) => const Settings(),
+          routeTask: (BuildContext context) => const Task(),
         },
       ),
     );

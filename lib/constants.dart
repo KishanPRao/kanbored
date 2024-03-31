@@ -10,3 +10,4 @@ const routeHome = "home";
 const routeSettings = "settings";
 const routeLogin = "login";
 const routeBoard = "board";
+const routeTask = "task";

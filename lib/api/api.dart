@@ -6,6 +6,8 @@ import 'package:kanbored/models/model.dart';
 import 'package:kanbored/models/project_model.dart';
 import 'dart:developer';
 
+import 'package:kanbored/models/subtask_model.dart';
+
 class Api {
   static Future<bool> login(
       String url, String username, String password) async {
@@ -78,6 +80,10 @@ class Api {
       baseApi("getBoard", 827046470, BoardModel.fromJson,
           params: {"project_id": projectId});
 
+  static Future<List<SubtaskModel>> getAllSubtasks(int taskId) async =>
+      baseApi("getAllSubtasks", 2087700490, SubtaskModel.fromJson,
+          params: {"task_id": taskId});
+
   static Future<List<T>> baseApi<T extends Model>(
       String method, int id, T Function(Map<String, dynamic>) constructor,
       {Map<String, Object> params = const {}}) async {
@@ -98,7 +104,7 @@ class Api {
     );
 
     final decodedData = json.decode(utf8.decode(resp.bodyBytes));
-    // log("decodedData: ${decodedData}");
+    log("decodedData: $decodedData");
 
     if (decodedData['error'] != null) return Future.error(decodedData['error']);
     final List<dynamic> results = decodedData['result'];

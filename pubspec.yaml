@@ -14,6 +14,7 @@ dependencies:
   shared_preferences: ^2.2.2
   http:
   flutter_secure_storage:
+  flutter_markdown:
 
 dev_dependencies:
   flutter_test:

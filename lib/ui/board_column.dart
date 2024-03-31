@@ -1,9 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:kanbored/constants.dart';
 import 'package:kanbored/models/column_model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/ui/app_theme.dart';
-import 'package:kanbored/utils.dart';
 
 Widget buildBoardColumn(ColumnModel column, BuildContext context) {
   return Card(
@@ -32,9 +31,38 @@ Widget buildBoardTask(TaskModel task, BuildContext context) {
       clipBehavior: Clip.hardEdge,
       child: InkWell(
           splashColor: context.theme.appColors.primary.withAlpha(30),
-          onTap: () {},
+          onTap: () {
+            Navigator.pushNamed(context, routeTask, arguments: task);
+          },
           child: Padding(
             padding: const EdgeInsets.all(10.0),
-            child: SizedBox(height: 50, child: Center(child: Text(task.title))),
+            child: SizedBox(
+                height: 50,
+                child: Center(
+                    child: Text(
+                  task.title,
+                  textAlign: TextAlign.center,
+                ))),
           )));
+}
+
+Widget buildSubtask(ColumnModel column, BuildContext context) {
+  return Card(
+      color: context.theme.appColors.cardBg,
+      margin: const EdgeInsets.all(10),
+      clipBehavior: Clip.hardEdge,
+      child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child:
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(column.title) as Widget,
+            Expanded(
+                child: ListView(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    children: column.tasks
+                        .map((column) =>
+                        SizedBox(child: buildBoardTask(column, context)))
+                        .toList()))
+          ])));
 }

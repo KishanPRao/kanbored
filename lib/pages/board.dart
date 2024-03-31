@@ -1,11 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/ui/app_theme.dart';
 import 'package:kanbored/models/board_model.dart';
 import 'package:kanbored/models/project_model.dart';
-import 'dart:developer';
-
 import 'package:kanbored/ui/board_column.dart';
 import 'package:kanbored/utils.dart';
 
