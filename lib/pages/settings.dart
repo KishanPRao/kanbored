@@ -38,27 +38,6 @@ class _SettingsState extends State<Settings> {
               _showThemeOptions),
           _buildSettingOption(
               context,
-              "API Token",
-              apiToken,
-              () => _showDialog("API Token", "Enter the API Token", (token) {
-                    AppData.setString(prefApiPassword, token);
-                    setState(() {
-                      apiToken = token;
-                    });
-                  })),
-          _buildSettingOption(
-              context,
-              "API Endpoint",
-              apiEndpoint,
-              () => _showDialog("API Endpoint", "Enter the API Endpoint",
-                      (endpoint) {
-                    AppData.setString(prefApiUrl, endpoint);
-                    setState(() {
-                      apiEndpoint = endpoint;
-                    });
-                  })),
-          _buildSettingOption(
-              context,
               "Logout",
               "",
               () => {

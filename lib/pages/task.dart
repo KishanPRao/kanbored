@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:kanbored/api/api.dart';
@@ -6,7 +5,6 @@ import 'package:kanbored/models/comment_model.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/ui/app_theme.dart';
-import 'package:kanbored/ui/board_column.dart';
 
 class Task extends StatefulWidget {
   const Task({super.key});

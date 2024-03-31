@@ -46,7 +46,8 @@ class _BoardState extends State<Board> {
       ),
       body: Column(
           children: boards
-              .map((board) => Expanded(child: Column(
+              .map((board) => Expanded(
+                      child: Column(
                     children: [
                       // TODO: move each ui element into a function or class?
                       Card(
@@ -54,15 +55,16 @@ class _BoardState extends State<Board> {
                           child: SizedBox(
                             child: Center(child: Text(board.name)), // swimlane
                           )),
+                      // TODO: Keep a setting to enable swimlane info; default disabled; give warning on possible limitations
                       Expanded(
-                          child: ListView(
-                            shrinkWrap: true,
+                          child: ListView.builder(
+                              shrinkWrap: true,
                               scrollDirection: Axis.horizontal,
-                              children: board.columns
-                                  .map((column) => SizedBox(
-                                      width: Utils.getWidth(context) * 0.7,
-                                      child: buildBoardColumn(column, context)))
-                                  .toList()))
+                              itemBuilder: (context, index) => SizedBox(
+                                  width: Utils.getWidth(context) * 0.7,
+                                  child: buildBoardColumn(
+                                      board.columns.elementAt(index),
+                                      context))))
                     ],
                   )))
               .toList()),
