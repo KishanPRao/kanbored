@@ -3,7 +3,6 @@
 //     final SubtaskModel = SubtaskModelFromJson(jsonString);
 
 import 'dart:convert';
-import 'package:kanbored/models/column_model.dart';
 import 'package:kanbored/models/model.dart';
 
 SubtaskModel subtaskModelFromJson(String str) =>
@@ -12,63 +11,69 @@ SubtaskModel subtaskModelFromJson(String str) =>
 String subtaskModelToJson(SubtaskModel data) => json.encode(data.toJson());
 
 class SubtaskModel implements Model {
+  static const kStatusTodo = 0;
+  static const kStatusInProgress = 1;
+  static const kStatusFinished = 2;
+
   SubtaskModel({
     required this.id,
-    required this.name,
+    required this.title,
+    required this.status,
+    required this.timeEstimated,
+    required this.timeSpent,
+    required this.taskId,
+    required this.userId,
     required this.position,
-    required this.isActive,
-    required this.projectId,
-    required this.description,
-    required this.taskLimit,
-    required this.columns,
-    required this.nbSwimlanes,
-    required this.nbColumns,
-    required this.nbTasks,
-    required this.score,
+    required this.username,
+    required this.name,
+    required this.timerStartDate,
+    required this.statusName,
+    required this.isTimerStarted,
   });
 
   int id;
-  String name;
+  String title;
+  int status;
+  int timeEstimated;
+  int timeSpent;
+  int taskId;
+  int userId;
   int position;
-  int isActive;
-  int projectId;
-  String description;
-  int taskLimit;
-  List<ColumnModel> columns;
-  int nbSwimlanes;
-  int nbColumns;
-  int nbTasks;
-  int score;
+  String? username;
+  String? name;
+  int timerStartDate;
+  String statusName;
+  bool isTimerStarted;
 
   factory SubtaskModel.fromJson(Map<String, dynamic> json) => SubtaskModel(
-    id: json["id"],
-    name: json["name"],
-    position: json["position"],
-    isActive: json["is_active"],
-    projectId: json["project_id"],
-    description: json["description"],
-    taskLimit: json["task_limit"],
-    columns: (json["columns"] as List<dynamic>)
-        .map((e) => ColumnModel.fromJson(e))
-        .toList(),
-    nbSwimlanes: json["nb_swimlanes"],
-    nbColumns: json["nb_columns"],
-    nbTasks: json["nb_tasks"],
-    score: json["score"],
-  );
+        id: json["id"],
+        title: json["title"],
+        status: json["status"],
+        timeEstimated: json["time_estimated"],
+        timeSpent: json["time_spent"],
+        taskId: json["task_id"],
+        userId: json["user_id"],
+        position: json["position"],
+        username: json["username"],
+        name: json["name"],
+        timerStartDate: json["timer_start_date"],
+        statusName: json["status_name"],
+        isTimerStarted: json["is_timer_started"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "name": name,
-    "position": position,
-    "isActive": isActive,
-    "project_id": projectId,
-    "description": description,
-    "task_limit": taskLimit,
-    "columns": columns.map((e) => e.toJson()),
-    "nb_swimlanes": nbSwimlanes,
-    "nb_columns": nbColumns,
-    "nb_tasks": nbTasks,
-    "score": score,
-  };
+        "id": id,
+        "title": title,
+        "status": status,
+        "time_estimated": timeEstimated,
+        "time_spent": timeSpent,
+        "task_id": taskId,
+        "user_id": userId,
+        "position": position,
+        "username": username,
+        "name": name,
+        "timer_start_date": timerStartDate,
+        "status_name": statusName,
+        "is_timer_started": isTimerStarted,
+      };
 }

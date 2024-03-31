@@ -1,9 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/ui/app_theme.dart';
+import 'package:kanbored/ui/board_column.dart';
 
 class Task extends StatefulWidget {
   const Task({super.key});
@@ -25,10 +27,18 @@ class _TaskState extends State<Task> {
   }
 
   void init() async {
-    var subtasks = await Api.getAllSubtasks(taskModel.id);
-    setState(() {
-      this.subtasks = subtasks;
-    });
+    if (taskModel.nbSubtasks > 0) {
+      var subtasks = await Api.getAllSubtasks(taskModel.id);
+      setState(() {
+        this.subtasks = subtasks;
+      });
+    }
+    if (taskModel.nbComments > 0) {
+      // var subtasks = await Api.getAllSubtasks(taskModel.id);
+      // setState(() {
+      //   this.subtasks = subtasks;
+      // });
+    }
   }
 
   @override
@@ -46,30 +56,44 @@ class _TaskState extends State<Task> {
         ),
         body: Column(children: [
           Expanded(
-            child: Markdown(data: taskModel.description)
-            // TextField(
-            //     controller: TextEditingController()
-            //       ..text = taskModel.description,
-            //     maxLines: null,
-            //     keyboardType: TextInputType.multiline,
-            //     decoration: const InputDecoration(hintText: "Description"),
-            //     enabled: false)
-            ,
-            //     children: taskModel.sub
-            //         .map((Task) => Expanded(child: Column(
-            //               children: [
-            //                 Expanded(
-            //                     child: ListView(
-            //                       shrinkWrap: true,
-            //                         scrollDirection: Axis.horizontal,
-            //                         children: task
-            //                             .map((column) => SizedBox(
-            //                                 width: Utils.getWidth(context) * 0.7,
-            //                                 child: buildSubtask(column, context)))
-            //                             .toList()))
-            //               ],
-            //             )))
-            //         .toList()),
+            child: Column(children: [
+              Markdown(data: taskModel.description, shrinkWrap: true),
+              Expanded( // Subtasks
+                  child: ListView(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.vertical,
+                      children: subtasks
+                          .map((subtask) => Row(children: [
+                                Checkbox(
+                                  checkColor:
+                                      Colors.white, // TODO: themed color!
+                                  fillColor: MaterialStateProperty.resolveWith(
+                                      (states) {
+                                    if (states
+                                        .contains(MaterialState.selected)) {
+                                      return context.theme.appColors.primary;
+                                    }
+                                    return Colors.transparent;
+                                  }),
+                                  value: subtask.status ==
+                                      SubtaskModel.kStatusFinished,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      subtask.status = value!
+                                          ? SubtaskModel.kStatusFinished
+                                          : SubtaskModel.kStatusTodo;
+                                    });
+                                  },
+                                ),
+                                Text(subtask.title)
+                              ]))
+                          .toList())),
+              Expanded( // Comments
+                  child: ListView(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.vertical,
+                      children: []))
+            ]),
           )
         ]));
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kanbored/constants.dart';
 import 'package:kanbored/models/column_model.dart';
+import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/ui/app_theme.dart';
 
@@ -46,23 +47,15 @@ Widget buildBoardTask(TaskModel task, BuildContext context) {
           )));
 }
 
-Widget buildSubtask(ColumnModel column, BuildContext context) {
-  return Card(
-      color: context.theme.appColors.cardBg,
-      margin: const EdgeInsets.all(10),
-      clipBehavior: Clip.hardEdge,
-      child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child:
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(column.title) as Widget,
-            Expanded(
-                child: ListView(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.vertical,
-                    children: column.tasks
-                        .map((column) =>
-                        SizedBox(child: buildBoardTask(column, context)))
-                        .toList()))
-          ])));
+Widget buildSubtask(SubtaskModel subtask, BuildContext context) {
+  bool isChecked = false;
+  return Row(children: [
+    Checkbox(
+      value: isChecked,
+      onChanged: (value) {
+        isChecked = value!;
+      },
+    ),
+    Text(subtask.title)
+  ]);
 }

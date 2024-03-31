@@ -84,6 +84,10 @@ class Api {
       baseApi("getAllSubtasks", 2087700490, SubtaskModel.fromJson,
           params: {"task_id": taskId});
 
+  // static Future<List<CommentModel>> getAllComments(int taskId) async =>
+  //     baseApi("getAllComments", 148484683, CommentModel.fromJson,
+  //         params: {"task_id": taskId});
+
   static Future<List<T>> baseApi<T extends Model>(
       String method, int id, T Function(Map<String, dynamic>) constructor,
       {Map<String, Object> params = const {}}) async {
@@ -104,7 +108,7 @@ class Api {
     );
 
     final decodedData = json.decode(utf8.decode(resp.bodyBytes));
-    log("decodedData: $decodedData");
+    // log("decodedData: $decodedData");
 
     if (decodedData['error'] != null) return Future.error(decodedData['error']);
     final List<dynamic> results = decodedData['result'];
