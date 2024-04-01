@@ -34,7 +34,7 @@ class SubtaskModel implements Model {
   int timeSpent;
   int taskId;
   int userId;
-  int position;
+  int position; // TODO: use position info! Needed while reading or default sorted
   String? username;
   String? name;
   int timerStartDate;

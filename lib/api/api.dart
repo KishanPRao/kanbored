@@ -8,6 +8,7 @@ import 'package:kanbored/models/project_model.dart';
 import 'dart:developer';
 
 import 'package:kanbored/models/subtask_model.dart';
+import 'package:kanbored/models/task_metadata_model.dart';
 
 class Api {
   static Future<bool> login(
@@ -48,7 +49,7 @@ class Api {
     } on FormatException catch (_) {
       Map<String, String> error = {
         'message':
-            'Unknown Error! Please, try again or contact your administrator'
+            'Could not decode data! Please, try again or contact your administrator'
       };
       return Future.error(error);
     }
@@ -75,21 +76,45 @@ class Api {
   // static Future getMyDashboard() async => baseApi("getMyDashboard", 447898718);
   // static Future getMyProjectsList() async => baseApi("getMyProjectsList", 987834805);
   static Future<List<ProjectModel>> getmyProjects() async =>
-      baseApi("getmyProjects", 2134420212, ProjectModel.fromJson);
+      listApi("getmyProjects", 2134420212, ProjectModel.fromJson);
 
   static Future<List<BoardModel>> getBoard(int projectId) async =>
-      baseApi("getBoard", 827046470, BoardModel.fromJson,
+      listApi("getBoard", 827046470, BoardModel.fromJson,
           params: {"project_id": projectId});
 
   static Future<List<SubtaskModel>> getAllSubtasks(int taskId) async =>
-      baseApi("getAllSubtasks", 2087700490, SubtaskModel.fromJson,
+      listApi("getAllSubtasks", 2087700490, SubtaskModel.fromJson,
           params: {"task_id": taskId});
 
   static Future<List<CommentModel>> getAllComments(int taskId) async =>
-      baseApi("getAllComments", 148484683, CommentModel.fromJson,
+      listApi("getAllComments", 148484683, CommentModel.fromJson,
           params: {"task_id": taskId});
 
-  static Future<List<T>> baseApi<T extends Model>(
+  // TODO: Use for mutliple checklist, shopping list
+  static Future<TaskMetadataModel> getTaskMetadata(int taskId) async =>
+      singleApi("getTaskMetadata", 133280317, TaskMetadataModel.fromJson,
+          params: {"task_id": taskId});
+
+  static Future<T> singleApi<T extends Model>(
+      String method, int id, T Function(Map<String, dynamic>) constructor,
+      {Map<String, Object> params = const {}}) async {
+    final dynamic result = await baseApi(method, id, constructor, params: params) as Map<String, dynamic>;
+    return constructor(result);
+  }
+
+  static Future<List<T>> listApi<T extends Model>(
+      String method, int id, T Function(Map<String, dynamic>) constructor,
+      {Map<String, Object> params = const {}}) async {
+    final results = await baseApi(method, id, constructor, params: params) as List<dynamic>;
+    final List<T> models = [];
+    for (var data in results) {
+      final model = constructor(data);
+      models.add(model);
+    }
+    return models;
+  }
+
+  static dynamic baseApi<T extends Model>(
       String method, int id, T Function(Map<String, dynamic>) constructor,
       {Map<String, Object> params = const {}}) async {
     final Map<String, dynamic> parameters = {
@@ -112,12 +137,6 @@ class Api {
     // log("decodedData: $decodedData");
 
     if (decodedData['error'] != null) return Future.error(decodedData['error']);
-    final List<dynamic> results = decodedData['result'];
-    final List<T> models = [];
-    for (var data in results) {
-      final model = constructor(data);
-      models.add(model);
-    }
-    return models;
+    return decodedData['result'];
   }
 }

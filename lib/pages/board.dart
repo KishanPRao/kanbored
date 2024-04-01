@@ -55,7 +55,7 @@ class _BoardState extends State<Board> {
                           child: SizedBox(
                             child: Center(child: Text(board.name)), // swimlane
                           )),
-                      // TODO: Keep a setting to enable swimlane info; default disabled; give warning on possible limitations
+                      // TODO: Keep a setting to enable swimlane info; default disabled; give warning on possible limitations; or keep it simple, avoid using it.
                       Expanded(
                           child: ListView.builder(
                               shrinkWrap: true,

@@ -3,8 +3,11 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/models/comment_model.dart';
 import 'package:kanbored/models/subtask_model.dart';
+import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/ui/app_theme.dart';
+import 'package:kanbored/ui/multi_list_subtasks.dart';
+import 'package:kanbored/ui/single_list_subtasks.dart';
 
 class Task extends StatefulWidget {
   const Task({super.key});
@@ -16,6 +19,7 @@ class Task extends StatefulWidget {
 class _TaskState extends State<Task> {
   late TaskModel taskModel;
   List<SubtaskModel> subtasks = [];
+  TaskMetadataModel? taskMetadata;
   List<CommentModel> comments = [];
 
   @override
@@ -28,8 +32,10 @@ class _TaskState extends State<Task> {
   void init() async {
     if (taskModel.nbSubtasks > 0) {
       var subtasks = await Api.getAllSubtasks(taskModel.id);
+      var taskMetadata = await Api.getTaskMetadata(taskModel.id);
       setState(() {
         this.subtasks = subtasks;
+        this.taskMetadata = taskMetadata;
       });
     }
     if (taskModel.nbComments > 0) {
@@ -42,6 +48,13 @@ class _TaskState extends State<Task> {
 
   @override
   Widget build(BuildContext context) {
+    toggleStatus(subtask, value) {
+      setState(() {
+        subtask.status =
+            value ? SubtaskModel.kStatusFinished : SubtaskModel.kStatusTodo;
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(taskModel.title),
@@ -61,34 +74,12 @@ class _TaskState extends State<Task> {
                 children: <Widget>[
                       Markdown(data: taskModel.description, shrinkWrap: true)
                     ] +
-                    subtasks
-                        .map((subtask) => Row(children: [
-                              Checkbox(
-                                checkColor: Colors.white, // TODO: themed color!
-                                fillColor:
-                                    MaterialStateProperty.resolveWith((states) {
-                                  if (states.contains(MaterialState.selected)) {
-                                    return context.theme.appColors.primary;
-                                  }
-                                  return Colors.transparent;
-                                }),
-                                value: subtask.status ==
-                                    SubtaskModel.kStatusFinished,
-                                onChanged: (value) {
-                                  setState(() {
-                                    subtask.status = value!
-                                        ? SubtaskModel.kStatusFinished
-                                        : SubtaskModel.kStatusTodo;
-                                  });
-                                },
-                              ),
-                              Expanded(child: Text(subtask.title))
-                            ]))
-                        .toList() +
+                    buildSubtasks(
+                        context, subtasks, taskMetadata, toggleStatus) +
                     comments
-                        .map((comment) => SizedBox(child: Text(comment.comment)))
-                        .toList()
-            )),
+                        .map(
+                            (comment) => SizedBox(child: Text(comment.comment)))
+                        .toList())),
       ]),
     );
   }
