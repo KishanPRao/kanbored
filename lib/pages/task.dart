@@ -6,8 +6,7 @@ import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/ui/app_theme.dart';
-import 'package:kanbored/ui/multi_list_subtasks.dart';
-import 'package:kanbored/ui/single_list_subtasks.dart';
+import 'package:kanbored/ui/build_subtasks.dart';
 
 class Task extends StatefulWidget {
   const Task({super.key});
@@ -72,13 +71,26 @@ class _TaskState extends State<Task> {
                 shrinkWrap: true,
                 scrollDirection: Axis.vertical,
                 children: <Widget>[
-                      Markdown(data: taskModel.description, shrinkWrap: true)
+                      Container(
+                        margin: const EdgeInsets.all(5),
+                        color: context.theme.appColors.descBg,
+                        child: Markdown(
+                            data: taskModel.description,
+                            shrinkWrap: true,
+                            styleSheet: MarkdownStyleSheet(
+                              p: const TextStyle(fontSize: 15),
+                            )),
+                      )
                     ] +
                     buildSubtasks(
                         context, subtasks, taskMetadata, toggleStatus) +
                     comments
-                        .map(
-                            (comment) => SizedBox(child: Text(comment.comment)))
+                        .map((comment) => Markdown(
+                            data: comment.comment,
+                            shrinkWrap: true,
+                            styleSheet: MarkdownStyleSheet(
+                              p: const TextStyle(fontSize: 15),
+                            )))
                         .toList())),
       ]),
     );

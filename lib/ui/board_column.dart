@@ -42,7 +42,7 @@ Widget buildBoardTask(TaskModel task, BuildContext context) {
                 child: Center(
                     child: Text(
                   task.title,
-                  textAlign: TextAlign.center,
+                  textAlign: TextAlign.center, // horizontal
                 ))),
           )));
 }

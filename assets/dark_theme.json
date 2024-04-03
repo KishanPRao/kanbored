@@ -3,6 +3,7 @@
     {
       "cardBg": "0xFF263238",
       "pageBg": "0xFF212121",
+      "descBg": "0xFF2B2A2E",
       "primary": "0xFF4169e1"
     }
   ]
