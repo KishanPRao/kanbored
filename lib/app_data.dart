@@ -64,17 +64,17 @@ class AppData {
 
   static String get url => getString(prefApiUrl, "");
 
-  static set endpoint(String value) => setString(prefApiEndpoint, value);
+  static set userId(String value) => setString(prefApiUserid, value);
 
-  static String get endpoint => getString(prefApiEndpoint, "");
+  static String get userId => getString(prefApiUserid, "");
 
-  static set userId(int value) => setInt(prefApiUserid, value);
+  static set token(String value) => setString(prefApiToken, value);
 
-  static int get userId => getInt(prefApiUserid, 0);
+  static String get token => getString(prefApiToken, "");
 
-  static set appRole(String value) => setString(prefApiRole, value);
+  static set tokenExpires(String value) => setString(prefApiTokenExpires, value);
 
-  static String get appRole => getString(prefApiRole, "");
+  static String get tokenExpires => getString(prefApiTokenExpires, "");
 
   static set authenticated(bool value) => setBool(prefApiAuth, value);
 

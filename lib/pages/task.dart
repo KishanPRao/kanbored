@@ -29,20 +29,20 @@ class _TaskState extends State<Task> {
   }
 
   void init() async {
-    if (taskModel.nbSubtasks > 0) {
-      var subtasks = await Api.getAllSubtasks(taskModel.id);
-      var taskMetadata = await Api.getTaskMetadata(taskModel.id);
-      setState(() {
-        this.subtasks = subtasks;
-        this.taskMetadata = taskMetadata;
-      });
-    }
-    if (taskModel.nbComments > 0) {
-      var comments = await Api.getAllComments(taskModel.id);
-      setState(() {
-        this.comments = comments;
-      });
-    }
+    // if (taskModel.nbSubtasks > 0) {
+    //   var subtasks = await Api.getAllSubtasks(taskModel.id);
+    //   var taskMetadata = await Api.getTaskMetadata(taskModel.id);
+    //   setState(() {
+    //     this.subtasks = subtasks;
+    //     this.taskMetadata = taskMetadata;
+    //   });
+    // }
+    // if (taskModel.nbComments > 0) {
+    //   var comments = await Api.getAllComments(taskModel.id);
+    //   setState(() {
+    //     this.comments = comments;
+    //   });
+    // }
   }
 
   @override

@@ -23,7 +23,7 @@ class _HomeState extends State<Home> {
   }
 
   void init() async {
-    var projects = await Api.getmyProjects();
+    var projects = await Api.getAllBoards();
     setState(() {
       this.projects = projects;
     });

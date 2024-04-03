@@ -13,34 +13,23 @@ import 'package:kanbored/models/task_metadata_model.dart';
 class Api {
   static Future<bool> login(
       String url, String username, String password) async {
-    String endpoint = url;
-    int searchResult = url.indexOf('/jsonrpc.php');
-    if (searchResult < 0) {
-      endpoint += '/jsonrpc.php';
-    }
-    bool? validURL = Uri.tryParse(endpoint)?.isAbsolute;
-    if (validURL == null || !validURL) {
+    final resp = await http.post(
+      Uri.parse("$url/users/login"),
+      headers: {"Content-Type": "application/json"},
+      body: json.encode({
+        'username': username,
+        'password': password,
+      }),
+      encoding: Encoding.getByName("utf-8"),
+    );
+    log("Resp: ${resp.body}, ${resp.headers}");
+    if (resp.statusCode != 200) {
       Map<String, String> error = {
         'message':
-            'We could not reach your Kanboard Endpoint. Please, check your Endpoint URL and try again!'
+            'Unknown Error! Please, check your credentials and access permission! Status: ${resp.statusCode}'
       };
       return Future.error(error);
     }
-
-    final Map<String, dynamic> parameters = {
-      "jsonrpc": "2.0",
-      "method": "getMe",
-      "id": 2134420212
-    };
-    final credentials = "$username:$password";
-    Codec<String, String> stringToBase64 = utf8.fuse(base64);
-    String encoded = stringToBase64.encode(credentials);
-    final resp = await http.post(
-      Uri.parse(endpoint),
-      headers: <String, String>{"Authorization": "Basic $encoded"},
-      body: json.encode(parameters),
-      encoding: Encoding.getByName("utf-8"),
-    );
 
     dynamic decodedData;
     try {
@@ -53,21 +42,12 @@ class Api {
       };
       return Future.error(error);
     }
-    if (decodedData == null) {
-      Map<String, String> error = {
-        'message':
-            'Unknown Error! Please, check your credentials and access permission!'
-      };
-      return Future.error(error);
-    }
-    if (decodedData['error'] != null) return Future.error(decodedData['error']);
-    final myUser = decodedData['result'];
-    AppData.password = password;
-    AppData.username = username;
     AppData.url = url;
-    AppData.endpoint = endpoint;
-    AppData.userId = myUser["id"];
-    AppData.appRole = myUser["role"];
+    AppData.username = username;
+    AppData.password = password;
+    AppData.userId = decodedData["id"];
+    AppData.token = decodedData["token"];
+    AppData.tokenExpires = decodedData["tokenExpires"];
     AppData.authenticated = true;
     return true;
   }
@@ -75,37 +55,44 @@ class Api {
   // static Future getMe() async => baseApi("getMe", 1718627783);
   // static Future getMyDashboard() async => baseApi("getMyDashboard", 447898718);
   // static Future getMyProjectsList() async => baseApi("getMyProjectsList", 987834805);
-  static Future<List<ProjectModel>> getmyProjects() async =>
-      listApi("getmyProjects", 2134420212, ProjectModel.fromJson);
+  // static Future<List<ProjectModel>> getmyProjects() async =>
+  //     listApi("getmyProjects", 2134420212, ProjectModel.fromJson);
+  //
+  // static Future<List<BoardModel>> getBoard(int projectId) async =>
+  //     listApi("getBoard", 827046470, BoardModel.fromJson,
+  //         params: {"project_id": projectId});
+  //
+  // static Future<List<SubtaskModel>> getAllSubtasks(int taskId) async =>
+  //     listApi("getAllSubtasks", 2087700490, SubtaskModel.fromJson,
+  //         params: {"task_id": taskId});
+  //
+  // static Future<List<CommentModel>> getAllComments(int taskId) async =>
+  //     listApi("getAllComments", 148484683, CommentModel.fromJson,
+  //         params: {"task_id": taskId});
+  //
+  // // TODO: Use for mutliple checklist, shopping list
+  // static Future<TaskMetadataModel> getTaskMetadata(int taskId) async =>
+  //     singleApi("getTaskMetadata", 133280317, TaskMetadataModel.fromJson,
+  //         params: {"task_id": taskId});
 
-  static Future<List<BoardModel>> getBoard(int projectId) async =>
-      listApi("getBoard", 827046470, BoardModel.fromJson,
-          params: {"project_id": projectId});
 
-  static Future<List<SubtaskModel>> getAllSubtasks(int taskId) async =>
-      listApi("getAllSubtasks", 2087700490, SubtaskModel.fromJson,
-          params: {"task_id": taskId});
-
-  static Future<List<CommentModel>> getAllComments(int taskId) async =>
-      listApi("getAllComments", 148484683, CommentModel.fromJson,
-          params: {"task_id": taskId});
-
-  // TODO: Use for mutliple checklist, shopping list
-  static Future<TaskMetadataModel> getTaskMetadata(int taskId) async =>
-      singleApi("getTaskMetadata", 133280317, TaskMetadataModel.fromJson,
-          params: {"task_id": taskId});
+  static Future<List<BoardModel>> getAllBoards() async =>
+      listApi("/api/boards", 2134420212, BoardModel.fromJson);
 
   static Future<T> singleApi<T extends Model>(
       String method, int id, T Function(Map<String, dynamic>) constructor,
       {Map<String, Object> params = const {}}) async {
-    final dynamic result = await baseApi(method, id, constructor, params: params) as Map<String, dynamic>;
+    final dynamic result =
+        await baseApi(method, id, constructor, params: params)
+            as Map<String, dynamic>;
     return constructor(result);
   }
 
   static Future<List<T>> listApi<T extends Model>(
-      String method, int id, T Function(Map<String, dynamic>) constructor,
+      String apiPath, int id, T Function(Map<String, dynamic>) constructor,
       {Map<String, Object> params = const {}}) async {
-    final results = await baseApi(method, id, constructor, params: params) as List<dynamic>;
+    final results =
+        await baseApi(apiPath, id, constructor, params: params) as List<dynamic>;
     final List<T> models = [];
     for (var data in results) {
       final model = constructor(data);
@@ -115,22 +102,13 @@ class Api {
   }
 
   static dynamic baseApi<T extends Model>(
-      String method, int id, T Function(Map<String, dynamic>) constructor,
+      String apiPath, int id, T Function(Map<String, dynamic>) constructor,
       {Map<String, Object> params = const {}}) async {
-    final Map<String, dynamic> parameters = {
-      "jsonrpc": "2.0",
-      "method": method,
-      "id": id,
-      "params": params
-    };
-    final credentials = "${AppData.username}:${AppData.password}";
-    Codec<String, String> stringToBase64 = utf8.fuse(base64);
-    String encoded = stringToBase64.encode(credentials);
-    final resp = await http.post(
-      Uri.parse(AppData.endpoint),
-      headers: <String, String>{"Authorization": "Basic $encoded"},
-      body: json.encode(parameters),
-      encoding: Encoding.getByName("utf-8"),
+    // final credentials = "${AppData.username}:${AppData.password}";
+    final resp = await http.get(
+      Uri.parse("${AppData.url}$apiPath"),
+      headers: {"Accept": "application/json", "Authorization" : AppData.token},
+      // encoding: Encoding.getByName("utf-8"),
     );
 
     final decodedData = json.decode(utf8.decode(resp.bodyBytes));

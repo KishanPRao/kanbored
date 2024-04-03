@@ -25,10 +25,10 @@ class _BoardState extends State<Board> {
   }
 
   void init() async {
-    var boards = await Api.getBoard(projectModel.id);
-    setState(() {
-      this.boards = boards;
-    });
+    // var boards = await Api.getBoard(projectModel.id);
+    // setState(() {
+    //   this.boards = boards;
+    // });
   }
 
   @override
@@ -44,30 +44,30 @@ class _BoardState extends State<Board> {
           icon: const Icon(Icons.arrow_back),
         ),
       ),
-      body: Column(
-          children: boards
-              .map((board) => Expanded(
-                      child: Column(
-                    children: [
-                      // TODO: move each ui element into a function or class?
-                      Card(
-                          clipBehavior: Clip.hardEdge,
-                          child: SizedBox(
-                            child: Center(child: Text(board.name)), // swimlane
-                          )),
-                      // TODO: Keep a setting to enable swimlane info; default disabled; give warning on possible limitations; or keep it simple, avoid using it.
-                      Expanded(
-                          child: ListView.builder(
-                              shrinkWrap: true,
-                              scrollDirection: Axis.horizontal,
-                              itemBuilder: (context, index) => SizedBox(
-                                  width: Utils.getWidth(context) * 0.7,
-                                  child: buildBoardColumn(
-                                      board.columns.elementAt(index),
-                                      context))))
-                    ],
-                  )))
-              .toList()),
+      // body: Column(
+      //     children: boards
+      //         .map((board) => Expanded(
+      //                 child: Column(
+      //               children: [
+      //                 // TODO: move each ui element into a function or class?
+      //                 Card(
+      //                     clipBehavior: Clip.hardEdge,
+      //                     child: SizedBox(
+      //                       child: Center(child: Text(board.name)), // swimlane
+      //                     )),
+      //                 // TODO: Keep a setting to enable swimlane info; default disabled; give warning on possible limitations; or keep it simple, avoid using it.
+      //                 Expanded(
+      //                     child: ListView.builder(
+      //                         shrinkWrap: true,
+      //                         scrollDirection: Axis.horizontal,
+      //                         itemBuilder: (context, index) => SizedBox(
+      //                             width: Utils.getWidth(context) * 0.7,
+      //                             child: buildBoardColumn(
+      //                                 board.columns.elementAt(index),
+      //                                 context))))
+      //               ],
+      //             )))
+      //         .toList()),
     );
   }
 }
