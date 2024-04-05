@@ -4,6 +4,7 @@ import 'package:kanbored/app_data.dart';
 import 'package:kanbored/models/board_model.dart';
 import 'package:kanbored/models/comment_model.dart';
 import 'package:kanbored/models/model.dart';
+import 'package:kanbored/models/project_metadata_model.dart';
 import 'package:kanbored/models/project_model.dart';
 import 'dart:developer';
 
@@ -94,6 +95,10 @@ class Api {
   static Future<TaskMetadataModel> getTaskMetadata(int taskId) async =>
       singleApi("getTaskMetadata", 133280317, TaskMetadataModel.fromJson,
           params: {"task_id": taskId});
+
+  static Future<ProjectMetadataModel> getProjectMetadata(int projectId) async =>
+      singleApi("getProjectMetadata", 1797076613, ProjectMetadataModel.fromJson,
+          params: {"project_id": projectId});
 
   static Future<T> singleApi<T extends Model>(
       String method, int id, T Function(Map<String, dynamic>) constructor,

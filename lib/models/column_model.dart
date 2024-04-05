@@ -47,6 +47,8 @@ class ColumnModel {
   int columnScore;
   int columnNbScore;
   int columnNbOpenTasks;
+  bool isActive = true;
+  List<TaskModel> get activeTasks => tasks.where((t) => t.isActive).toList();
 
   factory ColumnModel.fromJson(Map<String, dynamic> json) => ColumnModel(
         id: json["id"],

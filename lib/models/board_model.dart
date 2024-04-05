@@ -26,7 +26,7 @@ class BoardModel implements Model {
   int id;
   String name;
   int position;
-  int isActive;
+  bool isActive;
   int projectId;
   String description;
   int taskLimit;
@@ -35,12 +35,13 @@ class BoardModel implements Model {
   int nbColumns;
   int nbTasks;
   int score;
+  List<ColumnModel> get activeColumns => columns.where((c) => c.isActive).toList();
 
   factory BoardModel.fromJson(Map<String, dynamic> json) => BoardModel(
         id: json["id"],
         name: json["name"],
         position: json["position"],
-        isActive: json["is_active"],
+        isActive: json["is_active"] == 1,
         projectId: json["project_id"],
         description: json["description"],
         taskLimit: json["task_limit"],
@@ -57,7 +58,7 @@ class BoardModel implements Model {
         "id": id,
         "name": name,
         "position": position,
-        "isActive": isActive,
+        "is_active": isActive ? 1 : 0,
         "project_id": projectId,
         "description": description,
         "task_limit": taskLimit,

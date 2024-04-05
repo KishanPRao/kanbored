@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:kanbored/api/api.dart';
+import 'package:kanbored/models/project_metadata_model.dart';
 import 'package:kanbored/ui/app_theme.dart';
 import 'package:kanbored/models/board_model.dart';
 import 'package:kanbored/models/project_model.dart';
@@ -15,6 +18,7 @@ class Board extends StatefulWidget {
 
 class _BoardState extends State<Board> {
   late ProjectModel projectModel;
+  ProjectMetadataModel? projectMetadataModel;
   List<BoardModel> boards = [];
 
   @override
@@ -26,8 +30,18 @@ class _BoardState extends State<Board> {
 
   void init() async {
     var boards = await Api.getBoard(projectModel.id);
+    var projectMetadataModel = await Api.getProjectMetadata(projectModel.id);
+    for (var board in boards) {
+      for (var column in board.columns) {
+        if (projectMetadataModel.closedColumns.contains(column.id)) {
+          column.isActive = false;
+          break;
+        }
+      }
+    }
     setState(() {
       this.boards = boards;
+      this.projectMetadataModel = projectMetadataModel;
     });
   }
 
@@ -60,10 +74,11 @@ class _BoardState extends State<Board> {
                           child: ListView.builder(
                               shrinkWrap: true,
                               scrollDirection: Axis.horizontal,
+                              itemCount: board.activeColumns.length,
                               itemBuilder: (context, index) => SizedBox(
                                   width: Utils.getWidth(context) * 0.7,
                                   child: buildBoardColumn(
-                                      board.columns.elementAt(index),
+                                      board.activeColumns.elementAt(index),
                                       context))))
                     ],
                   )))

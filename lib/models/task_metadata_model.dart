@@ -56,11 +56,11 @@ class TaskMetadataModel implements Model {
     required this.checklists,
   });
 
-  List<CheckListMetadata> checklists;
+  List<CheckListMetadata> checklists = [];
 
   factory TaskMetadataModel.fromJson(Map<String, dynamic> json) =>
       TaskMetadataModel(
-        checklists:
+        checklists: json["metadata"] ??
             (jsonDecode(json["metadata"])["checklists"] as List<dynamic>)
                 .map((e) => CheckListMetadata.fromJson(e))
                 .toList(),

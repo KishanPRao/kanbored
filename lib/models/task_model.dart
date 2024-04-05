@@ -60,7 +60,7 @@ class TaskModel implements Model {
   int columnId;
   int ownerId;
   int position;
-  int isActive;
+  bool isActive;
   int? dateCompleted;
   int? score;
   int? dateDue;
@@ -165,7 +165,7 @@ class TaskModel implements Model {
         columnId: json["column_id"],
         ownerId: json["owner_id"],
         position: json["position"],
-        isActive: json["is_active"],
+        isActive: json["is_active"] == 1,
         dateCompleted: json["date_completed"],
         score: json["score"],
         dateDue: json["date_due"],
@@ -204,7 +204,7 @@ class TaskModel implements Model {
         "column_id": columnId,
         "owner_id": ownerId,
         "position": position,
-        "is_active": isActive,
+        "is_active": isActive ? 1 : 0,
         "date_completed": dateCompleted,
         "score": score,
         "date_due": dateDue,

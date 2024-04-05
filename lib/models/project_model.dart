@@ -39,7 +39,7 @@ class ProjectModel implements Model {
 
   int id;
   String name;
-  int isActive;
+  bool isActive;
   String token;
   int lastModified;
   int isPublic;
@@ -63,7 +63,7 @@ class ProjectModel implements Model {
   factory ProjectModel.fromJson(Map<String, dynamic> json) => ProjectModel(
         id: json["id"],
         name: json["name"],
-        isActive: json["is_active"],
+        isActive: json["is_active"] == 1,
         token: json["token"],
         lastModified: json["last_modified"],
         isPublic: json["is_public"],
@@ -89,7 +89,7 @@ class ProjectModel implements Model {
   Map<String, dynamic> toJson() => {
         "id": id,
         "name": name,
-        "is_active": isActive,
+        "is_active": isActive ? 1 : 0,
         "token": token,
         "last_modified": lastModified,
         "is_public": isPublic,

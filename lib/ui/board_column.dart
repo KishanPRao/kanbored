@@ -16,13 +16,14 @@ Widget buildBoardColumn(ColumnModel column, BuildContext context) {
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(column.title) as Widget,
             Expanded(
-                child: ListView(
+                child: ListView.builder(
                     shrinkWrap: true,
                     scrollDirection: Axis.vertical,
-                    children: column.tasks
-                        .map((column) =>
-                            SizedBox(child: buildBoardTask(column, context)))
-                        .toList()))
+                    itemCount: column.activeTasks.length,
+                    itemBuilder: (context, index) => SizedBox(
+                        child: buildBoardTask(
+                            column.activeTasks.elementAt(index),
+                            context))))
           ])));
 }
 
