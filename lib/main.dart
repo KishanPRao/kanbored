@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kanbored/Strings.dart';
 import 'package:kanbored/app_data.dart';
 import 'package:kanbored/constants.dart';
 import 'package:kanbored/pages/board.dart';
@@ -11,8 +12,9 @@ import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await AppTheme.loadAllThemes();
-  await AppData.initializeAppData();
+  await AppTheme.initialize();
+  await AppData.initialize();
+  await Strings.initialize();
   runApp(App());
 }
 

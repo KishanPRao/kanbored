@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:kanbored/models/model.dart';
 
 TaskMetadataModel taskMetadataModelFromJson(String str) =>
@@ -60,11 +61,11 @@ class TaskMetadataModel implements Model {
 
   factory TaskMetadataModel.fromJson(Map<String, dynamic> json) =>
       TaskMetadataModel(
-        checklists: json["metadata"] ??
-            (jsonDecode(json["metadata"])["checklists"] as List<dynamic>)
-                .map((e) => CheckListMetadata.fromJson(e))
-                .toList(),
-      );
+          checklists: json["metadata"] != null
+              ? (jsonDecode(json["metadata"])["checklists"] as List<dynamic>)
+                  .map((e) => CheckListMetadata.fromJson(e))
+                  .toList()
+              : []);
 
   Map<String, dynamic> toJson() => {
         "metadata":

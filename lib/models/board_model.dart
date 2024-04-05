@@ -36,6 +36,7 @@ class BoardModel implements Model {
   int nbTasks;
   int score;
   List<ColumnModel> get activeColumns => columns.where((c) => c.isActive).toList();
+  List<ColumnModel> get inactiveColumns => columns.where((c) => (!c.isActive) || (c.inactiveTasks.isNotEmpty)).toList();
 
   factory BoardModel.fromJson(Map<String, dynamic> json) => BoardModel(
         id: json["id"],

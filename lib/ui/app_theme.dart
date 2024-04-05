@@ -3,7 +3,7 @@ import 'package:kanbored/app_data.dart';
 import 'app_colors_extension.dart';
 
 class AppTheme with ChangeNotifier {
-  static Future<void> loadAllThemes() async {
+  static Future<void> initialize() async {
     ThemeReader.readTheme('assets/light_theme.json').then((value) => _lightAppColors = value);
     ThemeReader.readTheme('assets/dark_theme.json').then((value) => _darkAppColors = value);
   }

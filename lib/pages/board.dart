@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:kanbored/Strings.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/models/project_metadata_model.dart';
 import 'package:kanbored/ui/app_theme.dart';
@@ -17,20 +18,21 @@ class Board extends StatefulWidget {
 }
 
 class _BoardState extends State<Board> {
-  late ProjectModel projectModel;
-  ProjectMetadataModel? projectMetadataModel;
-  List<BoardModel> boards = [];
+  late ProjectModel _projectModel;
+  ProjectMetadataModel? _projectMetadataModel;
+  List<BoardModel> _boards = [];
+  var showActive = true;
 
   @override
   void didChangeDependencies() {
-    projectModel = ModalRoute.of(context)?.settings.arguments as ProjectModel;
+    _projectModel = ModalRoute.of(context)?.settings.arguments as ProjectModel;
     init();
     super.didChangeDependencies();
   }
 
   void init() async {
-    var boards = await Api.getBoard(projectModel.id);
-    var projectMetadataModel = await Api.getProjectMetadata(projectModel.id);
+    var boards = await Api.getBoard(_projectModel.id);
+    var projectMetadataModel = await Api.getProjectMetadata(_projectModel.id);
     for (var board in boards) {
       for (var column in board.columns) {
         if (projectMetadataModel.closedColumns.contains(column.id)) {
@@ -40,8 +42,8 @@ class _BoardState extends State<Board> {
       }
     }
     setState(() {
-      this.boards = boards;
-      this.projectMetadataModel = projectMetadataModel;
+      _boards = boards;
+      _projectMetadataModel = projectMetadataModel;
     });
   }
 
@@ -49,7 +51,12 @@ class _BoardState extends State<Board> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(projectModel.name),
+        title: Text(_projectModel.name),
+        // bottom: PreferredSize(
+        //     preferredSize: Size.zero,
+        //     child: (showActive
+        //         ? const SizedBox.shrink()
+        //         : const Text("Archived"))),
         backgroundColor: context.theme.appColors.primary,
         leading: IconButton(
           onPressed: () {
@@ -57,9 +64,21 @@ class _BoardState extends State<Board> {
           },
           icon: const Icon(Icons.arrow_back),
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              setState(() {
+                showActive = !showActive;
+              });
+            },
+            color: showActive ? Colors.grey : Colors.red, //TODO
+            icon: const Icon(Icons.archive),
+            tooltip: "tt_archived_col".resc(),
+          )
+        ],
       ),
       body: Column(
-          children: boards
+          children: _boards
               .map((board) => Expanded(
                       child: Column(
                     children: [
@@ -74,12 +93,22 @@ class _BoardState extends State<Board> {
                           child: ListView.builder(
                               shrinkWrap: true,
                               scrollDirection: Axis.horizontal,
-                              itemCount: board.activeColumns.length,
+                              key: ObjectKey((showActive
+                                  ? board.activeColumns
+                                  : board.inactiveColumns)[0]),
+                              itemCount: (showActive
+                                      ? board.activeColumns
+                                      : board.inactiveColumns)
+                                  .length,
                               itemBuilder: (context, index) => SizedBox(
                                   width: Utils.getWidth(context) * 0.7,
                                   child: buildBoardColumn(
-                                      board.activeColumns.elementAt(index),
-                                      context))))
+                                      (showActive
+                                              ? board.activeColumns
+                                              : board.inactiveColumns)
+                                          .elementAt(index),
+                                      context,
+                                      showActive))))
                     ],
                   )))
               .toList()),

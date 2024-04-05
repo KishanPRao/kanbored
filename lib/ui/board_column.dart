@@ -4,8 +4,10 @@ import 'package:kanbored/models/column_model.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/ui/app_theme.dart';
+import 'package:kanbored/utils.dart';
 
-Widget buildBoardColumn(ColumnModel column, BuildContext context) {
+Widget buildBoardColumn(
+    ColumnModel column, BuildContext context, bool showActive) {
   return Card(
       color: context.theme.appColors.cardBg,
       margin: const EdgeInsets.all(10),
@@ -19,10 +21,12 @@ Widget buildBoardColumn(ColumnModel column, BuildContext context) {
                 child: ListView.builder(
                     shrinkWrap: true,
                     scrollDirection: Axis.vertical,
-                    itemCount: column.activeTasks.length,
+                    itemCount:
+                        (showActive ? column.activeTasks : column.tasks).length,
                     itemBuilder: (context, index) => SizedBox(
                         child: buildBoardTask(
-                            column.activeTasks.elementAt(index),
+                            (showActive ? column.activeTasks : column.tasks)
+                                .elementAt(index),
                             context))))
           ])));
 }

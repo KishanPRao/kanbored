@@ -4,9 +4,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'constants.dart';
 
 class AppData {
-  static Future<void> initializeAppData() async {
+  static Future<void> initialize() async {
     _preferences = await SharedPreferences.getInstance();
-    // decryptedPassword = getString(prefApiPassword, "");
     _decryptedPassword =
         await const FlutterSecureStorage().read(key: prefApiPassword) ?? "";
   }
@@ -43,17 +42,12 @@ class AppData {
 
   static void _setPassword(String value) async {
     await const FlutterSecureStorage()
-        .write(key: prefApiPassword, value: value)
-        .then((value) => print("Finished writing"))
-        .catchError((e, st) {
-      print("Failed to write! $e, $st");
-    });
+        .write(key: prefApiPassword, value: value);
   }
 
   static set password(String value) {
     _decryptedPassword = value;
     _setPassword(value);
-    // setString(prefApiPassword, value);
   }
 
   static late String _decryptedPassword;
