@@ -1,9 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/app_data.dart';
 import 'package:kanbored/constants.dart';
-import 'package:kanbored/ui/app_theme.dart';
+import 'package:kanbored/strings.dart';
+import 'package:kanbored/ui/sizes.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -23,12 +23,12 @@ class _LoginState extends State<Login> {
     return Scaffold(
         appBar: AppBar(
           title: const Text("Login"),
-          backgroundColor: context.theme.appColors.primary,
+          backgroundColor: "primary".themed(context),
         ),
         body: Form(
             key: _formKey,
             child: Column(children: [
-              const SizedBox(height: 20.0),
+              const SizedBox(height: Sizes.kLoginUrlPadding),
               _createField(
                   AppData.url,
                   Icons.cloud,
@@ -37,7 +37,7 @@ class _LoginState extends State<Login> {
                   'Must specify an URL!',
                   false,
                   (value) => url = value),
-              const SizedBox(height: 10.0),
+              const SizedBox(height: Sizes.kLoginPasswordPadding),
               _createField(
                   AppData.username,
                   Icons.person,
@@ -46,7 +46,7 @@ class _LoginState extends State<Login> {
                   'Must specify an username!',
                   false,
                   (value) => username = value),
-              const SizedBox(height: 10.0),
+              const SizedBox(height: Sizes.kLoginUsernamePadding),
               _createField(
                   AppData.password,
                   Icons.lock,
@@ -55,7 +55,7 @@ class _LoginState extends State<Login> {
                   'Must specify an password!',
                   true,
                   (value) => password = value),
-              const SizedBox(height: 25.0),
+              const SizedBox(height: Sizes.kLoginPasswordPadding),
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
@@ -76,7 +76,7 @@ class _LoginState extends State<Login> {
                   }
                 },
                 child: Text('LOGIN',
-                    style: TextStyle(color: context.theme.appColors.primary)),
+                    style: TextStyle(color: "primary".themed(context))),
               ),
             ])));
   }
@@ -89,7 +89,7 @@ class _LoginState extends State<Login> {
           initialValue: initValue,
           obscureText: obscureText,
           decoration: InputDecoration(
-            icon: Icon(icon, color: context.theme.appColors.primary),
+            icon: Icon(icon, color: "primary".themed(context)),
             hintText: hintText,
             labelText: lblText,
           ),

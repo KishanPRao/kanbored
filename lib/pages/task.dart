@@ -5,6 +5,7 @@ import 'package:kanbored/models/comment_model.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
+import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/app_theme.dart';
 import 'package:kanbored/ui/build_subtasks.dart';
 
@@ -58,7 +59,7 @@ class _TaskState extends State<Task> {
     return Scaffold(
       appBar: AppBar(
         title: Text(taskModel.title),
-        backgroundColor: context.theme.appColors.primary,
+        backgroundColor: "primary".themed(context),
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
@@ -76,7 +77,7 @@ class _TaskState extends State<Task> {
                 children: <Widget>[
                       Container(
                         margin: const EdgeInsets.all(5),
-                        color: context.theme.appColors.descBg,
+                        color: "descBg".themed(context),
                         child: SelectionArea(
                             child: Markdown(
                                 data: taskModel.description,

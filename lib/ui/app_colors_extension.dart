@@ -1,50 +1,31 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class ThemeReader {
   static Future<AppColorsExtension> readTheme(String jsonFile) async {
     var jsonString = await rootBundle.loadString(jsonFile);
-    var colors = jsonDecode(jsonString)["colors"][0];
+    var colors = jsonDecode(jsonString)["colors"];
     return AppColorsExtension(
-      primary: _parseColor(colors, "primary"),
-      pageBg: _parseColor(colors, "pageBg"),
-      cardBg: _parseColor(colors, "cardBg"),
-      descBg: _parseColor(colors, "descBg"),
+      colors: (colors as Map<String, dynamic>)
+          .map((key, value) => MapEntry(key, _parseColor(value))),
     );
   }
 
-  static Color _parseColor(dynamic colors, String name) =>
-      Color(int.parse(colors[name] ?? "0xFF000000"));
+  static Color _parseColor(String value) => Color(int.parse(value));
 }
 
 // TODO: Use generics? Simplify repetitive copy
 class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
   AppColorsExtension({
-    required this.primary,
-    required this.pageBg,
-    required this.cardBg,
-    required this.descBg,
+    required this.colors,
   });
-  final Color primary;
-  final Color pageBg;
-  final Color cardBg;
-  final Color descBg;
+
+  final Map<String, Color> colors;
 
   @override
-  ThemeExtension<AppColorsExtension> copyWith({
-    Color? primary,
-    Color? pageBg,
-    Color? cardBg,
-    Color? descBg,
-  }) {
-    return AppColorsExtension(
-      primary: primary ?? this.primary,
-      pageBg: pageBg ?? this.pageBg,
-      cardBg: cardBg ?? this.cardBg,
-      descBg: descBg ?? this.descBg,
-    );
+  ThemeExtension<AppColorsExtension> copyWith({Map<String, Color>? colors}) {
+    return AppColorsExtension(colors: colors ?? {});
   }
 
   @override
@@ -57,10 +38,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     }
 
     return AppColorsExtension(
-      primary: Color.lerp(primary, other.primary, t)!,
-      pageBg: Color.lerp(pageBg, other.pageBg, t)!,
-      cardBg: Color.lerp(cardBg, other.cardBg, t)!,
-      descBg: Color.lerp(descBg, other.descBg, t)!,
+      colors: colors.map((key, value) =>
+          MapEntry(key, Color.lerp(value, other.colors[key], t)!)),
     );
   }
 }

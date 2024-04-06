@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/constants.dart';
 import 'package:kanbored/models/project_model.dart';
-import 'package:kanbored/ui/app_theme.dart';
+import 'package:kanbored/strings.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key, required this.title});
@@ -34,7 +34,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        backgroundColor: context.theme.appColors.primary,
+        backgroundColor: "primary".themed(context),
         actions: [
           IconButton(
             onPressed: () async {
@@ -55,7 +55,7 @@ class _HomeState extends State<Home> {
                   clipBehavior: Clip.hardEdge,
                   child: InkWell(
                       splashColor:
-                          context.theme.appColors.primary.withAlpha(30),
+                          "primary".themed(context).withAlpha(30),
                       onTap: () {
                         Navigator.pushNamed(
                           context,

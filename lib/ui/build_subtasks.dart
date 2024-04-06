@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
-import 'package:kanbored/ui/app_theme.dart';
+import 'package:kanbored/strings.dart';
 
 List<Widget> buildSingleListSubtasks(BuildContext context,
     List<SubtaskModel> subtasks, Function(SubtaskModel, bool) toggleCb) {
@@ -11,7 +11,7 @@ List<Widget> buildSingleListSubtasks(BuildContext context,
       checkColor: Colors.white, // TODO: themed color!
       fillColor: MaterialStateProperty.resolveWith((states) {
         if (states.contains(MaterialState.selected)) {
-          return context.theme.appColors.primary;
+          return "primary".themed(context);
         }
         return Colors.transparent;
       }),
@@ -39,7 +39,7 @@ List<Widget> buildMultiListSubtasks(
                     checkColor: Colors.white, // TODO: themed color!
                     fillColor: MaterialStateProperty.resolveWith((states) {
                       if (states.contains(MaterialState.selected)) {
-                        return context.theme.appColors.primary;
+                        return "primary".themed(context);
                       }
                       return Colors.transparent;
                     }),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kanbored/Strings.dart';
+import 'package:kanbored/strings.dart';
 import 'package:kanbored/app_data.dart';
 import 'package:kanbored/constants.dart';
 import 'package:kanbored/pages/board.dart';

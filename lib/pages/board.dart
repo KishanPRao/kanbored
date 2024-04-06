@@ -1,10 +1,10 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:kanbored/Strings.dart';
+import 'package:kanbored/strings.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/models/project_metadata_model.dart';
-import 'package:kanbored/ui/app_theme.dart';
+import 'package:kanbored/ui/sizes.dart';
 import 'package:kanbored/models/board_model.dart';
 import 'package:kanbored/models/project_model.dart';
 import 'package:kanbored/ui/board_column.dart';
@@ -57,7 +57,7 @@ class _BoardState extends State<Board> {
         //     child: (showActive
         //         ? const SizedBox.shrink()
         //         : const Text("Archived"))),
-        backgroundColor: context.theme.appColors.primary,
+        backgroundColor: "primary".themed(context),
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
@@ -101,7 +101,8 @@ class _BoardState extends State<Board> {
                                       : board.inactiveColumns)
                                   .length,
                               itemBuilder: (context, index) => SizedBox(
-                                  width: Utils.getWidth(context) * 0.7,
+                                  width: Utils.getWidth(context) *
+                                      Sizes.kTaskWidthPercentage,
                                   child: buildBoardColumn(
                                       (showActive
                                               ? board.activeColumns

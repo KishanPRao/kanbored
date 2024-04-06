@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/app_text_style.dart';
 import 'package:kanbored/ui/app_theme.dart';
 import 'package:kanbored/utils.dart';
@@ -19,12 +20,13 @@ class _SettingsState extends State<Settings> {
   var apiToken = AppData.getString(prefApiPassword, "");
   var apiEndpoint = AppData.getString(prefApiUrl, "");
 
+  // TODO: extract strings
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
-        backgroundColor: context.theme.appColors.primary,
+        backgroundColor: "primary".themed(context),
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);

@@ -1,7 +1,5 @@
 {
-  "colors": [
-    {
-      "primary": "0xFF448AFF"
-    }
-  ]
+  "colors": {
+    "primary": "0xFF448AFF"
+  }
 }
