@@ -78,41 +78,36 @@ class _BoardState extends State<Board> {
         ],
       ),
       body: Column(
-          children: _boards
-              .map((board) => Expanded(
-                      child: Column(
-                    children: [
-                      // TODO: move each ui element into a function or class?
-                      Card(
-                          clipBehavior: Clip.hardEdge,
-                          child: SizedBox(
-                            child: Center(child: Text(board.name)), // swimlane
-                          )),
-                      // TODO: Keep a setting to enable swimlane info; default disabled; give warning on possible limitations; or keep it simple, avoid using it.
-                      Expanded(
-                          child: ListView.builder(
-                              shrinkWrap: true,
-                              scrollDirection: Axis.horizontal,
-                              key: ObjectKey((showActive
-                                  ? board.activeColumns
-                                  : board.inactiveColumns)[0]),
-                              itemCount: (showActive
-                                      ? board.activeColumns
-                                      : board.inactiveColumns)
-                                  .length,
-                              itemBuilder: (context, index) => SizedBox(
-                                  width: Utils.getWidth(context) *
-                                      Sizes.kTaskWidthPercentage,
-                                  child: buildBoardColumn(
-                                      (showActive
-                                              ? board.activeColumns
-                                              : board.inactiveColumns)
-                                          .elementAt(index),
-                                      context,
-                                      showActive))))
-                    ],
-                  )))
-              .toList()),
+          children: _boards.map((board) {
+        var columns =
+            (showActive ? board.activeColumns : board.inactiveColumns);
+        return Expanded(
+            child: Column(
+          children: [
+            // TODO: move each ui element into a function or class?
+            Card(
+                clipBehavior: Clip.hardEdge,
+                child: SizedBox(
+                  child: Center(child: Text(board.name)), // swimlane
+                )),
+            // TODO: Keep a setting to enable swimlane info; default disabled; give warning on possible limitations; or keep it simple, avoid using it.
+            Expanded(
+                child: ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    key: ObjectKey(columns[0]),
+                    itemCount: columns.length,
+                    itemBuilder: (context, index) => SizedBox(
+                        width: Utils.getWidth(context) *
+                            Sizes.kTaskWidthPercentage,
+                        child: buildBoardColumn(
+                            columns.elementAt(index), context, showActive,
+                            (taskName) {
+                          log("Create task: $taskName");
+                        }))))
+          ],
+        ));
+      }).toList()),
     );
   }
 }

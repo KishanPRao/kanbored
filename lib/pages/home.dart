@@ -23,10 +23,12 @@ class _HomeState extends State<Home> {
   }
 
   void init() async {
-    var projects = await Api.getmyProjects();
-    setState(() {
-      this.projects = projects;
-    });
+    Api.getmyProjects()
+        .then((value) => setState(() {
+              projects = value;
+            }))
+        .catchError((e) => ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Error: $e"))));
   }
 
   @override
@@ -54,8 +56,7 @@ class _HomeState extends State<Home> {
             .map((project) => Card(
                   clipBehavior: Clip.hardEdge,
                   child: InkWell(
-                      splashColor:
-                          "primary".themed(context).withAlpha(30),
+                      splashColor: "primary".themed(context).withAlpha(30),
                       onTap: () {
                         Navigator.pushNamed(
                           context,
