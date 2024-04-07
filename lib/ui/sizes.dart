@@ -1,5 +1,5 @@
 class Sizes {
-  static const double kAddTaskHeight = 25;
+  static const double kAddTaskHeight = 50;
   static const double kTaskHeight = 50;
   static const double kLoginUrlPadding = 20;
   static const double kLoginUsernamePadding = 10;

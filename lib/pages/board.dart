@@ -19,18 +19,24 @@ class Board extends StatefulWidget {
 
 class _BoardState extends State<Board> {
   late ProjectModel _projectModel;
+  final ScrollController _controller = ScrollController();
   ProjectMetadataModel? _projectMetadataModel;
   List<BoardModel> _boards = [];
   var showActive = true;
 
+  var activeColumnPos = 0;
+  late double _columnWidth;
+
   @override
   void didChangeDependencies() {
     _projectModel = ModalRoute.of(context)?.settings.arguments as ProjectModel;
-    init();
+    _columnWidth = Utils.getWidth(context) * Sizes.kTaskWidthPercentage;
+    updateData();
+    // _controller.position.jumpTo(_columnWidth * activeColumnPos);
     super.didChangeDependencies();
   }
 
-  void init() async {
+  void updateData() async {
     var boards = await Api.getBoard(_projectModel.id);
     var projectMetadataModel = await Api.getProjectMetadata(_projectModel.id);
     for (var board in boards) {
@@ -52,11 +58,6 @@ class _BoardState extends State<Board> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_projectModel.name),
-        // bottom: PreferredSize(
-        //     preferredSize: Size.zero,
-        //     child: (showActive
-        //         ? const SizedBox.shrink()
-        //         : const Text("Archived"))),
         backgroundColor: "primary".themed(context),
         leading: IconButton(
           onPressed: () {
@@ -94,17 +95,27 @@ class _BoardState extends State<Board> {
             Expanded(
                 child: ListView.builder(
                     shrinkWrap: true,
+                    // controller: _controller,
                     scrollDirection: Axis.horizontal,
                     key: ObjectKey(columns[0]),
                     itemCount: columns.length,
                     itemBuilder: (context, index) => SizedBox(
-                        width: Utils.getWidth(context) *
-                            Sizes.kTaskWidthPercentage,
-                        child: buildBoardColumn(
-                            columns.elementAt(index), context, showActive,
-                            (taskName) {
-                          log("Create task: $taskName");
-                        }))))
+                        width: _columnWidth,
+                        child: BoardColumn(
+                            column: columns.elementAt(index),
+                            showActive: showActive,
+                            createTaskCb: (taskName) async {
+                              await Api.createTask(_projectModel.id,
+                                  columns.elementAt(index).id, taskName);
+                              // activeColumnPos = index;
+                              // _controller.position.jumpTo(_columnWidth * index);
+                              // _controller.position.forcePixels(_columnWidth * index);
+                              // _controller.position.animateTo(
+                              //     _columnWidth * index,
+                              //     duration: const Duration(seconds: 2),
+                              //     curve: Curves.bounceIn);
+                              updateData();
+                            }))))
           ],
         ));
       }).toList()),

@@ -1,15 +1,11 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:kanbored/models/column_model.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/sizes.dart';
 
 class AddTask extends StatefulWidget {
-  final ColumnModel column;
   final Function(String) createTaskCb;
 
-  const AddTask({required this.column, required this.createTaskCb, super.key});
+  const AddTask({required this.createTaskCb, super.key});
 
   @override
   State<StatefulWidget> createState() => AddTaskState();
@@ -20,13 +16,11 @@ class AddTaskState extends State<AddTask> {
   var taskName = "";
   var validText = false;
   var focusNode = FocusNode();
-  late ColumnModel column;
   late Function(String) createTaskCb;
 
   @override
   void initState() {
     super.initState();
-    column = widget.column;
     createTaskCb = widget.createTaskCb;
   }
 
@@ -49,10 +43,10 @@ class AddTaskState extends State<AddTask> {
               focusNode.requestFocus();
             });
           },
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: SizedBox(
-                height: Sizes.kAddTaskHeight,
+          child: SizedBox(
+            height: Sizes.kAddTaskHeight,
+            child: Padding(
+                padding: const EdgeInsets.all(10.0),
                 child: Row(children: [
                   Expanded(
                       child: TextField(

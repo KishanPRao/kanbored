@@ -7,40 +7,71 @@ import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/add_task.dart';
 import 'package:kanbored/ui/sizes.dart';
 
-Widget buildBoardColumn(ColumnModel column, BuildContext context,
-    bool showActive, Function(String) createTaskCb) {
-  var tasks = (showActive ? column.activeTasks : column.tasks);
-  var tasksLength = (showActive ? tasks.length + 1 : tasks.length);
-  return Card(
-      color: "columnBg".themed(context),
-      margin: const EdgeInsets.all(10),
-      clipBehavior: Clip.hardEdge,
-      child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(column.title) as Widget,
-            Expanded(
-                child: ListView.builder(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.vertical,
-                    itemCount: tasksLength,
-                    itemBuilder: (context, index) {
-                      if (showActive && index == tasks.length) {
+class BoardColumn extends StatefulWidget {
+  final bool showActive;
+  final ColumnModel column;
+  final Function(String) createTaskCb;
+
+  const BoardColumn(
+      {required this.column,
+      required this.showActive,
+      required this.createTaskCb,
+      super.key});
+
+  @override
+  State<StatefulWidget> createState() => BoardColumnState();
+}
+
+class BoardColumnState extends State<BoardColumn> {
+  late List<TaskModel> _tasks;
+  late int _tasksLength;
+  late bool _showActive;
+  late ColumnModel _column;
+  late Function(String) _createTaskCb;
+
+  @override
+  void initState() {
+    super.initState();
+    _createTaskCb = widget.createTaskCb;
+    _column = widget.column;
+    _showActive = widget.showActive;
+    _tasks = (_showActive ? _column.activeTasks : _column.tasks);
+    _tasksLength = (_showActive ? _tasks.length + 1 : _tasks.length);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+        color: "columnBg".themed(context),
+        margin: const EdgeInsets.all(10),
+        clipBehavior: Clip.hardEdge,
+        child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(_column.title) as Widget,
+              Expanded(
+                  child: ListView.builder(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.vertical,
+                      itemCount: _tasksLength,
+                      itemBuilder: (context, index) {
+                        if (_showActive && index == _tasks.length) {
+                          return SizedBox(
+                              child: buildBoardAddTaskAction(
+                                  context, _createTaskCb));
+                        }
                         return SizedBox(
-                            child: buildBoardAddTaskAction(
-                                context, column, createTaskCb));
-                      }
-                      return SizedBox(
-                          child:
-                              buildBoardTask(tasks.elementAt(index), context));
-                    }))
-          ])));
+                            child: buildBoardTask(
+                                _tasks.elementAt(index), context));
+                      }))
+            ])));
+  }
 }
 
 Widget buildBoardAddTaskAction(
-    BuildContext context, ColumnModel column, Function(String) createTaskCb) {
-  return AddTask(column: column, createTaskCb: createTaskCb);
+    BuildContext context, Function(String) createTaskCb) {
+  return AddTask(createTaskCb: createTaskCb);
 }
 
 Widget buildBoardTask(TaskModel task, BuildContext context) {

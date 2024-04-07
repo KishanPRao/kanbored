@@ -73,9 +73,33 @@ class Api {
     return true;
   }
 
-  // static Future getMe() async => baseApi("getMe", 1718627783);
-  // static Future getMyDashboard() async => baseApi("getMyDashboard", 447898718);
-  // static Future getMyProjectsList() async => baseApi("getMyProjectsList", 987834805);
+  //////////////////////////////////// SETTER //////////////////////////////////
+
+  static Future<int> createTask(
+          int projectId, int columnId, String taskName) async =>
+      setApi("createTask", 1176509098, params: {
+        "owner_id": AppData.userId,
+        "creator_id": AppData.userId,
+        "date_started": null,
+        "date_due": null,
+        "description": "",
+        "category_id": 0,
+        "score": null,
+        "title": taskName,
+        "project_id": projectId,
+        "color_id": "yellow",
+        "column_id": columnId,
+        "recurrence_status": 0,
+        "recurrence_trigger": 0,
+        "recurrence_factor": 0,
+        "recurrence_timeframe": 0,
+        "recurrence_basedate": 0,
+        "time_estimated": 0,
+        "time_spent": 0,
+      });
+
+  //////////////////////////////////// GETTER //////////////////////////////////
+
   static Future<List<ProjectModel>> getmyProjects() async =>
       listApi("getmyProjects", 2134420212, ProjectModel.fromJson);
 
@@ -100,17 +124,25 @@ class Api {
       singleApi("getProjectMetadata", 1797076613, ProjectMetadataModel.fromJson,
           params: {"project_id": projectId});
 
+  //////////////////////////////////// API //////////////////////////////////
+
+  static Future<int> setApi(String method, int id,
+      {Map<String, dynamic> params = const {}}) async {
+    return await baseApi(method, id, params: params) as int;
+  }
+
   static Future<T> singleApi<T extends Model>(
       String method, int id, T Function(Map<String, dynamic>) constructor,
-      {Map<String, Object> params = const {}}) async {
-    final dynamic result = await baseApi(method, id, constructor, params: params) as Map<String, dynamic>;
+      {Map<String, dynamic> params = const {}}) async {
+    final dynamic result =
+        await baseApi(method, id, params: params) as Map<String, dynamic>;
     return constructor(result);
   }
 
   static Future<List<T>> listApi<T extends Model>(
       String method, int id, T Function(Map<String, dynamic>) constructor,
-      {Map<String, Object> params = const {}}) async {
-    final results = await baseApi(method, id, constructor, params: params) as List<dynamic>;
+      {Map<String, dynamic> params = const {}}) async {
+    final results = await baseApi(method, id, params: params) as List<dynamic>;
     final List<T> models = [];
     for (var data in results) {
       final model = constructor(data);
@@ -119,9 +151,8 @@ class Api {
     return models;
   }
 
-  static dynamic baseApi<T extends Model>(
-      String method, int id, T Function(Map<String, dynamic>) constructor,
-      {Map<String, Object> params = const {}}) async {
+  static dynamic baseApi<T extends Model>(String method, int id,
+      {Map<String, dynamic> params = const {}}) async {
     final Map<String, dynamic> parameters = {
       "jsonrpc": "2.0",
       "method": method,
