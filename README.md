@@ -4,6 +4,7 @@ Kanbored
 ```
 TODO: Remove!
 Container(child: Text("TMP"), color: Colors.white,)
+SizedBox(width: _columnWidth, child: TextField(decoration: InputDecoration(hintText: "add_task".resc())))
 ```
 
 Behaviour:
