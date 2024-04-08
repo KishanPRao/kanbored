@@ -15,6 +15,7 @@ dependencies:
   http:
   flutter_secure_storage:
   flutter_markdown:
+#  flutter_markdown_editor:
 
 dev_dependencies:
   flutter_test:

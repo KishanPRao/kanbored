@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
+
+// import 'package:flutter_markdown_editor/editor_field.dart';
+// import 'package:flutter_markdown_editor/flutter_markdown_editor.dart';
+// import 'package:flutter_markdown/flutter_markdown.dart';
+// import 'package:markdown/markdown.dart' as md;
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/models/comment_model.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/strings.dart';
-import 'package:kanbored/ui/app_theme.dart';
 import 'package:kanbored/ui/build_subtasks.dart';
+import 'package:kanbored/ui/markdown.dart';
 
 class Task extends StatefulWidget {
   const Task({super.key});
@@ -56,6 +60,11 @@ class _TaskState extends State<Task> {
     }
 
     ScrollController scrollController = ScrollController();
+    var textController = TextEditingController();
+    textController.text = taskModel.description;
+    // final MarkDownEditor markDownEditor = MarkDownEditor(controller: textController);
+    // var field = markDownEditor.field as MrkdownEditingField;
+    // field.controller.
     return Scaffold(
       appBar: AppBar(
         title: Text(taskModel.title),
@@ -76,31 +85,70 @@ class _TaskState extends State<Task> {
                 controller: scrollController,
                 children: <Widget>[
                       Container(
-                        margin: const EdgeInsets.all(5),
-                        color: "descBg".themed(context),
-                        child: SelectionArea(
-                            child: Markdown(
-                                data: taskModel.description,
-                                controller: scrollController,
-                                shrinkWrap: true,
-                                // selectable: true, // TODO
-                                // onSelectionChanged: (text, selection, cause) {
-                                // },
-                                styleSheet: MarkdownStyleSheet(
-                                  p: const TextStyle(fontSize: 15),
-                                ))),
-                      )
+                          margin: const EdgeInsets.all(5),
+                          color: "descBg".themed(context),
+                          child: Markdown(text: taskModel.description)
+                          // Scrollbar(
+                          //   child: SingleChildScrollView(
+                          //     child: Markdown(
+                          //       controller: ScrollController(),
+                          //       selectable: true,
+                          //       onTapLink: (_, href, __) async {
+                          //         // if (href == null || !await canLaunch(href)) {
+                          //         //   Fluttertoast.showToast(
+                          //         //     msg: "Couldn't open the URL",
+                          //         //     toastLength: Toast.LENGTH_SHORT,
+                          //         //     gravity: ToastGravity.CENTER,
+                          //         //     timeInSecForIosWeb: 1,
+                          //         //     backgroundColor: Colors.red,
+                          //         //     textColor: Colors.white,
+                          //         //     fontSize: 16.0,
+                          //         //   );
+                          //         // } else {
+                          //         //   launch(href);
+                          //         // }
+                          //       },
+                          //       data: taskModel.description,
+                          //       shrinkWrap: true,
+                          //       extensionSet: md.ExtensionSet(
+                          //         md.ExtensionSet.gitHubFlavored.blockSyntaxes,
+                          //         [
+                          //           md.EmojiSyntax(),
+                          //           ...md.ExtensionSet.gitHubFlavored.inlineSyntaxes
+                          //         ],
+                          //       ),
+                          //     ),
+                          //   ),
+                          // )
+                          // markDownEditor.vertical(),
+                          // markDownEditor.inPlace(),
+                          // MarkDownEditor(
+                          //   controller: _textController,
+                          // data: taskModel.description,
+                          // controller: scrollController,
+                          // shrinkWrap: true,
+                          // // selectable: true, // TODO
+                          // // onSelectionChanged: (text, selection, cause) {
+                          // // },
+                          // styleSheet: MarkdownStyleSheet(
+                          //   p: const TextStyle(fontSize: 15),
+                          // )
+                          // ),
+                          )
                     ] +
                     buildSubtasks(
                         context, subtasks, taskMetadata, toggleStatus) +
                     comments
-                        .map((comment) => Markdown(
-                            data: comment.comment,
-                            shrinkWrap: true,
-                            controller: scrollController,
-                            styleSheet: MarkdownStyleSheet(
-                              p: const TextStyle(fontSize: 15),
-                            )))
+                        .map((comment) => Text(comment.comment)
+                            // markDownEditor.inPlace()
+                            // Markdown(
+                            //     data: comment.comment,
+                            //     shrinkWrap: true,
+                            //     controller: scrollController,
+                            //     styleSheet: MarkdownStyleSheet(
+                            //       p: const TextStyle(fontSize: 15),
+                            //     ))
+                            )
                         .toList())),
       ]),
     );
