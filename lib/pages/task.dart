@@ -75,6 +75,17 @@ class _TaskState extends State<Task> {
           },
           icon: const Icon(Icons.arrow_back),
         ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                setState(() {
+                });
+              },
+              // color: showActive ? Colors.grey : Colors.red, //TODO
+              icon: const Icon(Icons.done),
+              tooltip: "TODO".resc(),
+            )
+          ]
       ),
       body: Column(children: [
         Expanded(
@@ -84,10 +95,9 @@ class _TaskState extends State<Task> {
                 scrollDirection: Axis.vertical,
                 controller: scrollController,
                 children: <Widget>[
-                      Container(
-                          margin: const EdgeInsets.all(5),
-                          color: "descBg".themed(context),
-                          child: Markdown(text: taskModel.description)
+                      Markdown(text: taskModel.description, onChange: (String ) {
+
+                      },)
                           // Scrollbar(
                           //   child: SingleChildScrollView(
                           //     child: Markdown(
@@ -134,7 +144,7 @@ class _TaskState extends State<Task> {
                           //   p: const TextStyle(fontSize: 15),
                           // )
                           // ),
-                          )
+
                     ] +
                     buildSubtasks(
                         context, subtasks, taskMetadata, toggleStatus) +

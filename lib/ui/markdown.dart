@@ -2,12 +2,14 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart' as flmd;
+import 'package:kanbored/strings.dart';
 import 'package:markdown/markdown.dart' as md;
 
 class Markdown extends StatefulWidget {
   final String text;
+  final Function(String) onChange;
 
-  const Markdown({super.key, required this.text});
+  const Markdown({super.key, required this.text, required this.onChange});
 
   // final TextEditingController controller;
   // final Function? onChange;
@@ -19,76 +21,81 @@ class Markdown extends StatefulWidget {
 
 class MarkdownState extends State<Markdown> {
   late TextEditingController controller;
-  late String text;
-  final Function? onChange = null;
+  late Function(String) onChange;
   final int maxLines = 8;
   bool editing = false;
 
   @override
   void initState() {
     super.initState();
-    text = widget.text;
-    controller = TextEditingController(text: text);
+    controller = TextEditingController(text: widget.text);
+    onChange = widget.onChange;
   }
 
   @override
   Widget build(BuildContext context) {
-    TextSelection currentSelection = const TextSelection(baseOffset: 0, extentOffset: 0);
-    return editing
-        ? TextFormField(
-            autofocus: true,
-            maxLines: 20,
-            style: const TextStyle(fontSize: 15),
-            controller: controller,
-            onChanged: (string) {
-              if (onChange != null) onChange!.call();
-            },
-          )
-        : Scrollbar(
-            child: SingleChildScrollView(
-              child: flmd.Markdown(
-                controller: ScrollController(),
-                selectable: true,
-                onSelectionChanged: (text, selection, cause) {
-                  log("onSelectionChanged: $selection, $text");
-                  currentSelection = selection;
-                },
-                styleSheet: flmd.MarkdownStyleSheet(
-                  p: const TextStyle(fontSize: 15),
+    TextSelection currentSelection =
+        const TextSelection(baseOffset: 0, extentOffset: 0);
+    return Container(
+        margin: const EdgeInsets.all(5),
+        color: (editing ? "descEditBg" : "descBg").themed(context),
+        child: editing
+            ? Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15.0, vertical: 0.0),
+                child: TextFormField(
+                  autofocus: true,
+                  maxLines: 20,
+                  style: const TextStyle(fontSize: 15),
+                  controller: controller,
+                  onChanged: (value) => onChange(value),
+                ))
+            : Scrollbar(
+                child: SingleChildScrollView(
+                  child: flmd.Markdown(
+                    controller: ScrollController(),
+                    selectable: true,
+                    onSelectionChanged: (text, selection, cause) {
+                      log("onSelectionChanged: $selection, $text, $cause");
+                      currentSelection = selection;
+                    },
+                    styleSheet: flmd.MarkdownStyleSheet(
+                      p: const TextStyle(fontSize: 15),
+                    ),
+                    onTapText: () {
+                      log("On tap text");
+                      setState(() {
+                        controller.selection = currentSelection;
+                        editing = true;
+                      });
+                      // onChange(controller.text);
+                    },
+                    onTapLink: (_, href, __) async {
+                      // if (href == null || !await canLaunch(href)) {
+                      //   Fluttertoast.showToast(
+                      //     msg: "Couldn't open the URL",
+                      //     toastLength: Toast.LENGTH_SHORT,
+                      //     gravity: ToastGravity.CENTER,
+                      //     timeInSecForIosWeb: 1,
+                      //     backgroundColor: Colors.red,
+                      //     textColor: Colors.white,
+                      //     fontSize: 16.0,
+                      //   );
+                      // } else {
+                      //   launch(href);
+                      // }
+                    },
+                    data: controller.text,
+                    shrinkWrap: true,
+                    extensionSet: md.ExtensionSet(
+                      md.ExtensionSet.gitHubFlavored.blockSyntaxes,
+                      [
+                        md.EmojiSyntax(),
+                        ...md.ExtensionSet.gitHubFlavored.inlineSyntaxes
+                      ],
+                    ),
+                  ),
                 ),
-                onTapText: () {
-                  log("On tap text");
-                  setState(() {
-                    controller.selection = currentSelection;
-                    editing = true;
-                  });
-                },
-                onTapLink: (_, href, __) async {
-                  // if (href == null || !await canLaunch(href)) {
-                  //   Fluttertoast.showToast(
-                  //     msg: "Couldn't open the URL",
-                  //     toastLength: Toast.LENGTH_SHORT,
-                  //     gravity: ToastGravity.CENTER,
-                  //     timeInSecForIosWeb: 1,
-                  //     backgroundColor: Colors.red,
-                  //     textColor: Colors.white,
-                  //     fontSize: 16.0,
-                  //   );
-                  // } else {
-                  //   launch(href);
-                  // }
-                },
-                data: text,
-                shrinkWrap: true,
-                extensionSet: md.ExtensionSet(
-                  md.ExtensionSet.gitHubFlavored.blockSyntaxes,
-                  [
-                    md.EmojiSyntax(),
-                    ...md.ExtensionSet.gitHubFlavored.inlineSyntaxes
-                  ],
-                ),
-              ),
-            ),
-          );
+              ));
   }
 }
