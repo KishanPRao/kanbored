@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 // import 'package:flutter_markdown_editor/editor_field.dart';
@@ -11,7 +13,9 @@ import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/build_subtasks.dart';
+import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/markdown.dart';
+import 'package:kanbored/ui/task_app_bar.dart';
 
 class Task extends StatefulWidget {
   const Task({super.key});
@@ -25,6 +29,9 @@ class _TaskState extends State<Task> {
   List<SubtaskModel> subtasks = [];
   TaskMetadataModel? taskMetadata;
   List<CommentModel> comments = [];
+  GlobalKey<TaskAppBarActionsState> keyTaskAppBarActionsState = GlobalKey();
+  List<GlobalKey<EditableState>> keysEditableText = [];
+  var activeEditIndex = 0;
 
   @override
   void didChangeDependencies() {
@@ -34,9 +41,17 @@ class _TaskState extends State<Task> {
   }
 
   void init() async {
+    comments = [];
+    subtasks = [];
+    taskMetadata = null;
+    keysEditableText = [];
+    keysEditableText.add(GlobalKey());
     if (taskModel.nbSubtasks > 0) {
       var subtasks = await Api.getAllSubtasks(taskModel.id);
       var taskMetadata = await Api.getTaskMetadata(taskModel.id);
+      for (var i = 0; i < subtasks.length; i++) {
+        keysEditableText.add(GlobalKey());
+      }
       setState(() {
         this.subtasks = subtasks;
         this.taskMetadata = taskMetadata;
@@ -44,6 +59,9 @@ class _TaskState extends State<Task> {
     }
     if (taskModel.nbComments > 0) {
       var comments = await Api.getAllComments(taskModel.id);
+      for (var i = 0; i < comments.length; i++) {
+        keysEditableText.add(GlobalKey());
+      }
       setState(() {
         this.comments = comments;
       });
@@ -65,28 +83,38 @@ class _TaskState extends State<Task> {
     // final MarkDownEditor markDownEditor = MarkDownEditor(controller: textController);
     // var field = markDownEditor.field as MrkdownEditingField;
     // field.controller.
+    onChange(text) {
+      log("onChange: $text");
+      keyTaskAppBarActionsState.currentState?.updateText(text);
+    }
+
+    onEditStart(int index) {
+      log("onEditStart: $index");
+      activeEditIndex = index;
+      keyTaskAppBarActionsState.currentState?.startEdit();
+    }
+
+    onEditEnd(bool saveChanges) {
+      log("onEditEnd: $activeEditIndex, $saveChanges");
+      keysEditableText[activeEditIndex].currentState?.endEdit();
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(taskModel.title),
-        backgroundColor: "primary".themed(context),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(Icons.arrow_back),
-        ),
+          title: Text(taskModel.title),
+          backgroundColor: "primary".themed(context),
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(Icons.arrow_back),
+          ),
           actions: [
-            IconButton(
-              onPressed: () {
-                setState(() {
-                });
-              },
-              // color: showActive ? Colors.grey : Colors.red, //TODO
-              icon: const Icon(Icons.done),
-              tooltip: "TODO".resc(),
+            TaskAppBarActions(
+              key: keyTaskAppBarActionsState,
+              onEditEnd: onEditEnd,
             )
-          ]
-      ),
+          ]),
       body: Column(children: [
         Expanded(
             // TODO: use ListView.builder, fix complex multi-checklist logic
@@ -95,71 +123,32 @@ class _TaskState extends State<Task> {
                 scrollDirection: Axis.vertical,
                 controller: scrollController,
                 children: <Widget>[
-                      Markdown(text: taskModel.description, onChange: (String ) {
-
-                      },)
-                          // Scrollbar(
-                          //   child: SingleChildScrollView(
-                          //     child: Markdown(
-                          //       controller: ScrollController(),
-                          //       selectable: true,
-                          //       onTapLink: (_, href, __) async {
-                          //         // if (href == null || !await canLaunch(href)) {
-                          //         //   Fluttertoast.showToast(
-                          //         //     msg: "Couldn't open the URL",
-                          //         //     toastLength: Toast.LENGTH_SHORT,
-                          //         //     gravity: ToastGravity.CENTER,
-                          //         //     timeInSecForIosWeb: 1,
-                          //         //     backgroundColor: Colors.red,
-                          //         //     textColor: Colors.white,
-                          //         //     fontSize: 16.0,
-                          //         //   );
-                          //         // } else {
-                          //         //   launch(href);
-                          //         // }
-                          //       },
-                          //       data: taskModel.description,
-                          //       shrinkWrap: true,
-                          //       extensionSet: md.ExtensionSet(
-                          //         md.ExtensionSet.gitHubFlavored.blockSyntaxes,
-                          //         [
-                          //           md.EmojiSyntax(),
-                          //           ...md.ExtensionSet.gitHubFlavored.inlineSyntaxes
-                          //         ],
-                          //       ),
-                          //     ),
-                          //   ),
-                          // )
-                          // markDownEditor.vertical(),
-                          // markDownEditor.inPlace(),
-                          // MarkDownEditor(
-                          //   controller: _textController,
-                          // data: taskModel.description,
-                          // controller: scrollController,
-                          // shrinkWrap: true,
-                          // // selectable: true, // TODO
-                          // // onSelectionChanged: (text, selection, cause) {
-                          // // },
-                          // styleSheet: MarkdownStyleSheet(
-                          //   p: const TextStyle(fontSize: 15),
-                          // )
-                          // ),
-
+                      Markdown(
+                          key: keysEditableText[0],
+                          text: taskModel.description,
+                          onChange: onChange,
+                          onEditStart: () => onEditStart(0))
                     ] +
                     buildSubtasks(
-                        context, subtasks, taskMetadata, toggleStatus) +
-                    comments
-                        .map((comment) => Text(comment.comment)
-                            // markDownEditor.inPlace()
-                            // Markdown(
-                            //     data: comment.comment,
-                            //     shrinkWrap: true,
-                            //     controller: scrollController,
-                            //     styleSheet: MarkdownStyleSheet(
-                            //       p: const TextStyle(fontSize: 15),
-                            //     ))
-                            )
-                        .toList())),
+                        context, subtasks, taskMetadata, keysEditableText, toggleStatus) +
+                    comments.asMap().entries.map((entry) {
+                      int idx = entry.key;
+                      CommentModel comment = entry.value;
+                      return Markdown(
+                          key: keysEditableText[idx + subtasks.length + 1],
+                          text: comment.comment,
+                          onChange: onChange,
+                          onEditStart: () => onEditStart(idx + 1));
+                    }).toList()
+                // markDownEditor.inPlace()
+                // Markdown(
+                //     data: comment.comment,
+                //     shrinkWrap: true,
+                //     controller: scrollController,
+                //     styleSheet: MarkdownStyleSheet(
+                //       p: const TextStyle(fontSize: 15),
+                //     ))
+                )),
       ]),
     );
   }
