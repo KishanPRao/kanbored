@@ -33,6 +33,7 @@ class _TaskState extends State<Task> {
   GlobalKey<TaskAppBarActionsState> keyTaskAppBarActionsState = GlobalKey();
   List<GlobalKey<EditableState>> keysEditableText = [];
   var activeEditIndex = 0;
+  var activeEditText = "";
 
   @override
   void didChangeDependencies() {
@@ -47,28 +48,31 @@ class _TaskState extends State<Task> {
     taskMetadata = null;
     keysEditableText = [];
     keysEditableText.add(GlobalKey());
+    var loadedSubtasks = <SubtaskModel>[];
+    var loadedComments = <CommentModel>[];
+    TaskMetadataModel? loadedTaskMetadata;
     if (taskModel.nbSubtasks > 0) {
-      var subtasks = await Api.getAllSubtasks(taskModel.id);
-      var taskMetadata = await Api.getTaskMetadata(taskModel.id);
-      var checklistSubtaskCount =
-          taskMetadata.checklists.length + subtasks.length;
+      loadedSubtasks = await Api.getAllSubtasks(taskModel.id);
+      loadedTaskMetadata = await Api.getTaskMetadata(taskModel.id);
+      var checklistSubtaskCount = (loadedTaskMetadata.checklists.isNotEmpty
+              ? loadedTaskMetadata.checklists.length * 2
+              : 1) +
+          loadedSubtasks.length; // add a new subtask for each checklist
       for (var i = 0; i < checklistSubtaskCount; i++) {
         keysEditableText.add(GlobalKey());
       }
-      setState(() {
-        this.subtasks = subtasks;
-        this.taskMetadata = taskMetadata;
-      });
     }
     if (taskModel.nbComments > 0) {
-      var comments = await Api.getAllComments(taskModel.id);
-      for (var i = 0; i < comments.length; i++) {
+      loadedComments = await Api.getAllComments(taskModel.id);
+      for (var i = 0; i < loadedComments.length; i++) {
         keysEditableText.add(GlobalKey());
       }
-      setState(() {
-        this.comments = comments;
-      });
     }
+    setState(() {
+      subtasks = loadedSubtasks;
+      taskMetadata = loadedTaskMetadata;
+      comments = loadedComments;
+    });
   }
 
   @override
@@ -87,7 +91,8 @@ class _TaskState extends State<Task> {
     // var field = markDownEditor.field as MrkdownEditingField;
     // field.controller.
     onChange(text) {
-      log("onChange: $text");
+      activeEditText = text;
+      // log("onChange: $text");
       keyTaskAppBarActionsState.currentState?.updateText(text);
     }
 
@@ -97,13 +102,30 @@ class _TaskState extends State<Task> {
       keyTaskAppBarActionsState.currentState?.startEdit();
     }
 
-    onEditEnd(bool saveChanges) {
+    bool onEditEnd(bool saveChanges) {
+      if (saveChanges && activeEditText.isEmpty) return false;
       log("onEditEnd: $activeEditIndex, $saveChanges");
       keysEditableText[activeEditIndex].currentState?.endEdit(saveChanges);
+      return true;
     }
 
-    var checklistSubtaskCount =
-        (taskMetadata?.checklists.length ?? 0) + subtasks.length;
+    var checklistSubtaskCount = 0;
+    var taskMetadata = this.taskMetadata;
+    if (taskMetadata != null) {
+      if (taskMetadata.checklists.isNotEmpty) {
+        checklistSubtaskCount += taskMetadata.checklists.length *
+            2; // each checklist has a `add subtask`
+      } else {
+        checklistSubtaskCount += 1;
+      }
+    }
+    checklistSubtaskCount += subtasks.length;
+    // var checklistSubtaskCount =
+    //     (taskMetadata?.checklists.length ?? 0) + subtasks.length;
+    // var checklistSubtaskCount = (((taskMetadata?.checklists.isNotEmpty ? taskMetadata?.checklists.length * 2
+    //     : 1)) ?? 0)
+    //      +
+    //     subtasks.length;
     log("Checklist subtask count: $checklistSubtaskCount");
     return Scaffold(
       appBar: AppBar(
@@ -152,7 +174,8 @@ class _TaskState extends State<Task> {
                               keysEditableText[idx + checklistSubtaskCount + 1],
                           text: comment.comment,
                           onChange: onChange,
-                          onEditStart: () => onEditStart(idx + 1));
+                          onEditStart: () =>
+                              onEditStart(idx + checklistSubtaskCount + 1));
                     }).toList()
                 // markDownEditor.inPlace()
                 // Markdown(

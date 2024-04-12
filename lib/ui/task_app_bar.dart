@@ -6,7 +6,7 @@ import 'package:kanbored/strings.dart';
 import 'editing_state.dart';
 
 class TaskAppBarActions extends StatefulWidget {
-  final Function(bool) onEditEnd;
+  final bool Function(bool) onEditEnd;
 
   const TaskAppBarActions({super.key, required this.onEditEnd});
 
@@ -17,7 +17,7 @@ class TaskAppBarActions extends StatefulWidget {
 class TaskAppBarActionsState extends EditableState<TaskAppBarActions> {
   bool _editing = false;
   String _text = "";
-  late Function(bool) onEditEnd;
+  late bool Function(bool) onEditEnd;
 
   @override
   void initState() {
@@ -43,8 +43,9 @@ class TaskAppBarActionsState extends EditableState<TaskAppBarActions> {
   }
 
   void stopEdit(bool saveChanges) {
-    onEditEnd(saveChanges);
-    endEdit(saveChanges);
+    if (onEditEnd(saveChanges)) {
+      endEdit(saveChanges);
+    }
   }
 
   void updateText(String value) => _text = value;

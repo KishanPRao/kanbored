@@ -1,28 +1,25 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/ui/editing_state.dart';
 
-class Subtask extends StatefulWidget {
-  final SubtaskModel subtask;
+class AddSubtask extends StatefulWidget {
   final Function(String) onChange;
   final Function() onEditStart;
   final bool Function(bool) onEditEnd;
 
-  const Subtask({
+  const AddSubtask({
     super.key,
-    required this.subtask,
     required this.onChange,
     required this.onEditStart,
     required this.onEditEnd,
   });
 
   @override
-  State<StatefulWidget> createState() => SubtaskState();
+  State<StatefulWidget> createState() => AddSubtaskState();
 }
 
-class SubtaskState extends EditableState<Subtask> {
+class AddSubtaskState extends EditableState<AddSubtask> {
   late TextEditingController controller;
   late Function(String) onChange;
   late Function() onEditStart;
@@ -38,17 +35,11 @@ class SubtaskState extends EditableState<Subtask> {
   }
 
   @override
-  void didChangeDependencies() {
-    controller.text = widget.subtask.title;
-    super.didChangeDependencies();
-  }
-
-  @override
   void endEdit(bool saveChanges) {
     if (saveChanges) {
-      log("Edit subtask name: ${controller.text}");
+      log("Add a new subtask: ${controller.text}");
     } else {
-      controller.text = widget.subtask.title;
+      controller.text = "";
     }
     FocusManager.instance.primaryFocus?.unfocus();
   }
@@ -65,6 +56,9 @@ class SubtaskState extends EditableState<Subtask> {
           onEditEnd(true);
         },
         onChanged: onChange,
-        decoration: const InputDecoration(border: InputBorder.none));
+        decoration: const InputDecoration(
+            hintText: "Add a new subtask",
+            border: InputBorder.none,
+            hintStyle: TextStyle(fontWeight: FontWeight.w300)));
   }
 }
