@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart' as flmd;
 import 'package:kanbored/strings.dart';
+import 'package:kanbored/ui/editing_state.dart';
 import 'package:markdown/markdown.dart' as md;
 
 class Markdown extends StatefulWidget {
@@ -24,7 +25,7 @@ class Markdown extends StatefulWidget {
   State<StatefulWidget> createState() => MarkdownState();
 }
 
-class MarkdownState extends State<Markdown> {
+class MarkdownState extends EditableState<Markdown> {
   // final int maxLines = 8;
   late TextEditingController controller;
   late Function(String) onChange;
@@ -39,9 +40,12 @@ class MarkdownState extends State<Markdown> {
     onEditStart = widget.onEditStart;
   }
 
-  void endEdit() => setState(() {
-        editing = false;
-      });
+  @override
+  void endEdit(bool saveChanges) {
+    setState(() {
+      editing = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

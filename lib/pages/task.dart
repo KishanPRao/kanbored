@@ -16,6 +16,7 @@ import 'package:kanbored/ui/build_subtasks.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/markdown.dart';
 import 'package:kanbored/ui/task_app_bar.dart';
+import 'package:kanbored/utils.dart';
 
 class Task extends StatefulWidget {
   const Task({super.key});
@@ -49,7 +50,9 @@ class _TaskState extends State<Task> {
     if (taskModel.nbSubtasks > 0) {
       var subtasks = await Api.getAllSubtasks(taskModel.id);
       var taskMetadata = await Api.getTaskMetadata(taskModel.id);
-      for (var i = 0; i < subtasks.length; i++) {
+      var checklistSubtaskCount =
+          taskMetadata.checklists.length + subtasks.length;
+      for (var i = 0; i < checklistSubtaskCount; i++) {
         keysEditableText.add(GlobalKey());
       }
       setState(() {
@@ -96,9 +99,12 @@ class _TaskState extends State<Task> {
 
     onEditEnd(bool saveChanges) {
       log("onEditEnd: $activeEditIndex, $saveChanges");
-      keysEditableText[activeEditIndex].currentState?.endEdit();
+      keysEditableText[activeEditIndex].currentState?.endEdit(saveChanges);
     }
 
+    var checklistSubtaskCount =
+        (taskMetadata?.checklists.length ?? 0) + subtasks.length;
+    log("Checklist subtask count: $checklistSubtaskCount");
     return Scaffold(
       appBar: AppBar(
           title: Text(taskModel.title),
@@ -130,12 +136,20 @@ class _TaskState extends State<Task> {
                           onEditStart: () => onEditStart(0))
                     ] +
                     buildSubtasks(
-                        context, subtasks, taskMetadata, keysEditableText, toggleStatus) +
-                    comments.asMap().entries.map((entry) {
+                        context,
+                        subtasks,
+                        taskMetadata,
+                        keysEditableText,
+                        onChange,
+                        onEditStart,
+                        onEditEnd,
+                        toggleStatus) +
+                    comments.mapIndexed((entry) {
                       int idx = entry.key;
                       CommentModel comment = entry.value;
                       return Markdown(
-                          key: keysEditableText[idx + subtasks.length + 1],
+                          key:
+                              keysEditableText[idx + checklistSubtaskCount + 1],
                           text: comment.comment,
                           onChange: onChange,
                           onEditStart: () => onEditStart(idx + 1));

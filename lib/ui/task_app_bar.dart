@@ -25,14 +25,27 @@ class TaskAppBarActionsState extends EditableState<TaskAppBarActions> {
     onEditEnd = widget.onEditEnd;
   }
 
-  void startEdit() => setState(() {
+  void startEdit() {
+    if (!_editing) {
+      setState(() {
         _editing = true;
       });
+    }
+  }
 
   @override
-  void endEdit() => setState(() {
+  void endEdit(bool saveChanges) {
+    if (_editing) {
+      setState(() {
         _editing = false;
       });
+    }
+  }
+
+  void stopEdit(bool saveChanges) {
+    onEditEnd(saveChanges);
+    endEdit(saveChanges);
+  }
 
   void updateText(String value) => _text = value;
 
@@ -46,23 +59,13 @@ class TaskAppBarActionsState extends EditableState<TaskAppBarActions> {
         children: _editing
             ? [
                 IconButton(
-                  onPressed: () {
-                    onEditEnd(false);
-                    setState(() {
-                      _editing = false;
-                    });
-                  },
+                  onPressed: () => stopEdit(false),
                   // color: showActive ? Colors.grey : Colors.red, //TODO
                   icon: const Icon(Icons.undo),
                   tooltip: "tt_discard".resc(),
                 ),
                 IconButton(
-                  onPressed: () {
-                    onEditEnd(true);
-                    setState(() {
-                      _editing = false;
-                    });
-                  },
+                  onPressed: () => stopEdit(true),
                   // color: showActive ? Colors.grey : Colors.red, //TODO
                   icon: const Icon(Icons.done),
                   tooltip: "tt_save".resc(),
