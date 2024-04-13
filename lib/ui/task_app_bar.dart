@@ -76,8 +76,11 @@ class TaskAppBarActionsState extends EditableState<TaskAppBarActions> {
                 PopupMenuButton<String>(
                   onSelected: handleClick,
                   itemBuilder: (BuildContext context) {
-                    return {"archive".resc(), "delete".resc()}
-                        .map((String choice) {
+                    return {
+                      "add_checklist".resc(),
+                      "archive".resc(),
+                      "delete".resc(),
+                    }.map((String choice) {
                       return PopupMenuItem<String>(
                         value: choice,
                         child: Text(choice),

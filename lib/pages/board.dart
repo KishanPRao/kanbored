@@ -92,6 +92,11 @@ class _BoardState extends State<Board> {
               ),
               actions: [
                 IconButton(
+                  onPressed: null,
+                  icon: const Icon(Icons.search),
+                  tooltip: "tt_search".resc(),
+                ),
+                IconButton(
                   onPressed: () {
                     setState(() {
                       showActive = !showActive;
@@ -100,7 +105,7 @@ class _BoardState extends State<Board> {
                   color: showActive ? Colors.grey : Colors.red, //TODO
                   icon: const Icon(Icons.archive),
                   tooltip: "tt_archived_col".resc(),
-                )
+                ),
               ],
             ),
             body: Column(

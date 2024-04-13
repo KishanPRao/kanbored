@@ -15,6 +15,7 @@ import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/build_subtasks.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/markdown.dart';
+import 'package:kanbored/ui/task_action_listener.dart';
 import 'package:kanbored/ui/task_app_bar.dart';
 import 'package:kanbored/utils.dart';
 
@@ -47,20 +48,21 @@ class _TaskState extends State<Task> {
     subtasks = [];
     taskMetadata = null;
     keysEditableText = [];
-    keysEditableText.add(GlobalKey());
+    keysEditableText.add(GlobalKey());  // description
     var loadedSubtasks = <SubtaskModel>[];
     var loadedComments = <CommentModel>[];
     TaskMetadataModel? loadedTaskMetadata;
+    var checklistSubtaskCount = 1;  // minimum 1, if no subtasks, show add new subtask
     if (taskModel.nbSubtasks > 0) {
       loadedSubtasks = await Api.getAllSubtasks(taskModel.id);
       loadedTaskMetadata = await Api.getTaskMetadata(taskModel.id);
-      var checklistSubtaskCount = (loadedTaskMetadata.checklists.isNotEmpty
+      checklistSubtaskCount = (loadedTaskMetadata.checklists.isNotEmpty
               ? loadedTaskMetadata.checklists.length * 2
               : 1) +
           loadedSubtasks.length; // add a new subtask for each checklist
-      for (var i = 0; i < checklistSubtaskCount; i++) {
-        keysEditableText.add(GlobalKey());
-      }
+    }
+    for (var i = 0; i < checklistSubtaskCount; i++) {
+      keysEditableText.add(GlobalKey());
     }
     if (taskModel.nbComments > 0) {
       loadedComments = await Api.getAllComments(taskModel.id);
@@ -68,11 +70,35 @@ class _TaskState extends State<Task> {
         keysEditableText.add(GlobalKey());
       }
     }
+    log("loadedSubtasks: $loadedSubtasks");
     setState(() {
       subtasks = loadedSubtasks;
       taskMetadata = loadedTaskMetadata;
       comments = loadedComments;
     });
+  }
+  void onChange(text) {
+    activeEditText = text;
+    keyTaskAppBarActionsState.currentState?.updateText(text);
+  }
+
+  void onEditStart(int index) {
+    activeEditIndex = index;
+    keyTaskAppBarActionsState.currentState?.startEdit();
+  }
+
+  bool onEditEnd(bool saveChanges) {
+    if (saveChanges && activeEditText.isEmpty) return false;
+    log("onEditEnd: $activeEditIndex, $saveChanges");
+    keysEditableText[activeEditIndex].currentState?.endEdit(saveChanges);
+    // setState(() {});
+    return true;
+  }
+
+  void refreshUi() {
+    log("Refresh UI!");
+    // setState(() {});
+    init();
   }
 
   @override
@@ -90,24 +116,6 @@ class _TaskState extends State<Task> {
     // final MarkDownEditor markDownEditor = MarkDownEditor(controller: textController);
     // var field = markDownEditor.field as MrkdownEditingField;
     // field.controller.
-    onChange(text) {
-      activeEditText = text;
-      // log("onChange: $text");
-      keyTaskAppBarActionsState.currentState?.updateText(text);
-    }
-
-    onEditStart(int index) {
-      log("onEditStart: $index");
-      activeEditIndex = index;
-      keyTaskAppBarActionsState.currentState?.startEdit();
-    }
-
-    bool onEditEnd(bool saveChanges) {
-      if (saveChanges && activeEditText.isEmpty) return false;
-      log("onEditEnd: $activeEditIndex, $saveChanges");
-      keysEditableText[activeEditIndex].currentState?.endEdit(saveChanges);
-      return true;
-    }
 
     var checklistSubtaskCount = 0;
     var taskMetadata = this.taskMetadata;
@@ -120,13 +128,8 @@ class _TaskState extends State<Task> {
       }
     }
     checklistSubtaskCount += subtasks.length;
-    // var checklistSubtaskCount =
-    //     (taskMetadata?.checklists.length ?? 0) + subtasks.length;
-    // var checklistSubtaskCount = (((taskMetadata?.checklists.isNotEmpty ? taskMetadata?.checklists.length * 2
-    //     : 1)) ?? 0)
-    //      +
-    //     subtasks.length;
-    log("Checklist subtask count: $checklistSubtaskCount");
+    log("Checklist + subtask count: $checklistSubtaskCount");
+    log("Checklist len: ${taskMetadata?.checklists.length} subtask len: ${subtasks.length}");
     return Scaffold(
       appBar: AppBar(
           title: Text(taskModel.title),
@@ -159,12 +162,16 @@ class _TaskState extends State<Task> {
                     ] +
                     buildSubtasks(
                         context,
+                        taskModel,
                         subtasks,
                         taskMetadata,
                         keysEditableText,
-                        onChange,
-                        onEditStart,
-                        onEditEnd,
+                        TaskActionListener(
+                          onChange: onChange,
+                          onEditStart: (index) => onEditStart(index!),
+                          onEditEnd: onEditEnd,
+                          refreshUi: refreshUi,
+                        ),
                         toggleStatus) +
                     comments.mapIndexed((entry) {
                       int idx = entry.key;

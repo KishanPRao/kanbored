@@ -21,6 +21,7 @@ class ProjectMetadataModel implements Model {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() => {
         "metadata": jsonEncode({"closed_columns": closedColumns}),
       };

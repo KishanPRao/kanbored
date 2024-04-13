@@ -3,19 +3,16 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/ui/editing_state.dart';
+import 'package:kanbored/ui/task_action_listener.dart';
 
 class Subtask extends StatefulWidget {
   final SubtaskModel subtask;
-  final Function(String) onChange;
-  final Function() onEditStart;
-  final bool Function(bool) onEditEnd;
+  final TaskActionListener taskActionListener;
 
   const Subtask({
     super.key,
     required this.subtask,
-    required this.onChange,
-    required this.onEditStart,
-    required this.onEditEnd,
+    required this.taskActionListener,
   });
 
   @override
@@ -24,17 +21,13 @@ class Subtask extends StatefulWidget {
 
 class SubtaskState extends EditableState<Subtask> {
   late TextEditingController controller;
-  late Function(String) onChange;
-  late Function() onEditStart;
-  late bool Function(bool) onEditEnd;
+  late TaskActionListener taskActionListener;
 
   @override
   void initState() {
     super.initState();
     controller = TextEditingController(text: "");
-    onChange = widget.onChange;
-    onEditStart = widget.onEditStart;
-    onEditEnd = widget.onEditEnd;
+    taskActionListener = widget.taskActionListener;
   }
 
   @override
@@ -58,13 +51,13 @@ class SubtaskState extends EditableState<Subtask> {
     return TextField(
         controller: controller,
         onTap: () {
-          onChange(controller.text);
-          onEditStart();
+          taskActionListener.onChange(controller.text);
+          taskActionListener.onEditStart(null);
         },
         onEditingComplete: () {
-          onEditEnd(true);
+          taskActionListener.onEditEnd(true);
         },
-        onChanged: onChange,
+        onChanged: taskActionListener.onChange,
         decoration: const InputDecoration(border: InputBorder.none));
   }
 }

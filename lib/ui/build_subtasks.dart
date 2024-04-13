@@ -3,80 +3,78 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
+import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/add_subtask.dart';
 import 'package:kanbored/ui/checklist.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/subtask.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/ui/task_action_listener.dart';
 
 List<Widget> buildSingleListSubtasks(
     BuildContext context,
+    TaskModel task,
     List<SubtaskModel> subtasks,
     List<GlobalKey<EditableState>> keysEditableText,
-    Function(String) onChange,
-    Function(int) onEditStart,
-    bool Function(bool) onEditEnd,
+    TaskActionListener taskActionListener,
     Function(SubtaskModel, bool) toggleCb) {
   var currentIndex = 1; // start after `description`
   return subtasks.map((subtask) {
         return buildSingleSubtask(context, subtask, keysEditableText,
-            currentIndex++, onChange, onEditStart, onEditEnd, toggleCb);
+            currentIndex++, taskActionListener, toggleCb);
       }).toList() +
       <Widget>[
-        buildAddSubtask(
-            keysEditableText, currentIndex++, onChange, onEditStart, onEditEnd)
+        buildAddSubtask(null, null, task, keysEditableText, currentIndex++,
+            taskActionListener)
       ];
 }
 
 List<Widget> buildMultiListSubtasks(
     BuildContext context,
+    TaskModel task,
     List<SubtaskModel> subtasks,
     TaskMetadataModel taskMetadata,
     List<GlobalKey<EditableState>> keysEditableText,
-    Function(String) onChange,
-    Function(int) onEditStart,
-    bool Function(bool) onEditEnd,
+    TaskActionListener taskActionListener,
     Function(SubtaskModel, bool) toggleCb) {
   var currentIndex = 1; // start after `description`
   return taskMetadata.checklists.map((checklist) {
-    log("checklist: ${checklist.name}: $currentIndex");
+    log("checklist: $checklist: $currentIndex");
     return Column(
         children: <Widget>[
               buildChecklistHeader(checklist, keysEditableText, currentIndex++,
-                  onChange, onEditStart, onEditEnd)
+                  taskActionListener)
             ] +
             checklist.items.map((item) {
               var subtask =
                   subtasks.singleWhere((element) => element.id == item.id);
               log("subtask: ${subtask.title}: $currentIndex");
               return buildSingleSubtask(context, subtask, keysEditableText,
-                  currentIndex++, onChange, onEditStart, onEditEnd, toggleCb);
+                  currentIndex++, taskActionListener, toggleCb);
             }).toList() +
             <Widget>[
-              buildAddSubtask(keysEditableText, currentIndex++, onChange,
-                  onEditStart, onEditEnd)
+              buildAddSubtask(checklist, taskMetadata, task, keysEditableText,
+                  currentIndex++, taskActionListener)
             ]);
   }).toList();
 }
 
 List<Widget> buildSubtasks(
     BuildContext context,
+    TaskModel task,
     List<SubtaskModel> subtasks,
     TaskMetadataModel? taskMetadata,
     List<GlobalKey<EditableState>> keysEditableText,
-    Function(String) onChange,
-    Function(int) onEditStart,
-    bool Function(bool) onEditEnd,
+    TaskActionListener taskActionListener,
     Function(SubtaskModel, bool) toggleCb) {
-  if (subtasks.isEmpty) {
-    return [const SizedBox.shrink()];
-  }
+  // if (subtasks.isEmpty) {
+  //   return [const SizedBox.shrink()];
+  // }
   return taskMetadata != null
-      ? buildMultiListSubtasks(context, subtasks, taskMetadata,
-          keysEditableText, onChange, onEditStart, onEditEnd, toggleCb)
-      : buildSingleListSubtasks(context, subtasks, keysEditableText, onChange,
-          onEditStart, onEditEnd, toggleCb);
+      ? buildMultiListSubtasks(context, task, subtasks, taskMetadata,
+          keysEditableText, taskActionListener, toggleCb)
+      : buildSingleListSubtasks(context, task, subtasks, keysEditableText,
+          taskActionListener, toggleCb);
 }
 
 Widget buildSingleSubtask(
@@ -84,9 +82,7 @@ Widget buildSingleSubtask(
     SubtaskModel subtask,
     List<GlobalKey<EditableState>> keysEditableText,
     int index,
-    Function(String) onChange,
-    Function(int) onEditStart,
-    bool Function(bool) onEditEnd,
+    TaskActionListener taskActionListener,
     Function(SubtaskModel, bool) toggleCb) {
   return Row(children: [
     Checkbox(
@@ -102,41 +98,48 @@ Widget buildSingleSubtask(
     ),
     Expanded(
         child: Subtask(
-      key: keysEditableText[index],
-      subtask: subtask,
-      onChange: onChange,
-      onEditStart: () => onEditStart(index),
-      onEditEnd: onEditEnd,
-    ))
+            key: keysEditableText[index],
+            subtask: subtask,
+            taskActionListener: TaskActionListener(
+              onChange: taskActionListener.onChange,
+              onEditStart: (_) => taskActionListener.onEditStart(index),
+              onEditEnd: taskActionListener.onEditEnd,
+              refreshUi: taskActionListener.refreshUi,
+            )))
   ]);
 }
 
 Widget buildAddSubtask(
+  CheckListMetadata? checklist,
+  TaskMetadataModel? taskMetadata,
+  TaskModel task,
   List<GlobalKey<EditableState>> keysEditableText,
   int index,
-  Function(String) onChange,
-  Function(int) onEditStart,
-  bool Function(bool) onEditEnd,
+  TaskActionListener taskActionListener,
 ) =>
     AddSubtask(
-      key: keysEditableText[index],
-      onChange: onChange,
-      onEditStart: () => onEditStart(index),
-      onEditEnd: onEditEnd,
-    );
+        key: keysEditableText[index],
+        checklist: checklist,
+        taskMetadata: taskMetadata,
+        task: task,
+        taskActionListener: TaskActionListener(
+          onChange: taskActionListener.onChange,
+          onEditStart: (_) => taskActionListener.onEditStart(index),
+          onEditEnd: taskActionListener.onEditEnd,
+          refreshUi: taskActionListener.refreshUi,
+        ));
 
 Widget buildChecklistHeader(
-  CheckListMetadata checklist,
-  List<GlobalKey<EditableState>> keysEditableText,
-  int index,
-  Function(String) onChange,
-  Function(int) onEditStart,
-  bool Function(bool) onEditEnd,
-) =>
+        CheckListMetadata checklist,
+        List<GlobalKey<EditableState>> keysEditableText,
+        int index,
+        TaskActionListener taskActionListener) =>
     Checklist(
-      key: keysEditableText[index],
-      checkListMetadata: checklist,
-      onChange: onChange,
-      onEditStart: () => onEditStart(index),
-      onEditEnd: onEditEnd,
-    );
+        key: keysEditableText[index],
+        checklist: checklist,
+        taskActionListener: TaskActionListener(
+          onChange: taskActionListener.onChange,
+          onEditStart: (_) => taskActionListener.onEditStart(index),
+          onEditEnd: taskActionListener.onEditEnd,
+          refreshUi: taskActionListener.refreshUi,
+        ));

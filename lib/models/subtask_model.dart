@@ -57,6 +57,7 @@ class SubtaskModel implements Model {
         isTimerStarted: json["is_timer_started"],
       );
 
+  @override
   Map<String, dynamic> toJson() => {
         "id": id,
         "title": title,
@@ -72,4 +73,7 @@ class SubtaskModel implements Model {
         "status_name": statusName,
         "is_timer_started": isTimerStarted,
       };
+
+  @override
+  String toString() => toJson().toString();
 }

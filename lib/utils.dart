@@ -15,4 +15,8 @@ class Utils {
   static getWidth(BuildContext context) => MediaQuery.of(context).size.width;
 
   static getHeight(BuildContext context) => MediaQuery.of(context).size.height;
+
+  static showErrorSnackbar(BuildContext context, dynamic e) =>
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Error: $e")));
 }

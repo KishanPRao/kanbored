@@ -1,9 +1,11 @@
 {
   "tt_archived_col": "Archived Columns & Tasks",
+  "tt_search": "Search",
   "tt_opt": "Options",
   "tt_discard": "Discard",
   "tt_save": "Save",
   "archive": "Archive",
+  "add_checklist": "Add a checklist",
   "delete": "Delete",
   "add_task": "Add a task"
 }

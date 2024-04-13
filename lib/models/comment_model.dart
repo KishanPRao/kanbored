@@ -44,6 +44,7 @@ class CommentModel implements Model {
         avatarPath: json["avatar_path"],
       );
 
+  @override
   Map<String, dynamic> toJson() => {
         "id": id,
         "date_creation": dateCreation,

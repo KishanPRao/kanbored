@@ -194,6 +194,7 @@ class TaskModel implements Model {
         nbCompletedSubtasks: json["nb_completed_subtasks"],
       );
 
+  @override
   Map<String, dynamic> toJson() => {
         "id": id,
         "title": title,

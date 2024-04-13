@@ -20,9 +20,13 @@ class CheckListItemMetadata implements Model {
         id: json["id"],
       );
 
+  @override
   Map<String, dynamic> toJson() => {
         "id": id,
       };
+
+  @override
+  String toString() => toJson().toString();
 }
 
 class CheckListMetadata implements Model {
@@ -45,11 +49,15 @@ class CheckListMetadata implements Model {
             .toList(),
       );
 
+  @override
   Map<String, dynamic> toJson() => {
         "name": name,
         "position": position,
-        "items": items.map((e) => e.toJson()),
+        "items": items.map((e) => e.toJson()).toList() as List<dynamic>,
       };
+
+  @override
+  String toString() => toJson().toString();
 }
 
 class TaskMetadataModel implements Model {
@@ -67,8 +75,14 @@ class TaskMetadataModel implements Model {
                   .toList()
               : []);
 
+  @override
   Map<String, dynamic> toJson() => {
-        "metadata":
-            jsonEncode({"checklists": checklists.map((e) => e.toJson())}),
+        "metadata": jsonEncode({
+          "checklists":
+              checklists.map((e) => e.toJson()).toList() as List<dynamic>
+        }),
       };
+
+  @override
+  String toString() => toJson().toString();
 }

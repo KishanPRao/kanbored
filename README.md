@@ -12,6 +12,7 @@ Behaviour:
 - New Checklist: if no existing checklist (from trello), all existing tasks to new checklist, create a new one.
 
 NOTE: bridge supported features might not look right while using `kanboard`.
+Also, `kanboard` features might be missing. eg, swimlane. 
 Bridge support:
 - Multiple checklist
 - Archived task (card), column (list)

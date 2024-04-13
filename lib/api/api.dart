@@ -98,6 +98,17 @@ class Api {
         "time_spent": 0,
       });
 
+  static Future<int> createSubtask(int taskId, String subtaskName) async =>
+      setApi("createSubtask", 2041554661, params: {
+        "title": subtaskName,
+        "task_id": taskId,
+      });
+
+  static Future<bool> saveTaskMetadata(
+          int taskId, TaskMetadataModel taskMetadata) async =>
+      setApi("saveTaskMetadata", 133280317,
+          params: [taskId, taskMetadata.toJson()]);
+
   //////////////////////////////////// GETTER //////////////////////////////////
 
   static Future<List<ProjectModel>> getmyProjects() async =>
@@ -126,9 +137,9 @@ class Api {
 
   //////////////////////////////////// API //////////////////////////////////
 
-  static Future<int> setApi(String method, int id,
-      {Map<String, dynamic> params = const {}}) async {
-    return await baseApi(method, id, params: params) as int;
+  static Future<T> setApi<T>(String method, int id,
+      {dynamic params = const {}}) async {
+    return await baseApi(method, id, params: params) as T;
   }
 
   static Future<T> singleApi<T extends Model>(
@@ -152,13 +163,14 @@ class Api {
   }
 
   static dynamic baseApi<T extends Model>(String method, int id,
-      {Map<String, dynamic> params = const {}}) async {
+      {dynamic params = const {}}) async {
     final Map<String, dynamic> parameters = {
       "jsonrpc": "2.0",
       "method": method,
       "id": id,
       "params": params
     };
+    log("Base api, params: $parameters");
     final credentials = "${AppData.username}:${AppData.password}";
     Codec<String, String> stringToBase64 = utf8.fuse(base64);
     String encoded = stringToBase64.encode(credentials);
