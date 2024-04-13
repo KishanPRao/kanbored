@@ -30,6 +30,7 @@ class CheckListItemMetadata implements Model {
 }
 
 class CheckListMetadata implements Model {
+  // NOTE: `position` starts with 1.
   CheckListMetadata({
     required this.name,
     required this.position,

@@ -56,6 +56,11 @@ class AddTaskState extends State<AddTask> {
                         taskName = value;
                       });
                     },
+                    onEditingComplete: () {
+                      if (validText) {
+                        createTaskCb(taskName);
+                      }
+                    },
                     focusNode: focusNode,
                     decoration: InputDecoration(hintText: "add_task".resc()),
                   )),

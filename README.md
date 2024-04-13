@@ -14,7 +14,7 @@ Behaviour:
 NOTE: bridge supported features might not look right while using `kanboard`.
 Also, `kanboard` features might be missing. eg, swimlane. 
 Bridge support:
-- Multiple checklist
+- Multiple checklist (adds task metadata into kanboard, even if not try checklist)
 - Archived task (card), column (list)
 
 Limitations:
@@ -22,4 +22,5 @@ Limitations:
 
 TODO:
 - Test w/ and w/o bridge features/metadata
+- Queue write tasks (offline support)
 - Optimize!

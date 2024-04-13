@@ -11,25 +11,7 @@ import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/subtask.dart';
 import 'package:kanbored/ui/task_action_listener.dart';
 
-List<Widget> buildSingleListSubtasks(
-    BuildContext context,
-    TaskModel task,
-    List<SubtaskModel> subtasks,
-    List<GlobalKey<EditableState>> keysEditableText,
-    TaskActionListener taskActionListener,
-    Function(SubtaskModel, bool) toggleCb) {
-  var currentIndex = 1; // start after `description`
-  return subtasks.map((subtask) {
-        return buildSingleSubtask(context, subtask, keysEditableText,
-            currentIndex++, taskActionListener, toggleCb);
-      }).toList() +
-      <Widget>[
-        buildAddSubtask(null, null, task, keysEditableText, currentIndex++,
-            taskActionListener)
-      ];
-}
-
-List<Widget> buildMultiListSubtasks(
+List<Widget> buildSubtasks(
     BuildContext context,
     TaskModel task,
     List<SubtaskModel> subtasks,
@@ -42,12 +24,12 @@ List<Widget> buildMultiListSubtasks(
     log("checklist: $checklist: $currentIndex");
     return Column(
         children: <Widget>[
-              buildChecklistHeader(checklist, keysEditableText, currentIndex++,
-                  taskActionListener)
-            ] +
+          buildChecklistHeader(checklist, keysEditableText, currentIndex++,
+              taskActionListener)
+        ] +
             checklist.items.map((item) {
               var subtask =
-                  subtasks.singleWhere((element) => element.id == item.id);
+              subtasks.singleWhere((element) => element.id == item.id);
               log("subtask: ${subtask.title}: $currentIndex");
               return buildSingleSubtask(context, subtask, keysEditableText,
                   currentIndex++, taskActionListener, toggleCb);
@@ -57,24 +39,6 @@ List<Widget> buildMultiListSubtasks(
                   currentIndex++, taskActionListener)
             ]);
   }).toList();
-}
-
-List<Widget> buildSubtasks(
-    BuildContext context,
-    TaskModel task,
-    List<SubtaskModel> subtasks,
-    TaskMetadataModel? taskMetadata,
-    List<GlobalKey<EditableState>> keysEditableText,
-    TaskActionListener taskActionListener,
-    Function(SubtaskModel, bool) toggleCb) {
-  // if (subtasks.isEmpty) {
-  //   return [const SizedBox.shrink()];
-  // }
-  return taskMetadata != null
-      ? buildMultiListSubtasks(context, task, subtasks, taskMetadata,
-          keysEditableText, taskActionListener, toggleCb)
-      : buildSingleListSubtasks(context, task, subtasks, keysEditableText,
-          taskActionListener, toggleCb);
 }
 
 Widget buildSingleSubtask(

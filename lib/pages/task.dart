@@ -29,7 +29,7 @@ class Task extends StatefulWidget {
 class _TaskState extends State<Task> {
   late TaskModel taskModel;
   List<SubtaskModel> subtasks = [];
-  TaskMetadataModel? taskMetadata;
+  TaskMetadataModel taskMetadata = TaskMetadataModel(checklists: []);
   List<CommentModel> comments = [];
   GlobalKey<TaskAppBarActionsState> keyTaskAppBarActionsState = GlobalKey();
   List<GlobalKey<EditableState>> keysEditableText = [];
@@ -44,23 +44,43 @@ class _TaskState extends State<Task> {
   }
 
   void init() async {
+    log("init");
+    taskModel = await Api.getTask(taskModel.id, taskModel.projectId);  // update task info
     comments = [];
     subtasks = [];
-    taskMetadata = null;
+    taskMetadata = TaskMetadataModel(checklists: []);
     keysEditableText = [];
-    keysEditableText.add(GlobalKey());  // description
+    keysEditableText.add(GlobalKey()); // description
     var loadedSubtasks = <SubtaskModel>[];
     var loadedComments = <CommentModel>[];
-    TaskMetadataModel? loadedTaskMetadata;
-    var checklistSubtaskCount = 1;  // minimum 1, if no subtasks, show add new subtask
+    TaskMetadataModel loadedTaskMetadata;
+    // minimum 1, if no subtasks, show add new subtask
     if (taskModel.nbSubtasks > 0) {
       loadedSubtasks = await Api.getAllSubtasks(taskModel.id);
       loadedTaskMetadata = await Api.getTaskMetadata(taskModel.id);
-      checklistSubtaskCount = (loadedTaskMetadata.checklists.isNotEmpty
-              ? loadedTaskMetadata.checklists.length * 2
-              : 1) +
-          loadedSubtasks.length; // add a new subtask for each checklist
+      // add a `new subtask` for each checklist
+    } else {
+      loadedTaskMetadata = TaskMetadataModel(checklists: []);
     }
+    log("Loaded task metadata: $loadedTaskMetadata");
+    if (loadedTaskMetadata.checklists.isEmpty) {
+      var items = <CheckListItemMetadata>[];
+      for (var subtask in loadedSubtasks) {
+        items.add(CheckListItemMetadata(id: subtask.id));
+      }
+      var checklist =
+          CheckListMetadata(name: "Checklist", position: 1, items: items);
+      loadedTaskMetadata.checklists.add(checklist);
+      Api.saveTaskMetadata(taskModel.id, loadedTaskMetadata).then((value) {
+        if (!value) {
+          Utils.showErrorSnackbar(context, "Could not save task metadata");
+        } else {
+          log("stored task metadata: $loadedTaskMetadata");
+        }
+      }).catchError((e) => Utils.showErrorSnackbar(context, e));
+    }
+    var checklistSubtaskCount = (loadedTaskMetadata.checklists.length * 2) + loadedSubtasks.length;
+    log("[init] Checklist + subtask count: $checklistSubtaskCount");
     for (var i = 0; i < checklistSubtaskCount; i++) {
       keysEditableText.add(GlobalKey());
     }
@@ -77,6 +97,7 @@ class _TaskState extends State<Task> {
       comments = loadedComments;
     });
   }
+
   void onChange(text) {
     activeEditText = text;
     keyTaskAppBarActionsState.currentState?.updateText(text);
@@ -101,35 +122,24 @@ class _TaskState extends State<Task> {
     init();
   }
 
+  void toggleStatus(subtask, value) {
+    setState(() {
+      subtask.status =
+      value ? SubtaskModel.kStatusFinished : SubtaskModel.kStatusTodo;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    toggleStatus(subtask, value) {
-      setState(() {
-        subtask.status =
-            value ? SubtaskModel.kStatusFinished : SubtaskModel.kStatusTodo;
-      });
+    // Do not load until some data is retrieved
+    if (taskMetadata.checklists.isEmpty) {
+      return const SizedBox.shrink();
     }
 
     ScrollController scrollController = ScrollController();
-    var textController = TextEditingController();
-    textController.text = taskModel.description;
-    // final MarkDownEditor markDownEditor = MarkDownEditor(controller: textController);
-    // var field = markDownEditor.field as MrkdownEditingField;
-    // field.controller.
-
-    var checklistSubtaskCount = 0;
-    var taskMetadata = this.taskMetadata;
-    if (taskMetadata != null) {
-      if (taskMetadata.checklists.isNotEmpty) {
-        checklistSubtaskCount += taskMetadata.checklists.length *
-            2; // each checklist has a `add subtask`
-      } else {
-        checklistSubtaskCount += 1;
-      }
-    }
-    checklistSubtaskCount += subtasks.length;
+    var checklistSubtaskCount = (taskMetadata.checklists.length * 2) + subtasks.length;
     log("Checklist + subtask count: $checklistSubtaskCount");
-    log("Checklist len: ${taskMetadata?.checklists.length} subtask len: ${subtasks.length}");
+    log("Checklist len: ${taskMetadata.checklists.length} subtask len: ${subtasks.length}");
     return Scaffold(
       appBar: AppBar(
           title: Text(taskModel.title),

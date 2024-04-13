@@ -10,6 +10,7 @@ import 'dart:developer';
 
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
+import 'package:kanbored/models/task_model.dart';
 
 class Api {
   static Future<bool> login(
@@ -96,6 +97,7 @@ class Api {
         "recurrence_basedate": 0,
         "time_estimated": 0,
         "time_spent": 0,
+        "nb_comments": 0,
       });
 
   static Future<int> createSubtask(int taskId, String subtaskName) async =>
@@ -125,6 +127,24 @@ class Api {
   static Future<List<CommentModel>> getAllComments(int taskId) async =>
       listApi("getAllComments", 148484683, CommentModel.fromJson,
           params: {"task_id": taskId});
+
+  static Future<TaskModel> getTask(int taskId, int projectId) async {
+    dynamic values = await Future.wait([
+      _getTask(taskId),
+      searchTasks(params: {"project_id": projectId, "query": "id:$taskId"})
+    ]);
+    Map<String, dynamic> searchResult = (values[1] as List<dynamic>).first;
+    var mergedValues = (values[0] as Map<String, dynamic>);
+    mergedValues.addAll(searchResult);
+    var task = TaskModel.fromJson(mergedValues);
+    return task;
+  }
+
+  static Future<dynamic> _getTask(int taskId) async =>
+      baseApi("getTask", 700738119, params: {"task_id": taskId});
+
+  static Future<dynamic> searchTasks({dynamic params = const {}}) async =>
+      baseApi("searchTasks", 1468511716, params: params);
 
   // TODO: Use for mutliple checklist, shopping list
   static Future<TaskMetadataModel> getTaskMetadata(int taskId) async =>
