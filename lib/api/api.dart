@@ -108,7 +108,7 @@ class Api {
         "task_id": taskId,
       });
 
-  static Future<int> createComment(int taskId, String content) async =>
+  static Future<dynamic> createComment(int taskId, String content) async =>
       setApi("createComment", 1580417921, params: {
         "task_id": taskId,
         "user_id": AppData.userId,
@@ -247,7 +247,7 @@ class Api {
     );
 
     final decodedData = json.decode(utf8.decode(resp.bodyBytes));
-    // log("decodedData: $decodedData");
+    log("decodedData: $decodedData");
 
     if (decodedData['error'] != null) return Future.error(decodedData['error']);
     return decodedData['result'];

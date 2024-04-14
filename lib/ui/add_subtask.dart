@@ -2,9 +2,9 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:kanbored/api/api.dart';
-import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
+import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/task_action_listener.dart';
 import 'package:kanbored/utils.dart';
@@ -42,7 +42,7 @@ class AddSubtaskState extends EditableState<AddSubtask> {
     task = widget.task;
     taskMetadata = widget.taskMetadata;
     checklist = widget.checklist;
-    log("Task metadata, checklist: ${taskMetadata?.checklists}");
+    log("Task metadata, checklist: ${taskMetadata.checklists}");
   }
 
   void updateTaskMetadata(int subtaskId) {
@@ -98,9 +98,9 @@ class AddSubtaskState extends EditableState<AddSubtask> {
           taskActionListener.onEditEnd(true);
         },
         onChanged: taskActionListener.onChange,
-        decoration: const InputDecoration(
-            hintText: "Add a new subtask",
+        decoration: InputDecoration(
+            hintText: "add_subtask".resc(),
             border: InputBorder.none,
-            hintStyle: TextStyle(fontWeight: FontWeight.w300)));
+            hintStyle: const TextStyle(fontWeight: FontWeight.w300)));
   }
 }

@@ -19,6 +19,10 @@ List<Widget> buildSubtasks(
     List<GlobalKey<EditableState>> keysEditableText,
     TaskActionListener taskActionListener,
     Function(SubtaskModel, bool) toggleCb) {
+  if (taskMetadata.checklists.isEmpty) {
+    return [const SizedBox.shrink()];
+  }
+  // TODO: use `flutter_sticky_header` for multi-header checklist & `SliverReorderableList`
   var currentIndex = 1; // start after `description`
   return taskMetadata.checklists.map((checklist) {
     log("checklist: $checklist: $currentIndex");
@@ -48,30 +52,40 @@ Widget buildSingleSubtask(
     int index,
     TaskActionListener taskActionListener,
     Function(SubtaskModel, bool) toggleCb) {
-  return Row(children: [
-    Checkbox(
-      checkColor: Colors.white, // TODO: themed color!
-      fillColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
-          return "primary".themed(context);
-        }
-        return Colors.transparent;
-      }),
-      value: subtask.status == SubtaskModel.kStatusFinished,
-      onChanged: (value) => toggleCb(subtask, value!),
-    ),
-    Expanded(
-        child: Subtask(
-            key: keysEditableText[index],
-            subtask: subtask,
-            taskActionListener: TaskActionListener(
-              onChange: taskActionListener.onChange,
-              onEditStart: (_) => taskActionListener.onEditStart(index),
-              onEditEnd: taskActionListener.onEditEnd,
-              onDelete: taskActionListener.onDelete,
-              refreshUi: taskActionListener.refreshUi,
-            )))
-  ]);
+  return Subtask(
+      key: keysEditableText[index],
+      subtask: subtask,
+      taskActionListener: TaskActionListener(
+        onChange: taskActionListener.onChange,
+        onEditStart: (_) => taskActionListener.onEditStart(index),
+        onEditEnd: taskActionListener.onEditEnd,
+        onDelete: taskActionListener.onDelete,
+        refreshUi: taskActionListener.refreshUi,
+      ));
+  // return Row(children: [
+  //   Checkbox(
+  //     checkColor: Colors.white, // TODO: themed color!
+  //     fillColor: MaterialStateProperty.resolveWith((states) {
+  //       if (states.contains(MaterialState.selected)) {
+  //         return "primary".themed(context);
+  //       }
+  //       return Colors.transparent;
+  //     }),
+  //     value: subtask.status == SubtaskModel.kStatusFinished,
+  //     onChanged: (value) => toggleCb(subtask, value!),
+  //   ),
+  //   Expanded(
+  //       child: Subtask(
+  //           key: keysEditableText[index],
+  //           subtask: subtask,
+  //           taskActionListener: TaskActionListener(
+  //             onChange: taskActionListener.onChange,
+  //             onEditStart: (_) => taskActionListener.onEditStart(index),
+  //             onEditEnd: taskActionListener.onEditEnd,
+  //             onDelete: taskActionListener.onDelete,
+  //             refreshUi: taskActionListener.refreshUi,
+  //           )))
+  // ]);
 }
 
 Widget buildAddSubtask(

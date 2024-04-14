@@ -5,8 +5,9 @@
   "tt_discard": "Discard",
   "tt_save": "Save",
   "archive": "Archive",
-  "add_checklist": "Add a checklist",
-  "add_comment": "Add a comment",
+  "add_checklist": "Add a new checklist",
+  "add_comment": "Add a new comment",
+  "add_subtask": "Add a new subtask",
   "invalid": "<invalid>",
   "delete": "Delete",
   "add_task": "Add a task"

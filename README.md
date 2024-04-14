@@ -19,8 +19,11 @@ Bridge support:
 
 Limitations:
 - User info not properly retained / shown
+- Subtask ordering will be different (uses metadata info to organize & decide position). If re-ordered in kanboard after in-app use, it will not be reflected.
 
 TODO:
+- Drag & drop, header/checklist & items between checklists (`flutter_sticky_header`, `SliverReorderableList`)
 - Test w/ and w/o bridge features/metadata
-- Queue write tasks (offline support)
+- Queue write tasks (offline support), bg service
+- Use multi-paragraph markdown: `flutter_markdown_selectionarea`
 - Optimize!

@@ -37,6 +37,7 @@ class _MarkdownState extends EditableState<Markdown> {
   late TextEditingController controller;
   late TaskActionListener taskActionListener;
   bool editing = false;
+  final FocusNode focusNode = FocusNode();
 
   @override
   void initState() {
@@ -70,7 +71,17 @@ class _MarkdownState extends EditableState<Markdown> {
   }
 
   @override
+  void startEdit() {
+    taskActionListener.onChange(controller.text);
+    taskActionListener.onEditStart(null);
+    setState(() {
+      editing = true;
+    });
+  }
+
+  @override
   void endEdit(bool saveChanges) {
+    FocusManager.instance.primaryFocus?.unfocus();
     if (saveChanges) {
       // TODO
       saveModelData().then((value) {
@@ -104,90 +115,105 @@ class _MarkdownState extends EditableState<Markdown> {
     log("mkdown: delete");
   }
 
+  void updateFocus() {
+    FocusManager.instance.primaryFocus?.unfocus();
+    focusNode.requestFocus();
+  }
+
   @override
   Widget build(BuildContext context) {
     TextSelection currentSelection =
-    const TextSelection(baseOffset: 0, extentOffset: 0);
+        const TextSelection(baseOffset: 0, extentOffset: 0);
     return Container(
       margin: const EdgeInsets.all(5),
       color: (editing ? "descEditBg" : "descBg").themed(context),
       child: editing
           ? Padding(
-          padding:
-          const EdgeInsets.symmetric(horizontal: 15.0, vertical: 0.0),
-          child: TextField(
-            autofocus: true,
-            maxLines: null,
-            style: const TextStyle(fontSize: 15),
-            controller: controller,
-            onTap: () {
-              taskActionListener.onChange(controller.text);
-              taskActionListener.onEditStart(null);
-            },
-            onChanged: taskActionListener.onChange,
-            onEditingComplete: () {
-              taskActionListener.onEditEnd(true);
-            },
-          ))
-          : GestureDetector(
-          onTap: () {
-            setState(() {
-                editing = true;
-              });
-            taskActionListener.onChange(controller.text);
-            taskActionListener.onEditStart(null);
-          },
-          child: flmd.Markdown(
-            controller: ScrollController(),
-            selectable: true,
-            onSelectionChanged: (text, selection, cause) {
-              log("onSelectionChanged: $selection, $text, $cause");
-              log("onSelectionChanged: ${selection.affinity}, ${selection
-                  .base}, ${selection.baseOffset}, ${selection
-                  .extent}, ${selection.extentOffset}, ${selection
-                  .end}, ${selection.start}");
-              currentSelection = selection;
-              // if (cause == SelectionChangedCause.tap) {
-              //
-              // }
-            },
-            styleSheet: flmd.MarkdownStyleSheet(
-              p: const TextStyle(fontSize: 15),
-            ),
-            onTapText: () =>
-                setState(() {
-                  controller.selection = currentSelection;
-                  editing = true;
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 15.0, vertical: 0.0),
+              child: TextField(
+                autofocus: true,
+                maxLines: null,
+                style: const TextStyle(fontSize: 15),
+                controller: controller,
+                focusNode: focusNode,
+                onTap: () {
                   taskActionListener.onChange(controller.text);
                   taskActionListener.onEditStart(null);
-                })
-            // onChange(controller.text);
-            ,
-            onTapLink: (_, href, __) async {
-              // if (href == null || !await canLaunch(href)) {
-              //   Fluttertoast.showToast(
-              //     msg: "Couldn't open the URL",
-              //     toastLength: Toast.LENGTH_SHORT,
-              //     gravity: ToastGravity.CENTER,
-              //     timeInSecForIosWeb: 1,
-              //     backgroundColor: Colors.red,
-              //     textColor: Colors.white,
-              //     fontSize: 16.0,
-              //   );
-              // } else {
-              //   launch(href);
-              // }
-            },
-            data: controller.text,
-            shrinkWrap: true,
-            extensionSet: md.ExtensionSet(
-              md.ExtensionSet.gitHubFlavored.blockSyntaxes,
-              [
-                md.EmojiSyntax(),
-                ...md.ExtensionSet.gitHubFlavored.inlineSyntaxes
-              ],
-            ),
-          )),
+                },
+                onChanged: taskActionListener.onChange,
+                onEditingComplete: () {
+                  taskActionListener.onEditEnd(true);
+                },
+              ))
+          : GestureDetector(
+              onTap: () {
+                updateFocus();
+                log("onTap Gesture");
+                taskActionListener.onChange(controller.text);
+                taskActionListener.onEditStart(null);
+                // focusNode.requestFocus();
+                setState(() {
+                  editing = true;
+                });
+              },
+              child: flmd.Markdown(
+                controller: ScrollController(),
+                selectable: true,
+                onSelectionChanged: (text, selection, cause) {
+                  log("onSelectionChanged: $selection, $text, $cause");
+                  log("onSelectionChanged: ${selection.affinity}, ${selection.base}, ${selection.baseOffset}, ${selection.extent}, ${selection.extentOffset}, ${selection.end}, ${selection.start}");
+                  currentSelection = selection;
+                  // if (cause == SelectionChangedCause.tap) {
+                  //
+                  // }
+                },
+                styleSheet: flmd.MarkdownStyleSheet(
+                  p: const TextStyle(fontSize: 15),
+                ),
+                onTapText: () {
+                  log("onTapText");
+                  updateFocus();
+                  controller.selection = currentSelection;
+                  taskActionListener.onChange(controller.text);
+                  taskActionListener.onEditStart(null);
+                  setState(() {
+                    editing = true;
+                  });
+                }
+                // onChange(controller.text);
+                ,
+                onTapLink: (_, href, __) async {
+                  // if (href == null || !await canLaunch(href)) {
+                  //   Fluttertoast.showToast(
+                  //     msg: "Couldn't open the URL",
+                  //     toastLength: Toast.LENGTH_SHORT,
+                  //     gravity: ToastGravity.CENTER,
+                  //     timeInSecForIosWeb: 1,
+                  //     backgroundColor: Colors.red,
+                  //     textColor: Colors.white,
+                  //     fontSize: 16.0,
+                  //   );
+                  // } else {
+                  //   launch(href);
+                  // }
+                },
+                data: controller.text,
+                shrinkWrap: true,
+                extensionSet: md.ExtensionSet(
+                  md.ExtensionSet.gitHubFlavored.blockSyntaxes,
+                  [
+                    md.EmojiSyntax(),
+                    ...md.ExtensionSet.gitHubFlavored.inlineSyntaxes
+                  ],
+                ),
+              )),
     );
+  }
+
+  @override
+  void dispose() {
+    focusNode.dispose();
+    super.dispose();
   }
 }

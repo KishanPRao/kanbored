@@ -3,6 +3,7 @@ class TaskActionListener {
   final Function(int?) onEditStart; // include array of valid actions
   final bool Function(bool) onEditEnd;
   final Function() onDelete;
+  final Function()? onCreateChecklist;
   final Function() refreshUi;
 
   TaskActionListener({
@@ -10,6 +11,7 @@ class TaskActionListener {
     required this.onEditStart,
     required this.onEditEnd,
     required this.onDelete,
+    this.onCreateChecklist,
     required this.refreshUi,
   });
 }

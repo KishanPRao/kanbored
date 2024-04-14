@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:kanbored/api/api.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/task_action_listener.dart';
 
@@ -26,6 +27,7 @@ class TaskAppBarActionsState extends EditableState<TaskAppBarActions> {
     taskActionListener = widget.taskActionListener;
   }
 
+  @override
   void startEdit() {
     if (!_editing) {
       setState(() {
@@ -62,14 +64,11 @@ class TaskAppBarActionsState extends EditableState<TaskAppBarActions> {
     return [
       IconButton(
         onPressed: () {
-          log("Add comment");
-        },
-        icon: const Icon(Icons.add_comment),
-        tooltip: "add_comment".resc(),
-      ),
-      IconButton(
-        onPressed: () {
           log("Add checklist");
+          taskActionListener.onCreateChecklist?.call();
+          // Api.createSubtask(task.id, controller.text)
+          //     .then((subtaskId) => updateTaskMetadata(subtaskId))
+          //     .catchError((e) => Utils.showErrorSnackbar(context, e));
         },
         icon: const Icon(Icons.format_list_bulleted_add),
         tooltip: "add_checklist".resc(),

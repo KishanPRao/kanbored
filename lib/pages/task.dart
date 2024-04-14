@@ -1,17 +1,12 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
-
-// import 'package:flutter_markdown_editor/editor_field.dart';
-// import 'package:flutter_markdown_editor/flutter_markdown_editor.dart';
-// import 'package:flutter_markdown/flutter_markdown.dart';
-// import 'package:markdown/markdown.dart' as md;
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/models/comment_model.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/strings.dart';
+import 'package:kanbored/ui/add_comment.dart';
 import 'package:kanbored/ui/build_subtasks.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/markdown.dart';
@@ -35,6 +30,9 @@ class _TaskState extends State<Task> {
   List<GlobalKey<EditableState>> keysEditableText = [];
   var activeEditIndex = 0;
   var activeEditText = "";
+  var isLoaded = false;
+  static const kDescriptionCount = 1;
+  static const kAddCommentCount = 1;
 
   @override
   void didChangeDependencies() {
@@ -52,34 +50,40 @@ class _TaskState extends State<Task> {
     taskMetadata = TaskMetadataModel(checklists: []);
     keysEditableText = [];
     keysEditableText.add(GlobalKey()); // description
+    keysEditableText.add(GlobalKey()); // add-comment
     var loadedSubtasks = <SubtaskModel>[];
     var loadedComments = <CommentModel>[];
-    TaskMetadataModel loadedTaskMetadata;
+    TaskMetadataModel loadedTaskMetadata =
+        await Api.getTaskMetadata(taskModel.id);
     // minimum 1, if no subtasks, show add new subtask
     if (taskModel.nbSubtasks > 0) {
       loadedSubtasks = await Api.getAllSubtasks(taskModel.id);
-      loadedTaskMetadata = await Api.getTaskMetadata(taskModel.id);
+      loadedSubtasks.sort((a, b) {
+        if (a.position > b.position) {
+          return 1;
+        } else {
+          return -1;
+        }
+      });
       // add a `new subtask` for each checklist
-    } else {
-      loadedTaskMetadata = TaskMetadataModel(checklists: []);
+      if (loadedTaskMetadata.checklists.isEmpty) {
+        var items = <CheckListItemMetadata>[];
+        for (var subtask in loadedSubtasks) {
+          items.add(CheckListItemMetadata(id: subtask.id));
+        }
+        var checklist =
+            CheckListMetadata(name: "Checklist", position: 1, items: items);
+        loadedTaskMetadata.checklists.add(checklist);
+        Api.saveTaskMetadata(taskModel.id, loadedTaskMetadata).then((value) {
+          if (!value) {
+            Utils.showErrorSnackbar(context, "Could not save task metadata");
+          } else {
+            log("stored task metadata: $loadedTaskMetadata");
+          }
+        }).catchError((e) => Utils.showErrorSnackbar(context, e));
+      }
     }
     log("Loaded task metadata: $loadedTaskMetadata");
-    if (loadedTaskMetadata.checklists.isEmpty) {
-      var items = <CheckListItemMetadata>[];
-      for (var subtask in loadedSubtasks) {
-        items.add(CheckListItemMetadata(id: subtask.id));
-      }
-      var checklist =
-          CheckListMetadata(name: "Checklist", position: 1, items: items);
-      loadedTaskMetadata.checklists.add(checklist);
-      Api.saveTaskMetadata(taskModel.id, loadedTaskMetadata).then((value) {
-        if (!value) {
-          Utils.showErrorSnackbar(context, "Could not save task metadata");
-        } else {
-          log("stored task metadata: $loadedTaskMetadata");
-        }
-      }).catchError((e) => Utils.showErrorSnackbar(context, e));
-    }
     var checklistSubtaskCount =
         (loadedTaskMetadata.checklists.length * 2) + loadedSubtasks.length;
     log("[init] Checklist + subtask count: $checklistSubtaskCount");
@@ -88,6 +92,13 @@ class _TaskState extends State<Task> {
     }
     if (taskModel.nbComments > 0) {
       loadedComments = await Api.getAllComments(taskModel.id);
+      loadedComments.sort((a, b) {
+        if (a.dateCreation > b.dateCreation) {
+          return -1;
+        } else {
+          return 1;
+        }
+      });
       for (var i = 0; i < loadedComments.length; i++) {
         keysEditableText.add(GlobalKey());
       }
@@ -97,6 +108,7 @@ class _TaskState extends State<Task> {
       subtasks = loadedSubtasks;
       taskMetadata = loadedTaskMetadata;
       comments = loadedComments;
+      isLoaded = true;
     });
   }
 
@@ -106,6 +118,7 @@ class _TaskState extends State<Task> {
   }
 
   void onEditStart(int index) {
+    log("onEditStart: $index");
     activeEditIndex = index;
     keyTaskAppBarActionsState.currentState?.startEdit();
   }
@@ -124,6 +137,22 @@ class _TaskState extends State<Task> {
     keysEditableText[activeEditIndex].currentState?.delete();
   }
 
+  void onCreateChecklist() {
+    var checklist = CheckListMetadata(
+        name: "Checklist",
+        position: taskMetadata.checklists.length + 1,
+        items: []);
+    taskMetadata.checklists.add(checklist);
+    Api.saveTaskMetadata(taskModel.id, taskMetadata).then((value) {
+      if (!value) {
+        Utils.showErrorSnackbar(context, "Could not save task metadata");
+      } else {
+        log("stored new task metadata: $taskMetadata");
+        refreshUi();
+      }
+    }).catchError((e) => Utils.showErrorSnackbar(context, e));
+  }
+
   void refreshUi() {
     log("Refresh UI!");
     // setState(() {});
@@ -140,7 +169,7 @@ class _TaskState extends State<Task> {
   @override
   Widget build(BuildContext context) {
     // Do not load until some data is retrieved
-    if (taskMetadata.checklists.isEmpty) {
+    if (!isLoaded) {
       return const SizedBox.shrink();
     }
 
@@ -167,6 +196,7 @@ class _TaskState extends State<Task> {
                 onEditStart: (_) => onEditStart(0),
                 onEditEnd: onEditEnd,
                 onDelete: onDelete,
+                onCreateChecklist: onCreateChecklist,
                 refreshUi: refreshUi,
               ),
             )
@@ -207,17 +237,36 @@ class _TaskState extends State<Task> {
                           refreshUi: refreshUi,
                         ),
                         toggleStatus) +
+                    [
+                      AddComment(
+                          key: keysEditableText[
+                              checklistSubtaskCount + kDescriptionCount],
+                          task: taskModel,
+                          taskActionListener: TaskActionListener(
+                            onChange: onChange,
+                            onEditStart: (_) => onEditStart(
+                                checklistSubtaskCount + kDescriptionCount),
+                            onEditEnd: onEditEnd,
+                            onDelete: onDelete,
+                            refreshUi: refreshUi,
+                          ))
+                    ] +
                     comments.mapIndexed((entry) {
+                      // TODO: Move into Comment & Description ui class, wrap Markdown
                       int idx = entry.key;
                       CommentModel comment = entry.value;
                       return Markdown(
-                          key:
-                              keysEditableText[idx + checklistSubtaskCount + 1],
+                          key: keysEditableText[idx +
+                              checklistSubtaskCount +
+                              kDescriptionCount +
+                              kAddCommentCount],
                           model: comment,
                           taskActionListener: TaskActionListener(
                             onChange: onChange,
-                            onEditStart: (_) =>
-                                onEditStart(idx + checklistSubtaskCount + 1),
+                            onEditStart: (_) => onEditStart(idx +
+                                checklistSubtaskCount +
+                                kDescriptionCount +
+                                kAddCommentCount),
                             onEditEnd: (saveChanges) {
                               // updateComment()
                               return onEditEnd(saveChanges);
