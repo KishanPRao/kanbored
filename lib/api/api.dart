@@ -76,6 +76,8 @@ class Api {
 
   //////////////////////////////////// SETTER //////////////////////////////////
 
+  // CREATE
+
   static Future<int> createTask(
           int projectId, int columnId, String taskName) async =>
       setApi("createTask", 1176509098, params: {
@@ -106,13 +108,48 @@ class Api {
         "task_id": taskId,
       });
 
-  static Future<bool> updateSubtask(int subtaskId, int taskId, String title, int status) async =>
-      setApi("updateSubtask", 191749979, params: {
-        "id": subtaskId,
+  static Future<int> createComment(int taskId, String content) async =>
+      setApi("createComment", 1580417921, params: {
         "task_id": taskId,
-        "title": title,
-        "status": status,
+        "user_id": AppData.userId,
+        "content": content
       });
+
+  // UPDATE
+
+  static Future<bool> updateTask(TaskModel taskModel) async =>
+      setApi("updateTask", 1406803059,
+          params: taskModel.toJsonWithKeys([
+            "id",
+            "title",
+            "color_id",
+            "owner_id",
+            "date_due",
+            "description",
+            "category_id",
+            "score",
+            "priority",
+            "recurrence_status",
+            "recurrence_trigger",
+            "recurrence_factor",
+            "recurrence_timeframe",
+            "recurrence_basedate",
+            "reference",
+            "tags",
+            "date_started",
+          ]));
+
+  static Future<bool> updateSubtask(SubtaskModel subtaskModel) async =>
+      setApi("updateSubtask", 191749979,
+          params: subtaskModel.toJsonWithKeys([
+            "id",
+            "task_id",
+            "title",
+            "user_id",
+            "time_estimated",
+            "time_spent",
+            "status",
+          ]));
 
   static Future<bool> saveTaskMetadata(
           int taskId, TaskMetadataModel taskMetadata) async =>

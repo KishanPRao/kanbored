@@ -6,6 +6,8 @@
   "tt_save": "Save",
   "archive": "Archive",
   "add_checklist": "Add a checklist",
+  "add_comment": "Add a comment",
+  "invalid": "<invalid>",
   "delete": "Delete",
   "add_task": "Add a task"
 }

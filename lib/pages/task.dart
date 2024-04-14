@@ -110,6 +110,7 @@ class _TaskState extends State<Task> {
     keyTaskAppBarActionsState.currentState?.startEdit();
   }
 
+  // TODO: needed?
   bool onEditEnd(bool saveChanges) {
     if (saveChanges && activeEditText.isEmpty) return false;
     log("onEditEnd: $activeEditIndex, $saveChanges");
@@ -180,11 +181,14 @@ class _TaskState extends State<Task> {
                 children: <Widget>[
                       Markdown(
                           key: keysEditableText[0],
-                          text: taskModel.description,
+                          model: taskModel,
                           taskActionListener: TaskActionListener(
                             onChange: onChange,
                             onEditStart: (_) => onEditStart(0),
-                            onEditEnd: onEditEnd,
+                            onEditEnd: (saveChanges) {
+                              // updateDescription()
+                              return onEditEnd(saveChanges);
+                            },
                             onDelete: onDelete,
                             refreshUi: refreshUi,
                           ))
@@ -209,12 +213,15 @@ class _TaskState extends State<Task> {
                       return Markdown(
                           key:
                               keysEditableText[idx + checklistSubtaskCount + 1],
-                          text: comment.comment,
+                          model: comment,
                           taskActionListener: TaskActionListener(
                             onChange: onChange,
                             onEditStart: (_) =>
                                 onEditStart(idx + checklistSubtaskCount + 1),
-                            onEditEnd: onEditEnd,
+                            onEditEnd: (saveChanges) {
+                              // updateComment()
+                              return onEditEnd(saveChanges);
+                            },
                             onDelete: onDelete,
                             refreshUi: refreshUi,
                           ));

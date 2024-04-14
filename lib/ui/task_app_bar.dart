@@ -58,6 +58,39 @@ class TaskAppBarActionsState extends EditableState<TaskAppBarActions> {
     log("opt: $value");
   }
 
+  List<Widget> buildDefaultActions() {
+    return [
+      IconButton(
+        onPressed: () {
+          log("Add comment");
+        },
+        icon: const Icon(Icons.add_comment),
+        tooltip: "add_comment".resc(),
+      ),
+      IconButton(
+        onPressed: () {
+          log("Add checklist");
+        },
+        icon: const Icon(Icons.format_list_bulleted_add),
+        tooltip: "add_checklist".resc(),
+      ),
+      PopupMenuButton<String>(
+        onSelected: handleClick,
+        itemBuilder: (BuildContext context) {
+          return {
+            "archive".resc(),
+            "delete".resc(),
+          }.map((String choice) {
+            return PopupMenuItem<String>(
+              value: choice,
+              child: Text(choice),
+            );
+          }).toList();
+        },
+      )
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -82,22 +115,6 @@ class TaskAppBarActionsState extends EditableState<TaskAppBarActions> {
                   tooltip: "tt_save".resc(),
                 )
               ]
-            : [
-                PopupMenuButton<String>(
-                  onSelected: handleClick,
-                  itemBuilder: (BuildContext context) {
-                    return {
-                      "add_checklist".resc(),
-                      "archive".resc(),
-                      "delete".resc(),
-                    }.map((String choice) {
-                      return PopupMenuItem<String>(
-                        value: choice,
-                        child: Text(choice),
-                      );
-                    }).toList();
-                  },
-                )
-              ]);
+            : buildDefaultActions());
   }
 }

@@ -44,13 +44,13 @@ class SubtaskState extends EditableState<Subtask> {
   void endEdit(bool saveChanges) {
     if (saveChanges) {
       subtask.title = controller.text;
-      Api.updateSubtask(
-              subtask.id, subtask.taskId, subtask.title, subtask.status)
-          .then((value) {
+      Api.updateSubtask(subtask).then((value) {
         if (!value) {
           Utils.showErrorSnackbar(context, "Could not update task");
         }
-      }).catchError((e) => Utils.showErrorSnackbar(context, e));
+      }).onError((e, _) {
+        Utils.showErrorSnackbar(context, e);
+      });
     } else {
       controller.text = subtask.title;
     }

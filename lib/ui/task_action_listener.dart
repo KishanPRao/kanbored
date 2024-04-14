@@ -1,6 +1,6 @@
 class TaskActionListener {
   final Function(String) onChange;
-  final Function(int?) onEditStart;
+  final Function(int?) onEditStart; // include array of valid actions
   final bool Function(bool) onEditEnd;
   final Function() onDelete;
   final Function() refreshUi;
