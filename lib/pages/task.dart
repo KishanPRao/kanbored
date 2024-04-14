@@ -216,6 +216,7 @@ class _TaskState extends State<Task> {
                             onChange: onChange,
                             onEditStart: (_) => onEditStart(0),
                             onEditEnd: (saveChanges) {
+                              // TODO: allow empty desc, default hint text
                               // updateDescription()
                               return onEditEnd(saveChanges);
                             },

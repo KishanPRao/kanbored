@@ -21,9 +21,32 @@ Limitations:
 - User info not properly retained / shown
 - Subtask ordering will be different (uses metadata info to organize & decide position). If re-ordered in kanboard after in-app use, it will not be reflected.
 
+Basic features:
+- Checklist-bridge complete
+- Bridge, linked task
+- Multi-line subtasks
+- Add, remove, update items (project, task, subtask, comment)
+- Archive-unarchive
+- Amolded theme
+- Attachments if simple
+- Pin task to homescreen (android only?)
+- Search: task, subtask & comments (local cache info or rely on `kanboard`?)
+- Test if only sqlite or other `kanboard` DBs work (JSON type issues?)
+
 TODO:
-- Drag & drop, header/checklist & items between checklists (`flutter_sticky_header`, `SliverReorderableList`)
+- Link tasks
+- (re-order) Drag & drop, header/checklist & items between checklists (`flutter_sticky_header`, `SliverReorderableList`)
 - Test w/ and w/o bridge features/metadata
 - Queue write tasks (offline support), bg service
+- Load all projects, pull down refresh to force update, bg service
 - Use multi-paragraph markdown: `flutter_markdown_selectionarea`
+- Move/copy task
+- Task bg or color
+- Due date
+- Task activity
+- Attachments
+- Favorite/starred tasks
 - Optimize!
+
+Unlikely:
+- Swimlane support
