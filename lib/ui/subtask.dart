@@ -1,9 +1,11 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:kanbored/api/api.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/task_action_listener.dart';
+import 'package:kanbored/utils.dart';
 
 class Subtask extends StatefulWidget {
   final SubtaskModel subtask;
@@ -20,14 +22,16 @@ class Subtask extends StatefulWidget {
 }
 
 class SubtaskState extends EditableState<Subtask> {
+  late SubtaskModel subtask;
   late TextEditingController controller;
   late TaskActionListener taskActionListener;
 
   @override
   void initState() {
     super.initState();
-    controller = TextEditingController(text: "");
+    subtask = widget.subtask;
     taskActionListener = widget.taskActionListener;
+    controller = TextEditingController(text: "");
   }
 
   @override
@@ -39,11 +43,23 @@ class SubtaskState extends EditableState<Subtask> {
   @override
   void endEdit(bool saveChanges) {
     if (saveChanges) {
-      log("Edit subtask name: ${controller.text}");
+      subtask.title = controller.text;
+      Api.updateSubtask(
+              subtask.id, subtask.taskId, subtask.title, subtask.status)
+          .then((value) {
+        if (!value) {
+          Utils.showErrorSnackbar(context, "Could not update task");
+        }
+      }).catchError((e) => Utils.showErrorSnackbar(context, e));
     } else {
-      controller.text = widget.subtask.title;
+      controller.text = subtask.title;
     }
     FocusManager.instance.primaryFocus?.unfocus();
+  }
+
+  @override
+  void delete() {
+    log("subtask: delete");
   }
 
   @override

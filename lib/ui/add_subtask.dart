@@ -10,8 +10,8 @@ import 'package:kanbored/ui/task_action_listener.dart';
 import 'package:kanbored/utils.dart';
 
 class AddSubtask extends StatefulWidget {
-  final CheckListMetadata? checklist;
-  final TaskMetadataModel? taskMetadata;
+  final CheckListMetadata checklist;
+  final TaskMetadataModel taskMetadata;
   final TaskModel task;
   final TaskActionListener taskActionListener;
 
@@ -28,8 +28,8 @@ class AddSubtask extends StatefulWidget {
 }
 
 class AddSubtaskState extends EditableState<AddSubtask> {
-  late CheckListMetadata? checklist;
-  late TaskMetadataModel? taskMetadata;
+  late CheckListMetadata checklist;
+  late TaskMetadataModel taskMetadata;
   late TaskModel task;
   late TextEditingController controller;
   late TaskActionListener taskActionListener;
@@ -45,47 +45,45 @@ class AddSubtaskState extends EditableState<AddSubtask> {
     log("Task metadata, checklist: ${taskMetadata?.checklists}");
   }
 
-  bool updateTaskMetadata(int subtaskId) {
-    var taskMetadata = this.taskMetadata;
-    var checklistMetadata = checklist;
-    if (taskMetadata != null && checklistMetadata != null) {
-      outerLoop:
-      for (var checklist in taskMetadata.checklists) {
-        if (checklist.name == checklistMetadata.name &&
-            checklist.position == checklistMetadata.position) {
-          checklist.items.add(CheckListItemMetadata(id: subtaskId));
-          break outerLoop;
-        }
+  void updateTaskMetadata(int subtaskId) {
+    // outerLoop:
+    // for (var checklist in taskMetadata.checklists) {
+    //   if (checklist.name == this.checklist.name &&
+    //       checklist.position == this.checklist.position) {
+    //     checklist.items.add(CheckListItemMetadata(id: subtaskId));
+    //     break outerLoop;
+    //   }
+    // }
+    checklist.items.add(CheckListItemMetadata(id: subtaskId));
+    log("Task metadata, checklist: ${taskMetadata.checklists}");
+    Api.saveTaskMetadata(task.id, taskMetadata).then((value) {
+      taskActionListener.refreshUi();
+      if (!value) {
+        log("Could not store metadata!");
+        Utils.showErrorSnackbar(context, "Could not save task metadata");
+      } else {
+        log("Stored metadata!");
       }
-      log("Task metadata, checklist: ${taskMetadata.checklists}");
-      Api.saveTaskMetadata(task.id, taskMetadata).then((value) {
-        taskActionListener.refreshUi();
-        if (!value) {
-          log("Could not store metadata!");
-          Utils.showErrorSnackbar(context, "Could not save task metadata");
-        } else {
-          log("Stored metadata!");
-        }
-      }).catchError((e) => Utils.showErrorSnackbar(context, e));
-      log("Task metadata: ${taskMetadata.toJson()}");
-      return false;
-    }
-    return true;
+    }).catchError((e) => Utils.showErrorSnackbar(context, e));
+    log("Task metadata: ${taskMetadata.toJson()}");
   }
 
   @override
   void endEdit(bool saveChanges) async {
     if (saveChanges) {
-      log("Add a new subtask: ${controller.text}, into task: ${task.title} & checklist: ${taskMetadata?.checklists}");
-      Api.createSubtask(task.id, controller.text).then((subtaskId) {
-        if (updateTaskMetadata(subtaskId)) {
-          taskActionListener.refreshUi();
-        }
-      }).catchError((e) => Utils.showErrorSnackbar(context, e));
+      log("Add a new subtask: ${controller.text}, into task: ${task.title} & checklist: ${taskMetadata.checklists}");
+      Api.createSubtask(task.id, controller.text)
+          .then((subtaskId) => updateTaskMetadata(subtaskId))
+          .catchError((e) => Utils.showErrorSnackbar(context, e));
     } else {
       controller.text = "";
     }
     FocusManager.instance.primaryFocus?.unfocus();
+  }
+
+  @override
+  void delete() {
+    log("add subtask: delete");
   }
 
   @override

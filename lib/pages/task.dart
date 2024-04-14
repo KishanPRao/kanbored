@@ -45,7 +45,8 @@ class _TaskState extends State<Task> {
 
   void init() async {
     log("init");
-    taskModel = await Api.getTask(taskModel.id, taskModel.projectId);  // update task info
+    taskModel = await Api.getTask(
+        taskModel.id, taskModel.projectId); // update task info
     comments = [];
     subtasks = [];
     taskMetadata = TaskMetadataModel(checklists: []);
@@ -79,7 +80,8 @@ class _TaskState extends State<Task> {
         }
       }).catchError((e) => Utils.showErrorSnackbar(context, e));
     }
-    var checklistSubtaskCount = (loadedTaskMetadata.checklists.length * 2) + loadedSubtasks.length;
+    var checklistSubtaskCount =
+        (loadedTaskMetadata.checklists.length * 2) + loadedSubtasks.length;
     log("[init] Checklist + subtask count: $checklistSubtaskCount");
     for (var i = 0; i < checklistSubtaskCount; i++) {
       keysEditableText.add(GlobalKey());
@@ -100,7 +102,7 @@ class _TaskState extends State<Task> {
 
   void onChange(text) {
     activeEditText = text;
-    keyTaskAppBarActionsState.currentState?.updateText(text);
+    // keyTaskAppBarActionsState.currentState?.updateText(text);
   }
 
   void onEditStart(int index) {
@@ -116,6 +118,11 @@ class _TaskState extends State<Task> {
     return true;
   }
 
+  void onDelete() {
+    log("onDelete");
+    keysEditableText[activeEditIndex].currentState?.delete();
+  }
+
   void refreshUi() {
     log("Refresh UI!");
     // setState(() {});
@@ -125,7 +132,7 @@ class _TaskState extends State<Task> {
   void toggleStatus(subtask, value) {
     setState(() {
       subtask.status =
-      value ? SubtaskModel.kStatusFinished : SubtaskModel.kStatusTodo;
+          value ? SubtaskModel.kStatusFinished : SubtaskModel.kStatusTodo;
     });
   }
 
@@ -137,7 +144,8 @@ class _TaskState extends State<Task> {
     }
 
     ScrollController scrollController = ScrollController();
-    var checklistSubtaskCount = (taskMetadata.checklists.length * 2) + subtasks.length;
+    var checklistSubtaskCount =
+        (taskMetadata.checklists.length * 2) + subtasks.length;
     log("Checklist + subtask count: $checklistSubtaskCount");
     log("Checklist len: ${taskMetadata.checklists.length} subtask len: ${subtasks.length}");
     return Scaffold(
@@ -153,7 +161,13 @@ class _TaskState extends State<Task> {
           actions: [
             TaskAppBarActions(
               key: keyTaskAppBarActionsState,
-              onEditEnd: onEditEnd,
+              taskActionListener: TaskActionListener(
+                onChange: onChange,
+                onEditStart: (_) => onEditStart(0),
+                onEditEnd: onEditEnd,
+                onDelete: onDelete,
+                refreshUi: refreshUi,
+              ),
             )
           ]),
       body: Column(children: [
@@ -167,8 +181,13 @@ class _TaskState extends State<Task> {
                       Markdown(
                           key: keysEditableText[0],
                           text: taskModel.description,
-                          onChange: onChange,
-                          onEditStart: () => onEditStart(0))
+                          taskActionListener: TaskActionListener(
+                            onChange: onChange,
+                            onEditStart: (_) => onEditStart(0),
+                            onEditEnd: onEditEnd,
+                            onDelete: onDelete,
+                            refreshUi: refreshUi,
+                          ))
                     ] +
                     buildSubtasks(
                         context,
@@ -180,6 +199,7 @@ class _TaskState extends State<Task> {
                           onChange: onChange,
                           onEditStart: (index) => onEditStart(index!),
                           onEditEnd: onEditEnd,
+                          onDelete: onDelete,
                           refreshUi: refreshUi,
                         ),
                         toggleStatus) +
@@ -190,9 +210,14 @@ class _TaskState extends State<Task> {
                           key:
                               keysEditableText[idx + checklistSubtaskCount + 1],
                           text: comment.comment,
-                          onChange: onChange,
-                          onEditStart: () =>
-                              onEditStart(idx + checklistSubtaskCount + 1));
+                          taskActionListener: TaskActionListener(
+                            onChange: onChange,
+                            onEditStart: (_) =>
+                                onEditStart(idx + checklistSubtaskCount + 1),
+                            onEditEnd: onEditEnd,
+                            onDelete: onDelete,
+                            refreshUi: refreshUi,
+                          ));
                     }).toList()
                 // markDownEditor.inPlace()
                 // Markdown(

@@ -2,13 +2,14 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:kanbored/strings.dart';
+import 'package:kanbored/ui/task_action_listener.dart';
 
 import 'editing_state.dart';
 
 class TaskAppBarActions extends StatefulWidget {
-  final bool Function(bool) onEditEnd;
+  final TaskActionListener taskActionListener;
 
-  const TaskAppBarActions({super.key, required this.onEditEnd});
+  const TaskAppBarActions({super.key, required this.taskActionListener});
 
   @override
   State<StatefulWidget> createState() => TaskAppBarActionsState();
@@ -16,13 +17,13 @@ class TaskAppBarActions extends StatefulWidget {
 
 class TaskAppBarActionsState extends EditableState<TaskAppBarActions> {
   bool _editing = false;
-  String _text = "";
-  late bool Function(bool) onEditEnd;
+  // String _text = "";
+  late TaskActionListener taskActionListener;
 
   @override
   void initState() {
     super.initState();
-    onEditEnd = widget.onEditEnd;
+    taskActionListener = widget.taskActionListener;
   }
 
   void startEdit() {
@@ -42,13 +43,16 @@ class TaskAppBarActionsState extends EditableState<TaskAppBarActions> {
     }
   }
 
+  @override
+  void delete() => taskActionListener.onDelete();
+
   void stopEdit(bool saveChanges) {
-    if (onEditEnd(saveChanges)) {
+    if (taskActionListener.onEditEnd(saveChanges)) {
       endEdit(saveChanges);
     }
   }
 
-  void updateText(String value) => _text = value;
+  // void updateText(String value) => _text = value;
 
   void handleClick(String value) {
     log("opt: $value");
@@ -59,6 +63,12 @@ class TaskAppBarActionsState extends EditableState<TaskAppBarActions> {
     return Row(
         children: _editing
             ? [
+                IconButton(
+                  onPressed: () => delete(),
+                  // color: showActive ? Colors.grey : Colors.red, //TODO
+                  icon: const Icon(Icons.delete),
+                  tooltip: "delete".resc(),
+                ),
                 IconButton(
                   onPressed: () => stopEdit(false),
                   // color: showActive ? Colors.grey : Colors.red, //TODO

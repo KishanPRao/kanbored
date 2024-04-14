@@ -4,18 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart' as flmd;
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/editing_state.dart';
+import 'package:kanbored/ui/task_action_listener.dart';
 import 'package:markdown/markdown.dart' as md;
 
 class Markdown extends StatefulWidget {
   final String text;
-  final Function(String) onChange;
-  final Function() onEditStart;
+  final TaskActionListener taskActionListener;
 
-  Markdown(
-      {super.key,
-      required this.text,
-      required this.onChange,
-      required this.onEditStart});
+  const Markdown({
+    super.key,
+    required this.text,
+    required this.taskActionListener,
+  });
 
   // final TextEditingController controller;
   // final Function? onChange;
@@ -28,16 +28,14 @@ class Markdown extends StatefulWidget {
 class MarkdownState extends EditableState<Markdown> {
   // final int maxLines = 8;
   late TextEditingController controller;
-  late Function(String) onChange;
-  late Function() onEditStart;
+  late TaskActionListener taskActionListener;
   bool editing = false;
 
   @override
   void initState() {
     super.initState();
     controller = TextEditingController(text: widget.text);
-    onChange = widget.onChange;
-    onEditStart = widget.onEditStart;
+    taskActionListener = widget.taskActionListener;
   }
 
   @override
@@ -45,6 +43,11 @@ class MarkdownState extends EditableState<Markdown> {
     setState(() {
       editing = false;
     });
+  }
+
+  @override
+  void delete() {
+    log("mkdown: delete");
   }
 
   @override
@@ -63,12 +66,12 @@ class MarkdownState extends EditableState<Markdown> {
                 maxLines: null,
                 style: const TextStyle(fontSize: 15),
                 controller: controller,
-                onChanged: (value) => onChange(value),
+                onChanged: (value) => taskActionListener.onChange(value),
               ))
           : GestureDetector(
               onTap: () => setState(() {
                     editing = true;
-                    onEditStart();
+                    taskActionListener.onEditStart(0);
                   }),
               child: flmd.Markdown(
                 controller: ScrollController(),
@@ -87,7 +90,7 @@ class MarkdownState extends EditableState<Markdown> {
                 onTapText: () => setState(() {
                   controller.selection = currentSelection;
                   editing = true;
-                  onEditStart();
+                  taskActionListener.onEditStart(0);
                 })
                 // onChange(controller.text);
                 ,

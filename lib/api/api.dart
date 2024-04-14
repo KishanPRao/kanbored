@@ -106,6 +106,14 @@ class Api {
         "task_id": taskId,
       });
 
+  static Future<bool> updateSubtask(int subtaskId, int taskId, String title, int status) async =>
+      setApi("updateSubtask", 191749979, params: {
+        "id": subtaskId,
+        "task_id": taskId,
+        "title": title,
+        "status": status,
+      });
+
   static Future<bool> saveTaskMetadata(
           int taskId, TaskMetadataModel taskMetadata) async =>
       setApi("saveTaskMetadata", 133280317,

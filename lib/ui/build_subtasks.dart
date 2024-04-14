@@ -24,12 +24,12 @@ List<Widget> buildSubtasks(
     log("checklist: $checklist: $currentIndex");
     return Column(
         children: <Widget>[
-          buildChecklistHeader(checklist, keysEditableText, currentIndex++,
-              taskActionListener)
-        ] +
+              buildChecklistHeader(checklist, taskMetadata, task,
+                  keysEditableText, currentIndex++, taskActionListener)
+            ] +
             checklist.items.map((item) {
               var subtask =
-              subtasks.singleWhere((element) => element.id == item.id);
+                  subtasks.singleWhere((element) => element.id == item.id);
               log("subtask: ${subtask.title}: $currentIndex");
               return buildSingleSubtask(context, subtask, keysEditableText,
                   currentIndex++, taskActionListener, toggleCb);
@@ -68,14 +68,15 @@ Widget buildSingleSubtask(
               onChange: taskActionListener.onChange,
               onEditStart: (_) => taskActionListener.onEditStart(index),
               onEditEnd: taskActionListener.onEditEnd,
+              onDelete: taskActionListener.onDelete,
               refreshUi: taskActionListener.refreshUi,
             )))
   ]);
 }
 
 Widget buildAddSubtask(
-  CheckListMetadata? checklist,
-  TaskMetadataModel? taskMetadata,
+  CheckListMetadata checklist,
+  TaskMetadataModel taskMetadata,
   TaskModel task,
   List<GlobalKey<EditableState>> keysEditableText,
   int index,
@@ -90,20 +91,26 @@ Widget buildAddSubtask(
           onChange: taskActionListener.onChange,
           onEditStart: (_) => taskActionListener.onEditStart(index),
           onEditEnd: taskActionListener.onEditEnd,
+          onDelete: taskActionListener.onDelete,
           refreshUi: taskActionListener.refreshUi,
         ));
 
 Widget buildChecklistHeader(
         CheckListMetadata checklist,
+        TaskMetadataModel taskMetadata,
+        TaskModel task,
         List<GlobalKey<EditableState>> keysEditableText,
         int index,
         TaskActionListener taskActionListener) =>
     Checklist(
         key: keysEditableText[index],
         checklist: checklist,
+        task: task,
+        taskMetadata: taskMetadata,
         taskActionListener: TaskActionListener(
           onChange: taskActionListener.onChange,
           onEditStart: (_) => taskActionListener.onEditStart(index),
           onEditEnd: taskActionListener.onEditEnd,
+          onDelete: taskActionListener.onDelete,
           refreshUi: taskActionListener.refreshUi,
         ));

@@ -1,18 +1,26 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:kanbored/api/api.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
+import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/task_action_listener.dart';
+import 'package:kanbored/utils.dart';
 
 class Checklist extends StatefulWidget {
+  // TODO: store taskId in one of the metadata classes / in bridge!
   final CheckListMetadata checklist;
+  final TaskMetadataModel taskMetadata;
+  final TaskModel task;
   final TaskActionListener taskActionListener;
 
   const Checklist({
     super.key,
     required this.checklist,
+    required this.task,
     required this.taskActionListener,
+    required this.taskMetadata,
   });
 
   @override
@@ -20,24 +28,47 @@ class Checklist extends StatefulWidget {
 }
 
 class ChecklistState extends EditableState<Checklist> {
-  late TextEditingController controller;
+  late CheckListMetadata checklist;
+  late TaskMetadataModel taskMetadata;
+  late TaskModel task;
   late TaskActionListener taskActionListener;
+  late TextEditingController controller;
 
   @override
   void initState() {
     super.initState();
-    controller = TextEditingController(text: widget.checklist.name);
+    checklist = widget.checklist;
+    taskMetadata = widget.taskMetadata;
+    task = widget.task;
     taskActionListener = widget.taskActionListener;
+    controller = TextEditingController(text: widget.checklist.name);
   }
 
   @override
   void endEdit(bool saveChanges) {
     if (saveChanges) {
       log("Edit checklist name: ${controller.text}");
+      checklist.name = controller.text;
+      log("Task metadata, checklist: ${taskMetadata.checklists}");
+      Api.saveTaskMetadata(task.id, taskMetadata).then((value) {
+        // taskActionListener.refreshUi();
+        if (!value) {
+          log("Could not store metadata!");
+          Utils.showErrorSnackbar(context, "Could not save task metadata");
+        } else {
+          log("Stored metadata!");
+        }
+      }).catchError((e) => Utils.showErrorSnackbar(context, e));
+      log("Task metadata: ${taskMetadata.toJson()}");
     } else {
       controller.text = widget.checklist.name;
     }
     FocusManager.instance.primaryFocus?.unfocus();
+  }
+
+  @override
+  void delete() {
+    log("checklist: delete");
   }
 
   @override
