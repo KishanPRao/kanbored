@@ -24,14 +24,18 @@ Limitations:
 Basic features:
 - Checklist-bridge complete
 - Bridge, linked task
-- Multi-line subtasks
 - Add, remove, update items (project, task, subtask, comment)
+- Cached data
 - Archive-unarchive
 - Amolded theme
 - Attachments if simple
 - Pin task to homescreen (android only?)
 - Search: task, subtask & comments (local cache info or rely on `kanboard`?)
 - Test if only sqlite or other `kanboard` DBs work (JSON type issues?)
+- Replace newline for markdown with double newline
+- Due date, task and subtask
+- Date note added, all activity list (separate dialog/screen?)
+- A common state listener for changes from different routes/screens, decide if task change matters to Board/Column screen etc, trigger rebuild, maybe mention scope of change
 
 TODO:
 - Link tasks

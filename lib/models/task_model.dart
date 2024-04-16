@@ -69,8 +69,8 @@ class TaskModel implements Model {
   int? dateModification;
   String? reference;
   int? dateStarted;
-  int timeSpent = 0;
-  int timeEstimated = 0;
+  int? timeSpent;
+  int? timeEstimated;
   int swimlaneId = 0;
   int dateMoved;
   int recurrenceStatus;

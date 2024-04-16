@@ -3,12 +3,17 @@
   "tt_search": "Search",
   "tt_opt": "Options",
   "tt_discard": "Discard",
-  "tt_save": "Save",
+  "tt_done": "Done",
   "archive": "Archive",
+  "archived": "Archived",
+  "unarchive": "Unarchive",
   "add_checklist": "Add a new checklist",
   "add_comment": "Add a new comment",
   "add_subtask": "Add a new subtask",
   "invalid": "<invalid>",
   "delete": "Delete",
+  "ok": "OK",
+  "cancel": "Cancel",
+  "alert_del_content": "Are you sure you want to delete this item?",
   "add_task": "Add a task"
 }

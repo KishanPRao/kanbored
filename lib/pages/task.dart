@@ -7,6 +7,7 @@ import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/add_comment.dart';
+import 'package:kanbored/ui/app_theme.dart';
 import 'package:kanbored/ui/build_subtasks.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/markdown.dart';
@@ -36,8 +37,10 @@ class _TaskState extends State<Task> {
 
   @override
   void didChangeDependencies() {
-    taskModel = ModalRoute.of(context)?.settings.arguments as TaskModel;
-    init();
+    if (!isLoaded) {
+      taskModel = ModalRoute.of(context)?.settings.arguments as TaskModel;
+      init();
+    }
     super.didChangeDependencies();
   }
 
@@ -59,11 +62,11 @@ class _TaskState extends State<Task> {
     if (taskModel.nbSubtasks > 0) {
       loadedSubtasks = await Api.getAllSubtasks(taskModel.id);
       loadedSubtasks.sort((a, b) {
+        // ascending
         if (a.position > b.position) {
           return 1;
-        } else {
-          return -1;
         }
+        return -1;
       });
       // add a `new subtask` for each checklist
       if (loadedTaskMetadata.checklists.isEmpty) {
@@ -117,17 +120,21 @@ class _TaskState extends State<Task> {
     // keyTaskAppBarActionsState.currentState?.updateText(text);
   }
 
-  void onEditStart(int index) {
+  void onEditStart(int index, List<TaskAppBarAction> actions) {
     log("onEditStart: $index");
     activeEditIndex = index;
+    keyTaskAppBarActionsState.currentState?.currentActions = actions;
     keyTaskAppBarActionsState.currentState?.startEdit();
   }
 
   // TODO: needed?
   bool onEditEnd(bool saveChanges) {
-    if (saveChanges && activeEditText.isEmpty) return false;
+    if (saveChanges && activeEditIndex != 0 && activeEditText.isEmpty) {
+      return false;
+    }
     log("onEditEnd: $activeEditIndex, $saveChanges");
     keysEditableText[activeEditIndex].currentState?.endEdit(saveChanges);
+    keyTaskAppBarActionsState.currentState?.endEdit(saveChanges);
     // setState(() {});
     return true;
   }
@@ -191,9 +198,10 @@ class _TaskState extends State<Task> {
           actions: [
             TaskAppBarActions(
               key: keyTaskAppBarActionsState,
+              taskModel: taskModel,
               taskActionListener: TaskActionListener(
                 onChange: onChange,
-                onEditStart: (_) => onEditStart(0),
+                onEditStart: (_, __) => onEditStart(0, []),
                 onEditEnd: onEditEnd,
                 onDelete: onDelete,
                 onCreateChecklist: onCreateChecklist,
@@ -202,6 +210,14 @@ class _TaskState extends State<Task> {
             )
           ]),
       body: Column(children: [
+        taskModel.isActive
+            ? Utils.emptyUi()
+            : Card(
+                clipBehavior: Clip.hardEdge,
+                color: "archivedBgColor".themed(context),
+                child: SizedBox(
+                  child: Center(child: Text("archived".resc())),
+                )),
         Expanded(
             // TODO: use ListView.builder, fix complex multi-checklist logic
             child: ListView(
@@ -214,7 +230,10 @@ class _TaskState extends State<Task> {
                           model: taskModel,
                           taskActionListener: TaskActionListener(
                             onChange: onChange,
-                            onEditStart: (_) => onEditStart(0),
+                            onEditStart: (_, __) => onEditStart(0, [
+                              TaskAppBarAction.kDiscard,
+                              TaskAppBarAction.kDone
+                            ]),
                             onEditEnd: (saveChanges) {
                               // TODO: allow empty desc, default hint text
                               // updateDescription()
@@ -232,7 +251,8 @@ class _TaskState extends State<Task> {
                         keysEditableText,
                         TaskActionListener(
                           onChange: onChange,
-                          onEditStart: (index) => onEditStart(index!),
+                          onEditStart: (index, actions) =>
+                              onEditStart(index!, actions),
                           onEditEnd: onEditEnd,
                           onDelete: onDelete,
                           refreshUi: refreshUi,
@@ -245,8 +265,9 @@ class _TaskState extends State<Task> {
                           task: taskModel,
                           taskActionListener: TaskActionListener(
                             onChange: onChange,
-                            onEditStart: (_) => onEditStart(
-                                checklistSubtaskCount + kDescriptionCount),
+                            onEditStart: (_, actions) => onEditStart(
+                                checklistSubtaskCount + kDescriptionCount,
+                                actions),
                             onEditEnd: onEditEnd,
                             onDelete: onDelete,
                             refreshUi: refreshUi,
@@ -264,10 +285,16 @@ class _TaskState extends State<Task> {
                           model: comment,
                           taskActionListener: TaskActionListener(
                             onChange: onChange,
-                            onEditStart: (_) => onEditStart(idx +
-                                checklistSubtaskCount +
-                                kDescriptionCount +
-                                kAddCommentCount),
+                            onEditStart: (_, __) => onEditStart(
+                                idx +
+                                    checklistSubtaskCount +
+                                    kDescriptionCount +
+                                    kAddCommentCount,
+                                [
+                                  TaskAppBarAction.kDelete,
+                                  TaskAppBarAction.kDiscard,
+                                  TaskAppBarAction.kDone
+                                ]),
                             onEditEnd: (saveChanges) {
                               // updateComment()
                               return onEditEnd(saveChanges);

@@ -35,8 +35,15 @@ List<Widget> buildSubtasks(
               var subtask =
                   subtasks.singleWhere((element) => element.id == item.id);
               log("subtask: ${subtask.title}: $currentIndex");
-              return buildSingleSubtask(context, subtask, keysEditableText,
-                  currentIndex++, taskActionListener, toggleCb);
+              return buildSingleSubtask(
+                  context,
+                  subtask,
+                  checklist,
+                  taskMetadata,
+                  keysEditableText,
+                  currentIndex++,
+                  taskActionListener,
+                  toggleCb);
             }).toList() +
             <Widget>[
               buildAddSubtask(checklist, taskMetadata, task, keysEditableText,
@@ -48,6 +55,8 @@ List<Widget> buildSubtasks(
 Widget buildSingleSubtask(
     BuildContext context,
     SubtaskModel subtask,
+    CheckListMetadata checklist,
+    TaskMetadataModel taskMetadata,
     List<GlobalKey<EditableState>> keysEditableText,
     int index,
     TaskActionListener taskActionListener,
@@ -55,9 +64,12 @@ Widget buildSingleSubtask(
   return Subtask(
       key: keysEditableText[index],
       subtask: subtask,
+      checklist: checklist,
+      taskMetadata: taskMetadata,
       taskActionListener: TaskActionListener(
         onChange: taskActionListener.onChange,
-        onEditStart: (_) => taskActionListener.onEditStart(index),
+        onEditStart: (_, actions) =>
+            taskActionListener.onEditStart(index, actions),
         onEditEnd: taskActionListener.onEditEnd,
         onDelete: taskActionListener.onDelete,
         refreshUi: taskActionListener.refreshUi,
@@ -103,7 +115,8 @@ Widget buildAddSubtask(
         task: task,
         taskActionListener: TaskActionListener(
           onChange: taskActionListener.onChange,
-          onEditStart: (_) => taskActionListener.onEditStart(index),
+          onEditStart: (_, actions) =>
+              taskActionListener.onEditStart(index, actions),
           onEditEnd: taskActionListener.onEditEnd,
           onDelete: taskActionListener.onDelete,
           refreshUi: taskActionListener.refreshUi,
@@ -123,7 +136,8 @@ Widget buildChecklistHeader(
         taskMetadata: taskMetadata,
         taskActionListener: TaskActionListener(
           onChange: taskActionListener.onChange,
-          onEditStart: (_) => taskActionListener.onEditStart(index),
+          onEditStart: (_, actions) =>
+              taskActionListener.onEditStart(index, actions),
           onEditEnd: taskActionListener.onEditEnd,
           onDelete: taskActionListener.onDelete,
           refreshUi: taskActionListener.refreshUi,

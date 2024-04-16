@@ -120,24 +120,30 @@ class Api {
   static Future<bool> updateTask(TaskModel taskModel) async =>
       setApi("updateTask", 1406803059,
           params: taskModel.toJsonWithKeys([
-            "id",
-            "title",
-            "color_id",
-            "owner_id",
-            "date_due",
-            "description",
-            "category_id",
-            "score",
-            "priority",
-            "recurrence_status",
-            "recurrence_trigger",
-            "recurrence_factor",
-            "recurrence_timeframe",
-            "recurrence_basedate",
-            "reference",
-            "tags",
-            "date_started",
-          ]));
+                "id",
+                "title",
+                "color_id",
+                "owner_id",
+                "description",
+                "score",
+                // "category_id",
+                // "priority",
+                // "recurrence_status",
+                // "recurrence_trigger",
+                // "recurrence_factor",
+                // "recurrence_timeframe",
+                // "recurrence_basedate",
+                // "reference",
+                // "tags",
+                // "date_started",
+              ] +
+              ((taskModel.dateDue == null || taskModel.dateDue == 0)
+                  ? []
+                  : ["date_due"])));
+
+  static Future<bool> updateComment(CommentModel model) async =>
+      setApi("updateComment", 496470023,
+          params: {"id": model.id, "content": model.comment});
 
   static Future<bool> updateSubtask(SubtaskModel subtaskModel) async =>
       setApi("updateSubtask", 191749979,
@@ -151,10 +157,29 @@ class Api {
             "status",
           ]));
 
+  // Additional Updates
+
   static Future<bool> saveTaskMetadata(
           int taskId, TaskMetadataModel taskMetadata) async =>
       setApi("saveTaskMetadata", 133280317,
           params: [taskId, taskMetadata.toJson()]);
+
+  static Future<bool> openTask(int taskId) async =>
+      setApi("openTask", 1888531925, params: {"task_id": taskId});
+
+  static Future<bool> closeTask(int taskId) async =>
+      setApi("closeTask", 1654396960, params: {"task_id": taskId});
+
+  // Delete
+
+  static Future<bool> removeSubtask(int subtaskId) async =>
+      setApi("removeSubtask", 1382487306, params: {"subtask_id": subtaskId});
+
+  static Future<bool> removeComment(int commentId) async =>
+      setApi("removeComment", 328836871, params: {"comment_id": commentId});
+
+  static Future<bool> removeTask(int taskId) async =>
+      setApi("removeTask", 1423501287, params: {"task_id": taskId});
 
   //////////////////////////////////// GETTER //////////////////////////////////
 

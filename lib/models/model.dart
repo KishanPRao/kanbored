@@ -14,7 +14,6 @@ extension ModelExtension on Model {
   dynamic toJsonWithKeys(List<String> keys) {
     dynamic jsonData = toJson();
     if (jsonData is Map<String, dynamic>) {
-      log("Map");
       jsonData.removeWhere((key, value) => !keys.contains(key));
       return jsonData;
     } else {

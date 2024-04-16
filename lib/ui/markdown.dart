@@ -66,6 +66,7 @@ class _MarkdownState extends EditableState<Markdown> {
     } else if (model is CommentModel) {
       model.comment = controller.text;
       log("Save comment: ${model.comment}");
+      return await Api.updateComment(model);
     }
     return false;
   }
@@ -73,7 +74,7 @@ class _MarkdownState extends EditableState<Markdown> {
   @override
   void startEdit() {
     taskActionListener.onChange(controller.text);
-    taskActionListener.onEditStart(null);
+    taskActionListener.onEditStart(null, []);
     setState(() {
       editing = true;
     });
@@ -110,9 +111,29 @@ class _MarkdownState extends EditableState<Markdown> {
     // FocusManager.instance.primaryFocus?.unfocus();
   }
 
+  void deleteComment(CommentModel model) {
+    taskActionListener.onEditEnd(false);
+    Utils.showAlertDialog(context, "${'delete'.resc()} `${model.comment}`?",
+        "alert_del_content".resc(), () {
+      Api.removeComment(model.id).then((value) {
+        if (!value) {
+          Utils.showErrorSnackbar(context, "Could not delete comment");
+        } else {
+          taskActionListener.refreshUi();
+        }
+      }).onError((e, _) {
+        Utils.showErrorSnackbar(context, e);
+      });
+    });
+  }
+
   @override
   void delete() {
     log("mkdown: delete");
+    var model = this.model;
+    if (model is CommentModel) {
+      deleteComment(model);
+    }
   }
 
   void updateFocus() {
@@ -139,7 +160,7 @@ class _MarkdownState extends EditableState<Markdown> {
                 focusNode: focusNode,
                 onTap: () {
                   taskActionListener.onChange(controller.text);
-                  taskActionListener.onEditStart(null);
+                  taskActionListener.onEditStart(null, []);
                 },
                 onChanged: taskActionListener.onChange,
                 onEditingComplete: () {
@@ -151,7 +172,7 @@ class _MarkdownState extends EditableState<Markdown> {
                 updateFocus();
                 log("onTap Gesture");
                 taskActionListener.onChange(controller.text);
-                taskActionListener.onEditStart(null);
+                taskActionListener.onEditStart(null, []);
                 // focusNode.requestFocus();
                 setState(() {
                   editing = true;
@@ -176,7 +197,7 @@ class _MarkdownState extends EditableState<Markdown> {
                   updateFocus();
                   controller.selection = currentSelection;
                   taskActionListener.onChange(controller.text);
-                  taskActionListener.onEditStart(null);
+                  taskActionListener.onEditStart(null, []);
                   setState(() {
                     editing = true;
                   });

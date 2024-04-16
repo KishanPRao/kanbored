@@ -7,6 +7,7 @@ import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/task_action_listener.dart';
+import 'package:kanbored/ui/task_app_bar.dart';
 import 'package:kanbored/utils.dart';
 
 class AddComment extends StatefulWidget {
@@ -62,19 +63,22 @@ class AddCommentState extends EditableState<AddComment> {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-        controller: controller,
-        onTap: () {
-          taskActionListener.onChange(controller.text);
-          taskActionListener.onEditStart(null);
-        },
-        onEditingComplete: () {
-          taskActionListener.onEditEnd(true);
-        },
-        onChanged: taskActionListener.onChange,
-        decoration: InputDecoration(
-            hintText: "add_comment".resc(),
-            border: InputBorder.none,
-            hintStyle: const TextStyle(fontWeight: FontWeight.w300)));
+    return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 10.0),
+        child: TextField(
+            controller: controller,
+            onTap: () {
+              taskActionListener.onChange(controller.text);
+              taskActionListener.onEditStart(
+                  null, [TaskAppBarAction.kDiscard, TaskAppBarAction.kDone]);
+            },
+            onEditingComplete: () {
+              taskActionListener.onEditEnd(true);
+            },
+            onChanged: taskActionListener.onChange,
+            decoration: InputDecoration(
+                hintText: "add_comment".resc(),
+                border: InputBorder.none,
+                hintStyle: const TextStyle(fontWeight: FontWeight.w300))));
   }
 }

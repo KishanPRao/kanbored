@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kanbored/strings.dart';
 
 extension StringExtension on String {
   String capitalize() {
@@ -12,11 +13,42 @@ extension MapExtension<E> on List<E> {
 }
 
 class Utils {
+  // UI helpers
   static getWidth(BuildContext context) => MediaQuery.of(context).size.width;
 
   static getHeight(BuildContext context) => MediaQuery.of(context).size.height;
 
+  static emptyUi() => const SizedBox.shrink();
+
+  // Alerts
   static showErrorSnackbar(BuildContext context, dynamic e) =>
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("Error: $e")));
+
+  static showAlertDialog(BuildContext context, String title, String content,
+      VoidCallback onPressed) {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return PopScope(
+              canPop: false,
+              child: AlertDialog(
+                title: Text(
+                  title,
+                  maxLines: 1,
+                ),
+                content: Text(content),
+                actions: [
+                  TextButton(onPressed: () {
+                    Navigator.pop(context);
+                    onPressed();
+                  }, child: Text("ok".resc())),
+                  TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text("cancel".resc())),
+                ],
+              ));
+        });
+  }
 }
