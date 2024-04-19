@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/models/column_model.dart';
+import 'package:kanbored/models/project_metadata_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/strings.dart';
@@ -13,12 +14,14 @@ import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/utils.dart';
 
 class ColumnText extends StatefulWidget {
+  final ProjectMetadataModel projectMetadataModel;
   final ColumnModel columnModel;
   final AppBarActionListener abActionListener;
 
   const ColumnText({
     super.key,
     required this.columnModel,
+    required this.projectMetadataModel,
     required this.abActionListener,
   });
 
@@ -28,6 +31,7 @@ class ColumnText extends StatefulWidget {
 
 class ColumnTextState extends EditableState<ColumnText> {
   late ColumnModel columnModel;
+  late ProjectMetadataModel projectMetadataModel;
   late AppBarActionListener abActionListener;
   late TextEditingController controller;
 
@@ -35,6 +39,7 @@ class ColumnTextState extends EditableState<ColumnText> {
   void initState() {
     super.initState();
     columnModel = widget.columnModel;
+    projectMetadataModel = widget.projectMetadataModel;
     abActionListener = widget.abActionListener;
     controller = TextEditingController(text: columnModel.title);
   }
@@ -57,22 +62,6 @@ class ColumnTextState extends EditableState<ColumnText> {
     FocusManager.instance.primaryFocus?.unfocus();
   }
 
-  // @override
-  // void delete() {
-  //   abActionListener.onEditEnd(false);
-  //   Utils.showAlertDialog(context, "${'delete'.resc()} `${columnModel.title}`?",
-  //       "alert_del_content".resc(), () {
-  //     log("column, delete");
-  //     Api.removeColumn(columnModel.id).then((value) {
-  //       if (!value) {
-  //         Utils.showErrorSnackbar(context, "Could not delete column");
-  //       } else {
-  //         abActionListener.refreshUi();
-  //       }
-  //     }).onError((e, _) => Utils.showErrorSnackbar(context, e));
-  //   });
-  // }
-
   // TODO: Cannot remove column, kanboard issue?
   @override
   void archive() {
@@ -82,13 +71,24 @@ class ColumnTextState extends EditableState<ColumnText> {
         "${'archive'.resc()} `${columnModel.title}`?",
         "alert_arch_content".resc(), () {
       log("column, archive");
-      // Api.removeColumn(columnModel.id).then((value) {
-      //   if (!value) {
-      //     Utils.showErrorSnackbar(context, "Could not delete column");
-      //   } else {
-      //     abActionListener.refreshUi();
-      //   }
-      // }).onError((e, _) => Utils.showErrorSnackbar(context, e));
+      if (!projectMetadataModel.closedColumns.contains(columnModel.id)) {
+        columnModel.isActive = false;
+        projectMetadataModel.closedColumns.add(columnModel.id);
+        Api.saveProjectMetadata(columnModel.projectId, projectMetadataModel)
+            .then((value) {
+          if (!value) {
+            Utils.showErrorSnackbar(context, "Could not save project metadata");
+          } else {
+            abActionListener.refreshUi();
+          }
+        }).onError((e, _) {
+          if (mounted) {
+            Utils.showErrorSnackbar(context, e);
+          } else {
+            log("[Error snackbar] unmounted; $e");
+          }
+        });
+      }
     });
   }
 
@@ -100,6 +100,25 @@ class ColumnTextState extends EditableState<ColumnText> {
         "${'unarchive'.resc()} `${columnModel.title}`?",
         "alert_unarch_content".resc(), () {
       log("column, unarchive");
+      if (projectMetadataModel.closedColumns.contains(columnModel.id)) {
+        columnModel.isActive = true;
+        projectMetadataModel.closedColumns
+            .removeWhere((item) => item == columnModel.id);
+        Api.saveProjectMetadata(columnModel.projectId, projectMetadataModel)
+            .then((value) {
+          if (!value) {
+            Utils.showErrorSnackbar(context, "Could not save project metadata");
+          } else {
+            abActionListener.refreshUi();
+          }
+        }).onError((e, _) {
+          if (mounted) {
+            Utils.showErrorSnackbar(context, e);
+          } else {
+            log("[Error snackbar] unmounted; $e");
+          }
+        });
+      }
     });
   }
 

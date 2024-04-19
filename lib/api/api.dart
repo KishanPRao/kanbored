@@ -79,6 +79,13 @@ class Api {
 
   // CREATE
 
+  static Future<dynamic> createProject(String name) async =>
+      setApi("createProject", 1797076613,
+          params: {"name": name, "owner_id": AppData.userId});
+
+  static Future<dynamic> addColumn(int projectId, String title) async =>
+      setApi("addColumn", 638544704, params: [projectId, title]);
+
   static Future<int> createTask(
           int projectId, int columnId, String taskName) async =>
       setApi("createTask", 1176509098, params: {
@@ -117,6 +124,10 @@ class Api {
       });
 
   // UPDATE
+
+  static Future<bool> updateProject(ProjectModel model) async =>
+      setApi("updateProject", 1853996288,
+          params: {"project_id": model.id, "name": model.name});
 
   static Future<bool> updateColumn(ColumnModel model) async =>
       setApi("updateColumn", 480740641,
@@ -164,16 +175,29 @@ class Api {
 
   // Additional Updates
 
+  static Future<bool> enableProject(int id) async =>
+      setApi("enableProject", 1775494839, params: {"project_id": id});
+
+  static Future<bool> disableProject(int id) async =>
+      setApi("disableProject", 1734202312, params: {"project_id": id});
+
+  static Future<bool> saveProjectMetadata(
+          int projectId, ProjectMetadataModel projectMetadataModel) async =>
+      setApi("saveProjectMetadata", 1797076613, params: {
+        "project_id": projectId,
+        "values": projectMetadataModel.toJson()
+      });
+
   static Future<bool> saveTaskMetadata(
           int taskId, TaskMetadataModel taskMetadata) async =>
       setApi("saveTaskMetadata", 133280317,
           params: [taskId, taskMetadata.toJson()]);
 
-  static Future<bool> openTask(int taskId) async =>
-      setApi("openTask", 1888531925, params: {"task_id": taskId});
+  static Future<bool> openTask(int id) async =>
+      setApi("openTask", 1888531925, params: {"task_id": id});
 
-  static Future<bool> closeTask(int taskId) async =>
-      setApi("closeTask", 1654396960, params: {"task_id": taskId});
+  static Future<bool> closeTask(int id) async =>
+      setApi("closeTask", 1654396960, params: {"task_id": id});
 
   // Delete
 
@@ -191,9 +215,12 @@ class Api {
       setApi("removeSubtask", 1382487306, params: {"subtask_id": id});
 
   //////////////////////////////////// GETTER //////////////////////////////////
+  //
+  // static Future<List<ProjectModel>> getmyProjects() async =>
+  //     listApi("getmyProjects", 2134420212, ProjectModel.fromJson);
 
-  static Future<List<ProjectModel>> getmyProjects() async =>
-      listApi("getmyProjects", 2134420212, ProjectModel.fromJson);
+  static Future<List<ProjectModel>> getAllProjects() async =>
+      listApi("getAllProjects", 2134420212, ProjectModel.fromJson);
 
   static Future<List<BoardModel>> getBoard(int projectId) async =>
       listApi("getBoard", 827046470, BoardModel.fromJson,

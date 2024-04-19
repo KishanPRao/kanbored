@@ -76,11 +76,18 @@ class TaskAppBarActionsState extends EditableState<TaskAppBarActions> {
     if (action == "archive".resc() || action == "unarchive".resc()) {
       log("Archive/Unarchive");
       taskModel.isActive = !taskModel.isActive;
-      if (taskModel.isActive) {
-        Api.openTask(taskModel.id);
-      } else {
-        Api.closeTask(taskModel.id);
-      }
+      (taskModel.isActive
+              ? Api.openTask(taskModel.id)
+              : Api.closeTask(taskModel.id))
+          .then((value) {
+        if (!value) {
+          Utils.showErrorSnackbar(context, "Could not update task");
+        } else {
+          // TODO: bug: Does not refresh archived list
+          abActionListener.refreshUi();
+          log("Updated task");
+        }
+      }).catchError((e) => Utils.showErrorSnackbar(context, e));
     } else if (action == "delete".resc()) {
       Utils.showAlertDialog(context, "${'delete'.resc()} `${taskModel.title}`?",
           "alert_del_content".resc(), () {

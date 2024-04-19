@@ -41,9 +41,15 @@ class _TaskState extends State<Task> {
   @override
   void didChangeDependencies() {
     if (!isLoaded) {
-      var args = ModalRoute.of(context)?.settings.arguments as List<int>;
-      taskId = args[0];
-      projectId = args[1];
+      var args = ModalRoute.of(context)?.settings.arguments;
+      if (args is TaskModel) {
+        taskModel = args;
+        taskId = taskModel.id;
+        projectId = taskModel.projectId;
+      } else if (args is List<int>) {
+        taskId = args[0];
+        projectId = args[1];
+      }
       init();
     }
     super.didChangeDependencies();

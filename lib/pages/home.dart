@@ -1,8 +1,14 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/constants.dart';
 import 'package:kanbored/models/project_model.dart';
 import 'package:kanbored/strings.dart';
+import 'package:kanbored/ui/project_action_listener.dart';
+import 'package:kanbored/ui/project_app_bar.dart';
+import 'package:kanbored/ui/search_fab.dart';
+import 'package:kanbored/utils.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key, required this.title});
@@ -15,6 +21,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List<ProjectModel> projects = [];
+  var showArchived = false;
 
   @override
   void initState() {
@@ -23,7 +30,7 @@ class _HomeState extends State<Home> {
   }
 
   void init() async {
-    Api.getmyProjects()
+    Api.getAllProjects()
         .then((value) => setState(() {
               projects = value;
             }))
@@ -31,45 +38,126 @@ class _HomeState extends State<Home> {
             .showSnackBar(SnackBar(content: Text("Error: $e"))));
   }
 
+  void onChange(text) {
+    // activeEditText = text;
+    // keyTaskAppBarActionsState.currentState?.updateText(text);
+  }
+
+  void onEditStart(int index, List<int> actions) {
+    log("onEditStart: $index, $actions");
+    // activeEditIndex = index;
+    // keyAppBarActionsState.currentState?.currentActions = actions;
+    // keyAppBarActionsState.currentState?.startEdit();
+    // keysEditableText[activeEditIndex].currentState?.startEdit();
+  }
+
+  // TODO: needed?
+  bool onEditEnd(bool saveChanges) {
+    // if (saveChanges && activeEditText.isEmpty) {
+    //   return false;
+    // }
+    // // Utils.printStacktrace();
+    // log("project, onEditEnd: $activeEditIndex, $saveChanges");
+    // keysEditableText[activeEditIndex].currentState?.endEdit(saveChanges);
+    // keyAppBarActionsState.currentState?.endEdit(saveChanges);
+    // setState(() {});
+    return true;
+  }
+
+  void onDelete() {
+    log("project, onDelete");
+    // keysEditableText[activeEditIndex].currentState?.delete();
+  }
+
+  void onAddProject() {
+    log("project, onAddProject");
+    // NOTE: this approach will not work for multiple boards/swimlane; instead, add to board's popup options
+    Utils.showInputAlertDialog(
+        context, "add_project".resc(), "alert_new_proj_content".resc(), "",
+        (title) {
+      log("project, add col: $title");
+      Api.createProject(title).then((result) {
+        if (result is int) {
+          // TODO: remove default columns? `getColumns` and `removeColumn`
+          refreshUi();
+        } else {
+          Utils.showErrorSnackbar(context, "Could not add project");
+        }
+      }).onError((e, st) => Utils.showErrorSnackbar(context, e));
+    });
+  }
+
+  void onArchived(showArchived) {
+    log("project, onArchived: $showArchived");
+    setState(() {
+      this.showArchived = showArchived;
+    });
+  }
+
+  void refreshUi() {
+    log("project, Refresh UI!");
+    init();
+  }
+
   @override
   Widget build(BuildContext context) {
+    var projects =
+        this.projects.where((project) => project.isActive != showArchived);
+    log("Projects: $projects; orig: ${this.projects}");
     return Scaffold(
+      floatingActionButton: buildSearchFab(context, () {
+        log("home Search");
+      }),
       appBar: AppBar(
         title: Text(widget.title),
         backgroundColor: "primary".themed(context),
         actions: [
-          IconButton(
-            onPressed: () async {
-              Navigator.pushNamed(context, routeSettings).then((value) {
-                if (value is bool && value) {
-                  Navigator.pushNamed(context, routeLogin);
-                }
-              });
-            },
-            icon: const Icon(Icons.settings),
+          ProjectAppBarActions(
+            // key: keyAppBarActionsState,
+            showArchived: showArchived,
+            abActionListener: ProjectActionListener(
+              onArchived: onArchived,
+              onChange: onChange,
+              onEditStart: (_, __) => {},
+              onEditEnd: onEditEnd,
+              onDelete: onDelete,
+              onMainAction: onAddProject,
+              refreshUi: refreshUi,
+            ),
           )
         ],
       ),
-      body: GridView.count(
-        crossAxisCount: 2,
-        children: projects
-            .map((project) => Card(
-                  clipBehavior: Clip.hardEdge,
-                  child: InkWell(
-                      splashColor: "primary".themed(context).withAlpha(30),
-                      onTap: () {
-                        Navigator.pushNamed(
-                          context,
-                          routeBoard,
-                          arguments: project,
-                        );
-                      },
-                      child: SizedBox(
-                        child: Center(child: Text(project.name)),
-                      )),
+      body: Column(children: [
+        showArchived
+            ? Card(
+                clipBehavior: Clip.hardEdge,
+                color: "archivedBgColor".themed(context),
+                child: SizedBox(
+                  child: Center(child: Text("archived".resc())),
                 ))
-            .toList(),
-      ),
+            : Utils.emptyUi(),
+        GridView.count(
+          shrinkWrap: true,
+          crossAxisCount: 2,
+          children: projects
+              .map((project) => Card(
+                    clipBehavior: Clip.hardEdge,
+                    child: InkWell(
+                        splashColor: "primary".themed(context).withAlpha(30),
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            routeBoard,
+                            arguments: project,
+                          );
+                        },
+                        child: SizedBox(
+                          child: Center(child: Text(project.name)),
+                        )),
+                  ))
+              .toList(),
+        )
+      ]),
     );
   }
 }

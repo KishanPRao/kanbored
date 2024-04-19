@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:kanbored/constants.dart';
 import 'package:kanbored/models/column_model.dart';
+import 'package:kanbored/models/project_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
@@ -13,14 +14,16 @@ import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/sizes.dart';
 
 class BoardColumn extends StatefulWidget {
-  final bool showArchived;
   final ColumnModel column;
+  final ProjectMetadataModel projectMetadataModel;
+  final bool showArchived;
   final List<GlobalKey<EditableState>> keysEditableText;
   final int baseIdx;
   final AppBarActionListener abActionListener;
 
   const BoardColumn(
       {super.key,
+      required this.projectMetadataModel,
       required this.column,
       required this.showArchived,
       required this.keysEditableText,
@@ -35,6 +38,7 @@ class BoardColumnState extends State<BoardColumn> {
   late List<TaskModel> tasks;
   late int tasksLength;
   late bool showArchived;
+  late ProjectMetadataModel projectMetadataModel;
   late ColumnModel column;
   late List<GlobalKey<EditableState>> keysEditableText;
   late int baseIdx;
@@ -44,6 +48,15 @@ class BoardColumnState extends State<BoardColumn> {
   void initState() {
     super.initState();
     column = widget.column;
+    projectMetadataModel = widget.projectMetadataModel;
+    abActionListener = widget.abActionListener;
+    log("Board column: ${column.id}, ${column.title}, ${column.isActive}, ${projectMetadataModel.closedColumns}");
+  }
+
+  @override
+  void didChangeDependencies() {
+    keysEditableText = widget.keysEditableText;
+    baseIdx = widget.baseIdx;
     showArchived = widget.showArchived;
     tasks = (showArchived
         ? (column.isActive ? column.inactiveTasks : column.tasks)
@@ -59,13 +72,13 @@ class BoardColumnState extends State<BoardColumn> {
     });
     tasksLength =
         (showArchived ? tasks.length : tasks.length + 1); // Add new task
-    keysEditableText = widget.keysEditableText;
-    baseIdx = widget.baseIdx;
-    abActionListener = widget.abActionListener;
+    log("Board column, didChangeDep: ${tasks.length}");
+    super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
+    log("Board column, build: ${column.title}, ${column.isActive}");
     return Card(
         color: "columnBg".themed(context),
         margin: const EdgeInsets.all(10),
@@ -76,10 +89,13 @@ class BoardColumnState extends State<BoardColumn> {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               ColumnText(
                   key: keysEditableText[baseIdx],
+                  projectMetadataModel: projectMetadataModel,
                   columnModel: column,
                   abActionListener: abActionListener),
               Expanded(
                   child: ListView.builder(
+                      key: UniqueKey(),
+                      // TODO: perf: optimize!
                       shrinkWrap: true,
                       scrollDirection: Axis.vertical,
                       itemCount: tasksLength,
@@ -108,8 +124,7 @@ class BoardColumnState extends State<BoardColumn> {
         child: InkWell(
             splashColor: "primary".themed(context).withAlpha(30),
             onTap: () {
-              Navigator.pushNamed(context, routeTask,
-                  arguments: [task.id, columnModel.projectId]);
+              Navigator.pushNamed(context, routeTask, arguments: task);
             },
             child: Padding(
               padding: const EdgeInsets.all(10.0),

@@ -10,6 +10,7 @@ import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/ui/board_action_listener.dart';
 import 'package:kanbored/ui/board_app_bar.dart';
 import 'package:kanbored/ui/editing_state.dart';
+import 'package:kanbored/ui/search_fab.dart';
 import 'package:kanbored/ui/sizes.dart';
 import 'package:kanbored/models/board_model.dart';
 import 'package:kanbored/models/project_model.dart';
@@ -57,10 +58,8 @@ class _BoardState extends State<Board> {
       for (var column in board.columns) {
         keysEditableText.add(GlobalKey()); // Column name
         keysEditableText.add(GlobalKey()); // `Add task`
-        if (projectMetadataModel.closedColumns.contains(column.id)) {
-          column.isActive = false;
-          break;
-        }
+        column.isActive =
+            !projectMetadataModel.closedColumns.contains(column.id);
       }
     }
     if (mounted) {
@@ -103,7 +102,22 @@ class _BoardState extends State<Board> {
     keysEditableText[activeEditIndex].currentState?.delete();
   }
 
-  void onSearch() {}
+  void onAddColumn() {
+    log("board, onAddColumn");
+    // NOTE: this approach will not work for multiple boards/swimlane; instead, add to board's popup options
+    Utils.showInputAlertDialog(
+        context, "add_column".resc(), "alert_new_col_content".resc(), "",
+        (title) {
+      log("board, add col: $title");
+      Api.addColumn(projectModel.id, title).then((result) {
+        if (result is int) {
+          refreshUi();
+        } else {
+          Utils.showErrorSnackbar(context, "Could not add column");
+        }
+      }).onError((e, st) => Utils.showErrorSnackbar(context, e));
+    });
+  }
 
   void onArchive() {
     log("board, onArchive");
@@ -115,10 +129,10 @@ class _BoardState extends State<Board> {
     keysEditableText[activeEditIndex].currentState?.unarchive();
   }
 
-  void onArchived() {
-    log("board, onArchived");
+  void onArchived(bool showArchived) {
+    log("board, onArchived: $showArchived");
     setState(() {
-      showArchived = !showArchived;
+      this.showArchived = showArchived;
     });
   }
 
@@ -134,6 +148,9 @@ class _BoardState extends State<Board> {
       return Utils.emptyUi();
     }
     return Scaffold(
+      floatingActionButton: buildSearchFab(context, () {
+        log("board Search");
+      }),
       appBar: AppBar(
         title: Text(projectModel.name),
         backgroundColor: "primary".themed(context),
@@ -162,6 +179,7 @@ class _BoardState extends State<Board> {
           BoardAppBarActions(
             key: keyAppBarActionsState,
             projectModel: projectModel,
+            showArchived: showArchived,
             abActionListener: BoardActionListener(
               onArchive: onArchive,
               onUnarchive: onUnarchive,
@@ -170,7 +188,7 @@ class _BoardState extends State<Board> {
               onEditStart: (_, __) => {},
               onEditEnd: onEditEnd,
               onDelete: onDelete,
-              onMainAction: onSearch,
+              onMainAction: onAddColumn,
               refreshUi: refreshUi,
             ),
           )
@@ -181,7 +199,9 @@ class _BoardState extends State<Board> {
           children: boards.map((board) {
         var columns =
             (showArchived ? board.inactiveColumns : board.activeColumns);
-        log("columns: ${columns.length}");
+        for (var c in columns) {
+          log("Column: ${c.id}, ${c.isActive}, ${c.title}");
+        }
         return Expanded(
             child: Column(
           children: [
@@ -190,15 +210,15 @@ class _BoardState extends State<Board> {
                     clipBehavior: Clip.hardEdge,
                     color: "archivedBgColor".themed(context),
                     child: SizedBox(
-                      child: Center(child: Text("archived".resc())),
+                      child: Center(child: Text("archived_col".resc())),
                     ))
                 : Utils.emptyUi(),
             // TODO: move each ui element into a function or class?
             // TODO: Keep a setting to enable swimlane info; default disabled; give warning on possible limitations; or keep it simple, avoid using it.
             Expanded(
                 child: ListView.builder(
-                    key: ObjectKey(showArchived),
-                    // TODO: better approach
+                    key: UniqueKey(),
+                    // TODO: perf: better approach; everything causes refresh
                     shrinkWrap: true,
                     controller: controller,
                     scrollDirection: Axis.horizontal,
@@ -207,6 +227,7 @@ class _BoardState extends State<Board> {
                         width: columnWidth,
                         child: BoardColumn(
                           column: columns.elementAt(index),
+                          projectMetadataModel: projectMetadataModel,
                           showArchived: showArchived,
                           keysEditableText: keysEditableText,
                           baseIdx: (index * 2),
@@ -216,7 +237,7 @@ class _BoardState extends State<Board> {
                                 onEditStart((index * 2) + idx!, actions),
                             onEditEnd: onEditEnd,
                             onDelete: onDelete,
-                            onMainAction: onSearch,
+                            onMainAction: null,
                             refreshUi: refreshUi,
                           ),
                         ))))

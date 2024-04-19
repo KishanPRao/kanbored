@@ -48,6 +48,8 @@ TODO:
 - Favorite/starred tasks
 - Optimize!
 - Store updated accurate position info when deleting middle position items
+- Show metadata of task (num comments, num of subtasks)
+- Show progress of subtasks
 
 Limitations:
 These features are unlikely to be worked on either due to complexity, or due to limited understanding of its expected workflow.
@@ -55,3 +57,15 @@ These features are unlikely to be worked on either due to complexity, or due to 
 - Swimlane support
 - Multi user support / user show
 - Subtask ordering will be different (uses metadata info to organize & decide position). If re-ordered in kanboard after in-app use, it will not be reflected.
+
+Bugs:
+- Archive/unarchive task, does not refresh the main screen (fix after cache)
+- Views reload (while adding task, etc); optimization
+- Default columns in new project
+
+Test:
+- Archive, unarchive cols, tasks
+
+Possible Kanboard bugs:
+- Inaccurate position info when deleting middle position items
+- `removeColumn` not working

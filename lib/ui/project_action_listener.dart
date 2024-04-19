@@ -1,14 +1,10 @@
 import 'package:kanbored/ui/app_bar_action_listener.dart';
 
-class BoardActionListener extends AppBarActionListener {
-  final Function() onArchive;
-  final Function() onUnarchive;
+class ProjectActionListener extends AppBarActionListener {
   final Function(bool) onArchived;
 
-  BoardActionListener(
-      {required this.onArchive,
-      required this.onUnarchive,
-      required this.onArchived,
+  ProjectActionListener(
+      {required this.onArchived,
       required super.onChange,
       required super.onEditStart,
       required super.onEditEnd,

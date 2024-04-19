@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:kanbored/api/api.dart';
 import 'package:kanbored/models/project_model.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
@@ -14,9 +15,13 @@ class BoardAppBarAction extends AppBarAction {
 
 class BoardAppBarActions extends AppBarActions {
   final ProjectModel projectModel;
+  final bool showArchived;
 
   const BoardAppBarActions(
-      {super.key, required this.projectModel, required super.abActionListener});
+      {super.key,
+      required this.projectModel,
+      required this.showArchived,
+      required super.abActionListener});
 
   @override
   State<StatefulWidget> createState() => BoardAppBarActionsState();
@@ -24,11 +29,13 @@ class BoardAppBarActions extends AppBarActions {
 
 class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
   late ProjectModel projectModel;
+  late bool showArchived;
 
   @override
   void initState() {
     super.initState();
     projectModel = widget.projectModel;
+    showArchived = widget.showArchived;
   }
 
   @override
@@ -46,13 +53,57 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
   @override
   void unarchive() => (abActionListener as BoardActionListener).onUnarchive();
 
+  void toggleArchive() {
+    projectModel.isActive = !projectModel.isActive;
+    (projectModel.isActive
+            ? Api.enableProject(projectModel.id)
+            : Api.disableProject(projectModel.id))
+        .then((value) {
+      if (!value) {
+        Utils.showErrorSnackbar(context, "Could not update project");
+      } else {
+        // TODO: bug: Does not refresh archived list
+        abActionListener.refreshUi();
+        log("Updated project");
+      }
+    }).catchError((e) => Utils.showErrorSnackbar(context, e));
+  }
+
   @override
   Future<void> handlePopupAction(String action) async {
     log("board, handlePopupAction: $action");
-    if (action == "archived".resc()) {
-      (abActionListener as BoardActionListener).onArchived();
+    if (action == "hide_archived".resc() || action == "show_archived".resc()) {
+      showArchived = !showArchived;
+      (abActionListener as BoardActionListener).onArchived(showArchived);
     } else if (action == "archive".resc() || action == "unarchive".resc()) {
       log("Archive/Unarchive");
+      if (projectModel.isActive) {
+        Utils.showAlertDialog(
+            context,
+            "${'archive'.resc()} `${projectModel.name}`?",
+            "alert_arch_content".resc(),
+            toggleArchive);
+      } else {
+        Utils.showAlertDialog(
+            context,
+            "${'unarchive'.resc()} `${projectModel.name}`?",
+            "alert_unarch_content".resc(),
+            toggleArchive);
+      }
+    } else if (action == "rename".resc()) {
+      log("Rename");
+      Utils.showInputAlertDialog(context, "rename_project".resc(),
+          "alert_rename_proj_content".resc(), projectModel.name, (title) {
+        log("project, rename col: $title");
+        projectModel.name = title;
+        Api.updateProject(projectModel).then((result) {
+          if (result) {
+            abActionListener.refreshUi();
+          } else {
+            Utils.showErrorSnackbar(context, "Could not rename project");
+          }
+        }).onError((e, st) => Utils.showErrorSnackbar(context, e));
+      });
     } else if (action == "delete".resc()) {
       Utils.showAlertDialog(
           context,
@@ -72,20 +123,21 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
       case AppBarAction.kMain:
         return IconButton(
           onPressed: () {
-            log("Search");
-            // abActionListener.onMainAction?.call();
+            log("Add new column");
+            abActionListener.onMainAction?.call();
           },
-          icon: const Icon(Icons.search),
-          tooltip: "tt_search".resc(),
+          icon: const Icon(Icons.playlist_add),
+          tooltip: "add_column".resc(),
         );
       case AppBarAction.kPopup:
         return PopupMenuButton<String>(
           onSelected: handlePopupAction,
           itemBuilder: (BuildContext context) {
             return {
-              "archived".resc(),
-              // taskModel.isActive ? "archive".resc() : "unarchive".resc(),
-              "archive".resc(),
+              "rename".resc(),
+              projectModel.isActive ? "archive".resc() : "unarchive".resc(),
+              showArchived ? "hide_archived".resc() : "show_archived".resc(),
+              // TODO: `show_archived` adds extra spaces in UI?
               "delete".resc(),
             }.map((String choice) {
               return PopupMenuItem<String>(

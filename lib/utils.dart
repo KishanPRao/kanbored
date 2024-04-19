@@ -23,9 +23,14 @@ class Utils {
   static emptyUi() => const SizedBox.shrink();
 
   // Alerts
-  static showErrorSnackbar(BuildContext context, dynamic e) =>
+  static showErrorSnackbar(BuildContext context, dynamic e) {
+    if (context.mounted) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("Error: $e")));
+    } else {
+      log("[Error snackbar] unmounted; $e");
+    }
+  }
 
   static showAlertDialog(BuildContext context, String title, String content,
       VoidCallback onPressed) {
@@ -36,16 +41,49 @@ class Utils {
           return PopScope(
               canPop: false,
               child: AlertDialog(
-                title: Text(
-                  title,
-                  maxLines: 1,
-                ),
+                title: Text(title, maxLines: 1),
                 content: Text(content),
                 actions: [
-                  TextButton(onPressed: () {
-                    Navigator.pop(context);
-                    onPressed();
-                  }, child: Text("ok".resc())),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        onPressed();
+                      },
+                      child: Text("ok".resc())),
+                  TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text("cancel".resc())),
+                ],
+              ));
+        });
+  }
+
+  static showInputAlertDialog(BuildContext context, String title,
+      String content, String initText, Function(String) onPressed) {
+    TextEditingController controller = TextEditingController();
+    controller.text = initText;
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return PopScope(
+              canPop: false,
+              child: AlertDialog(
+                title: Text(title, maxLines: 1),
+                content: TextField(
+                  autofocus: true,
+                  controller: controller,
+                  decoration: InputDecoration(hintText: content),
+                ),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        if (controller.text.isNotEmpty) {
+                          Navigator.pop(context);
+                          onPressed(controller.text);
+                        }
+                      },
+                      child: Text("ok".resc())),
                   TextButton(
                       onPressed: () => Navigator.pop(context),
                       child: Text("cancel".resc())),
