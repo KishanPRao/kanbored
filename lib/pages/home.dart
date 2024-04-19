@@ -101,8 +101,11 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    var projects =
-        this.projects.where((project) => project.isActive != showArchived);
+    var projects = this
+        .projects
+        .where((project) => project.isActive != showArchived)
+        .toList();
+    projects.sort((a, b) => a.name.compareTo(b.name));
     log("Projects: $projects; orig: ${this.projects}");
     return Scaffold(
       floatingActionButton: buildSearchFab(context, () {
@@ -136,7 +139,8 @@ class _HomeState extends State<Home> {
                   child: Center(child: Text("archived".resc())),
                 ))
             : Utils.emptyUi(),
-        GridView.count(
+        Expanded(
+            child: GridView.count(
           shrinkWrap: true,
           crossAxisCount: 2,
           children: projects
@@ -156,7 +160,7 @@ class _HomeState extends State<Home> {
                         )),
                   ))
               .toList(),
-        )
+        ))
       ]),
     );
   }
