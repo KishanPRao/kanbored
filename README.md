@@ -62,6 +62,7 @@ Bugs:
 - Archive/unarchive task, does not refresh the main screen (fix after cache)
 - Views reload (while adding task, etc); optimization
 - Default columns in new project
+- Archive/unarchive incorrect reloading, better `key` usage 
 
 Test:
 - Archive, unarchive cols, tasks

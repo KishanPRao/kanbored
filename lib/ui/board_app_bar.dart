@@ -69,6 +69,7 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
     }).catchError((e) => Utils.showErrorSnackbar(context, e));
   }
 
+  // Project level
   @override
   Future<void> handlePopupAction(String action) async {
     log("board, handlePopupAction: $action");
@@ -110,8 +111,14 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
           "${'delete'.resc()} `${projectModel.name}`?",
           "alert_del_content".resc(), () {
         log("Delete project");
-        // Api.removeTask(taskModel.id);
-        // Navigator.pop(context);
+        Api.removeProject(projectModel.id).then((result) {
+          if (result) {
+            abActionListener.refreshUi();
+            Navigator.pop(context);
+          } else {
+            Utils.showErrorSnackbar(context, "Could not delete project");
+          }
+        }).onError((e, st) => Utils.showErrorSnackbar(context, e));
       });
     }
   }

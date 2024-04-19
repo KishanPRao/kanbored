@@ -9,23 +9,23 @@ import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/add_task.dart';
 import 'package:kanbored/ui/app_bar_action_listener.dart';
+import 'package:kanbored/ui/board_action_listener.dart';
 import 'package:kanbored/ui/column_text.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/sizes.dart';
+import 'package:kanbored/utils.dart';
 
 class BoardColumn extends StatefulWidget {
   final ColumnModel column;
   final ProjectMetadataModel projectMetadataModel;
-  final bool showArchived;
   final List<GlobalKey<EditableState>> keysEditableText;
   final int baseIdx;
-  final AppBarActionListener abActionListener;
+  final BoardActionListener abActionListener;
 
   const BoardColumn(
       {super.key,
       required this.projectMetadataModel,
       required this.column,
-      required this.showArchived,
       required this.keysEditableText,
       required this.baseIdx,
       required this.abActionListener});
@@ -36,29 +36,24 @@ class BoardColumn extends StatefulWidget {
 
 class BoardColumnState extends State<BoardColumn> {
   late List<TaskModel> tasks;
-  late int tasksLength;
-  late bool showArchived;
   late ProjectMetadataModel projectMetadataModel;
   late ColumnModel column;
   late List<GlobalKey<EditableState>> keysEditableText;
   late int baseIdx;
-  late AppBarActionListener abActionListener;
+  late BoardActionListener abActionListener;
 
   @override
   void initState() {
     super.initState();
-    column = widget.column;
-    projectMetadataModel = widget.projectMetadataModel;
     abActionListener = widget.abActionListener;
-    log("Board column: ${column.id}, ${column.title}, ${column.isActive}, ${projectMetadataModel.closedColumns}");
+    keysEditableText = widget.keysEditableText;
+    baseIdx = widget.baseIdx;
+    column = widget.column;
   }
 
   @override
   void didChangeDependencies() {
-    keysEditableText = widget.keysEditableText;
-    baseIdx = widget.baseIdx;
-    showArchived = widget.showArchived;
-    tasks = (showArchived
+    tasks = (abActionListener.isArchived()
         ? (column.isActive ? column.inactiveTasks : column.tasks)
         : column.activeTasks);
     // TODO: fix incorrect positioning (when remove a middle task, add new one, sometimes doesn't update position correctly)
@@ -70,15 +65,17 @@ class BoardColumnState extends State<BoardColumn> {
       }
       return -1;
     });
-    tasksLength =
-        (showArchived ? tasks.length : tasks.length + 1); // Add new task
-    log("Board column, didChangeDep: ${tasks.length}");
+    projectMetadataModel = widget.projectMetadataModel;
+    log("Board column: ${column.id}, ${column.title}, ${column.isActive}, ${projectMetadataModel.closedColumns}");
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
-    log("Board column, build: ${column.title}, ${column.isActive}");
+    var tasksLength = (abActionListener.isArchived()
+        ? tasks.length
+        : tasks.length + 1); // Add new task
+    log("Board column, build: ${column.title}, ${column.isActive}; archived: ${abActionListener.isArchived()}");
     return Card(
         color: "columnBg".themed(context),
         margin: const EdgeInsets.all(10),
@@ -88,6 +85,7 @@ class BoardColumnState extends State<BoardColumn> {
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               ColumnText(
+                  // TODO: Likely `key` makes deciding refresh required
                   key: keysEditableText[baseIdx],
                   projectMetadataModel: projectMetadataModel,
                   columnModel: column,
@@ -100,7 +98,9 @@ class BoardColumnState extends State<BoardColumn> {
                       scrollDirection: Axis.vertical,
                       itemCount: tasksLength,
                       itemBuilder: (context, index) {
-                        if (!showArchived && index == tasks.length) {
+                        // log("isArch: ${abActionListener.isArchived()}; $index, ${tasks.length}");
+                        if (!abActionListener.isArchived() &&
+                            index == tasks.length) {
                           return SizedBox(
                               child: AddTask(
                                   key: keysEditableText[baseIdx + 1],

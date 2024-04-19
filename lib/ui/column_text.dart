@@ -62,6 +62,42 @@ class ColumnTextState extends EditableState<ColumnText> {
     FocusManager.instance.primaryFocus?.unfocus();
   }
 
+  void removeColumn() {
+    Api.removeColumn(columnModel.id).then((value) {
+      if (!value) {
+        Utils.showErrorSnackbar(context, "Could not remove column");
+      } else {
+        abActionListener.refreshUi();
+      }
+    }).onError((e, _) => Utils.showErrorSnackbar(context, e));
+  }
+
+  @override
+  void delete() {
+    abActionListener.onEditEnd(false);
+    Utils.showAlertDialog(context, "${'delete'.resc()} `${columnModel.title}`?",
+        "alert_del_content".resc(), () {
+      log("column, delete");
+
+      var updateProjMetadata =
+          projectMetadataModel.closedColumns.remove(columnModel.id);
+      Future.wait(columnModel.tasks.map((t) => Api.removeTask(t.id)).toList() +
+              [
+                updateProjMetadata
+                    ? Api.saveProjectMetadata(
+                        columnModel.projectId, projectMetadataModel)
+                    : Future<bool>.value(true)
+              ])
+          .then((value) {
+        if (value.contains(false)) {
+          Utils.showErrorSnackbar(context, "Could not clear all tasks");
+        } else {
+          removeColumn();
+        }
+      }).onError((e, _) => Utils.showErrorSnackbar(context, e));
+    });
+  }
+
   // TODO: Cannot remove column, kanboard issue?
   @override
   void archive() {
@@ -102,8 +138,7 @@ class ColumnTextState extends EditableState<ColumnText> {
       log("column, unarchive");
       if (projectMetadataModel.closedColumns.contains(columnModel.id)) {
         columnModel.isActive = true;
-        projectMetadataModel.closedColumns
-            .removeWhere((item) => item == columnModel.id);
+        projectMetadataModel.closedColumns.remove(columnModel.id);
         Api.saveProjectMetadata(columnModel.projectId, projectMetadataModel)
             .then((value) {
           if (!value) {
@@ -125,11 +160,13 @@ class ColumnTextState extends EditableState<ColumnText> {
   @override
   Widget build(BuildContext context) {
     // TODO: use popup button, Edit & Delete buttons? Or keep it simple?
+    log("col text, build: ${columnModel.title}");
     return TextField(
       controller: controller,
       onTap: () {
         abActionListener.onChange(controller.text);
         abActionListener.onEditStart(0, [
+          AppBarAction.kDelete,
           columnModel.isActive
               ? BoardAppBarAction.kArchive
               : BoardAppBarAction.kUnarchive,

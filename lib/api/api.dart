@@ -201,7 +201,9 @@ class Api {
 
   // Delete
 
-  // TODO: cannot remove columns, for some reason; use fake archive instead.
+  static Future<bool> removeProject(int id) async =>
+      setApi("removeProject", 46285125, params: {"project_id": id});
+
   static Future<bool> removeColumn(int id) async =>
       setApi("removeColumn", 1433237746, params: {"column_id": id});
 

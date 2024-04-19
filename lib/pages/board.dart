@@ -51,6 +51,7 @@ class _BoardState extends State<Board> {
   }
 
   void updateData() async {
+    List<GlobalKey<EditableState>> keysEditableText = [];
     var projectModel = this.projectModel;
     var boards = await Api.getBoard(projectModel.id);
     var projectMetadataModel = await Api.getProjectMetadata(projectModel.id);
@@ -66,6 +67,7 @@ class _BoardState extends State<Board> {
       setState(() {
         this.boards = boards;
         this.projectMetadataModel = projectMetadataModel;
+        this.keysEditableText = keysEditableText;
         isLoaded = true;
       });
     }
@@ -96,6 +98,8 @@ class _BoardState extends State<Board> {
     // setState(() {});
     return true;
   }
+
+  bool isArchived() => showArchived;
 
   void onDelete() {
     log("board, onDelete");
@@ -161,21 +165,6 @@ class _BoardState extends State<Board> {
           icon: const Icon(Icons.arrow_back),
         ),
         actions: [
-          // IconButton(
-          //   onPressed: null,
-          //   icon: const Icon(Icons.search),
-          //   tooltip: "tt_search".resc(),
-          // ),
-          // IconButton(
-          //   onPressed: () {
-          //     setState(() {
-          //       showActive = !showActive;
-          //     });
-          //   },
-          //   color: showActive ? Colors.grey : Colors.red, //TODO
-          //   icon: const Icon(Icons.archive),
-          //   tooltip: "tt_archived_col".resc(),
-          // ),
           BoardAppBarActions(
             key: keyAppBarActionsState,
             projectModel: projectModel,
@@ -190,6 +179,7 @@ class _BoardState extends State<Board> {
               onDelete: onDelete,
               onMainAction: onAddColumn,
               refreshUi: refreshUi,
+              isArchived: isArchived,
             ),
           )
         ],
@@ -216,31 +206,39 @@ class _BoardState extends State<Board> {
             // TODO: move each ui element into a function or class?
             // TODO: Keep a setting to enable swimlane info; default disabled; give warning on possible limitations; or keep it simple, avoid using it.
             Expanded(
-                child: ListView.builder(
-                    key: UniqueKey(),
-                    // TODO: perf: better approach; everything causes refresh
-                    shrinkWrap: true,
-                    controller: controller,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: columns.length,
-                    itemBuilder: (context, index) => SizedBox(
-                        width: columnWidth,
-                        child: BoardColumn(
-                          column: columns.elementAt(index),
-                          projectMetadataModel: projectMetadataModel,
-                          showArchived: showArchived,
-                          keysEditableText: keysEditableText,
-                          baseIdx: (index * 2),
-                          abActionListener: AppBarActionListener(
-                            onChange: onChange,
-                            onEditStart: (idx, actions) =>
-                                onEditStart((index * 2) + idx!, actions),
-                            onEditEnd: onEditEnd,
-                            onDelete: onDelete,
-                            onMainAction: null,
-                            refreshUi: refreshUi,
-                          ),
-                        ))))
+                child: ListView(
+              // TODO: perf: better approach; everything causes refresh
+              shrinkWrap: true,
+              controller: controller,
+              scrollDirection: Axis.horizontal,
+              children: columns.mapIndexed((entry) {
+                var index = entry.key;
+                var column = entry.value;
+                log("col map: ${column.title}");
+                return SizedBox(
+                    width: columnWidth,
+                    child: BoardColumn(
+                      key: ObjectKey(column),
+                      column: column,
+                      projectMetadataModel: projectMetadataModel,
+                      keysEditableText: keysEditableText,
+                      baseIdx: (index * 2),
+                      abActionListener: BoardActionListener(
+                        onChange: onChange,
+                        onEditStart: (idx, actions) =>
+                            onEditStart((index * 2) + idx!, actions),
+                        onEditEnd: onEditEnd,
+                        onDelete: onDelete,
+                        isArchived: isArchived,
+                        onMainAction: null,
+                        refreshUi: refreshUi,
+                        onArchive: () {},
+                        onUnarchive: () {},
+                        onArchived: (_) {},
+                      ),
+                    ));
+              }).toList(),
+            ))
           ],
         ));
       }).toList()),
