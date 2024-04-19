@@ -196,6 +196,7 @@ class _TaskState extends State<Task> {
     log("Checklist + subtask count: $checklistSubtaskCount");
     log("Checklist len: ${taskMetadata.checklists.length} subtask len: ${subtasks.length}");
     return Scaffold(
+      backgroundColor: "scaffoldBackgroundColor".themed(context),
       appBar: AppBar(
           title: Text(taskModel.title),
           backgroundColor: "primary".themed(context),

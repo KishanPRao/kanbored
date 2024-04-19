@@ -20,6 +20,7 @@ void main() async {
 
 class App extends StatelessWidget {
   App({super.key});
+
   final authenticated = AppData.authenticated;
 
   @override
@@ -29,8 +30,9 @@ class App extends StatelessWidget {
       builder: (context, _) => MaterialApp(
         title: 'Kanbored',
         theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
-        themeMode: context.watch<AppTheme>().themeMode,
+        darkTheme:
+            AppData.theme == themeAmolded ? AppTheme.amolded : AppTheme.dark,
+        themeMode: AppTheme.strToThemeMode(context.watch<AppTheme>().themeMode),
         debugShowCheckedModeBanner: false,
         initialRoute: authenticated ? 'home' : 'login',
         routes: {

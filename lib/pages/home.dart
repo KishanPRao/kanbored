@@ -108,6 +108,7 @@ class _HomeState extends State<Home> {
     projects.sort((a, b) => a.name.compareTo(b.name));
     log("Projects: $projects; orig: ${this.projects}");
     return Scaffold(
+      backgroundColor: "scaffoldBackgroundColor".themed(context),
       floatingActionButton: buildSearchFab(context, () {
         log("home Search");
       }),

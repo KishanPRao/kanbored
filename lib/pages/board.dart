@@ -152,6 +152,7 @@ class _BoardState extends State<Board> {
       return Utils.emptyUi();
     }
     return Scaffold(
+      backgroundColor: "scaffoldBackgroundColor".themed(context),
       floatingActionButton: buildSearchFab(context, () {
         log("board Search");
       }),

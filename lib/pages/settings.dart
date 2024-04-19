@@ -15,7 +15,7 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  var theme = AppTheme.strToThemeMode(AppData.theme);
+  var theme = AppData.theme;
   var apiUsername = AppData.getString(prefApiPassword, "");
   var apiToken = AppData.getString(prefApiPassword, "");
   var apiEndpoint = AppData.getString(prefApiUrl, "");
@@ -24,6 +24,7 @@ class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: "scaffoldBackgroundColor".themed(context),
       appBar: AppBar(
         title: Text("settings".resc()),
         backgroundColor: "primary".themed(context),
@@ -36,8 +37,7 @@ class _SettingsState extends State<Settings> {
       ),
       body: Column(
         children: [
-          _buildSettingOption(context, "Theme", AppTheme.themeModeToStr(theme),
-              _showThemeOptions),
+          _buildSettingOption(context, "Theme", theme, _showThemeOptions),
           _buildSettingOption(
               context,
               "Logout",
@@ -92,17 +92,19 @@ class _SettingsState extends State<Settings> {
   }
 
   void _showThemeOptions() async {
-    context.read<AppTheme>().themeMode = (await showDialog<ThemeMode>(
+    var themes = ThemeMode.values.map((value) => value.name).toList();
+    themes.add(themeAmolded);
+    context.read<AppTheme>().themeMode = (await showDialog<String>(
         context: context,
         builder: (BuildContext context) {
           return SimpleDialog(
-            title: const Text('Select theme'),
-            children: ThemeMode.values.map((value) {
+            title: Text("select_theme".resc()),
+            children: themes.map((value) {
               return SimpleDialogOption(
                 onPressed: () {
                   Navigator.pop(context, value);
                 },
-                child: Text(value.name.capitalize()),
+                child: Text(value.capitalize()),
               );
             }).toList(),
           );
