@@ -4,10 +4,10 @@
   "tt_opt": "Options",
   "tt_discard": "Discard",
   "tt_done": "Done",
+  "tt_add_checklist": "Add a new checklist",
   "archive": "Archive",
   "archived": "Archived",
   "unarchive": "Unarchive",
-  "add_checklist": "Add a new checklist",
   "add_comment": "Add a new comment",
   "add_subtask": "Add a new subtask",
   "invalid": "<invalid>",
@@ -15,5 +15,8 @@
   "ok": "OK",
   "cancel": "Cancel",
   "alert_del_content": "Are you sure you want to delete this item?",
+  "alert_arch_content": "Are you sure you want to archive this item?",
+  "alert_unarch_content": "Are you sure you want to unarchive this item?",
+  "column_empty_warn": "Column name cannot be empty",
   "add_task": "Add a task"
 }

@@ -9,7 +9,7 @@ import 'package:kanbored/ui/add_subtask.dart';
 import 'package:kanbored/ui/checklist.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/subtask.dart';
-import 'package:kanbored/ui/task_action_listener.dart';
+import 'package:kanbored/ui/app_bar_action_listener.dart';
 
 List<Widget> buildSubtasks(
     BuildContext context,
@@ -17,7 +17,7 @@ List<Widget> buildSubtasks(
     List<SubtaskModel> subtasks,
     TaskMetadataModel taskMetadata,
     List<GlobalKey<EditableState>> keysEditableText,
-    TaskActionListener taskActionListener,
+    AppBarActionListener abActionListener,
     Function(SubtaskModel, bool) toggleCb) {
   if (taskMetadata.checklists.isEmpty) {
     return [const SizedBox.shrink()];
@@ -29,7 +29,7 @@ List<Widget> buildSubtasks(
     return Column(
         children: <Widget>[
               buildChecklistHeader(checklist, taskMetadata, task,
-                  keysEditableText, currentIndex++, taskActionListener)
+                  keysEditableText, currentIndex++, abActionListener)
             ] +
             checklist.items.map((item) {
               var subtask =
@@ -42,12 +42,12 @@ List<Widget> buildSubtasks(
                   taskMetadata,
                   keysEditableText,
                   currentIndex++,
-                  taskActionListener,
+                  abActionListener,
                   toggleCb);
             }).toList() +
             <Widget>[
               buildAddSubtask(checklist, taskMetadata, task, keysEditableText,
-                  currentIndex++, taskActionListener)
+                  currentIndex++, abActionListener)
             ]);
   }).toList();
 }
@@ -59,20 +59,20 @@ Widget buildSingleSubtask(
     TaskMetadataModel taskMetadata,
     List<GlobalKey<EditableState>> keysEditableText,
     int index,
-    TaskActionListener taskActionListener,
+    AppBarActionListener abActionListener,
     Function(SubtaskModel, bool) toggleCb) {
   return Subtask(
       key: keysEditableText[index],
       subtask: subtask,
       checklist: checklist,
       taskMetadata: taskMetadata,
-      taskActionListener: TaskActionListener(
-        onChange: taskActionListener.onChange,
+      abActionListener: AppBarActionListener(
+        onChange: abActionListener.onChange,
         onEditStart: (_, actions) =>
-            taskActionListener.onEditStart(index, actions),
-        onEditEnd: taskActionListener.onEditEnd,
-        onDelete: taskActionListener.onDelete,
-        refreshUi: taskActionListener.refreshUi,
+            abActionListener.onEditStart(index, actions),
+        onEditEnd: abActionListener.onEditEnd,
+        onDelete: abActionListener.onDelete,
+        refreshUi: abActionListener.refreshUi,
       ));
   // return Row(children: [
   //   Checkbox(
@@ -90,12 +90,12 @@ Widget buildSingleSubtask(
   //       child: Subtask(
   //           key: keysEditableText[index],
   //           subtask: subtask,
-  //           taskActionListener: TaskActionListener(
-  //             onChange: taskActionListener.onChange,
-  //             onEditStart: (_) => taskActionListener.onEditStart(index),
-  //             onEditEnd: taskActionListener.onEditEnd,
-  //             onDelete: taskActionListener.onDelete,
-  //             refreshUi: taskActionListener.refreshUi,
+  //           abActionListener: TaskActionListener(
+  //             onChange: abActionListener.onChange,
+  //             onEditStart: (_) => abActionListener.onEditStart(index),
+  //             onEditEnd: abActionListener.onEditEnd,
+  //             onDelete: abActionListener.onDelete,
+  //             refreshUi: abActionListener.refreshUi,
   //           )))
   // ]);
 }
@@ -106,20 +106,20 @@ Widget buildAddSubtask(
   TaskModel task,
   List<GlobalKey<EditableState>> keysEditableText,
   int index,
-  TaskActionListener taskActionListener,
+  AppBarActionListener abActionListener,
 ) =>
     AddSubtask(
         key: keysEditableText[index],
         checklist: checklist,
         taskMetadata: taskMetadata,
         task: task,
-        taskActionListener: TaskActionListener(
-          onChange: taskActionListener.onChange,
+        abActionListener: AppBarActionListener(
+          onChange: abActionListener.onChange,
           onEditStart: (_, actions) =>
-              taskActionListener.onEditStart(index, actions),
-          onEditEnd: taskActionListener.onEditEnd,
-          onDelete: taskActionListener.onDelete,
-          refreshUi: taskActionListener.refreshUi,
+              abActionListener.onEditStart(index, actions),
+          onEditEnd: abActionListener.onEditEnd,
+          onDelete: abActionListener.onDelete,
+          refreshUi: abActionListener.refreshUi,
         ));
 
 Widget buildChecklistHeader(
@@ -128,17 +128,17 @@ Widget buildChecklistHeader(
         TaskModel task,
         List<GlobalKey<EditableState>> keysEditableText,
         int index,
-        TaskActionListener taskActionListener) =>
+        AppBarActionListener abActionListener) =>
     Checklist(
         key: keysEditableText[index],
         checklist: checklist,
         task: task,
         taskMetadata: taskMetadata,
-        taskActionListener: TaskActionListener(
-          onChange: taskActionListener.onChange,
+        abActionListener: AppBarActionListener(
+          onChange: abActionListener.onChange,
           onEditStart: (_, actions) =>
-              taskActionListener.onEditStart(index, actions),
-          onEditEnd: taskActionListener.onEditEnd,
-          onDelete: taskActionListener.onDelete,
-          refreshUi: taskActionListener.refreshUi,
+              abActionListener.onEditStart(index, actions),
+          onEditEnd: abActionListener.onEditEnd,
+          onDelete: abActionListener.onDelete,
+          refreshUi: abActionListener.refreshUi,
         ));

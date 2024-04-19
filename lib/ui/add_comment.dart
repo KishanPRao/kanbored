@@ -5,19 +5,20 @@ import 'package:kanbored/api/api.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/strings.dart';
+import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/editing_state.dart';
-import 'package:kanbored/ui/task_action_listener.dart';
+import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/ui/task_app_bar.dart';
 import 'package:kanbored/utils.dart';
 
 class AddComment extends StatefulWidget {
   final TaskModel task;
-  final TaskActionListener taskActionListener;
+  final AppBarActionListener abActionListener;
 
   const AddComment({
     super.key,
     required this.task,
-    required this.taskActionListener,
+    required this.abActionListener,
   });
 
   @override
@@ -27,13 +28,13 @@ class AddComment extends StatefulWidget {
 class AddCommentState extends EditableState<AddComment> {
   late TaskModel task;
   late TextEditingController controller;
-  late TaskActionListener taskActionListener;
+  late AppBarActionListener abActionListener;
 
   @override
   void initState() {
     super.initState();
     controller = TextEditingController(text: "");
-    taskActionListener = widget.taskActionListener;
+    abActionListener = widget.abActionListener;
     task = widget.task;
   }
 
@@ -43,7 +44,7 @@ class AddCommentState extends EditableState<AddComment> {
       log("Add a new comment: ${controller.text}, into task: ${task.title}");
       Api.createComment(task.id, controller.text).then((result) {
         if (result is int) {
-          taskActionListener.refreshUi();
+          abActionListener.refreshUi();
         } else {
           Utils.showErrorSnackbar(context, "Could not add a comment");
         }
@@ -57,25 +58,20 @@ class AddCommentState extends EditableState<AddComment> {
   }
 
   @override
-  void delete() {
-    log("add comment: delete");
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 10.0),
         child: TextField(
             controller: controller,
             onTap: () {
-              taskActionListener.onChange(controller.text);
-              taskActionListener.onEditStart(
-                  null, [TaskAppBarAction.kDiscard, TaskAppBarAction.kDone]);
+              abActionListener.onChange(controller.text);
+              abActionListener.onEditStart(
+                  null, [AppBarAction.kDiscard, AppBarAction.kDone]);
             },
             onEditingComplete: () {
-              taskActionListener.onEditEnd(true);
+              abActionListener.onEditEnd(true);
             },
-            onChanged: taskActionListener.onChange,
+            onChanged: abActionListener.onChange,
             decoration: InputDecoration(
                 hintText: "add_comment".resc(),
                 border: InputBorder.none,

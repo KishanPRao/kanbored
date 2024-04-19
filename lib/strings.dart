@@ -11,7 +11,7 @@ extension Strings on String {
     _strings = jsonDecode(jsonString);
   }
 
-  String resc() => _strings[this] ?? "";
+  String resc() => _strings[this] ?? "?";
 
   Color themed(BuildContext context) =>
       context.theme.appColors.colors[this] ?? Colors.black;

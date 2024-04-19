@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:kanbored/strings.dart';
 
@@ -50,5 +52,9 @@ class Utils {
                 ],
               ));
         });
+  }
+
+  static void printStacktrace() {
+    log("[stacktrace] ${StackTrace.current}");
   }
 }

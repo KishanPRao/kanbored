@@ -6,12 +6,13 @@ import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/strings.dart';
+import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/add_comment.dart';
 import 'package:kanbored/ui/app_theme.dart';
 import 'package:kanbored/ui/build_subtasks.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/markdown.dart';
-import 'package:kanbored/ui/task_action_listener.dart';
+import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/ui/task_app_bar.dart';
 import 'package:kanbored/utils.dart';
 
@@ -23,6 +24,8 @@ class Task extends StatefulWidget {
 }
 
 class _TaskState extends State<Task> {
+  late int taskId;
+  late int projectId;
   late TaskModel taskModel;
   List<SubtaskModel> subtasks = [];
   TaskMetadataModel taskMetadata = TaskMetadataModel(checklists: []);
@@ -38,7 +41,9 @@ class _TaskState extends State<Task> {
   @override
   void didChangeDependencies() {
     if (!isLoaded) {
-      taskModel = ModalRoute.of(context)?.settings.arguments as TaskModel;
+      var args = ModalRoute.of(context)?.settings.arguments as List<int>;
+      taskId = args[0];
+      projectId = args[1];
       init();
     }
     super.didChangeDependencies();
@@ -46,8 +51,7 @@ class _TaskState extends State<Task> {
 
   void init() async {
     log("init");
-    taskModel = await Api.getTask(
-        taskModel.id, taskModel.projectId); // update task info
+    taskModel = await Api.getTask(taskId, projectId); // update task info
     comments = [];
     subtasks = [];
     taskMetadata = TaskMetadataModel(checklists: []);
@@ -120,7 +124,7 @@ class _TaskState extends State<Task> {
     // keyTaskAppBarActionsState.currentState?.updateText(text);
   }
 
-  void onEditStart(int index, List<TaskAppBarAction> actions) {
+  void onEditStart(int index, List<int> actions) {
     log("onEditStart: $index");
     activeEditIndex = index;
     keyTaskAppBarActionsState.currentState?.currentActions = actions;
@@ -177,7 +181,7 @@ class _TaskState extends State<Task> {
   Widget build(BuildContext context) {
     // Do not load until some data is retrieved
     if (!isLoaded) {
-      return const SizedBox.shrink();
+      return Utils.emptyUi();
     }
 
     ScrollController scrollController = ScrollController();
@@ -199,12 +203,12 @@ class _TaskState extends State<Task> {
             TaskAppBarActions(
               key: keyTaskAppBarActionsState,
               taskModel: taskModel,
-              taskActionListener: TaskActionListener(
+              abActionListener: AppBarActionListener(
                 onChange: onChange,
                 onEditStart: (_, __) => onEditStart(0, []),
                 onEditEnd: onEditEnd,
                 onDelete: onDelete,
-                onCreateChecklist: onCreateChecklist,
+                onMainAction: onCreateChecklist,
                 refreshUi: refreshUi,
               ),
             )
@@ -228,12 +232,10 @@ class _TaskState extends State<Task> {
                       Markdown(
                           key: keysEditableText[0],
                           model: taskModel,
-                          taskActionListener: TaskActionListener(
+                          abActionListener: AppBarActionListener(
                             onChange: onChange,
-                            onEditStart: (_, __) => onEditStart(0, [
-                              TaskAppBarAction.kDiscard,
-                              TaskAppBarAction.kDone
-                            ]),
+                            onEditStart: (_, __) => onEditStart(
+                                0, [AppBarAction.kDiscard, AppBarAction.kDone]),
                             onEditEnd: (saveChanges) {
                               // TODO: allow empty desc, default hint text
                               // updateDescription()
@@ -249,7 +251,7 @@ class _TaskState extends State<Task> {
                         subtasks,
                         taskMetadata,
                         keysEditableText,
-                        TaskActionListener(
+                        AppBarActionListener(
                           onChange: onChange,
                           onEditStart: (index, actions) =>
                               onEditStart(index!, actions),
@@ -263,7 +265,7 @@ class _TaskState extends State<Task> {
                           key: keysEditableText[
                               checklistSubtaskCount + kDescriptionCount],
                           task: taskModel,
-                          taskActionListener: TaskActionListener(
+                          abActionListener: AppBarActionListener(
                             onChange: onChange,
                             onEditStart: (_, actions) => onEditStart(
                                 checklistSubtaskCount + kDescriptionCount,
@@ -283,7 +285,7 @@ class _TaskState extends State<Task> {
                               kDescriptionCount +
                               kAddCommentCount],
                           model: comment,
-                          taskActionListener: TaskActionListener(
+                          abActionListener: AppBarActionListener(
                             onChange: onChange,
                             onEditStart: (_, __) => onEditStart(
                                 idx +
@@ -291,9 +293,9 @@ class _TaskState extends State<Task> {
                                     kDescriptionCount +
                                     kAddCommentCount,
                                 [
-                                  TaskAppBarAction.kDelete,
-                                  TaskAppBarAction.kDiscard,
-                                  TaskAppBarAction.kDone
+                                  AppBarAction.kDelete,
+                                  AppBarAction.kDiscard,
+                                  AppBarAction.kDone
                                 ]),
                             onEditEnd: (saveChanges) {
                               // updateComment()

@@ -4,6 +4,7 @@
 
 import 'dart:convert';
 
+import 'package:kanbored/models/model.dart';
 import 'package:kanbored/models/task_model.dart';
 
 ColumnModel columnModelFromJson(String str) =>
@@ -11,7 +12,7 @@ ColumnModel columnModelFromJson(String str) =>
 
 String columnModelToJson(ColumnModel data) => json.encode(data.toJson());
 
-class ColumnModel {
+class ColumnModel extends Model {
   ColumnModel({
     required this.id,
     required this.title,
@@ -72,6 +73,7 @@ class ColumnModel {
         columnNbOpenTasks: json["column_nb_open_tasks"],
       );
 
+  @override
   Map<String, dynamic> toJson() => {
         "id": id,
         "title": title,

@@ -1,33 +1,50 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:kanbored/api/api.dart';
+import 'package:kanbored/constants.dart';
+import 'package:kanbored/models/column_model.dart';
 import 'package:kanbored/strings.dart';
+import 'package:kanbored/ui/abstract_app_bar.dart';
+import 'package:kanbored/ui/app_bar_action_listener.dart';
+import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/sizes.dart';
+import 'package:kanbored/utils.dart';
 
 class AddTask extends StatefulWidget {
-  final Function(String) createTaskCb;
+  final AppBarActionListener abActionListener;
+  final ColumnModel columnModel;
 
-  const AddTask({required this.createTaskCb, super.key});
+  const AddTask(
+      {super.key, required this.columnModel, required this.abActionListener});
 
   @override
   State<StatefulWidget> createState() => AddTaskState();
 }
 
-class AddTaskState extends State<AddTask> {
-  var editing = false;
-  var taskName = "";
-  var validText = false;
+class AddTaskState extends EditableState<AddTask> {
   var focusNode = FocusNode();
-  late Function(String) createTaskCb;
+  late ColumnModel columnModel;
+  late AppBarActionListener abActionListener;
+  late TextEditingController controller;
 
   @override
   void initState() {
     super.initState();
-    createTaskCb = widget.createTaskCb;
+    columnModel = widget.columnModel;
+    abActionListener = widget.abActionListener;
+    controller = TextEditingController(text: "");
   }
 
   @override
   void dispose() {
     focusNode.dispose();
     super.dispose();
+  }
+
+  void startEditing() {
+    abActionListener.onChange(controller.text);
+    abActionListener
+        .onEditStart(1, [AppBarAction.kDiscard, AppBarAction.kDone]);
   }
 
   @override
@@ -40,6 +57,7 @@ class AddTaskState extends State<AddTask> {
           // splashColor: "primary".themed(context).withAlpha(30),
           onTap: () {
             setState(() {
+              startEditing();
               focusNode.requestFocus();
             });
           },
@@ -50,26 +68,42 @@ class AddTaskState extends State<AddTask> {
                 child: Row(children: [
                   Expanded(
                       child: TextField(
-                    onChanged: (value) {
-                      setState(() {
-                        validText = value.isNotEmpty;
-                        taskName = value;
-                      });
-                    },
-                    onEditingComplete: () {
-                      if (validText) {
-                        createTaskCb(taskName);
-                      }
-                    },
-                    focusNode: focusNode,
-                    decoration: InputDecoration(hintText: "add_task".resc()),
-                  )),
-                  IconButton(
-                      onPressed:
-                          validText ? () => createTaskCb(taskName) : null,
-                      icon: const Icon(Icons.check))
+                          controller: controller,
+                          onTap: startEditing,
+                          onEditingComplete: () {
+                            abActionListener.onEditEnd(true);
+                          },
+                          onChanged: abActionListener.onChange,
+                          focusNode: focusNode,
+                          decoration: InputDecoration(
+                              hintText: "add_task".resc(),
+                              // border: InputBorder.none,
+                              hintStyle: const TextStyle(
+                                  fontWeight: FontWeight.w300)))),
+                  // IconButton(
+                  //     onPressed:
+                  //         validText ? () => createTaskCb(taskName) : null,
+                  //     icon: const Icon(Icons.check))
                 ])),
           )),
     );
+  }
+
+  @override
+  void endEdit(bool saveChanges) async {
+    log("endEdit: $saveChanges");
+    if (saveChanges) {
+      log("Add a new task: ${controller.text}, into task: ${columnModel.title}");
+      Api.createTask(columnModel.projectId, columnModel.id, controller.text)
+          .then((taskId) {
+        controller.text = "";
+        abActionListener.refreshUi();
+        Navigator.pushNamed(context, routeTask,
+            arguments: [taskId, columnModel.projectId]);
+      }).onError((e, st) => Utils.showErrorSnackbar(context, e));
+    } else {
+      controller.text = "";
+    }
+    FocusManager.instance.primaryFocus?.unfocus();
   }
 }

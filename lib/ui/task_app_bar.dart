@@ -4,25 +4,26 @@ import 'package:flutter/material.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/strings.dart';
-import 'package:kanbored/ui/task_action_listener.dart';
+import 'package:kanbored/ui/abstract_app_bar.dart';
+import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/utils.dart';
 
 import 'editing_state.dart';
 
-enum TaskAppBarAction {
-  kDelete,
-  kDiscard,
-  kDone,
-  kAddChecklist,
-  kPopup,
-}
+// enum TaskAppBarAction {
+//   kDelete,
+//   kDiscard,
+//   kDone,
+//   kAddChecklist,
+//   kPopup,
+// }
 
 class TaskAppBarActions extends StatefulWidget {
   final TaskModel taskModel;
-  final TaskActionListener taskActionListener;
+  final AppBarActionListener abActionListener;
 
   const TaskAppBarActions(
-      {super.key, required this.taskModel, required this.taskActionListener});
+      {super.key, required this.taskModel, required this.abActionListener});
 
   @override
   State<StatefulWidget> createState() => TaskAppBarActionsState();
@@ -30,11 +31,11 @@ class TaskAppBarActions extends StatefulWidget {
 
 class TaskAppBarActionsState extends EditableState<TaskAppBarActions> {
   late TaskModel taskModel;
-  late TaskActionListener taskActionListener;
+  late AppBarActionListener abActionListener;
   bool _editing = false;
   var defaultActions = [
-    TaskAppBarAction.kAddChecklist,
-    TaskAppBarAction.kPopup,
+    AppBarAction.kMain,
+    AppBarAction.kPopup,
   ];
   var currentActions = [];
 
@@ -42,7 +43,7 @@ class TaskAppBarActionsState extends EditableState<TaskAppBarActions> {
   void initState() {
     super.initState();
     taskModel = widget.taskModel;
-    taskActionListener = widget.taskActionListener;
+    abActionListener = widget.abActionListener;
   }
 
   @override
@@ -62,10 +63,10 @@ class TaskAppBarActionsState extends EditableState<TaskAppBarActions> {
   }
 
   @override
-  void delete() => taskActionListener.onDelete();
+  void delete() => abActionListener.onDelete();
 
   void stopEdit(bool saveChanges) {
-    if (taskActionListener.onEditEnd(saveChanges)) {
+    if (abActionListener.onEditEnd(saveChanges)) {
       endEdit(saveChanges);
     }
   }
@@ -90,39 +91,39 @@ class TaskAppBarActionsState extends EditableState<TaskAppBarActions> {
     }
   }
 
-  Widget getButton(TaskAppBarAction action) {
+  Widget getButton(int action) {
     switch (action) {
-      case TaskAppBarAction.kDelete:
+      case AppBarAction.kDelete:
         return IconButton(
           onPressed: () => delete(),
           // color: showActive ? Colors.grey : Colors.red, //TODO
           icon: const Icon(Icons.delete),
           tooltip: "delete".resc(),
         );
-      case TaskAppBarAction.kDiscard:
+      case AppBarAction.kDiscard:
         return IconButton(
           onPressed: () => stopEdit(false),
           // color: showActive ? Colors.grey : Colors.red, //TODO
           icon: const Icon(Icons.undo),
           tooltip: "tt_discard".resc(),
         );
-      case TaskAppBarAction.kDone:
+      case AppBarAction.kDone:
         return IconButton(
           onPressed: () => stopEdit(true),
           // color: showActive ? Colors.grey : Colors.red, //TODO
           icon: const Icon(Icons.done),
           tooltip: "tt_done".resc(),
         );
-      case TaskAppBarAction.kAddChecklist:
+      case AppBarAction.kMain:
         return IconButton(
           onPressed: () {
             log("Add checklist");
-            taskActionListener.onCreateChecklist?.call();
+            abActionListener.onMainAction?.call();
           },
           icon: const Icon(Icons.format_list_bulleted_add),
-          tooltip: "add_checklist".resc(),
+          tooltip: "tt_add_checklist".resc(),
         );
-      case TaskAppBarAction.kPopup:
+      case AppBarAction.kPopup:
         return PopupMenuButton<String>(
           onSelected: handlePopupAction,
           itemBuilder: (BuildContext context) {
@@ -137,6 +138,9 @@ class TaskAppBarActionsState extends EditableState<TaskAppBarActions> {
             }).toList();
           },
         );
+      default:
+        log("Could not find matching app bar action buttons!");
+        return Utils.emptyUi();
     }
   }
 

@@ -4,10 +4,12 @@ class Model {
   factory Model.fromJson(Map<String, dynamic> json) {
     return Model();
   }
+  Model();
 
   dynamic toJson() => {};
 
-  Model();
+  @override
+  String toString() => toJson().toString();
 }
 
 extension ModelExtension on Model {

@@ -1,13 +1,14 @@
 import 'dart:convert';
+import 'dart:developer';
+
 import 'package:http/http.dart' as http;
 import 'package:kanbored/app_data.dart';
 import 'package:kanbored/models/board_model.dart';
+import 'package:kanbored/models/column_model.dart';
 import 'package:kanbored/models/comment_model.dart';
 import 'package:kanbored/models/model.dart';
 import 'package:kanbored/models/project_metadata_model.dart';
 import 'package:kanbored/models/project_model.dart';
-import 'dart:developer';
-
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
@@ -117,6 +118,10 @@ class Api {
 
   // UPDATE
 
+  static Future<bool> updateColumn(ColumnModel model) async =>
+      setApi("updateColumn", 480740641,
+          params: [model.id, model.title, model.taskLimit, model.description]);
+
   static Future<bool> updateTask(TaskModel taskModel) async =>
       setApi("updateTask", 1406803059,
           params: taskModel.toJsonWithKeys([
@@ -172,14 +177,18 @@ class Api {
 
   // Delete
 
-  static Future<bool> removeSubtask(int subtaskId) async =>
-      setApi("removeSubtask", 1382487306, params: {"subtask_id": subtaskId});
+  // TODO: cannot remove columns, for some reason; use fake archive instead.
+  static Future<bool> removeColumn(int id) async =>
+      setApi("removeColumn", 1433237746, params: {"column_id": id});
 
-  static Future<bool> removeComment(int commentId) async =>
-      setApi("removeComment", 328836871, params: {"comment_id": commentId});
+  static Future<bool> removeTask(int id) async =>
+      setApi("removeTask", 1423501287, params: {"task_id": id});
 
-  static Future<bool> removeTask(int taskId) async =>
-      setApi("removeTask", 1423501287, params: {"task_id": taskId});
+  static Future<bool> removeComment(int id) async =>
+      setApi("removeComment", 328836871, params: {"comment_id": id});
+
+  static Future<bool> removeSubtask(int id) async =>
+      setApi("removeSubtask", 1382487306, params: {"subtask_id": id});
 
   //////////////////////////////////// GETTER //////////////////////////////////
 
@@ -272,7 +281,7 @@ class Api {
     );
 
     final decodedData = json.decode(utf8.decode(resp.bodyBytes));
-    log("decodedData: $decodedData");
+    // log("decodedData: $decodedData");
 
     if (decodedData['error'] != null) return Future.error(decodedData['error']);
     return decodedData['result'];

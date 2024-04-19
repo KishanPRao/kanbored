@@ -17,10 +17,6 @@ Bridge support:
 - Multiple checklist (adds task metadata into kanboard, even if not try checklist)
 - Archived task (card), column (list)
 
-Limitations:
-- User info not properly retained / shown
-- Subtask ordering will be different (uses metadata info to organize & decide position). If re-ordered in kanboard after in-app use, it will not be reflected.
-
 Basic features:
 - Checklist-bridge complete
 - Bridge, linked task
@@ -51,6 +47,11 @@ TODO:
 - Attachments
 - Favorite/starred tasks
 - Optimize!
+- Store updated accurate position info when deleting middle position items
 
-Unlikely:
+Limitations:
+These features are unlikely to be worked on either due to complexity, or due to limited understanding of its expected workflow.
+
 - Swimlane support
+- Multi user support / user show
+- Subtask ordering will be different (uses metadata info to organize & decide position). If re-ordered in kanboard after in-app use, it will not be reflected.

@@ -5,8 +5,9 @@ import 'package:kanbored/api/api.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/strings.dart';
+import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/editing_state.dart';
-import 'package:kanbored/ui/task_action_listener.dart';
+import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/ui/task_app_bar.dart';
 import 'package:kanbored/utils.dart';
 
@@ -14,14 +15,14 @@ class Subtask extends StatefulWidget {
   final SubtaskModel subtask;
   final TaskMetadataModel taskMetadata;
   final CheckListMetadata checklist;
-  final TaskActionListener taskActionListener;
+  final AppBarActionListener abActionListener;
 
   const Subtask({
     super.key,
     required this.subtask,
     required this.taskMetadata,
     required this.checklist,
-    required this.taskActionListener,
+    required this.abActionListener,
   });
 
   @override
@@ -33,7 +34,7 @@ class SubtaskState extends EditableState<Subtask> {
   late TaskMetadataModel taskMetadata;
   late CheckListMetadata checklist;
   late TextEditingController controller;
-  late TaskActionListener taskActionListener;
+  late AppBarActionListener abActionListener;
 
   @override
   void initState() {
@@ -41,7 +42,7 @@ class SubtaskState extends EditableState<Subtask> {
     subtask = widget.subtask;
     taskMetadata = widget.taskMetadata;
     checklist = widget.checklist;
-    taskActionListener = widget.taskActionListener;
+    abActionListener = widget.abActionListener;
     controller = TextEditingController(text: "");
   }
 
@@ -64,8 +65,10 @@ class SubtaskState extends EditableState<Subtask> {
   @override
   void endEdit(bool saveChanges) {
     if (saveChanges) {
-      subtask.title = controller.text;
-      updateSubtask();
+      if (subtask.title != controller.text) {
+        subtask.title = controller.text;
+        updateSubtask();
+      }
     } else {
       controller.text = subtask.title;
     }
@@ -77,7 +80,7 @@ class SubtaskState extends EditableState<Subtask> {
         (checklistItemMetadata) => checklistItemMetadata.id == subtask.id);
     log("Task metadata, checklist: ${taskMetadata.checklists}");
     Api.saveTaskMetadata(subtask.taskId, taskMetadata).then((value) {
-      taskActionListener.refreshUi();
+      abActionListener.refreshUi();
       if (!value) {
         log("Could not store metadata!");
         Utils.showErrorSnackbar(context, "Could not save task metadata");
@@ -90,7 +93,7 @@ class SubtaskState extends EditableState<Subtask> {
 
   @override
   void delete() {
-    taskActionListener.onEditEnd(false);
+    abActionListener.onEditEnd(false);
     // TODO: on showing dialog, keeps refreshing data, any action, refreshes, with incomplete data
     Utils.showAlertDialog(context, "${'delete'.resc()} `${subtask.title}`?",
         "alert_del_content".resc(), () {
@@ -130,12 +133,13 @@ class SubtaskState extends EditableState<Subtask> {
           child: TextField(
               controller: controller,
               maxLines: null,
+              textInputAction: TextInputAction.go,
               onTap: () {
-                taskActionListener.onChange(controller.text);
-                taskActionListener.onEditStart(null, [
-                  TaskAppBarAction.kDelete,
-                  TaskAppBarAction.kDiscard,
-                  TaskAppBarAction.kDone
+                abActionListener.onChange(controller.text);
+                abActionListener.onEditStart(null, [
+                  AppBarAction.kDelete,
+                  AppBarAction.kDiscard,
+                  AppBarAction.kDone
                 ]);
               },
               style: subtask.status == SubtaskModel.kStatusFinished
@@ -144,9 +148,9 @@ class SubtaskState extends EditableState<Subtask> {
                       fontStyle: FontStyle.italic)
                   : null,
               onEditingComplete: () {
-                taskActionListener.onEditEnd(true);
+                abActionListener.onEditEnd(true);
               },
-              onChanged: taskActionListener.onChange,
+              onChanged: abActionListener.onChange,
               decoration: const InputDecoration(border: InputBorder.none)))
     ]);
   }

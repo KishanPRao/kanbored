@@ -1,42 +1,67 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:kanbored/constants.dart';
 import 'package:kanbored/models/column_model.dart';
-import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/strings.dart';
+import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/add_task.dart';
+import 'package:kanbored/ui/app_bar_action_listener.dart';
+import 'package:kanbored/ui/column_text.dart';
+import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/sizes.dart';
 
 class BoardColumn extends StatefulWidget {
-  final bool showActive;
+  final bool showArchived;
   final ColumnModel column;
-  final Function(String) createTaskCb;
+  final List<GlobalKey<EditableState>> keysEditableText;
+  final int baseIdx;
+  final AppBarActionListener abActionListener;
 
   const BoardColumn(
-      {required this.column,
-      required this.showActive,
-      required this.createTaskCb,
-      super.key});
+      {super.key,
+      required this.column,
+      required this.showArchived,
+      required this.keysEditableText,
+      required this.baseIdx,
+      required this.abActionListener});
 
   @override
   State<StatefulWidget> createState() => BoardColumnState();
 }
 
 class BoardColumnState extends State<BoardColumn> {
-  late List<TaskModel> _tasks;
-  late int _tasksLength;
-  late bool _showActive;
-  late ColumnModel _column;
-  late Function(String) _createTaskCb;
+  late List<TaskModel> tasks;
+  late int tasksLength;
+  late bool showArchived;
+  late ColumnModel column;
+  late List<GlobalKey<EditableState>> keysEditableText;
+  late int baseIdx;
+  late AppBarActionListener abActionListener;
 
   @override
   void initState() {
     super.initState();
-    _createTaskCb = widget.createTaskCb;
-    _column = widget.column;
-    _showActive = widget.showActive;
-    _tasks = (_showActive ? _column.activeTasks : _column.tasks);
-    _tasksLength = (_showActive ? _tasks.length + 1 : _tasks.length);
+    column = widget.column;
+    showArchived = widget.showArchived;
+    tasks = (showArchived
+        ? (column.isActive ? column.inactiveTasks : column.tasks)
+        : column.activeTasks);
+    // TODO: fix incorrect positioning (when remove a middle task, add new one, sometimes doesn't update position correctly)
+    // moveTaskPosition or updateTask for all tasks?
+    tasks.sort((a, b) {
+      // ascending
+      if (a.position > b.position) {
+        return 1;
+      }
+      return -1;
+    });
+    tasksLength =
+        (showArchived ? tasks.length : tasks.length + 1); // Add new task
+    keysEditableText = widget.keysEditableText;
+    baseIdx = widget.baseIdx;
+    abActionListener = widget.abActionListener;
   }
 
   @override
@@ -49,62 +74,52 @@ class BoardColumnState extends State<BoardColumn> {
             padding: const EdgeInsets.all(8.0),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(_column.title) as Widget,
+              ColumnText(
+                  key: keysEditableText[baseIdx],
+                  columnModel: column,
+                  abActionListener: abActionListener),
               Expanded(
                   child: ListView.builder(
                       shrinkWrap: true,
                       scrollDirection: Axis.vertical,
-                      itemCount: _tasksLength,
+                      itemCount: tasksLength,
                       itemBuilder: (context, index) {
-                        if (_showActive && index == _tasks.length) {
+                        if (!showArchived && index == tasks.length) {
                           return SizedBox(
-                              child: buildBoardAddTaskAction(
-                                  context, _createTaskCb));
+                              child: AddTask(
+                                  key: keysEditableText[baseIdx + 1],
+                                  columnModel: column,
+                                  abActionListener: abActionListener));
                         }
                         return SizedBox(
                             child: buildBoardTask(
-                                _tasks.elementAt(index), context));
+                                tasks.elementAt(index), column, context));
                       }))
             ])));
   }
-}
 
-Widget buildBoardAddTaskAction(
-    BuildContext context, Function(String) createTaskCb) {
-  return AddTask(createTaskCb: createTaskCb);
-}
-
-Widget buildBoardTask(TaskModel task, BuildContext context) {
-  return Card(
-      margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 0.0),
-      clipBehavior: Clip.hardEdge,
-      color: "taskBg".themed(context),
-      child: InkWell(
-          splashColor: "primary".themed(context).withAlpha(30),
-          onTap: () {
-            Navigator.pushNamed(context, routeTask, arguments: task);
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: SizedBox(
-                height: Sizes.kTaskHeight,
-                child: Center(
-                    child: Text(
-                  task.title,
-                  textAlign: TextAlign.center, // horizontal
-                ))),
-          )));
-}
-
-Widget buildSubtask(SubtaskModel subtask, BuildContext context) {
-  bool isChecked = false;
-  return Row(children: [
-    Checkbox(
-      value: isChecked,
-      onChanged: (value) {
-        isChecked = value!;
-      },
-    ),
-    Text(subtask.title)
-  ]);
+  Widget buildBoardTask(
+      TaskModel task, ColumnModel columnModel, BuildContext context) {
+    // log("Board task: ${task.title} at ${task.position}");
+    return Card(
+        margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 0.0),
+        clipBehavior: Clip.hardEdge,
+        color: "taskBg".themed(context),
+        child: InkWell(
+            splashColor: "primary".themed(context).withAlpha(30),
+            onTap: () {
+              Navigator.pushNamed(context, routeTask,
+                  arguments: [task.id, columnModel.projectId]);
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: SizedBox(
+                  height: Sizes.kTaskHeight,
+                  child: Center(
+                      child: Text(
+                    task.title,
+                    textAlign: TextAlign.center, // horizontal
+                  ))),
+            )));
+  }
 }

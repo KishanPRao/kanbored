@@ -5,9 +5,9 @@ import 'package:kanbored/api/api.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/strings.dart';
+import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/editing_state.dart';
-import 'package:kanbored/ui/task_action_listener.dart';
-import 'package:kanbored/ui/task_app_bar.dart';
+import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/utils.dart';
 
 class Checklist extends StatefulWidget {
@@ -15,13 +15,13 @@ class Checklist extends StatefulWidget {
   final CheckListMetadata checklist;
   final TaskMetadataModel taskMetadata;
   final TaskModel task;
-  final TaskActionListener taskActionListener;
+  final AppBarActionListener abActionListener;
 
   const Checklist({
     super.key,
     required this.checklist,
     required this.task,
-    required this.taskActionListener,
+    required this.abActionListener,
     required this.taskMetadata,
   });
 
@@ -33,7 +33,7 @@ class ChecklistState extends EditableState<Checklist> {
   late CheckListMetadata checklist;
   late TaskMetadataModel taskMetadata;
   late TaskModel task;
-  late TaskActionListener taskActionListener;
+  late AppBarActionListener abActionListener;
   late TextEditingController controller;
 
   @override
@@ -42,26 +42,28 @@ class ChecklistState extends EditableState<Checklist> {
     checklist = widget.checklist;
     taskMetadata = widget.taskMetadata;
     task = widget.task;
-    taskActionListener = widget.taskActionListener;
+    abActionListener = widget.abActionListener;
     controller = TextEditingController(text: widget.checklist.name);
   }
 
   @override
   void endEdit(bool saveChanges) {
     if (saveChanges) {
-      log("Edit checklist name: ${controller.text}");
-      checklist.name = controller.text;
-      log("Task metadata, checklist: ${taskMetadata.checklists}");
-      Api.saveTaskMetadata(task.id, taskMetadata).then((value) {
-        // taskActionListener.refreshUi();
-        if (!value) {
-          log("Could not store metadata!");
-          Utils.showErrorSnackbar(context, "Could not save task metadata");
-        } else {
-          log("Stored metadata!");
-        }
-      }).catchError((e) => Utils.showErrorSnackbar(context, e));
-      log("Task metadata: ${taskMetadata.toJson()}");
+      if (checklist.name != controller.text) {
+        log("Edit checklist name: ${controller.text}");
+        checklist.name = controller.text;
+        log("Task metadata, checklist: ${taskMetadata.checklists}");
+        Api.saveTaskMetadata(task.id, taskMetadata).then((value) {
+          // abActionListener.refreshUi();
+          if (!value) {
+            log("Could not store metadata!");
+            Utils.showErrorSnackbar(context, "Could not save task metadata");
+          } else {
+            log("Stored metadata!");
+          }
+        }).catchError((e) => Utils.showErrorSnackbar(context, e));
+        log("Task metadata: ${taskMetadata.toJson()}");
+      }
     } else {
       controller.text = widget.checklist.name;
     }
@@ -92,7 +94,7 @@ class ChecklistState extends EditableState<Checklist> {
         log("Could not store metadata!");
         Utils.showErrorSnackbar(context, "Could not save task metadata");
       } else {
-        taskActionListener.refreshUi();
+        abActionListener.refreshUi();
         log("Stored metadata!");
       }
     }).catchError((e) => Utils.showErrorSnackbar(context, e));
@@ -101,7 +103,7 @@ class ChecklistState extends EditableState<Checklist> {
 
   @override
   void delete() {
-    taskActionListener.onEditEnd(false);
+    abActionListener.onEditEnd(false);
     log("checklist: delete");
     Utils.showAlertDialog(context, "${'delete'.resc()} `${checklist.name}`?",
         "alert_del_content".resc(), () {
@@ -111,20 +113,19 @@ class ChecklistState extends EditableState<Checklist> {
 
   @override
   Widget build(BuildContext context) {
+    // TODO: use popup button, Hide Completed, Edit & Delete buttons? Or keep it simple?
     return TextField(
       controller: controller,
       onTap: () {
-        taskActionListener.onChange(controller.text);
-        taskActionListener.onEditStart(null, [
-          TaskAppBarAction.kDelete,
-          TaskAppBarAction.kDiscard,
-          TaskAppBarAction.kDone
+        abActionListener.onChange(controller.text);
+        abActionListener.onEditStart(null, [
+          AppBarAction.kDelete,
+          AppBarAction.kDiscard,
+          AppBarAction.kDone
         ]);
       },
-      onChanged: taskActionListener.onChange,
-      onEditingComplete: () {
-        taskActionListener.onEditEnd(true);
-      },
+      onChanged: abActionListener.onChange,
+      onEditingComplete: () => abActionListener.onEditEnd(true),
       decoration: const InputDecoration(border: InputBorder.none),
       style: const TextStyle(fontWeight: FontWeight.bold),
     );

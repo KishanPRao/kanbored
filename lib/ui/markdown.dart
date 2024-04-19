@@ -8,18 +8,18 @@ import 'package:kanbored/models/model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/editing_state.dart';
-import 'package:kanbored/ui/task_action_listener.dart';
+import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/utils.dart';
 import 'package:markdown/markdown.dart' as md;
 
 class Markdown extends StatefulWidget {
   final Model model;
-  final TaskActionListener taskActionListener;
+  final AppBarActionListener abActionListener;
 
   const Markdown({
     super.key,
     required this.model,
-    required this.taskActionListener,
+    required this.abActionListener,
   });
 
   // final TextEditingController controller;
@@ -35,7 +35,7 @@ class _MarkdownState extends EditableState<Markdown> {
   // final int maxLines = 8;
   late Model model;
   late TextEditingController controller;
-  late TaskActionListener taskActionListener;
+  late AppBarActionListener abActionListener;
   bool editing = false;
   final FocusNode focusNode = FocusNode();
 
@@ -43,7 +43,7 @@ class _MarkdownState extends EditableState<Markdown> {
   void initState() {
     super.initState();
     model = widget.model;
-    taskActionListener = widget.taskActionListener;
+    abActionListener = widget.abActionListener;
     controller = TextEditingController(text: getModelData());
   }
 
@@ -73,8 +73,8 @@ class _MarkdownState extends EditableState<Markdown> {
 
   @override
   void startEdit() {
-    taskActionListener.onChange(controller.text);
-    taskActionListener.onEditStart(null, []);
+    abActionListener.onChange(controller.text);
+    abActionListener.onEditStart(null, []);
     setState(() {
       editing = true;
     });
@@ -112,18 +112,16 @@ class _MarkdownState extends EditableState<Markdown> {
   }
 
   void deleteComment(CommentModel model) {
-    taskActionListener.onEditEnd(false);
+    abActionListener.onEditEnd(false);
     Utils.showAlertDialog(context, "${'delete'.resc()} `${model.comment}`?",
         "alert_del_content".resc(), () {
       Api.removeComment(model.id).then((value) {
         if (!value) {
           Utils.showErrorSnackbar(context, "Could not delete comment");
         } else {
-          taskActionListener.refreshUi();
+          abActionListener.refreshUi();
         }
-      }).onError((e, _) {
-        Utils.showErrorSnackbar(context, e);
-      });
+      }).onError((e, _) => Utils.showErrorSnackbar(context, e));
     });
   }
 
@@ -159,20 +157,20 @@ class _MarkdownState extends EditableState<Markdown> {
                 controller: controller,
                 focusNode: focusNode,
                 onTap: () {
-                  taskActionListener.onChange(controller.text);
-                  taskActionListener.onEditStart(null, []);
+                  abActionListener.onChange(controller.text);
+                  abActionListener.onEditStart(null, []);
                 },
-                onChanged: taskActionListener.onChange,
+                onChanged: abActionListener.onChange,
                 onEditingComplete: () {
-                  taskActionListener.onEditEnd(true);
+                  abActionListener.onEditEnd(true);
                 },
               ))
           : GestureDetector(
               onTap: () {
                 updateFocus();
                 log("onTap Gesture");
-                taskActionListener.onChange(controller.text);
-                taskActionListener.onEditStart(null, []);
+                abActionListener.onChange(controller.text);
+                abActionListener.onEditStart(null, []);
                 // focusNode.requestFocus();
                 setState(() {
                   editing = true;
@@ -196,8 +194,8 @@ class _MarkdownState extends EditableState<Markdown> {
                   log("onTapText");
                   updateFocus();
                   controller.selection = currentSelection;
-                  taskActionListener.onChange(controller.text);
-                  taskActionListener.onEditStart(null, []);
+                  abActionListener.onChange(controller.text);
+                  abActionListener.onEditStart(null, []);
                   setState(() {
                     editing = true;
                   });
