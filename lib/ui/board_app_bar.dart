@@ -40,12 +40,12 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
 
   @override
   Iterable<String> getPopupNames() => {
-    "rename".resc(),
-    showArchived ? "hide_archived".resc() : "show_archived".resc(),
-    projectModel.isActive ? "archive".resc() : "unarchive".resc(),
-    // TODO: `show_archived` adds extra spaces in UI?
-    "delete".resc(),
-  };
+        "rename".resc(),
+        showArchived ? "hide_archived".resc() : "show_archived".resc(),
+        projectModel.isActive ? "archive".resc() : "unarchive".resc(),
+        // TODO: `show_archived` adds extra spaces in UI?
+        "delete".resc(),
+      };
 
   @override
   void delete() {
@@ -138,10 +138,7 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
     switch (action) {
       case AppBarAction.kMain:
         return IconButton(
-          onPressed: () {
-            log("Add new column");
-            abActionListener.onMainAction?.call();
-          },
+          onPressed: () => abActionListener.onMainAction?.call(),
           icon: const Icon(Icons.playlist_add),
           tooltip: "add_column".resc(),
         );

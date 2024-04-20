@@ -1,6 +1,6 @@
 {
   "colors": {
-    "screenBg": "0xFF1B1A1E",
+    "pageBg": "0xFF1B1A1E",
     "projectBg": "0xFF212121",
     "columnBg": "0xFF000000",
     "taskBg": "0xFF212121",

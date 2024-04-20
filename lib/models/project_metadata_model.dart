@@ -7,7 +7,7 @@ ProjectMetadataModel projectMetadataModelFromJson(String str) =>
 String projectMetadataModelToJson(ProjectMetadataModel data) =>
     json.encode(data.toJson());
 
-class ProjectMetadataModel implements Model {
+class ProjectMetadataModel extends Model {
   ProjectMetadataModel({
     required this.closedColumns,
   });

@@ -63,6 +63,8 @@ Bugs:
 - Views reload (while adding task, etc); optimization
 - Default columns in new project
 - Archive/unarchive incorrect reloading, better `key` usage 
+- Close task would complete incomplete subtasks (use metadata for archive instead)
+- perf: Re-use same pages/screens; search -> col -> search, etc
 
 Test:
 - Archive, unarchive cols, tasks

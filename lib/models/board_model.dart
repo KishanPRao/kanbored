@@ -8,7 +8,7 @@ BoardModel boardModelFromJson(String str) =>
 
 String boardModelToJson(BoardModel data) => json.encode(data.toJson());
 
-class BoardModel implements Model {
+class BoardModel extends Model {
   BoardModel({
     required this.id,
     required this.name,
@@ -36,8 +36,13 @@ class BoardModel implements Model {
   int nbColumns;
   int nbTasks;
   int score;
-  List<ColumnModel> get activeColumns => columns.where((c) => c.isActive).toList();
-  List<ColumnModel> get inactiveColumns => columns.where((c) => (!c.isActive) || (c.inactiveTasks.isNotEmpty)).toList();
+
+  List<ColumnModel> get activeColumns =>
+      columns.where((c) => c.isActive).toList();
+
+  List<ColumnModel> get inactiveColumns => columns
+      .where((c) => (!c.isActive) || (c.inactiveTasks.isNotEmpty))
+      .toList();
 
   factory BoardModel.fromJson(Map<String, dynamic> json) => BoardModel(
         id: json["id"],
@@ -71,4 +76,12 @@ class BoardModel implements Model {
         "nb_tasks": nbTasks,
         "score": score,
       };
+
+  List<Model> filter(String query) {
+    List<Model> filtered = [];
+    if (query.isEmpty) return filtered;
+    query = query.toLowerCase();
+    filtered.addAll(columns.expand((c) => c.filter(query)));
+    return filtered;
+  }
 }

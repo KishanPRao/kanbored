@@ -36,7 +36,6 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     if (other is! AppColorsExtension) {
       return this;
     }
-
     return AppColorsExtension(
       colors: colors.map((key, value) =>
           MapEntry(key, Color.lerp(value, other.colors[key], t)!)),

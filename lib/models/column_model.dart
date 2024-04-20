@@ -49,7 +49,9 @@ class ColumnModel extends Model {
   int columnNbScore;
   int columnNbOpenTasks;
   bool isActive = true;
+
   List<TaskModel> get activeTasks => tasks.where((t) => t.isActive).toList();
+
   List<TaskModel> get inactiveTasks => tasks.where((t) => !t.isActive).toList();
 
   factory ColumnModel.fromJson(Map<String, dynamic> json) => ColumnModel(
@@ -92,4 +94,15 @@ class ColumnModel extends Model {
         "column_nb_score": columnNbScore,
         "column_nb_open_tasks": columnNbOpenTasks,
       };
+
+  List<Model> filter(String query) {
+    List<Model> filtered = [];
+    if (query.isEmpty) return filtered;
+    query = query.toLowerCase();
+    if (title.toLowerCase().contains(query)) {
+      filtered.add(this);
+    }
+    filtered.addAll(tasks.expand((t) => t.filter(query)));
+    return filtered;
+  }
 }

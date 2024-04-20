@@ -20,7 +20,7 @@ class Utils {
 
   static getHeight(BuildContext context) => MediaQuery.of(context).size.height;
 
-  static emptyUi() => const SizedBox.shrink();
+  static Widget emptyUi() => const SizedBox.shrink();
 
   // Alerts
   static showErrorSnackbar(BuildContext context, dynamic e) {

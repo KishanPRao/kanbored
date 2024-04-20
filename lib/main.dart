@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kanbored/pages/search.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/app_data.dart';
 import 'package:kanbored/constants.dart';
@@ -28,19 +29,21 @@ class App extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => AppTheme(),
       builder: (context, _) => MaterialApp(
-        title: 'Kanbored',
+        title: "app_name".resc(),
         theme: AppTheme.light,
         darkTheme:
             AppData.theme == themeAmolded ? AppTheme.amolded : AppTheme.dark,
         themeMode: AppTheme.strToThemeMode(context.watch<AppTheme>().themeMode),
         debugShowCheckedModeBanner: false,
         initialRoute: authenticated ? 'home' : 'login',
+        // TODO: re-use pages
         routes: {
-          routeHome: (BuildContext context) => const Home(title: 'Kanbored'),
+          routeHome: (BuildContext context) => const Home(),
           routeLogin: (BuildContext context) => const Login(),
           routeBoard: (BuildContext context) => const Board(),
           routeSettings: (BuildContext context) => const Settings(),
           routeTask: (BuildContext context) => const Task(),
+          routeSearch: (BuildContext context) => const Search(),
         },
       ),
     );

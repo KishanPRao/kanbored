@@ -6,7 +6,7 @@ SubtaskModel subtaskModelFromJson(String str) =>
 
 String subtaskModelToJson(SubtaskModel data) => json.encode(data.toJson());
 
-class SubtaskModel implements Model {
+class SubtaskModel extends Model {
   static const kStatusTodo = 0;
   static const kStatusInProgress = 1;
   static const kStatusFinished = 2;

@@ -1,4 +1,5 @@
 {
+  "app_name": "Kanbored",
   "select_theme": "Select theme",
   "tt_archived_col": "Archived Columns & Tasks",
   "tt_search": "Search",
@@ -24,6 +25,7 @@
   "delete": "Delete",
   "ok": "OK",
   "cancel": "Cancel",
+  "search_bar_text": "Search tasks",
   "alert_del_content": "Are you sure you want to delete this item?",
   "alert_arch_content": "Are you sure you want to archive this item?",
   "alert_unarch_content": "Are you sure you want to unarchive this item?",

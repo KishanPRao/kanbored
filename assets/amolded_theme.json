@@ -1,6 +1,6 @@
 {
   "colors": {
-    "screenBg": "0xFF000000",
+    "pageBg": "0xFF000000",
     "projectBg": "0xFF111111",
     "columnBg": "0xFF020202",
     "taskBg": "0xFF111111",
@@ -9,6 +9,7 @@
     "archivedBg": "0xFF8A6700",
     "unarchiveBg": "0xFFecb000",
     "cardHighlight": "0x664789f0",
+    "searchBar": "0xFF212121",
     "primary": "0xFF0D47A1"
   }
 }

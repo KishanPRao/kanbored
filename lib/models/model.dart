@@ -8,8 +8,8 @@ class Model {
 
   dynamic toJson() => {};
 
-  @override
-  String toString() => toJson().toString();
+  // @override
+  // String toString() => toJson().toString();
 }
 
 extension ModelExtension on Model {

@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:kanbored/constants.dart';
+import 'package:kanbored/models/column_model.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/models/project_metadata_model.dart';
@@ -152,9 +153,28 @@ class _BoardState extends State<Board> {
       return Utils.emptyUi();
     }
     return Scaffold(
-      backgroundColor: "screenBg".themed(context),
+      backgroundColor: "pageBg".themed(context),
       floatingActionButton: buildSearchFab(context, () {
-        log("board Search");
+        Navigator.pushNamed(context, routeSearch,
+            arguments: [projectModel, boards]).then((value) {
+          if (value is ColumnModel) {
+            var showArchived = !value.isActive;
+            var columns = (showArchived
+                ? boards.first.inactiveColumns
+                : boards.first.activeColumns);
+            onArchived(showArchived);
+            for (int i = 0; i < columns.length; i++) {
+              var c = columns[i];
+              if (c.title == value.title && c.position == value.position) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  // TODO: need more testing; after archive state fixed
+                  controller.jumpTo(columnWidth * i);
+                });
+                break;
+              }
+            }
+          }
+        });
       }),
       appBar: AppBar(
         title: Text(projectModel.name),

@@ -10,6 +10,7 @@ import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/add_task.dart';
 import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/ui/board_action_listener.dart';
+import 'package:kanbored/ui/build_subtasks.dart';
 import 'package:kanbored/ui/column_text.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/sizes.dart';
@@ -75,7 +76,7 @@ class BoardColumnState extends State<BoardColumn> {
     var tasksLength = (abActionListener.isArchived()
         ? tasks.length
         : tasks.length + 1); // Add new task
-    // log("Board column, build: ${column.title}, ${column.isActive}; archived: ${abActionListener.isArchived()}");
+    // log("Board column, build: ${column.title}, ${column.isActive}; archived: ${abActionListener.isArchived()}, $baseIdx");
     return Card(
         color: "columnBg".themed(context),
         margin: const EdgeInsets.all(10),
@@ -109,33 +110,8 @@ class BoardColumnState extends State<BoardColumn> {
                         }
                         return SizedBox(
                             child: buildBoardTask(
-                                tasks.elementAt(index), column, context));
+                                tasks.elementAt(index), context));
                       }))
             ])));
-  }
-
-  Widget buildBoardTask(
-      TaskModel task, ColumnModel columnModel, BuildContext context) {
-    // log("Board task: ${task.title} at ${task.position}");
-    return Card(
-        margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 0.0),
-        clipBehavior: Clip.hardEdge,
-        color: "taskBg".themed(context),
-        child: InkWell(
-            splashColor: "cardHighlight".themed(context),
-            highlightColor: "cardHighlight".themed(context),
-            onTap: () {
-              Navigator.pushNamed(context, routeTask, arguments: task);
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: SizedBox(
-                  height: Sizes.kTaskHeight,
-                  child: Center(
-                      child: Text(
-                    task.title,
-                    textAlign: TextAlign.center, // horizontal
-                  ))),
-            )));
   }
 }

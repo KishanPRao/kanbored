@@ -6,7 +6,7 @@ CommentModel commentModelFromJson(String str) =>
 
 String commentModelToJson(CommentModel data) => json.encode(data.toJson());
 
-class CommentModel implements Model {
+class CommentModel extends Model {
   CommentModel({
     required this.id,
     required this.dateCreation,

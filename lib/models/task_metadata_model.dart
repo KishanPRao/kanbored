@@ -8,7 +8,7 @@ TaskMetadataModel taskMetadataModelFromJson(String str) =>
 String taskMetadataModelToJson(TaskMetadataModel data) =>
     json.encode(data.toJson());
 
-class CheckListItemMetadata implements Model {
+class CheckListItemMetadata extends Model {
   CheckListItemMetadata({
     required this.id,
   });
@@ -29,7 +29,7 @@ class CheckListItemMetadata implements Model {
   String toString() => toJson().toString();
 }
 
-class CheckListMetadata implements Model {
+class CheckListMetadata extends Model {
   // NOTE: `position` starts with 1.
   CheckListMetadata({
     required this.name,
@@ -61,7 +61,7 @@ class CheckListMetadata implements Model {
   String toString() => toJson().toString();
 }
 
-class TaskMetadataModel implements Model {
+class TaskMetadataModel extends Model {
   TaskMetadataModel({
     required this.checklists,
   });

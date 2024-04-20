@@ -1,6 +1,9 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:kanbored/constants.dart';
+import 'package:kanbored/models/column_model.dart';
+import 'package:kanbored/models/project_model.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
@@ -8,8 +11,10 @@ import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/add_subtask.dart';
 import 'package:kanbored/ui/checklist.dart';
 import 'package:kanbored/ui/editing_state.dart';
+import 'package:kanbored/ui/sizes.dart';
 import 'package:kanbored/ui/subtask.dart';
 import 'package:kanbored/ui/app_bar_action_listener.dart';
+import 'package:kanbored/utils.dart';
 
 List<Widget> buildSubtasks(
     BuildContext context,
@@ -20,7 +25,7 @@ List<Widget> buildSubtasks(
     AppBarActionListener abActionListener,
     Function(SubtaskModel, bool) toggleCb) {
   if (taskMetadata.checklists.isEmpty) {
-    return [const SizedBox.shrink()];
+    return [Utils.emptyUi()];
   }
   // TODO: use `flutter_sticky_header` for multi-header checklist & `SliverReorderableList`
   var currentIndex = 1; // start after `description`
@@ -142,3 +147,50 @@ Widget buildChecklistHeader(
           onDelete: abActionListener.onDelete,
           refreshUi: abActionListener.refreshUi,
         ));
+
+Widget buildBoardTask(TaskModel task, BuildContext context) {
+  // log("Board task: ${task.title} at ${task.position}");
+  return Card(
+      margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 0.0),
+      clipBehavior: Clip.hardEdge,
+      color: "taskBg".themed(context),
+      child: InkWell(
+          splashColor: "cardHighlight".themed(context),
+          highlightColor: "cardHighlight".themed(context),
+          onTap: () {
+            Navigator.pushNamed(context, routeTask, arguments: task);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: SizedBox(
+                height: Sizes.kTaskHeight,
+                child: Center(
+                    child: Text(
+                  task.title,
+                  textAlign: TextAlign.center, // horizontal
+                ))),
+          )));
+}
+
+Widget buildBoardColumn(ColumnModel model,
+    BuildContext context, VoidCallback onTap) {
+  // log("Board task: ${task.title} at ${task.position}");
+  return Card(
+      margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 0.0),
+      clipBehavior: Clip.hardEdge,
+      color: "taskBg".themed(context),
+      child: InkWell(
+          splashColor: "cardHighlight".themed(context),
+          highlightColor: "cardHighlight".themed(context),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: SizedBox(
+                height: Sizes.kColumnHeight,
+                child: Center(
+                    child: Text(
+                  model.title,
+                  textAlign: TextAlign.center, // horizontal
+                ))),
+          )));
+}

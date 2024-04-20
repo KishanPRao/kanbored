@@ -11,7 +11,7 @@ TaskModel taskModelFromJson(String str) => TaskModel.fromJson(json.decode(str));
 
 String taskModelToJson(TaskModel data) => json.encode(data.toJson());
 
-class TaskModel implements Model {
+class TaskModel extends Model {
   TaskModel({
     required this.id,
     required this.title,
@@ -233,4 +233,16 @@ class TaskModel implements Model {
         "nb_subtasks": nbSubtasks,
         "nb_completed_subtasks": nbCompletedSubtasks,
       };
+
+  List<Model> filter(String query) {
+    List<Model> filtered = [];
+    if (query.isEmpty) return filtered;
+    query = query.toLowerCase();
+    if (title.toLowerCase().contains(query) ||
+        description.toLowerCase().contains(query)) {
+      filtered.add(this);
+    }
+    // TODO: subtask, comment
+    return filtered;
+  }
 }

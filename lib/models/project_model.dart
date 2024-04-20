@@ -11,7 +11,7 @@ ProjectModel projectModelFromJson(String str) =>
 
 String projectModelToJson(ProjectModel data) => json.encode(data.toJson());
 
-class ProjectModel implements Model {
+class ProjectModel extends Model {
   ProjectModel({
     required this.id,
     required this.name,

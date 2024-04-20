@@ -11,9 +11,7 @@ import 'package:kanbored/ui/search_fab.dart';
 import 'package:kanbored/utils.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key, required this.title});
-
-  final String title;
+  const Home({super.key});
 
   @override
   State<StatefulWidget> createState() => _HomeState();
@@ -106,14 +104,14 @@ class _HomeState extends State<Home> {
         .where((project) => project.isActive != showArchived)
         .toList();
     projects.sort((a, b) => a.name.compareTo(b.name));
-    log("Projects: $projects; orig: ${this.projects}");
+    // log("Projects: $projects; orig: ${this.projects}");
     return Scaffold(
-      backgroundColor: "screenBg".themed(context),
-      floatingActionButton: buildSearchFab(context, () {
-        log("home Search");
-      }),
+      backgroundColor: "pageBg".themed(context),
+      // floatingActionButton: buildSearchFab(context, () {
+      //   log("home Search");
+      // }),
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text("app_name".resc()),
         backgroundColor: "primary".themed(context),
         actions: [
           ProjectAppBarActions(

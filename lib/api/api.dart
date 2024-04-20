@@ -239,7 +239,7 @@ class Api {
   static Future<TaskModel> getTask(int taskId, int projectId) async {
     dynamic values = await Future.wait([
       _getTask(taskId),
-      searchTasks(params: {"project_id": projectId, "query": "id:$taskId"})
+      _searchTasks(params: {"project_id": projectId, "query": "id:$taskId"})
     ]);
     Map<String, dynamic> searchResult = (values[1] as List<dynamic>).first;
     var mergedValues = (values[0] as Map<String, dynamic>);
@@ -251,7 +251,29 @@ class Api {
   static Future<dynamic> _getTask(int taskId) async =>
       baseApi("getTask", 700738119, params: {"task_id": taskId});
 
-  static Future<dynamic> searchTasks({dynamic params = const {}}) async =>
+  /* Search queries:
+  title, desc, comment
+  TODO: checklist, subtask
+   */
+  static Future<List<TaskModel>> searchTasks(
+      int projectId, String query) async {
+    var values = await Future.wait([
+      _searchTasks(params: {"project_id": projectId, "query": "title:$query"}),
+      _searchTasks(
+          params: {"project_id": projectId, "query": "description:$query"}),
+      _searchTasks(
+          params: {"project_id": projectId, "query": "comment:$query"}),
+    ]);
+    List<TaskModel> tasks = [];
+    for (var tasksJsonList in values) {
+      for (var taskJson in tasksJsonList) {
+        tasks.add(TaskModel.fromJson(taskJson));
+      }
+    }
+    return tasks;
+  }
+
+  static Future<dynamic> _searchTasks({dynamic params = const {}}) async =>
       baseApi("searchTasks", 1468511716, params: params);
 
   // TODO: Use for mutliple checklist, shopping list
