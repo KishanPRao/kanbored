@@ -129,40 +129,46 @@ class _HomeState extends State<Home> {
           )
         ],
       ),
-      body: Column(children: [
-        showArchived
-            ? Card(
-                clipBehavior: Clip.hardEdge,
-                color: "archivedBg".themed(context),
-                child: SizedBox(
-                  child: Center(child: Text("archived".resc())),
-                ))
-            : Utils.emptyUi(),
-        Expanded(
-            child: GridView.count(
-          shrinkWrap: true,
-          crossAxisCount: 2,
-          children: projects
-              .map((project) => Card(
-                    color: "projectBg".themed(context),
+      body: RefreshIndicator(
+          // trigger the _loadData function when the user pulls down
+          onRefresh: () {
+            refreshUi();
+            return Utils.emptyFuture();
+          },
+          child: Column(children: [
+            showArchived
+                ? Card(
                     clipBehavior: Clip.hardEdge,
-                    child: InkWell(
-                        splashColor: "cardHighlight".themed(context),
-                        highlightColor: "cardHighlight".themed(context),
-                        onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            routeBoard,
-                            arguments: project,
-                          );
-                        },
-                        child: SizedBox(
-                          child: Center(child: Text(project.name)),
-                        )),
-                  ))
-              .toList(),
-        ))
-      ]),
+                    color: "archivedBg".themed(context),
+                    child: SizedBox(
+                      child: Center(child: Text("archived".resc())),
+                    ))
+                : Utils.emptyUi(),
+            Expanded(
+                child: GridView.count(
+              shrinkWrap: true,
+              crossAxisCount: 2,
+              children: projects
+                  .map((project) => Card(
+                        color: "projectBg".themed(context),
+                        clipBehavior: Clip.hardEdge,
+                        child: InkWell(
+                            splashColor: "cardHighlight".themed(context),
+                            highlightColor: "cardHighlight".themed(context),
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                routeBoard,
+                                arguments: project,
+                              );
+                            },
+                            child: SizedBox(
+                              child: Center(child: Text(project.name)),
+                            )),
+                      ))
+                  .toList(),
+            ))
+          ])),
     );
   }
 }

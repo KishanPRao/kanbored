@@ -86,7 +86,7 @@ class ColumnTextState extends EditableState<ColumnText> {
                 updateProjMetadata
                     ? Api.saveProjectMetadata(
                         columnModel.projectId, projectMetadataModel)
-                    : Future<bool>.value(true)
+                    : Utils.emptyFuture()
               ])
           .then((value) {
         if (value.contains(false)) {

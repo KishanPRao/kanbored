@@ -20,6 +20,8 @@ class Utils {
 
   static getHeight(BuildContext context) => MediaQuery.of(context).size.height;
 
+  static Future<bool> emptyFuture() => Future<bool>.value(true);
+
   static Widget emptyUi() => const SizedBox.shrink();
 
   // Alerts
