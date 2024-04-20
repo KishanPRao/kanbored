@@ -101,6 +101,6 @@ class AddSubtaskState extends EditableState<AddSubtask> {
             decoration: InputDecoration(
                 hintText: "add_subtask".resc(),
                 border: InputBorder.none,
-                hintStyle: const TextStyle(fontWeight: FontWeight.w300))));
+                hintStyle: const TextStyle(fontWeight: FontWeight.w400))));
   }
 }

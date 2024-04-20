@@ -160,7 +160,7 @@ class ColumnTextState extends EditableState<ColumnText> {
   @override
   Widget build(BuildContext context) {
     // TODO: use popup button, Edit & Delete buttons? Or keep it simple?
-    log("col text, build: ${columnModel.title}");
+    // log("col text, build: ${columnModel.title}");
     return TextField(
       controller: controller,
       onTap: () {
@@ -180,7 +180,7 @@ class ColumnTextState extends EditableState<ColumnText> {
           hintText: "column_empty_warn".resc(),
           border: InputBorder.none,
           hintStyle: const TextStyle(
-              fontWeight: FontWeight.w300, fontStyle: FontStyle.italic)),
+              fontWeight: FontWeight.w400, fontStyle: FontStyle.italic)),
       // style: const TextStyle(fontWeight: FontWeight.bold),
     );
   }

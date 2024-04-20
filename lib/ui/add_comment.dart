@@ -75,6 +75,6 @@ class AddCommentState extends EditableState<AddComment> {
             decoration: InputDecoration(
                 hintText: "add_comment".resc(),
                 border: InputBorder.none,
-                hintStyle: const TextStyle(fontWeight: FontWeight.w300))));
+                hintStyle: const TextStyle(fontWeight: FontWeight.w400))));
   }
 }

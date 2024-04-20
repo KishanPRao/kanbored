@@ -152,7 +152,7 @@ class _BoardState extends State<Board> {
       return Utils.emptyUi();
     }
     return Scaffold(
-      backgroundColor: "scaffoldBackgroundColor".themed(context),
+      backgroundColor: "screenBg".themed(context),
       floatingActionButton: buildSearchFab(context, () {
         log("board Search");
       }),
@@ -190,16 +190,16 @@ class _BoardState extends State<Board> {
           children: boards.map((board) {
         var columns =
             (showArchived ? board.inactiveColumns : board.activeColumns);
-        for (var c in columns) {
-          log("Column: ${c.id}, ${c.isActive}, ${c.title}");
-        }
+        // for (var c in columns) {
+        //   log("Column: ${c.id}, ${c.isActive}, ${c.title}");
+        // }
         return Expanded(
             child: Column(
           children: [
             showArchived
                 ? Card(
                     clipBehavior: Clip.hardEdge,
-                    color: "archivedBgColor".themed(context),
+                    color: "archivedBg".themed(context),
                     child: SizedBox(
                       child: Center(child: Text("archived_col".resc())),
                     ))
@@ -215,7 +215,7 @@ class _BoardState extends State<Board> {
               children: columns.mapIndexed((entry) {
                 var index = entry.key;
                 var column = entry.value;
-                log("col map: ${column.title}");
+                // log("col map: ${column.title}");
                 return SizedBox(
                     width: columnWidth,
                     child: BoardColumn(

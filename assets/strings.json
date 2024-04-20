@@ -7,6 +7,7 @@
   "tt_done": "Done",
   "tt_add_checklist": "Add a new checklist",
   "rename_project": "Rename project",
+  "rename_task": "Rename task",
   "archive": "Archive",
   "archived": "Archived",
   "archived_col": "Archived columns & tasks",
@@ -29,6 +30,7 @@
   "alert_new_col_content": "Enter the name of the new column",
   "alert_new_proj_content": "Enter the name of the new project",
   "alert_rename_proj_content": "Enter the name of the project",
+  "alert_rename_task_content": "Enter the name of the task",
   "column_empty_warn": "Column name cannot be empty",
   "add_task": "Add a task"
 }

@@ -5,73 +5,39 @@ import 'package:kanbored/api/api.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
-import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/utils.dart';
 
-import 'editing_state.dart';
-
-// enum TaskAppBarAction {
-//   kDelete,
-//   kDiscard,
-//   kDone,
-//   kAddChecklist,
-//   kPopup,
-// }
-
-class TaskAppBarActions extends StatefulWidget {
+class TaskAppBarActions extends AppBarActions {
   final TaskModel taskModel;
-  final AppBarActionListener abActionListener;
 
   const TaskAppBarActions(
-      {super.key, required this.taskModel, required this.abActionListener});
+      {super.key, required this.taskModel, required super.abActionListener});
 
   @override
   State<StatefulWidget> createState() => TaskAppBarActionsState();
 }
 
-class TaskAppBarActionsState extends EditableState<TaskAppBarActions> {
+class TaskAppBarActionsState extends AppBarActionsState<TaskAppBarActions> {
   late TaskModel taskModel;
-  late AppBarActionListener abActionListener;
-  bool _editing = false;
-  var defaultActions = [
-    AppBarAction.kMain,
-    AppBarAction.kPopup,
-  ];
-  var currentActions = [];
 
   @override
   void initState() {
     super.initState();
     taskModel = widget.taskModel;
-    abActionListener = widget.abActionListener;
   }
 
   @override
-  void startEdit() {
-    setState(() {
-      _editing = true;
-    });
-  }
-
-  @override
-  void endEdit(bool _) {
-    if (_editing) {
-      setState(() {
-        _editing = false;
-      });
-    }
-  }
+  Iterable<String> getPopupNames() => {
+        taskModel.isActive ? "archive".resc() : "unarchive".resc(),
+        "rename".resc(),
+        "delete".resc(),
+      };
 
   @override
   void delete() => abActionListener.onDelete();
 
-  void stopEdit(bool saveChanges) {
-    if (abActionListener.onEditEnd(saveChanges)) {
-      endEdit(saveChanges);
-    }
-  }
-
   // TODO: find out why re-build invoked
+  @override
   Future<void> handlePopupAction(String action) async {
     if (action == "archive".resc() || action == "unarchive".resc()) {
       log("Archive/Unarchive");
@@ -95,32 +61,26 @@ class TaskAppBarActionsState extends EditableState<TaskAppBarActions> {
         Api.removeTask(taskModel.id);
         Navigator.pop(context);
       });
+    } else if (action == "rename".resc()) {
+      log("Rename task");
+      Utils.showInputAlertDialog(context, "rename_task".resc(),
+          "alert_rename_task_content".resc(), taskModel.title, (title) {
+        log("project, rename task: $title");
+        taskModel.title = title;
+        Api.updateTask(taskModel).then((result) {
+          if (result) {
+            abActionListener.refreshUi();
+          } else {
+            Utils.showErrorSnackbar(context, "Could not rename task");
+          }
+        }).onError((e, st) => Utils.showErrorSnackbar(context, e));
+      });
     }
   }
 
+  @override
   Widget getButton(int action) {
     switch (action) {
-      case AppBarAction.kDelete:
-        return IconButton(
-          onPressed: () => delete(),
-          // color: showActive ? Colors.grey : Colors.red, //TODO
-          icon: const Icon(Icons.delete),
-          tooltip: "delete".resc(),
-        );
-      case AppBarAction.kDiscard:
-        return IconButton(
-          onPressed: () => stopEdit(false),
-          // color: showActive ? Colors.grey : Colors.red, //TODO
-          icon: const Icon(Icons.undo),
-          tooltip: "tt_discard".resc(),
-        );
-      case AppBarAction.kDone:
-        return IconButton(
-          onPressed: () => stopEdit(true),
-          // color: showActive ? Colors.grey : Colors.red, //TODO
-          icon: const Icon(Icons.done),
-          tooltip: "tt_done".resc(),
-        );
       case AppBarAction.kMain:
         return IconButton(
           onPressed: () {
@@ -130,32 +90,8 @@ class TaskAppBarActionsState extends EditableState<TaskAppBarActions> {
           icon: const Icon(Icons.format_list_bulleted_add),
           tooltip: "tt_add_checklist".resc(),
         );
-      case AppBarAction.kPopup:
-        return PopupMenuButton<String>(
-          onSelected: handlePopupAction,
-          itemBuilder: (BuildContext context) {
-            return {
-              taskModel.isActive ? "archive".resc() : "unarchive".resc(),
-              "delete".resc(),
-            }.map((String choice) {
-              return PopupMenuItem<String>(
-                value: choice,
-                child: Text(choice),
-              );
-            }).toList();
-          },
-        );
       default:
-        log("Could not find matching app bar action buttons!");
-        return Utils.emptyUi();
+        return super.getButton(action);
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-        children: (_editing ? currentActions : defaultActions)
-            .map((e) => getButton(e))
-            .toList());
   }
 }

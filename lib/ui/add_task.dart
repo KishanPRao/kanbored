@@ -79,7 +79,7 @@ class AddTaskState extends EditableState<AddTask> {
                               hintText: "add_task".resc(),
                               // border: InputBorder.none,
                               hintStyle: const TextStyle(
-                                  fontWeight: FontWeight.w300)))),
+                                  fontWeight: FontWeight.w400)))),
                   // IconButton(
                   //     onPressed:
                   //         validText ? () => createTaskCb(taskName) : null,

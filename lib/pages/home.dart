@@ -108,7 +108,7 @@ class _HomeState extends State<Home> {
     projects.sort((a, b) => a.name.compareTo(b.name));
     log("Projects: $projects; orig: ${this.projects}");
     return Scaffold(
-      backgroundColor: "scaffoldBackgroundColor".themed(context),
+      backgroundColor: "screenBg".themed(context),
       floatingActionButton: buildSearchFab(context, () {
         log("home Search");
       }),
@@ -135,7 +135,7 @@ class _HomeState extends State<Home> {
         showArchived
             ? Card(
                 clipBehavior: Clip.hardEdge,
-                color: "archivedBgColor".themed(context),
+                color: "archivedBg".themed(context),
                 child: SizedBox(
                   child: Center(child: Text("archived".resc())),
                 ))
@@ -146,9 +146,11 @@ class _HomeState extends State<Home> {
           crossAxisCount: 2,
           children: projects
               .map((project) => Card(
+                    color: "projectBg".themed(context),
                     clipBehavior: Clip.hardEdge,
                     child: InkWell(
-                        splashColor: "primary".themed(context).withAlpha(30),
+                        splashColor: "cardHighlight".themed(context),
+                        highlightColor: "cardHighlight".themed(context),
                         onTap: () {
                           Navigator.pushNamed(
                             context,

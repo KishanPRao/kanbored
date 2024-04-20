@@ -30,6 +30,12 @@ class ProjectAppBarActionsState
   }
 
   @override
+  Iterable<String> getPopupNames() => {
+    showArchived ? "hide_archived".resc() : "show_archived".resc(),
+    "settings".resc(),
+  };
+
+  @override
   void delete() {
     log("project, delete");
     abActionListener.onDelete();
@@ -63,21 +69,6 @@ class ProjectAppBarActionsState
           },
           icon: const Icon(Icons.add),
           tooltip: "add_project".resc(),
-        );
-      case AppBarAction.kPopup:
-        return PopupMenuButton<String>(
-          onSelected: handlePopupAction,
-          itemBuilder: (BuildContext context) {
-            return {
-              showArchived ? "hide_archived".resc() : "show_archived".resc(),
-              "settings".resc(),
-            }.map((String choice) {
-              return PopupMenuItem<String>(
-                value: choice,
-                child: Text(choice),
-              );
-            }).toList();
-          },
         );
       default:
         return super.getButton(action);

@@ -57,6 +57,8 @@ abstract class AppBarActionsState<T extends AppBarActions>
     }
   }
 
+  Iterable<String> getPopupNames();
+
   // TODO: find out why re-build invoked
   Future<void> handlePopupAction(String action);
 
@@ -84,7 +86,18 @@ abstract class AppBarActionsState<T extends AppBarActions>
           icon: const Icon(Icons.done),
           tooltip: "tt_done".resc(),
         );
-
+      case AppBarAction.kPopup:
+        return PopupMenuButton<String>(
+          onSelected: handlePopupAction,
+          itemBuilder: (BuildContext context) {
+            return getPopupNames().map((String choice) {
+              return PopupMenuItem<String>(
+                value: choice,
+                child: Text(choice),
+              );
+            }).toList();
+          },
+        );
       default:
         log("Could not find matching app bar action buttons!");
         return Utils.emptyUi();
@@ -93,7 +106,6 @@ abstract class AppBarActionsState<T extends AppBarActions>
 
   @override
   Widget build(BuildContext context) {
-    // log("app bar, $_editing, $currentActions, $defaultActions");
     return Row(
         children: (_editing ? currentActions : defaultActions)
             .map((e) => getButton(e))

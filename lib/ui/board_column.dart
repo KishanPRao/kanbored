@@ -66,7 +66,7 @@ class BoardColumnState extends State<BoardColumn> {
       return -1;
     });
     projectMetadataModel = widget.projectMetadataModel;
-    log("Board column: ${column.id}, ${column.title}, ${column.isActive}, ${projectMetadataModel.closedColumns}");
+    // log("Board column: ${column.id}, ${column.title}, ${column.isActive}, ${projectMetadataModel.closedColumns}");
     super.didChangeDependencies();
   }
 
@@ -75,7 +75,7 @@ class BoardColumnState extends State<BoardColumn> {
     var tasksLength = (abActionListener.isArchived()
         ? tasks.length
         : tasks.length + 1); // Add new task
-    log("Board column, build: ${column.title}, ${column.isActive}; archived: ${abActionListener.isArchived()}");
+    // log("Board column, build: ${column.title}, ${column.isActive}; archived: ${abActionListener.isArchived()}");
     return Card(
         color: "columnBg".themed(context),
         margin: const EdgeInsets.all(10),
@@ -122,7 +122,8 @@ class BoardColumnState extends State<BoardColumn> {
         clipBehavior: Clip.hardEdge,
         color: "taskBg".themed(context),
         child: InkWell(
-            splashColor: "primary".themed(context).withAlpha(30),
+            splashColor: "cardHighlight".themed(context),
+            highlightColor: "cardHighlight".themed(context),
             onTap: () {
               Navigator.pushNamed(context, routeTask, arguments: task);
             },

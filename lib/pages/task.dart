@@ -196,7 +196,7 @@ class _TaskState extends State<Task> {
     log("Checklist + subtask count: $checklistSubtaskCount");
     log("Checklist len: ${taskMetadata.checklists.length} subtask len: ${subtasks.length}");
     return Scaffold(
-      backgroundColor: "scaffoldBackgroundColor".themed(context),
+      backgroundColor: "screenBg".themed(context),
       appBar: AppBar(
           title: Text(taskModel.title),
           backgroundColor: "primary".themed(context),
@@ -225,7 +225,7 @@ class _TaskState extends State<Task> {
             ? Utils.emptyUi()
             : Card(
                 clipBehavior: Clip.hardEdge,
-                color: "archivedBgColor".themed(context),
+                color: "archivedBg".themed(context),
                 child: SizedBox(
                   child: Center(child: Text("archived".resc())),
                 )),

@@ -39,6 +39,15 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
   }
 
   @override
+  Iterable<String> getPopupNames() => {
+    "rename".resc(),
+    showArchived ? "hide_archived".resc() : "show_archived".resc(),
+    projectModel.isActive ? "archive".resc() : "unarchive".resc(),
+    // TODO: `show_archived` adds extra spaces in UI?
+    "delete".resc(),
+  };
+
+  @override
   void delete() {
     log("board, delete");
     abActionListener.onDelete();
@@ -136,24 +145,6 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
           icon: const Icon(Icons.playlist_add),
           tooltip: "add_column".resc(),
         );
-      case AppBarAction.kPopup:
-        return PopupMenuButton<String>(
-          onSelected: handlePopupAction,
-          itemBuilder: (BuildContext context) {
-            return {
-              "rename".resc(),
-              projectModel.isActive ? "archive".resc() : "unarchive".resc(),
-              showArchived ? "hide_archived".resc() : "show_archived".resc(),
-              // TODO: `show_archived` adds extra spaces in UI?
-              "delete".resc(),
-            }.map((String choice) {
-              return PopupMenuItem<String>(
-                value: choice,
-                child: Text(choice),
-              );
-            }).toList();
-          },
-        );
       case BoardAppBarAction.kArchive:
         return IconButton(
           onPressed: () => archive(),
@@ -164,7 +155,7 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
       case BoardAppBarAction.kUnarchive:
         return IconButton(
           onPressed: () => unarchive(),
-          color: "unarchiveBgColor".themed(context), //TODO
+          color: "unarchiveBg".themed(context), //TODO
           icon: const Icon(Icons.unarchive),
           tooltip: "unarchive".resc(),
         );
