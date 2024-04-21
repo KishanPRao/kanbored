@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:kanbored/api/api.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
@@ -43,8 +43,8 @@ class TaskAppBarActionsState extends AppBarActionsState<TaskAppBarActions> {
       log("Archive/Unarchive");
       taskModel.isActive = !taskModel.isActive;
       (taskModel.isActive
-              ? Api.openTask(taskModel.id)
-              : Api.closeTask(taskModel.id))
+              ? WebApi.openTask(taskModel.id)
+              : WebApi.closeTask(taskModel.id))
           .then((value) {
         if (!value) {
           Utils.showErrorSnackbar(context, "Could not update task");
@@ -58,7 +58,7 @@ class TaskAppBarActionsState extends AppBarActionsState<TaskAppBarActions> {
       Utils.showAlertDialog(context, "${'delete'.resc()} `${taskModel.title}`?",
           "alert_del_content".resc(), () {
         log("Delete task");
-        Api.removeTask(taskModel.id);
+        WebApi.removeTask(taskModel.id);
         Navigator.pop(context);
       });
     } else if (action == "rename".resc()) {
@@ -67,7 +67,7 @@ class TaskAppBarActionsState extends AppBarActionsState<TaskAppBarActions> {
           "alert_rename_task_content".resc(), taskModel.title, (title) {
         log("project, rename task: $title");
         taskModel.title = title;
-        Api.updateTask(taskModel).then((result) {
+        WebApi.updateTask(taskModel).then((result) {
           if (result) {
             abActionListener.refreshUi();
           } else {

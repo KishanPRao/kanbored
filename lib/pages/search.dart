@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:kanbored/api/api.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/board_model.dart';
 import 'package:kanbored/models/column_model.dart';
 import 'package:kanbored/models/model.dart';

@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:kanbored/api/api.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/project_model.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
@@ -65,8 +65,8 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
   void toggleArchive() {
     projectModel.isActive = !projectModel.isActive;
     (projectModel.isActive
-            ? Api.enableProject(projectModel.id)
-            : Api.disableProject(projectModel.id))
+            ? WebApi.enableProject(projectModel.id)
+            : WebApi.disableProject(projectModel.id))
         .then((value) {
       if (!value) {
         Utils.showErrorSnackbar(context, "Could not update project");
@@ -106,7 +106,7 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
           "alert_rename_proj_content".resc(), projectModel.name, (title) {
         log("project, rename col: $title");
         projectModel.name = title;
-        Api.updateProject(projectModel).then((result) {
+        WebApi.updateProject(projectModel).then((result) {
           if (result) {
             abActionListener.refreshUi();
           } else {
@@ -120,7 +120,7 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
           "${'delete'.resc()} `${projectModel.name}`?",
           "alert_del_content".resc(), () {
         log("Delete project");
-        Api.removeProject(projectModel.id).then((result) {
+        WebApi.removeProject(projectModel.id).then((result) {
           if (result) {
             abActionListener.refreshUi();
             Navigator.pop(context);

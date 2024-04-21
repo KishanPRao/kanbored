@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:kanbored/api/api.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/strings.dart';
@@ -53,7 +53,7 @@ class SubtaskState extends EditableState<Subtask> {
   }
 
   void updateSubtask() {
-    Api.updateSubtask(subtask).then((value) {
+    WebApi.updateSubtask(subtask).then((value) {
       if (!value) {
         Utils.showErrorSnackbar(context, "Could not update task");
       }
@@ -79,7 +79,7 @@ class SubtaskState extends EditableState<Subtask> {
     checklist.items.removeWhere(
         (checklistItemMetadata) => checklistItemMetadata.id == subtask.id);
     log("Task metadata, checklist: ${taskMetadata.checklists}");
-    Api.saveTaskMetadata(subtask.taskId, taskMetadata).then((value) {
+    WebApi.saveTaskMetadata(subtask.taskId, taskMetadata).then((value) {
       abActionListener.refreshUi();
       if (!value) {
         log("Could not store metadata!");
@@ -97,7 +97,7 @@ class SubtaskState extends EditableState<Subtask> {
     // TODO: on showing dialog, keeps refreshing data, any action, refreshes, with incomplete data
     Utils.showAlertDialog(context, "${'delete'.resc()} `${subtask.title}`?",
         "alert_del_content".resc(), () {
-      Api.removeSubtask(subtask.id).then((value) {
+      WebApi.removeSubtask(subtask.id).then((value) {
         if (!value) {
           Utils.showErrorSnackbar(context, "Could not delete task");
         } else {

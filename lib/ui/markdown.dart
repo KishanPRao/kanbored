@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart' as flmd;
-import 'package:kanbored/api/api.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/comment_model.dart';
 import 'package:kanbored/models/model.dart';
 import 'package:kanbored/models/task_model.dart';
@@ -62,11 +62,11 @@ class _MarkdownState extends EditableState<Markdown> {
     if (model is TaskModel) {
       model.description = controller.text;
       log("Save desc: ${model.description}");
-      return await Api.updateTask(model);
+      return await WebApi.updateTask(model);
     } else if (model is CommentModel) {
       model.comment = controller.text;
       log("Save comment: ${model.comment}");
-      return await Api.updateComment(model);
+      return await WebApi.updateComment(model);
     }
     return false;
   }
@@ -115,7 +115,7 @@ class _MarkdownState extends EditableState<Markdown> {
     abActionListener.onEditEnd(false);
     Utils.showAlertDialog(context, "${'delete'.resc()} `${model.comment}`?",
         "alert_del_content".resc(), () {
-      Api.removeComment(model.id).then((value) {
+      WebApi.removeComment(model.id).then((value) {
         if (!value) {
           Utils.showErrorSnackbar(context, "Could not delete comment");
         } else {

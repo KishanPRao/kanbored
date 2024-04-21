@@ -1,6 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:kanbored/api/api.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/constants.dart';
 import 'package:kanbored/models/column_model.dart';
 import 'package:kanbored/strings.dart';
@@ -94,7 +94,7 @@ class AddTaskState extends EditableState<AddTask> {
     log("endEdit: $saveChanges");
     if (saveChanges) {
       log("Add a new task: ${controller.text}, into task: ${columnModel.title}");
-      Api.createTask(columnModel.projectId, columnModel.id, controller.text)
+      WebApi.createTask(columnModel.projectId, columnModel.id, controller.text)
           .then((taskId) {
         controller.text = "";
         abActionListener.refreshUi();

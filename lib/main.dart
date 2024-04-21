@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kanbored/db/database.dart';
 import 'package:kanbored/pages/search.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/app_data.dart';
@@ -16,6 +17,13 @@ void main() async {
   await AppTheme.initialize();
   await AppData.initialize();
   await Strings.initialize();
+  final database = AppDatabase();
+  database.delete(database.projectModel).go();
+  database.delete(database.columnModel).go();
+  database.delete(database.taskModel).go();
+  database.delete(database.taskMetadataModel).go();
+  database.delete(database.subtaskModel).go();
+  database.delete(database.commentModel).go();
   runApp(App());
 }
 

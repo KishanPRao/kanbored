@@ -13,7 +13,7 @@ import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
 
-class Api {
+class WebApi {
   static Future<bool> login(
       String url, String username, String password) async {
     String endpoint = url;

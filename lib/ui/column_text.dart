@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:kanbored/api/api.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/column_model.dart';
 import 'package:kanbored/models/project_metadata_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
@@ -50,7 +50,7 @@ class ColumnTextState extends EditableState<ColumnText> {
       log("column, save: ${columnModel.title}");
       if (columnModel.title != controller.text) {
         columnModel.title = controller.text;
-        Api.updateColumn(columnModel).then((value) {
+        WebApi.updateColumn(columnModel).then((value) {
           if (!value) {
             Utils.showErrorSnackbar(context, "Could not save column");
           }
@@ -63,7 +63,7 @@ class ColumnTextState extends EditableState<ColumnText> {
   }
 
   void removeColumn() {
-    Api.removeColumn(columnModel.id).then((value) {
+    WebApi.removeColumn(columnModel.id).then((value) {
       if (!value) {
         Utils.showErrorSnackbar(context, "Could not remove column");
       } else {
@@ -81,10 +81,10 @@ class ColumnTextState extends EditableState<ColumnText> {
 
       var updateProjMetadata =
           projectMetadataModel.closedColumns.remove(columnModel.id);
-      Future.wait(columnModel.tasks.map((t) => Api.removeTask(t.id)).toList() +
+      Future.wait(columnModel.tasks.map((t) => WebApi.removeTask(t.id)).toList() +
               [
                 updateProjMetadata
-                    ? Api.saveProjectMetadata(
+                    ? WebApi.saveProjectMetadata(
                         columnModel.projectId, projectMetadataModel)
                     : Utils.emptyFuture()
               ])
@@ -110,7 +110,7 @@ class ColumnTextState extends EditableState<ColumnText> {
       if (!projectMetadataModel.closedColumns.contains(columnModel.id)) {
         columnModel.isActive = false;
         projectMetadataModel.closedColumns.add(columnModel.id);
-        Api.saveProjectMetadata(columnModel.projectId, projectMetadataModel)
+        WebApi.saveProjectMetadata(columnModel.projectId, projectMetadataModel)
             .then((value) {
           if (!value) {
             Utils.showErrorSnackbar(context, "Could not save project metadata");
@@ -139,7 +139,7 @@ class ColumnTextState extends EditableState<ColumnText> {
       if (projectMetadataModel.closedColumns.contains(columnModel.id)) {
         columnModel.isActive = true;
         projectMetadataModel.closedColumns.remove(columnModel.id);
-        Api.saveProjectMetadata(columnModel.projectId, projectMetadataModel)
+        WebApi.saveProjectMetadata(columnModel.projectId, projectMetadataModel)
             .then((value) {
           if (!value) {
             Utils.showErrorSnackbar(context, "Could not save project metadata");

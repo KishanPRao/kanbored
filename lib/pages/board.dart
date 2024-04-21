@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:kanbored/constants.dart';
 import 'package:kanbored/models/column_model.dart';
 import 'package:kanbored/strings.dart';
-import 'package:kanbored/api/api.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/project_metadata_model.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/app_bar_action_listener.dart';
@@ -54,8 +54,8 @@ class _BoardState extends State<Board> {
   void updateData() async {
     List<GlobalKey<EditableState>> keysEditableText = [];
     var projectModel = this.projectModel;
-    var boards = await Api.getBoard(projectModel.id);
-    var projectMetadataModel = await Api.getProjectMetadata(projectModel.id);
+    var boards = await WebApi.getBoard(projectModel.id);
+    var projectMetadataModel = await WebApi.getProjectMetadata(projectModel.id);
     for (var board in boards) {
       for (var column in board.columns) {
         keysEditableText.add(GlobalKey()); // Column name
@@ -114,7 +114,7 @@ class _BoardState extends State<Board> {
         context, "add_column".resc(), "alert_new_col_content".resc(), "",
         (title) {
       log("board, add col: $title");
-      Api.addColumn(projectModel.id, title).then((result) {
+      WebApi.addColumn(projectModel.id, title).then((result) {
         if (result is int) {
           refreshUi();
         } else {

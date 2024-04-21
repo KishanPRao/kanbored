@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:kanbored/api/api.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/strings.dart';
@@ -42,7 +42,7 @@ class AddCommentState extends EditableState<AddComment> {
   void endEdit(bool saveChanges) async {
     if (saveChanges) {
       log("Add a new comment: ${controller.text}, into task: ${task.title}");
-      Api.createComment(task.id, controller.text).then((result) {
+      WebApi.createComment(task.id, controller.text).then((result) {
         if (result is int) {
           abActionListener.refreshUi();
         } else {

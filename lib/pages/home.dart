@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:kanbored/api/api.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/constants.dart';
 import 'package:kanbored/models/project_model.dart';
 import 'package:kanbored/strings.dart';
@@ -28,7 +28,7 @@ class _HomeState extends State<Home> {
   }
 
   void init() async {
-    Api.getAllProjects()
+    WebApi.getAllProjects()
         .then((value) => setState(() {
               projects = value;
             }))
@@ -74,7 +74,7 @@ class _HomeState extends State<Home> {
         context, "add_project".resc(), "alert_new_proj_content".resc(), "",
         (title) {
       log("project, add col: $title");
-      Api.createProject(title).then((result) {
+      WebApi.createProject(title).then((result) {
         if (result is int) {
           // TODO: remove default columns? `getColumns` and `removeColumn`
           refreshUi();

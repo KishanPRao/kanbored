@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kanbored/api/api.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/app_data.dart';
 import 'package:kanbored/constants.dart';
 import 'package:kanbored/strings.dart';
@@ -61,7 +61,7 @@ class _LoginState extends State<Login> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     _showLoaderDialog(context);
-                    Api.login(url, username, password).then((value) {
+                    WebApi.login(url, username, password).then((value) {
                       Navigator.pop(context); // dialog
                       setState(() {
                         Navigator.pop(context); // login
