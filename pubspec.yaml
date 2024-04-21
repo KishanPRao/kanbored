@@ -16,12 +16,20 @@ dependencies:
   flutter_secure_storage:
   flutter_markdown:
   markdown:
-#  flutter_markdown_editor:
+  drift: ^2.17.0
+  sqlite3_flutter_libs: ^0.5.0
+  path_provider: ^2.0.0
+  path: ^1.9.0
+  sqlite3:
+  json_annotation:
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+  drift_dev: ^2.17.0
+  build_runner: ^2.4.9
+  json_serializable:
 
 flutter:
   uses-material-design: true

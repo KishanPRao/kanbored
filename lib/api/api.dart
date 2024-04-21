@@ -228,6 +228,15 @@ class Api {
       listApi("getBoard", 827046470, BoardModel.fromJson,
           params: {"project_id": projectId});
 
+  static Future<List<ColumnModel>> getColumns(int projectId) async =>
+      listApi("getColumns", 887036325, ColumnModel.fromJson,
+          params: {"project_id": projectId});
+
+  static Future<List<TaskModel>> getAllTasks(
+          int projectId, int isActive) async =>
+      listApi("getAllTasks", 133280317, TaskModel.fromJson,
+          params: {"project_id": projectId, "status_id": isActive});
+
   static Future<List<SubtaskModel>> getAllSubtasks(int taskId) async =>
       listApi("getAllSubtasks", 2087700490, SubtaskModel.fromJson,
           params: {"task_id": taskId});
@@ -332,7 +341,7 @@ class Api {
     );
 
     final decodedData = json.decode(utf8.decode(resp.bodyBytes));
-    // log("decodedData: $decodedData");
+    log("decodedData: ${utf8.decode(resp.bodyBytes)}");
 
     if (decodedData['error'] != null) return Future.error(decodedData['error']);
     return decodedData['result'];

@@ -1,0 +1,96 @@
+import 'dart:convert';
+
+import 'package:drift/drift.dart';
+import 'package:json_annotation/json_annotation.dart' as j;
+
+part 'converters.g.dart';
+
+// MARK: TaskMetadata
+@j.JsonSerializable()
+class TaskMetadata {
+  List<ChecklistMetadata> checklists;
+
+  TaskMetadata(this.checklists);
+
+  factory TaskMetadata.fromJson(Map<String, dynamic> json) =>
+      _$TaskMetadataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TaskMetadataToJson(this);
+}
+
+class TaskMetadataConverter extends TypeConverter<TaskMetadata, String>
+    with JsonTypeConverter2<TaskMetadata, String, String> {
+  const TaskMetadataConverter();
+
+  @override
+  String toJson(TaskMetadata value) => (jsonEncode(value.toJson()));
+
+  @override
+  TaskMetadata fromJson(String json) => TaskMetadata.fromJson(jsonDecode(json));
+
+  // TODO: test
+  @override
+  TaskMetadata fromSql(String fromDb) =>
+      TaskMetadata.fromJson(jsonDecode(fromDb) as Map<String, dynamic>);
+
+  @override
+  String toSql(TaskMetadata value) => jsonEncode(value);
+}
+
+@j.JsonSerializable()
+class ChecklistMetadata {
+  String name;
+  int position;
+  List<CheckListItemMetadata> items;
+
+  ChecklistMetadata(this.name, this.position, this.items);
+
+  factory ChecklistMetadata.fromJson(Map<String, dynamic> json) =>
+      _$ChecklistMetadataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ChecklistMetadataToJson(this);
+}
+
+@j.JsonSerializable()
+class CheckListItemMetadata {
+  int id;
+
+  CheckListItemMetadata(this.id);
+
+  factory CheckListItemMetadata.fromJson(Map<String, dynamic> json) =>
+      _$CheckListItemMetadataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CheckListItemMetadataToJson(this);
+}
+
+// MARK: Url
+@j.JsonSerializable()
+class Url {
+  String board;
+  String list;
+  String? calendar;
+
+  Url(this.board, this.list, {this.calendar});
+
+  factory Url.fromJson(Map<String, dynamic> json) => _$UrlFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UrlToJson(this);
+}
+
+class UrlConverter extends TypeConverter<Url, String>
+    with JsonTypeConverter2<Url, String, Map<String, dynamic>> {
+  const UrlConverter();
+
+  @override
+  Map<String, dynamic> toJson(Url value) => value.toJson();
+
+  @override
+  Url fromJson(Map<String, dynamic> json) => Url.fromJson(json);
+
+  @override
+  Url fromSql(String fromDb) =>
+      Url.fromJson(jsonDecode(fromDb) as Map<String, dynamic>);
+
+  @override
+  String toSql(Url value) => jsonEncode(value);
+}
