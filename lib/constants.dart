@@ -21,3 +21,5 @@ const themeDark = "dark";
 const themeLight = "light";
 const themeAmolded = "amolded";
 const themeSystem = "system";
+
+const apiTimerDurationInSec = 30;

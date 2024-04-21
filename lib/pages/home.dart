@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/api.dart';
 import 'package:kanbored/api/state.dart';
 import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/constants.dart';
@@ -24,11 +25,7 @@ class _HomeState extends ConsumerState<Home> {
   @override
   void initState() {
     super.initState();
-    init();
-  }
-
-  void init() async {
-    // Api.watchProjects().;
+    Api.updateProjects(ref, recurring: true);
   }
 
   void onChange(text) {
@@ -89,7 +86,7 @@ class _HomeState extends ConsumerState<Home> {
 
   void refreshUi() {
     log("project, Refresh UI!");
-    init();
+    Api.updateProjects(ref);
   }
 
   @override
@@ -155,6 +152,7 @@ class _HomeState extends ConsumerState<Home> {
   }
 
   Widget buildProjects(List<ProjectModelData> projects) {
+    // log("build, # projects ${projects.length}");
     return Expanded(
         child: GridView.count(
             shrinkWrap: true,

@@ -2,6 +2,9 @@ import 'package:drift/drift.dart';
 import 'package:kanbored/db/converters.dart';
 
 class ProjectModel extends Table {
+  @override
+  Set<Column> get primaryKey => {id};
+
   IntColumn get id => integer()();
 
   TextColumn get name => text()();
@@ -56,8 +59,9 @@ class ProjectModel extends Table {
   @JsonKey('enable_global_tags')
   IntColumn get enableGlobalTags => integer()();
 
+  // TODO: confirm that it works w/ normal `kanboard`
   @JsonKey('is_trello_imported')
-  IntColumn get isTrelloImported => integer()();
+  IntColumn get isTrelloImported => integer().nullable()();
 
   TextColumn get url => text().map(const UrlConverter())();
 }

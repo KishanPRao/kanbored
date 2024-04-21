@@ -4,6 +4,9 @@ import 'package:kanbored/db/converters.dart';
 import 'package:kanbored/db/project_model.dart';
 
 class TaskModel extends Table {
+  @override
+  Set<Column> get primaryKey => {id, columnId, projectId};
+
   IntColumn get id => integer()();
 
   TextColumn get title => text()();
@@ -89,6 +92,9 @@ class TaskModel extends Table {
 }
 
 class TaskMetadataModel extends Table {
+  @override
+  Set<Column> get primaryKey => {taskId};
+
   @JsonKey('task_id')
   IntColumn get taskId => integer().references(TaskModel, #id).nullable()();
 

@@ -1,5 +1,16 @@
 {
   "colors": {
-    "primary": "0xFF448AFF"
+    "pageBg": "0xFFFFFFFF",
+    "appBarText": "0xFFFFFFFF",
+    "projectBg": "0xFFBBBBDD",
+    "columnBg": "0xFF020202",
+    "taskBg": "0xFF111111",
+    "descBg": "0xFF101010",
+    "descEditBg": "0xFF000000",
+    "archivedBg": "0xFF8A6700",
+    "unarchiveBg": "0xFFecb000",
+    "cardHighlight": "0x664789f0",
+    "searchBar": "0xFF212121",
+    "primary": "0xFF4789f0"
   }
 }

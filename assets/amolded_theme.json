@@ -1,6 +1,7 @@
 {
   "colors": {
     "pageBg": "0xFF000000",
+    "appBarText": "0xFFFFFFF",
     "projectBg": "0xFF111111",
     "columnBg": "0xFF020202",
     "taskBg": "0xFF111111",

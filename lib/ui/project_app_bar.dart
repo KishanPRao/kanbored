@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/constants.dart';
 import 'package:kanbored/models/project_model.dart';
 import 'package:kanbored/strings.dart';
@@ -16,7 +17,7 @@ class ProjectAppBarActions extends AppBarActions {
       {super.key, required this.showArchived, required super.abActionListener});
 
   @override
-  State<StatefulWidget> createState() => ProjectAppBarActionsState();
+  ConsumerState<ConsumerStatefulWidget> createState() => ProjectAppBarActionsState();
 }
 
 class ProjectAppBarActionsState

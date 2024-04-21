@@ -1,6 +1,9 @@
 import 'package:drift/drift.dart';
 
 class CommentModel extends Table {
+  @override
+  Set<Column> get primaryKey => {id, taskId};
+  
   IntColumn get id => integer()();
 
   @JsonKey('date_creation')

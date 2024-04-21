@@ -1,34 +1,42 @@
 import 'dart:async';
-import 'dart:developer';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/state.dart';
 import 'package:kanbored/api/web_api.dart';
-import 'package:kanbored/db/database.dart';
+import 'package:kanbored/constants.dart';
 
 class Api {
   // static Future<ProjectModelData> getProjects() {
   //   WebApi.getAllProjects()
   // }
-  // static final db = AppDatabase();
-  //
-  // // TODO: run in timer
-  // static void updateProjects() {
-  //   const oneSec = Duration(seconds: 1);
-  //   Timer.periodic(oneSec, (Timer t) {
-  //     log("update projects");
-  //     WebApi.getAllProjects().then((projects) async {
-  //       db.transaction(() async {
-  //         for (var project in projects) {
-  //           log("project: $project");
-  //           var data = ProjectModelData.fromJson(project);
-  //           log("project data: $data");
-  //           await db.into(db.projectModel).insert(data);
-  //         }
-  //       });
-  //     });
-  //   });
-  // }
+  // static final db = ;
 
-  static Stream<List<ProjectModelData>> watchProjects() {
-    return (db.select(db.projectModel)).watch();
+  // TODO: run in timer
+  static void updateProjects(WidgetRef ref, {recurring = false}) {
+    function() {
+      WebApi.getAllProjects().then((projects) async {
+        updateDbProjects(ref, projects);
+      });
+    }
+
+    function();
+    if (recurring) recurringApi(function);
   }
+
+  static Future<bool> removeProject(WidgetRef ref, int projectId) async {
+    var result = await WebApi.removeProject(projectId);
+    if (result) removeDbProject(ref, projectId);
+    return result;
+  }
+
+  static void recurringApi(VoidCallback function) {
+    function();
+    const oneSec = Duration(seconds: apiTimerDurationInSec);
+    Timer.periodic(oneSec, (Timer t) => function());
+  }
+
+// static Stream<List<ProjectModelData>> watchProjects() {
+//   return (db.select(db.projectModel)).watch();
+// }
 }

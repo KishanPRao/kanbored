@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart' as flmd;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/comment_model.dart';
 import 'package:kanbored/models/model.dart';
@@ -12,7 +13,7 @@ import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/utils.dart';
 import 'package:markdown/markdown.dart' as md;
 
-class Markdown extends StatefulWidget {
+class Markdown extends ConsumerStatefulWidget {
   final Model model;
   final AppBarActionListener abActionListener;
 
@@ -27,7 +28,7 @@ class Markdown extends StatefulWidget {
   // final int maxLines;
 
   @override
-  State<StatefulWidget> createState() => _MarkdownState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _MarkdownState();
 }
 
 // NOTE: Assumes `TaskModel` is used for description, `CommentModel` for comments.

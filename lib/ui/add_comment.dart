@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
@@ -11,7 +12,7 @@ import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/ui/task_app_bar.dart';
 import 'package:kanbored/utils.dart';
 
-class AddComment extends StatefulWidget {
+class AddComment extends ConsumerStatefulWidget {
   final TaskModel task;
   final AppBarActionListener abActionListener;
 
@@ -22,7 +23,7 @@ class AddComment extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() => AddCommentState();
+  ConsumerState<ConsumerStatefulWidget> createState() => AddCommentState();
 }
 
 class AddCommentState extends EditableState<AddComment> {

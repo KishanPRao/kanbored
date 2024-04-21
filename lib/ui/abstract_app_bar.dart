@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/utils.dart';
@@ -13,7 +14,7 @@ class AppBarAction {
   static const kPopup = 4;
 }
 
-abstract class AppBarActions extends StatefulWidget {
+abstract class AppBarActions extends ConsumerStatefulWidget {
   final AppBarActionListener abActionListener;
 
   const AppBarActions({super.key, required this.abActionListener});

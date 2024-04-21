@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/constants.dart';
 import 'package:kanbored/models/column_model.dart';
@@ -10,7 +11,7 @@ import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/sizes.dart';
 import 'package:kanbored/utils.dart';
 
-class AddTask extends StatefulWidget {
+class AddTask extends ConsumerStatefulWidget {
   final AppBarActionListener abActionListener;
   final ColumnModel columnModel;
 
@@ -18,7 +19,7 @@ class AddTask extends StatefulWidget {
       {super.key, required this.columnModel, required this.abActionListener});
 
   @override
-  State<StatefulWidget> createState() => AddTaskState();
+  ConsumerState<ConsumerStatefulWidget> createState() => AddTaskState();
 }
 
 class AddTaskState extends EditableState<AddTask> {

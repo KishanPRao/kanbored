@@ -2,6 +2,9 @@ import 'package:drift/drift.dart';
 import 'package:kanbored/db/project_model.dart';
 
 class ColumnModel extends Table {
+  @override
+  Set<Column> get primaryKey => {id, projectId};
+
   IntColumn get id => integer()();
 
   TextColumn get title => text()();

@@ -13,7 +13,7 @@ class $ProjectModelTable extends ProjectModel
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
       'id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+      type: DriftSqlType.int, requiredDuringInsert: false);
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
@@ -129,8 +129,8 @@ class $ProjectModelTable extends ProjectModel
       const VerificationMeta('isTrelloImported');
   @override
   late final GeneratedColumn<int> isTrelloImported = GeneratedColumn<int>(
-      'is_trello_imported', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+      'is_trello_imported', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   static const VerificationMeta _urlMeta = const VerificationMeta('url');
   @override
   late final GeneratedColumnWithTypeConverter<Url, String> url =
@@ -174,8 +174,6 @@ class $ProjectModelTable extends ProjectModel
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
     }
     if (data.containsKey('name')) {
       context.handle(
@@ -309,15 +307,13 @@ class $ProjectModelTable extends ProjectModel
           _isTrelloImportedMeta,
           isTrelloImported.isAcceptableOrUnknown(
               data['is_trello_imported']!, _isTrelloImportedMeta));
-    } else if (isInserting) {
-      context.missing(_isTrelloImportedMeta);
     }
     context.handle(_urlMeta, const VerificationResult.success());
     return context;
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   ProjectModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -363,8 +359,8 @@ class $ProjectModelTable extends ProjectModel
           .read(DriftSqlType.int, data['${effectivePrefix}task_limit'])!,
       enableGlobalTags: attachedDatabase.typeMapping.read(
           DriftSqlType.int, data['${effectivePrefix}enable_global_tags'])!,
-      isTrelloImported: attachedDatabase.typeMapping.read(
-          DriftSqlType.int, data['${effectivePrefix}is_trello_imported'])!,
+      isTrelloImported: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}is_trello_imported']),
       url: $ProjectModelTable.$converterurl.fromSql(attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}url'])!),
     );
@@ -401,7 +397,7 @@ class ProjectModelData extends DataClass
   final int perSwimlaneTaskLimits;
   final int taskLimit;
   final int enableGlobalTags;
-  final int isTrelloImported;
+  final int? isTrelloImported;
   final Url url;
   const ProjectModelData(
       {required this.id,
@@ -424,7 +420,7 @@ class ProjectModelData extends DataClass
       required this.perSwimlaneTaskLimits,
       required this.taskLimit,
       required this.enableGlobalTags,
-      required this.isTrelloImported,
+      this.isTrelloImported,
       required this.url});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -456,7 +452,9 @@ class ProjectModelData extends DataClass
     map['per_swimlane_task_limits'] = Variable<int>(perSwimlaneTaskLimits);
     map['task_limit'] = Variable<int>(taskLimit);
     map['enable_global_tags'] = Variable<int>(enableGlobalTags);
-    map['is_trello_imported'] = Variable<int>(isTrelloImported);
+    if (!nullToAbsent || isTrelloImported != null) {
+      map['is_trello_imported'] = Variable<int>(isTrelloImported);
+    }
     {
       map['url'] =
           Variable<String>($ProjectModelTable.$converterurl.toSql(url));
@@ -491,7 +489,9 @@ class ProjectModelData extends DataClass
       perSwimlaneTaskLimits: Value(perSwimlaneTaskLimits),
       taskLimit: Value(taskLimit),
       enableGlobalTags: Value(enableGlobalTags),
-      isTrelloImported: Value(isTrelloImported),
+      isTrelloImported: isTrelloImported == null && nullToAbsent
+          ? const Value.absent()
+          : Value(isTrelloImported),
       url: Value(url),
     );
   }
@@ -522,7 +522,7 @@ class ProjectModelData extends DataClass
           serializer.fromJson<int>(json['per_swimlane_task_limits']),
       taskLimit: serializer.fromJson<int>(json['task_limit']),
       enableGlobalTags: serializer.fromJson<int>(json['enable_global_tags']),
-      isTrelloImported: serializer.fromJson<int>(json['is_trello_imported']),
+      isTrelloImported: serializer.fromJson<int?>(json['is_trello_imported']),
       url: $ProjectModelTable.$converterurl
           .fromJson(serializer.fromJson<Map<String, dynamic>>(json['url'])),
     );
@@ -552,7 +552,7 @@ class ProjectModelData extends DataClass
       'per_swimlane_task_limits': serializer.toJson<int>(perSwimlaneTaskLimits),
       'task_limit': serializer.toJson<int>(taskLimit),
       'enable_global_tags': serializer.toJson<int>(enableGlobalTags),
-      'is_trello_imported': serializer.toJson<int>(isTrelloImported),
+      'is_trello_imported': serializer.toJson<int?>(isTrelloImported),
       'url': serializer.toJson<Map<String, dynamic>>(
           $ProjectModelTable.$converterurl.toJson(url)),
     };
@@ -579,7 +579,7 @@ class ProjectModelData extends DataClass
           int? perSwimlaneTaskLimits,
           int? taskLimit,
           int? enableGlobalTags,
-          int? isTrelloImported,
+          Value<int?> isTrelloImported = const Value.absent(),
           Url? url}) =>
       ProjectModelData(
         id: id ?? this.id,
@@ -605,7 +605,9 @@ class ProjectModelData extends DataClass
             perSwimlaneTaskLimits ?? this.perSwimlaneTaskLimits,
         taskLimit: taskLimit ?? this.taskLimit,
         enableGlobalTags: enableGlobalTags ?? this.enableGlobalTags,
-        isTrelloImported: isTrelloImported ?? this.isTrelloImported,
+        isTrelloImported: isTrelloImported.present
+            ? isTrelloImported.value
+            : this.isTrelloImported,
         url: url ?? this.url,
       );
   @override
@@ -711,9 +713,8 @@ class ProjectModelCompanion extends UpdateCompanion<ProjectModelData> {
   final Value<int> perSwimlaneTaskLimits;
   final Value<int> taskLimit;
   final Value<int> enableGlobalTags;
-  final Value<int> isTrelloImported;
+  final Value<int?> isTrelloImported;
   final Value<Url> url;
-  final Value<int> rowid;
   const ProjectModelCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -737,10 +738,9 @@ class ProjectModelCompanion extends UpdateCompanion<ProjectModelData> {
     this.enableGlobalTags = const Value.absent(),
     this.isTrelloImported = const Value.absent(),
     this.url = const Value.absent(),
-    this.rowid = const Value.absent(),
   });
   ProjectModelCompanion.insert({
-    required int id,
+    this.id = const Value.absent(),
     required String name,
     required int isActive,
     required String token,
@@ -760,11 +760,9 @@ class ProjectModelCompanion extends UpdateCompanion<ProjectModelData> {
     required int perSwimlaneTaskLimits,
     required int taskLimit,
     required int enableGlobalTags,
-    required int isTrelloImported,
+    this.isTrelloImported = const Value.absent(),
     required Url url,
-    this.rowid = const Value.absent(),
-  })  : id = Value(id),
-        name = Value(name),
+  })  : name = Value(name),
         isActive = Value(isActive),
         token = Value(token),
         lastModified = Value(lastModified),
@@ -780,7 +778,6 @@ class ProjectModelCompanion extends UpdateCompanion<ProjectModelData> {
         perSwimlaneTaskLimits = Value(perSwimlaneTaskLimits),
         taskLimit = Value(taskLimit),
         enableGlobalTags = Value(enableGlobalTags),
-        isTrelloImported = Value(isTrelloImported),
         url = Value(url);
   static Insertable<ProjectModelData> custom({
     Expression<int>? id,
@@ -805,7 +802,6 @@ class ProjectModelCompanion extends UpdateCompanion<ProjectModelData> {
     Expression<int>? enableGlobalTags,
     Expression<int>? isTrelloImported,
     Expression<String>? url,
-    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -832,7 +828,6 @@ class ProjectModelCompanion extends UpdateCompanion<ProjectModelData> {
       if (enableGlobalTags != null) 'enable_global_tags': enableGlobalTags,
       if (isTrelloImported != null) 'is_trello_imported': isTrelloImported,
       if (url != null) 'url': url,
-      if (rowid != null) 'rowid': rowid,
     });
   }
 
@@ -857,9 +852,8 @@ class ProjectModelCompanion extends UpdateCompanion<ProjectModelData> {
       Value<int>? perSwimlaneTaskLimits,
       Value<int>? taskLimit,
       Value<int>? enableGlobalTags,
-      Value<int>? isTrelloImported,
-      Value<Url>? url,
-      Value<int>? rowid}) {
+      Value<int?>? isTrelloImported,
+      Value<Url>? url}) {
     return ProjectModelCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -885,7 +879,6 @@ class ProjectModelCompanion extends UpdateCompanion<ProjectModelData> {
       enableGlobalTags: enableGlobalTags ?? this.enableGlobalTags,
       isTrelloImported: isTrelloImported ?? this.isTrelloImported,
       url: url ?? this.url,
-      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -961,9 +954,6 @@ class ProjectModelCompanion extends UpdateCompanion<ProjectModelData> {
       map['url'] =
           Variable<String>($ProjectModelTable.$converterurl.toSql(url.value));
     }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
     return map;
   }
 
@@ -991,8 +981,7 @@ class ProjectModelCompanion extends UpdateCompanion<ProjectModelData> {
           ..write('taskLimit: $taskLimit, ')
           ..write('enableGlobalTags: $enableGlobalTags, ')
           ..write('isTrelloImported: $isTrelloImported, ')
-          ..write('url: $url, ')
-          ..write('rowid: $rowid')
+          ..write('url: $url')
           ..write(')'))
         .toString();
   }
@@ -1109,7 +1098,7 @@ class $ColumnModelTable extends ColumnModel
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id, projectId};
   @override
   ColumnModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -1521,7 +1510,7 @@ class $CommentModelTable extends CommentModel
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id, taskId};
   @override
   CommentModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -2060,7 +2049,7 @@ class $SubtaskModelTable extends SubtaskModel
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id, taskId};
   @override
   SubtaskModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -2916,7 +2905,7 @@ class $TaskModelTable extends TaskModel
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id, columnId, projectId};
   @override
   TaskModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -3848,7 +3837,7 @@ class $TaskMetadataModelTable extends TaskMetadataModel
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {taskId};
   @override
   TaskMetadataModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -3949,37 +3938,29 @@ class TaskMetadataModelCompanion
     extends UpdateCompanion<TaskMetadataModelData> {
   final Value<int?> taskId;
   final Value<TaskMetadata?> metadata;
-  final Value<int> rowid;
   const TaskMetadataModelCompanion({
     this.taskId = const Value.absent(),
     this.metadata = const Value.absent(),
-    this.rowid = const Value.absent(),
   });
   TaskMetadataModelCompanion.insert({
     this.taskId = const Value.absent(),
     this.metadata = const Value.absent(),
-    this.rowid = const Value.absent(),
   });
   static Insertable<TaskMetadataModelData> custom({
     Expression<int>? taskId,
     Expression<String>? metadata,
-    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (taskId != null) 'task_id': taskId,
       if (metadata != null) 'metadata': metadata,
-      if (rowid != null) 'rowid': rowid,
     });
   }
 
   TaskMetadataModelCompanion copyWith(
-      {Value<int?>? taskId,
-      Value<TaskMetadata?>? metadata,
-      Value<int>? rowid}) {
+      {Value<int?>? taskId, Value<TaskMetadata?>? metadata}) {
     return TaskMetadataModelCompanion(
       taskId: taskId ?? this.taskId,
       metadata: metadata ?? this.metadata,
-      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -3993,9 +3974,6 @@ class TaskMetadataModelCompanion
       map['metadata'] = Variable<String>(
           $TaskMetadataModelTable.$convertermetadatan.toSql(metadata.value));
     }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
     return map;
   }
 
@@ -4003,8 +3981,7 @@ class TaskMetadataModelCompanion
   String toString() {
     return (StringBuffer('TaskMetadataModelCompanion(')
           ..write('taskId: $taskId, ')
-          ..write('metadata: $metadata, ')
-          ..write('rowid: $rowid')
+          ..write('metadata: $metadata')
           ..write(')'))
         .toString();
   }

@@ -1,6 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/api.dart';
 import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/project_model.dart';
 import 'package:kanbored/strings.dart';
@@ -24,7 +26,7 @@ class BoardAppBarActions extends AppBarActions {
       required super.abActionListener});
 
   @override
-  State<StatefulWidget> createState() => BoardAppBarActionsState();
+  ConsumerState<ConsumerStatefulWidget> createState() => BoardAppBarActionsState();
 }
 
 class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
@@ -120,7 +122,7 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
           "${'delete'.resc()} `${projectModel.name}`?",
           "alert_del_content".resc(), () {
         log("Delete project");
-        WebApi.removeProject(projectModel.id).then((result) {
+        Api.removeProject(ref, projectModel.id).then((result) {
           if (result) {
             abActionListener.refreshUi();
             Navigator.pop(context);

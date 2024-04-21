@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
@@ -10,7 +11,7 @@ import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/utils.dart';
 
-class Checklist extends StatefulWidget {
+class Checklist extends ConsumerStatefulWidget {
   // TODO: store taskId in one of the metadata classes / in bridge!
   final CheckListMetadata checklist;
   final TaskMetadataModel taskMetadata;
@@ -26,7 +27,7 @@ class Checklist extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() => ChecklistState();
+  ConsumerState<ConsumerStatefulWidget> createState() => ChecklistState();
 }
 
 class ChecklistState extends EditableState<Checklist> {

@@ -222,7 +222,7 @@ class WebApi {
   //     listApi("getmyProjects", 2134420212, ProjectModel.fromJson);
 
   static Future<List<dynamic>> getAllProjects() async =>
-      baseApi("getAllProjects", 2134420212);
+      await baseApi("getAllProjects", 2134420212) as List<dynamic>;
 
   static Future<List<BoardModel>> getBoard(int projectId) async =>
       listApi("getBoard", 827046470, BoardModel.fromJson,
@@ -341,7 +341,7 @@ class WebApi {
     );
 
     final decodedData = json.decode(utf8.decode(resp.bodyBytes));
-    log("decodedData: ${utf8.decode(resp.bodyBytes)}");
+    // log("decodedData: ${utf8.decode(resp.bodyBytes)}");
 
     if (decodedData['error'] != null) return Future.error(decodedData['error']);
     return decodedData['result'];

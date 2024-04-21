@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/strings.dart';
@@ -14,7 +15,7 @@ class TaskAppBarActions extends AppBarActions {
       {super.key, required this.taskModel, required super.abActionListener});
 
   @override
-  State<StatefulWidget> createState() => TaskAppBarActionsState();
+  ConsumerState<ConsumerStatefulWidget> createState() => TaskAppBarActionsState();
 }
 
 class TaskAppBarActionsState extends AppBarActionsState<TaskAppBarActions> {

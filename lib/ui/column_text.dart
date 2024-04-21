@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/column_model.dart';
 import 'package:kanbored/models/project_metadata_model.dart';
@@ -13,7 +14,7 @@ import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/utils.dart';
 
-class ColumnText extends StatefulWidget {
+class ColumnText extends ConsumerStatefulWidget {
   final ProjectMetadataModel projectMetadataModel;
   final ColumnModel columnModel;
   final AppBarActionListener abActionListener;
@@ -26,7 +27,7 @@ class ColumnText extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() => ColumnTextState();
+  ConsumerState<ConsumerStatefulWidget> createState() => ColumnTextState();
 }
 
 class ColumnTextState extends EditableState<ColumnText> {

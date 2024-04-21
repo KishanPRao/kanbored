@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
@@ -11,7 +12,7 @@ import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/ui/task_app_bar.dart';
 import 'package:kanbored/utils.dart';
 
-class Subtask extends StatefulWidget {
+class Subtask extends ConsumerStatefulWidget {
   final SubtaskModel subtask;
   final TaskMetadataModel taskMetadata;
   final CheckListMetadata checklist;
@@ -26,7 +27,7 @@ class Subtask extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() => SubtaskState();
+  ConsumerState<ConsumerStatefulWidget> createState() => SubtaskState();
 }
 
 class SubtaskState extends EditableState<Subtask> {
