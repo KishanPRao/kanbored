@@ -5,14 +5,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/state.dart';
 import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/constants.dart';
+import 'package:kanbored/db/database.dart';
 
 class Api {
-  // static Future<ProjectModelData> getProjects() {
-  //   WebApi.getAllProjects()
-  // }
-  // static final db = ;
+  static void recurringApi(VoidCallback function) {
+    function();
+    const oneSec = Duration(seconds: apiTimerDurationInSec);
+    Timer.periodic(oneSec, (Timer t) => function());
+  }
 
-  // TODO: run in timer
   static void updateProjects(WidgetRef ref, {recurring = false}) {
     function() {
       WebApi.getAllProjects().then((projects) async {
@@ -30,10 +31,12 @@ class Api {
     return result;
   }
 
-  static void recurringApi(VoidCallback function) {
-    function();
-    const oneSec = Duration(seconds: apiTimerDurationInSec);
-    Timer.periodic(oneSec, (Timer t) => function());
+  static Future<bool> updateProject(
+      WidgetRef ref, ProjectModelData data, {webUpdate = true}) async {
+    ref.refresh(activeProject.notifier).state = data;
+    var result = await WebApi.updateProject(data);
+    if (result) updateDbProject(ref, data);
+    return result;
   }
 
 // static Stream<List<ProjectModelData>> watchProjects() {

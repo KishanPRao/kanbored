@@ -69,6 +69,7 @@ class _HomeState extends ConsumerState<Home> {
       WebApi.createProject(title).then((result) {
         if (result is int) {
           // TODO: remove default columns? `getColumns` and `removeColumn`
+          onArchived(false);
           refreshUi();
         } else {
           Utils.showErrorSnackbar(context, "Could not add project");
@@ -91,7 +92,7 @@ class _HomeState extends ConsumerState<Home> {
 
   @override
   Widget build(BuildContext context) {
-    final projects = ref.watch(currentProjects);
+    final projects = ref.watch(allProjects);
     // var projects = this
     //     .projects
     //     .where((project) => project.isActive != showArchived)
@@ -152,6 +153,11 @@ class _HomeState extends ConsumerState<Home> {
   }
 
   Widget buildProjects(List<ProjectModelData> projects) {
+    projects = projects
+        .where((project) =>
+            ((project.isActive == 0) && showArchived) ||
+            ((project.isActive == 1) && !showArchived))
+        .toList();
     // log("build, # projects ${projects.length}");
     return Expanded(
         child: GridView.count(
@@ -165,11 +171,8 @@ class _HomeState extends ConsumerState<Home> {
                           splashColor: "cardHighlight".themed(context),
                           highlightColor: "cardHighlight".themed(context),
                           onTap: () {
-                            Navigator.pushNamed(
-                              context,
-                              routeBoard,
-                              arguments: project,
-                            );
+                            ref.refresh(activeProject.notifier).state = project;
+                            Navigator.pushNamed(context, routeBoard);
                           },
                           child: SizedBox(
                             child: Center(child: Text(project.name)),

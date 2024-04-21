@@ -1,34 +1,33 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:kanbored/constants.dart';
-import 'package:kanbored/models/column_model.dart';
-import 'package:kanbored/strings.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/state.dart';
 import 'package:kanbored/api/web_api.dart';
+import 'package:kanbored/constants.dart';
+import 'package:kanbored/db/database.dart';
+import 'package:kanbored/models/board_model.dart';
+import 'package:kanbored/models/column_model.dart';
 import 'package:kanbored/models/project_metadata_model.dart';
-import 'package:kanbored/ui/abstract_app_bar.dart';
-import 'package:kanbored/ui/app_bar_action_listener.dart';
+import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/board_action_listener.dart';
 import 'package:kanbored/ui/board_app_bar.dart';
+import 'package:kanbored/ui/board_column.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/search_fab.dart';
 import 'package:kanbored/ui/sizes.dart';
-import 'package:kanbored/models/board_model.dart';
-import 'package:kanbored/models/project_model.dart';
-import 'package:kanbored/ui/board_column.dart';
-import 'package:kanbored/ui/task_app_bar.dart';
 import 'package:kanbored/utils.dart';
 
-class Board extends StatefulWidget {
+class Board extends ConsumerStatefulWidget {
   const Board({super.key});
 
   @override
-  State<StatefulWidget> createState() => _BoardState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _BoardState();
 }
 
-class _BoardState extends State<Board> {
+class _BoardState extends ConsumerState<Board> {
   bool isLoaded = false;
-  late ProjectModel projectModel;
+  late ProjectModelData projectModel;
   late ProjectMetadataModel projectMetadataModel;
   List<BoardModel> boards = [];
   var showArchived = false;
@@ -44,7 +43,13 @@ class _BoardState extends State<Board> {
   @override
   void didChangeDependencies() {
     if (!isLoaded) {
-      projectModel = ModalRoute.of(context)?.settings.arguments as ProjectModel;
+      var projectModel = ref.read(activeProject);
+      if (projectModel != null) {
+        this.projectModel = projectModel;
+      }
+      ref.refresh(boardShowArchived.notifier).state = false;
+      // projectModel =
+      //     ModalRoute.of(context)?.settings.arguments as ProjectModelData;
       columnWidth = Utils.getWidth(context) * Sizes.kTaskWidthPercentage;
       updateData();
     }
@@ -136,9 +141,10 @@ class _BoardState extends State<Board> {
 
   void onArchived(bool showArchived) {
     log("board, onArchived: $showArchived");
-    setState(() {
-      this.showArchived = showArchived;
-    });
+    // setState(() {
+    //   this.showArchived = showArchived;
+    // });
+    ref.refresh(boardShowArchived.notifier).state = showArchived;
   }
 
   void refreshUi() {
@@ -149,7 +155,9 @@ class _BoardState extends State<Board> {
   @override
   Widget build(BuildContext context) {
     // Do not load until some data is retrieved
-    if (!isLoaded) {
+    var projectModel = ref.watch(activeProject);
+    showArchived = ref.watch(boardShowArchived);
+    if (!isLoaded || projectModel == null) {
       return Utils.emptyUi();
     }
     return Scaffold(
@@ -188,8 +196,6 @@ class _BoardState extends State<Board> {
         actions: [
           BoardAppBarActions(
             key: keyAppBarActionsState,
-            projectModel: projectModel,
-            showArchived: showArchived,
             abActionListener: BoardActionListener(
               onArchive: onArchive,
               onUnarchive: onUnarchive,

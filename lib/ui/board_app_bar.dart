@@ -3,8 +3,9 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/api.dart';
+import 'package:kanbored/api/state.dart';
 import 'package:kanbored/api/web_api.dart';
-import 'package:kanbored/models/project_model.dart';
+import 'package:kanbored/db/database.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/board_action_listener.dart';
@@ -16,35 +17,37 @@ class BoardAppBarAction extends AppBarAction {
 }
 
 class BoardAppBarActions extends AppBarActions {
-  final ProjectModel projectModel;
-  final bool showArchived;
+  // final ProjectModelData projectModel;
+  // final bool showArchived;
 
   const BoardAppBarActions(
       {super.key,
-      required this.projectModel,
-      required this.showArchived,
+      // required this.projectModel,
+      // required this.showArchived,
       required super.abActionListener});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => BoardAppBarActionsState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      BoardAppBarActionsState();
 }
 
 class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
-  late ProjectModel projectModel;
+  late ProjectModelData projectModel;
   late bool showArchived;
 
   @override
   void initState() {
     super.initState();
-    projectModel = widget.projectModel;
-    showArchived = widget.showArchived;
+    // projectModel = widget.projectModel;
+    projectModel = ref.read(activeProject)!;
+    showArchived = ref.read(boardShowArchived);
   }
 
   @override
   Iterable<String> getPopupNames() => {
         "rename".resc(),
         showArchived ? "hide_archived".resc() : "show_archived".resc(),
-        projectModel.isActive ? "archive".resc() : "unarchive".resc(),
+        (projectModel.isActive == 1) ? "archive".resc() : "unarchive".resc(),
         // TODO: `show_archived` adds extra spaces in UI?
         "delete".resc(),
       };
@@ -65,8 +68,11 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
   void unarchive() => (abActionListener as BoardActionListener).onUnarchive();
 
   void toggleArchive() {
-    projectModel.isActive = !projectModel.isActive;
-    (projectModel.isActive
+    // projectModel.isActive = !projectModel.isActive;
+    var updatedProject =
+        projectModel.copyWith(isActive: 1 - projectModel.isActive);
+    Api.updateProject(ref, updatedProject, webUpdate: false);
+    (updatedProject.isActive == 1
             ? WebApi.enableProject(projectModel.id)
             : WebApi.disableProject(projectModel.id))
         .then((value) {
@@ -89,7 +95,7 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
       (abActionListener as BoardActionListener).onArchived(showArchived);
     } else if (action == "archive".resc() || action == "unarchive".resc()) {
       log("Archive/Unarchive");
-      if (projectModel.isActive) {
+      if (projectModel.isActive == 1) {
         Utils.showAlertDialog(
             context,
             "${'archive'.resc()} `${projectModel.name}`?",
@@ -107,8 +113,8 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
       Utils.showInputAlertDialog(context, "rename_project".resc(),
           "alert_rename_proj_content".resc(), projectModel.name, (title) {
         log("project, rename col: $title");
-        projectModel.name = title;
-        WebApi.updateProject(projectModel).then((result) {
+        var updatedProject = projectModel.copyWith(name: title);
+        Api.updateProject(ref, updatedProject).then((result) {
           if (result) {
             abActionListener.refreshUi();
           } else {
@@ -161,5 +167,15 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
       default:
         return super.getButton(action);
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var projectModel = ref.watch(activeProject);
+    if (projectModel != null) {
+      this.projectModel = projectModel;
+    }
+    showArchived = ref.watch(boardShowArchived);
+    return super.build(context);
   }
 }

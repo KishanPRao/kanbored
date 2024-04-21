@@ -3,12 +3,12 @@ import 'dart:developer';
 
 import 'package:http/http.dart' as http;
 import 'package:kanbored/app_data.dart';
+import 'package:kanbored/db/database.dart';
 import 'package:kanbored/models/board_model.dart';
 import 'package:kanbored/models/column_model.dart';
 import 'package:kanbored/models/comment_model.dart';
 import 'package:kanbored/models/model.dart';
 import 'package:kanbored/models/project_metadata_model.dart';
-import 'package:kanbored/models/project_model.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
@@ -125,7 +125,7 @@ class WebApi {
 
   // UPDATE
 
-  static Future<bool> updateProject(ProjectModel model) async =>
+  static Future<bool> updateProject(ProjectModelData model) async =>
       setApi("updateProject", 1853996288,
           params: {"project_id": model.id, "name": model.name});
 
