@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:kanbored/db/column_model.dart';
 import 'package:kanbored/db/comment_model.dart';
+import 'package:kanbored/db/converters.dart';
 import 'package:kanbored/db/project_model.dart';
 import 'package:kanbored/db/subtask_model.dart';
 import 'package:kanbored/db/task_model.dart';

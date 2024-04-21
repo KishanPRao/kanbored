@@ -8,7 +8,9 @@ class $ProjectModelTable extends ProjectModel
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
+
   $ProjectModelTable(this.attachedDatabase, [this._alias]);
+
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -137,6 +139,7 @@ class $ProjectModelTable extends ProjectModel
       GeneratedColumn<String>('url', aliasedName, false,
               type: DriftSqlType.string, requiredDuringInsert: true)
           .withConverter<Url>($ProjectModelTable.$converterurl);
+
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -162,11 +165,14 @@ class $ProjectModelTable extends ProjectModel
         isTrelloImported,
         url
       ];
+
   @override
   String get aliasedName => _alias ?? actualTableName;
+
   @override
   String get actualTableName => $name;
   static const String $name = 'project_model';
+
   @override
   VerificationContext validateIntegrity(Insertable<ProjectModelData> instance,
       {bool isInserting = false}) {
@@ -318,6 +324,7 @@ class $ProjectModelTable extends ProjectModel
 
   @override
   Set<GeneratedColumn> get $primaryKey => const {};
+
   @override
   ProjectModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -403,6 +410,7 @@ class ProjectModelData extends DataClass
   final int enableGlobalTags;
   final int isTrelloImported;
   final Url url;
+
   const ProjectModelData(
       {required this.id,
       required this.name,
@@ -426,6 +434,7 @@ class ProjectModelData extends DataClass
       required this.enableGlobalTags,
       required this.isTrelloImported,
       required this.url});
+
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -527,6 +536,7 @@ class ProjectModelData extends DataClass
           .fromJson(serializer.fromJson<Map<String, dynamic>>(json['url'])),
     );
   }
+
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
@@ -608,6 +618,7 @@ class ProjectModelData extends DataClass
         isTrelloImported: isTrelloImported ?? this.isTrelloImported,
         url: url ?? this.url,
       );
+
   @override
   String toString() {
     return (StringBuffer('ProjectModelData(')
@@ -662,6 +673,7 @@ class ProjectModelData extends DataClass
         isTrelloImported,
         url
       ]);
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -714,6 +726,7 @@ class ProjectModelCompanion extends UpdateCompanion<ProjectModelData> {
   final Value<int> isTrelloImported;
   final Value<Url> url;
   final Value<int> rowid;
+
   const ProjectModelCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -739,6 +752,7 @@ class ProjectModelCompanion extends UpdateCompanion<ProjectModelData> {
     this.url = const Value.absent(),
     this.rowid = const Value.absent(),
   });
+
   ProjectModelCompanion.insert({
     required int id,
     required String name,
@@ -782,6 +796,7 @@ class ProjectModelCompanion extends UpdateCompanion<ProjectModelData> {
         enableGlobalTags = Value(enableGlobalTags),
         isTrelloImported = Value(isTrelloImported),
         url = Value(url);
+
   static Insertable<ProjectModelData> custom({
     Expression<int>? id,
     Expression<String>? name,
@@ -1003,7 +1018,9 @@ class $ColumnModelTable extends ColumnModel
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
+
   $ColumnModelTable(this.attachedDatabase, [this._alias]);
+
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -1047,14 +1064,18 @@ class $ColumnModelTable extends ColumnModel
       requiredDuringInsert: true,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('REFERENCES project_model (id)'));
+
   @override
   List<GeneratedColumn> get $columns =>
       [id, title, position, taskLimit, description, hideInDashboard, projectId];
+
   @override
   String get aliasedName => _alias ?? actualTableName;
+
   @override
   String get actualTableName => $name;
   static const String $name = 'column_model';
+
   @override
   VerificationContext validateIntegrity(Insertable<ColumnModelData> instance,
       {bool isInserting = false}) {
@@ -1110,6 +1131,7 @@ class $ColumnModelTable extends ColumnModel
 
   @override
   Set<GeneratedColumn> get $primaryKey => const {};
+
   @override
   ColumnModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -1145,6 +1167,7 @@ class ColumnModelData extends DataClass implements Insertable<ColumnModelData> {
   final String description;
   final int hideInDashboard;
   final int projectId;
+
   const ColumnModelData(
       {required this.id,
       required this.title,
@@ -1153,6 +1176,7 @@ class ColumnModelData extends DataClass implements Insertable<ColumnModelData> {
       required this.description,
       required this.hideInDashboard,
       required this.projectId});
+
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1191,6 +1215,7 @@ class ColumnModelData extends DataClass implements Insertable<ColumnModelData> {
       projectId: serializer.fromJson<int>(json['project_id']),
     );
   }
+
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
@@ -1222,6 +1247,7 @@ class ColumnModelData extends DataClass implements Insertable<ColumnModelData> {
         hideInDashboard: hideInDashboard ?? this.hideInDashboard,
         projectId: projectId ?? this.projectId,
       );
+
   @override
   String toString() {
     return (StringBuffer('ColumnModelData(')
@@ -1239,6 +1265,7 @@ class ColumnModelData extends DataClass implements Insertable<ColumnModelData> {
   @override
   int get hashCode => Object.hash(
       id, title, position, taskLimit, description, hideInDashboard, projectId);
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1261,6 +1288,7 @@ class ColumnModelCompanion extends UpdateCompanion<ColumnModelData> {
   final Value<int> hideInDashboard;
   final Value<int> projectId;
   final Value<int> rowid;
+
   const ColumnModelCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
@@ -1271,6 +1299,7 @@ class ColumnModelCompanion extends UpdateCompanion<ColumnModelData> {
     this.projectId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
+
   ColumnModelCompanion.insert({
     required int id,
     required String title,
@@ -1287,6 +1316,7 @@ class ColumnModelCompanion extends UpdateCompanion<ColumnModelData> {
         description = Value(description),
         hideInDashboard = Value(hideInDashboard),
         projectId = Value(projectId);
+
   static Insertable<ColumnModelData> custom({
     Expression<int>? id,
     Expression<String>? title,
@@ -1381,7 +1411,9 @@ class $CommentModelTable extends CommentModel
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
+
   $CommentModelTable(this.attachedDatabase, [this._alias]);
+
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -1437,6 +1469,7 @@ class $CommentModelTable extends CommentModel
   late final GeneratedColumn<String> avatarPath = GeneratedColumn<String>(
       'avatar_path', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -1450,11 +1483,14 @@ class $CommentModelTable extends CommentModel
         email,
         avatarPath
       ];
+
   @override
   String get aliasedName => _alias ?? actualTableName;
+
   @override
   String get actualTableName => $name;
   static const String $name = 'comment_model';
+
   @override
   VerificationContext validateIntegrity(Insertable<CommentModelData> instance,
       {bool isInserting = false}) {
@@ -1522,6 +1558,7 @@ class $CommentModelTable extends CommentModel
 
   @override
   Set<GeneratedColumn> get $primaryKey => const {};
+
   @override
   CommentModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -1567,6 +1604,7 @@ class CommentModelData extends DataClass
   final String? name;
   final String? email;
   final String? avatarPath;
+
   const CommentModelData(
       {required this.id,
       required this.dateCreation,
@@ -1578,6 +1616,7 @@ class CommentModelData extends DataClass
       this.name,
       this.email,
       this.avatarPath});
+
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1638,6 +1677,7 @@ class CommentModelData extends DataClass
       avatarPath: serializer.fromJson<String?>(json['avatar_path']),
     );
   }
+
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
@@ -1678,6 +1718,7 @@ class CommentModelData extends DataClass
         email: email.present ? email.value : this.email,
         avatarPath: avatarPath.present ? avatarPath.value : this.avatarPath,
       );
+
   @override
   String toString() {
     return (StringBuffer('CommentModelData(')
@@ -1698,6 +1739,7 @@ class CommentModelData extends DataClass
   @override
   int get hashCode => Object.hash(id, dateCreation, dateModification, taskId,
       userId, comment, username, name, email, avatarPath);
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1726,6 +1768,7 @@ class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
   final Value<String?> email;
   final Value<String?> avatarPath;
   final Value<int> rowid;
+
   const CommentModelCompanion({
     this.id = const Value.absent(),
     this.dateCreation = const Value.absent(),
@@ -1739,6 +1782,7 @@ class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
     this.avatarPath = const Value.absent(),
     this.rowid = const Value.absent(),
   });
+
   CommentModelCompanion.insert({
     required int id,
     required int dateCreation,
@@ -1757,6 +1801,7 @@ class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
         taskId = Value(taskId),
         userId = Value(userId),
         comment = Value(comment);
+
   static Insertable<CommentModelData> custom({
     Expression<int>? id,
     Expression<int>? dateCreation,
@@ -1875,7 +1920,9 @@ class $SubtaskModelTable extends SubtaskModel
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
+
   $SubtaskModelTable(this.attachedDatabase, [this._alias]);
+
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -1951,6 +1998,7 @@ class $SubtaskModelTable extends SubtaskModel
       requiredDuringInsert: true,
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'CHECK ("is_timer_started" IN (0, 1))'));
+
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -1967,11 +2015,14 @@ class $SubtaskModelTable extends SubtaskModel
         statusName,
         isTimerStarted
       ];
+
   @override
   String get aliasedName => _alias ?? actualTableName;
+
   @override
   String get actualTableName => $name;
   static const String $name = 'subtask_model';
+
   @override
   VerificationContext validateIntegrity(Insertable<SubtaskModelData> instance,
       {bool isInserting = false}) {
@@ -2061,6 +2112,7 @@ class $SubtaskModelTable extends SubtaskModel
 
   @override
   Set<GeneratedColumn> get $primaryKey => const {};
+
   @override
   SubtaskModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -2115,6 +2167,7 @@ class SubtaskModelData extends DataClass
   final int timerStartDate;
   final String? statusName;
   final bool isTimerStarted;
+
   const SubtaskModelData(
       {required this.id,
       required this.title,
@@ -2129,6 +2182,7 @@ class SubtaskModelData extends DataClass
       required this.timerStartDate,
       this.statusName,
       required this.isTimerStarted});
+
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -2195,6 +2249,7 @@ class SubtaskModelData extends DataClass
       isTimerStarted: serializer.fromJson<bool>(json['is_timer_started']),
     );
   }
+
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
@@ -2244,6 +2299,7 @@ class SubtaskModelData extends DataClass
         statusName: statusName.present ? statusName.value : this.statusName,
         isTimerStarted: isTimerStarted ?? this.isTimerStarted,
       );
+
   @override
   String toString() {
     return (StringBuffer('SubtaskModelData(')
@@ -2279,6 +2335,7 @@ class SubtaskModelData extends DataClass
       timerStartDate,
       statusName,
       isTimerStarted);
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2313,6 +2370,7 @@ class SubtaskModelCompanion extends UpdateCompanion<SubtaskModelData> {
   final Value<String?> statusName;
   final Value<bool> isTimerStarted;
   final Value<int> rowid;
+
   const SubtaskModelCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
@@ -2329,6 +2387,7 @@ class SubtaskModelCompanion extends UpdateCompanion<SubtaskModelData> {
     this.isTimerStarted = const Value.absent(),
     this.rowid = const Value.absent(),
   });
+
   SubtaskModelCompanion.insert({
     required int id,
     required String title,
@@ -2354,6 +2413,7 @@ class SubtaskModelCompanion extends UpdateCompanion<SubtaskModelData> {
         position = Value(position),
         timerStartDate = Value(timerStartDate),
         isTimerStarted = Value(isTimerStarted);
+
   static Insertable<SubtaskModelData> custom({
     Expression<int>? id,
     Expression<String>? title,
@@ -2496,7 +2556,9 @@ class $TaskModelTable extends TaskModel
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
+
   $TaskModelTable(this.attachedDatabase, [this._alias]);
+
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -2680,6 +2742,7 @@ class $TaskModelTable extends TaskModel
   late final GeneratedColumn<int> priority = GeneratedColumn<int>(
       'priority', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
+
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -2713,11 +2776,14 @@ class $TaskModelTable extends TaskModel
         recurrenceChild,
         priority
       ];
+
   @override
   String get aliasedName => _alias ?? actualTableName;
+
   @override
   String get actualTableName => $name;
   static const String $name = 'task_model';
+
   @override
   VerificationContext validateIntegrity(Insertable<TaskModelData> instance,
       {bool isInserting = false}) {
@@ -2917,6 +2983,7 @@ class $TaskModelTable extends TaskModel
 
   @override
   Set<GeneratedColumn> get $primaryKey => const {};
+
   @override
   TaskModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -3021,6 +3088,7 @@ class TaskModelData extends DataClass implements Insertable<TaskModelData> {
   final int? recurrenceParent;
   final int? recurrenceChild;
   final int priority;
+
   const TaskModelData(
       {required this.id,
       required this.title,
@@ -3052,6 +3120,7 @@ class TaskModelData extends DataClass implements Insertable<TaskModelData> {
       this.recurrenceParent,
       this.recurrenceChild,
       required this.priority});
+
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -3199,6 +3268,7 @@ class TaskModelData extends DataClass implements Insertable<TaskModelData> {
       priority: serializer.fromJson<int>(json['priority']),
     );
   }
+
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
@@ -3307,6 +3377,7 @@ class TaskModelData extends DataClass implements Insertable<TaskModelData> {
             : this.recurrenceChild,
         priority: priority ?? this.priority,
       );
+
   @override
   String toString() {
     return (StringBuffer('TaskModelData(')
@@ -3377,6 +3448,7 @@ class TaskModelData extends DataClass implements Insertable<TaskModelData> {
         recurrenceChild,
         priority
       ]);
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3445,6 +3517,7 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
   final Value<int?> recurrenceChild;
   final Value<int> priority;
   final Value<int> rowid;
+
   const TaskModelCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
@@ -3478,6 +3551,7 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
     this.priority = const Value.absent(),
     this.rowid = const Value.absent(),
   });
+
   TaskModelCompanion.insert({
     required int id,
     required String title,
@@ -3530,6 +3604,7 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
         recurrenceTimeframe = Value(recurrenceTimeframe),
         recurrenceBasedate = Value(recurrenceBasedate),
         priority = Value(priority);
+
   static Insertable<TaskModelData> custom({
     Expression<int>? id,
     Expression<String>? title,
@@ -3809,7 +3884,9 @@ class $TaskMetadataModelTable extends TaskMetadataModel
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
+
   $TaskMetadataModelTable(this.attachedDatabase, [this._alias]);
+
   static const VerificationMeta _taskIdMeta = const VerificationMeta('taskId');
   @override
   late final GeneratedColumn<int> taskId = GeneratedColumn<int>(
@@ -3826,13 +3903,17 @@ class $TaskMetadataModelTable extends TaskMetadataModel
               type: DriftSqlType.string, requiredDuringInsert: false)
           .withConverter<TaskMetadata?>(
               $TaskMetadataModelTable.$convertermetadatan);
+
   @override
   List<GeneratedColumn> get $columns => [taskId, metadata];
+
   @override
   String get aliasedName => _alias ?? actualTableName;
+
   @override
   String get actualTableName => $name;
   static const String $name = 'task_metadata_model';
+
   @override
   VerificationContext validateIntegrity(
       Insertable<TaskMetadataModelData> instance,
@@ -3849,6 +3930,7 @@ class $TaskMetadataModelTable extends TaskMetadataModel
 
   @override
   Set<GeneratedColumn> get $primaryKey => const {};
+
   @override
   TaskMetadataModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -3876,7 +3958,9 @@ class TaskMetadataModelData extends DataClass
     implements Insertable<TaskMetadataModelData> {
   final int? taskId;
   final TaskMetadata? metadata;
+
   const TaskMetadataModelData({this.taskId, this.metadata});
+
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -3909,6 +3993,7 @@ class TaskMetadataModelData extends DataClass
           .fromJson(serializer.fromJson<String?>(json['metadata'])),
     );
   }
+
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
@@ -3926,6 +4011,7 @@ class TaskMetadataModelData extends DataClass
         taskId: taskId.present ? taskId.value : this.taskId,
         metadata: metadata.present ? metadata.value : this.metadata,
       );
+
   @override
   String toString() {
     return (StringBuffer('TaskMetadataModelData(')
@@ -3937,6 +4023,7 @@ class TaskMetadataModelData extends DataClass
 
   @override
   int get hashCode => Object.hash(taskId, metadata);
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3950,16 +4037,19 @@ class TaskMetadataModelCompanion
   final Value<int?> taskId;
   final Value<TaskMetadata?> metadata;
   final Value<int> rowid;
+
   const TaskMetadataModelCompanion({
     this.taskId = const Value.absent(),
     this.metadata = const Value.absent(),
     this.rowid = const Value.absent(),
   });
+
   TaskMetadataModelCompanion.insert({
     this.taskId = const Value.absent(),
     this.metadata = const Value.absent(),
     this.rowid = const Value.absent(),
   });
+
   static Insertable<TaskMetadataModelData> custom({
     Expression<int>? taskId,
     Expression<String>? metadata,
@@ -4019,9 +4109,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $TaskModelTable taskModel = $TaskModelTable(this);
   late final $TaskMetadataModelTable taskMetadataModel =
       $TaskMetadataModelTable(this);
+
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
+
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
         projectModel,
