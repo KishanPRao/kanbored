@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,8 +17,37 @@ class Api {
 
   static void updateProjects(WidgetRef ref, {recurring = false}) {
     function() {
-      WebApi.getAllProjects().then((projects) async {
-        updateDbProjects(ref, projects);
+      WebApi.getAllProjects().then((items) async {
+        updateDbProjects(ref, items);
+      });
+    }
+
+    function();
+    if (recurring) recurringApi(function);
+  }
+
+  static void updateColumns(WidgetRef ref, int projectId, {recurring = false}) {
+    function() {
+      WebApi.getColumns(projectId).then((items) async {
+        updateDbColumns(ref, items);
+      });
+    }
+
+    function();
+    if (recurring) recurringApi(function);
+  }
+
+  static void updateTasks(WidgetRef ref, int projectId, {recurring = false}) {
+    function() {
+      // active, inactive tasks
+      Future.wait([
+        WebApi.getAllTasks(projectId, 1),
+        WebApi.getAllTasks(projectId, 0),
+      ]).then((value) {
+        var tasks = value[0];
+        tasks.addAll(value[1]);
+        // log("tasks: $tasks");
+        updateDbTasks(ref, tasks);
       });
     }
 
@@ -31,12 +61,33 @@ class Api {
     return result;
   }
 
-  static Future<bool> updateProject(
-      WidgetRef ref, ProjectModelData data, {webUpdate = true}) async {
+  static Future<bool> updateProject(WidgetRef ref, ProjectModelData data,
+      {webUpdate = true}) async {
     ref.refresh(activeProject.notifier).state = data;
-    var result = await WebApi.updateProject(data);
-    if (result) updateDbProject(ref, data);
-    return result;
+    if (webUpdate) {
+      var result = await WebApi.updateProject(data);
+      if (result) updateDbProject(ref, data);
+      return result;
+    }
+    return true;
+  }
+
+  static Future<TaskMetadataModelData?> retrieveTaskMetadata(WidgetRef ref, int taskId,
+      {webUpdate = true}) async {
+    var data = await WebApi.getTaskMetadata(taskId);
+    if (data["task_id"] == null) {
+      return null;
+    }
+    data["task_id"] = int.parse(data["task_id"]);
+    return updateDbTaskMetadata(ref, data);
+  }
+
+  static Future<TaskMetadataModelData?> retrieveActiveTaskMetadata(WidgetRef ref,
+      {webUpdate = true}) async {
+    var task = ref.read(activeTask)!;
+    var metadata = retrieveTaskMetadata(ref, task.id);
+    ref.refresh(activeTaskMetadata.notifier).state = await metadata;
+    return metadata;
   }
 
 // static Stream<List<ProjectModelData>> watchProjects() {

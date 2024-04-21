@@ -6,14 +6,30 @@ import 'package:kanbored/db/database_query.dart';
 
 final boardShowArchived = StateProvider<bool>((ref) => false);
 final activeProject = StateProvider<ProjectModelData?>((ref) => null);
+final activeTask = StateProvider<TaskModelData?>((ref) => null);
+final activeTaskMetadata = StateProvider<TaskMetadataModelData?>((ref) => null);
+
 final columnsInProject = StreamProvider((ref) {
   final database = ref.watch(AppDatabase.provider);
   final current = ref.watch(activeProject)?.id;
   return database.columnsInProject(current);
 });
+
+final tasksInProject = StreamProvider((ref) {
+  final database = ref.watch(AppDatabase.provider);
+  final current = ref.watch(activeProject)?.id;
+  return database.tasksInProject(current);
+});
+
 final allProjects = StreamProvider((ref) {
   final database = ref.watch(AppDatabase.provider);
   return database.projects();
+});
+
+final taskMetadata = StreamProvider((ref) {
+  final database = ref.watch(AppDatabase.provider);
+  final current = ref.watch(activeTask)?.id;
+  return database.taskMetadata(current);
 });
 
 void updateDbProjects(WidgetRef ref, List<dynamic> projects) {
@@ -27,6 +43,41 @@ void updateDbProjects(WidgetRef ref, List<dynamic> projects) {
       await db.into(db.projectModel).insertOnConflictUpdate(data);
     }
   });
+}
+
+void updateDbColumns(WidgetRef ref, List<dynamic> columns) {
+  final db = ref.watch(AppDatabase.provider);
+  db.transaction(() async {
+    // log("# projects ${projects.length}");
+    for (var column in columns) {
+      // log("project: $project");
+      var data = ColumnModelData.fromJson(column);
+      // log("project data: ${data.name}");
+      await db.into(db.columnModel).insertOnConflictUpdate(data);
+    }
+  });
+}
+
+void updateDbTasks(WidgetRef ref, List<dynamic> tasks) {
+  final db = ref.watch(AppDatabase.provider);
+  db.transaction(() async {
+    // log("# projects ${projects.length}");
+    for (var task in tasks) {
+      // log("project: $project");
+      var data = TaskModelData.fromJson(task);
+      // log("project data: ${data.name}");
+      await db.into(db.taskModel).insertOnConflictUpdate(data);
+    }
+  });
+}
+
+TaskMetadataModelData updateDbTaskMetadata(WidgetRef ref, dynamic metadata) {
+  var data = TaskMetadataModelData.fromJson(metadata);
+  final db = ref.watch(AppDatabase.provider);
+  db.transaction(() async {
+    await db.into(db.taskMetadataModel).insertOnConflictUpdate(data);
+  });
+  return data;
 }
 
 void removeDbProject(WidgetRef ref, int projectId) {

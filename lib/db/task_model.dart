@@ -96,8 +96,8 @@ class TaskMetadataModel extends Table {
   Set<Column> get primaryKey => {taskId};
 
   @JsonKey('task_id')
-  IntColumn get taskId => integer().references(TaskModel, #id).nullable()();
+  IntColumn get taskId => integer().references(TaskModel, #id)();
 
   TextColumn get metadata =>
-      text().map(const TaskMetadataConverter()).nullable()();
+      text().map(const TaskMetadataConverter())();
 }

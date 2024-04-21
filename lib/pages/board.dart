@@ -2,13 +2,12 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/api.dart';
 import 'package:kanbored/api/state.dart';
 import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/constants.dart';
-import 'package:kanbored/db/database.dart';
 import 'package:kanbored/models/board_model.dart';
 import 'package:kanbored/models/column_model.dart';
-import 'package:kanbored/models/project_metadata_model.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/board_action_listener.dart';
 import 'package:kanbored/ui/board_app_bar.dart';
@@ -27,8 +26,9 @@ class Board extends ConsumerStatefulWidget {
 
 class _BoardState extends ConsumerState<Board> {
   bool isLoaded = false;
-  late ProjectModelData projectModel;
-  late ProjectMetadataModel projectMetadataModel;
+
+  // late ProjectModelData projectModel;
+  // late ProjectMetadataModel projectMetadataModel;
   List<BoardModel> boards = [];
   var showArchived = false;
   var activeColumnPos = -1;
@@ -41,12 +41,21 @@ class _BoardState extends ConsumerState<Board> {
   final ScrollController controller = ScrollController();
 
   @override
+  void initState() {
+    super.initState();
+    var projectModel = ref.read(activeProject)!;
+    Api.updateColumns(ref, projectModel.id, recurring: true);
+    Api.updateTasks(ref, projectModel.id, recurring: true);
+  }
+
+  @override
   void didChangeDependencies() {
     if (!isLoaded) {
-      var projectModel = ref.read(activeProject);
-      if (projectModel != null) {
-        this.projectModel = projectModel;
-      }
+      // var projectModel = ref.read(activeProject);
+      // columns = ref.read(columnsInProject);
+      // if (projectModel != null) {
+      //   this.projectModel = projectModel;
+      // }
       ref.refresh(boardShowArchived.notifier).state = false;
       // projectModel =
       //     ModalRoute.of(context)?.settings.arguments as ProjectModelData;
@@ -58,7 +67,7 @@ class _BoardState extends ConsumerState<Board> {
 
   void updateData() async {
     List<GlobalKey<EditableState>> keysEditableText = [];
-    var projectModel = this.projectModel;
+    var projectModel = ref.read(activeProject)!;
     var boards = await WebApi.getBoard(projectModel.id);
     var projectMetadataModel = await WebApi.getProjectMetadata(projectModel.id);
     for (var board in boards) {
@@ -72,7 +81,7 @@ class _BoardState extends ConsumerState<Board> {
     if (mounted) {
       setState(() {
         this.boards = boards;
-        this.projectMetadataModel = projectMetadataModel;
+        // this.projectMetadataModel = projectMetadataModel;
         this.keysEditableText = keysEditableText;
         isLoaded = true;
       });
@@ -119,6 +128,7 @@ class _BoardState extends ConsumerState<Board> {
         context, "add_column".resc(), "alert_new_col_content".resc(), "",
         (title) {
       log("board, add col: $title");
+      var projectModel = ref.read(activeProject)!;
       WebApi.addColumn(projectModel.id, title).then((result) {
         if (result is int) {
           refreshUi();
@@ -149,6 +159,8 @@ class _BoardState extends ConsumerState<Board> {
 
   void refreshUi() {
     log("board, Refresh UI!");
+    // TODO
+    // Api.updateColumns(ref, projectModel.id);
     updateData();
   }
 
@@ -160,6 +172,24 @@ class _BoardState extends ConsumerState<Board> {
     if (!isLoaded || projectModel == null) {
       return Utils.emptyUi();
     }
+    var columns = ref.watch(columnsInProject);
+    columns.when(
+        data: (columns) {
+          // log("cols: $columns");
+        },
+        error: (e, s) {},
+        loading: () {});
+    var tasks = ref.watch(columnsInProject);
+    tasks.when(
+        data: (tasks) async {
+          // log("tasks: $tasks");
+          for (var task in tasks) {
+            var metadata = await Api.retrieveTaskMetadata(ref, task.id);
+            log("metadata: $metadata");
+          }
+        },
+        error: (e, s) {},
+        loading: () {});
     return Scaffold(
       backgroundColor: "pageBg".themed(context),
       floatingActionButton: buildSearchFab(context, () {
@@ -253,7 +283,7 @@ class _BoardState extends ConsumerState<Board> {
                         child: BoardColumn(
                           key: ObjectKey(column),
                           column: column,
-                          projectMetadataModel: projectMetadataModel,
+                          // projectMetadataModel: projectMetadataModel,
                           keysEditableText: keysEditableText,
                           baseIdx: (index * 2),
                           abActionListener: BoardActionListener(

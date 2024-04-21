@@ -1,5 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/api.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/app_data.dart';
 import 'package:kanbored/constants.dart';
 import 'package:kanbored/db/database.dart';
@@ -25,6 +29,10 @@ void main() async {
   database.delete(database.subtaskModel).go();
   database.delete(database.commentModel).go();
   database.close();
+
+  // WebApi.getTaskMetadata(44).then((value) {
+  //   log("task META: $value");
+  // });
   runApp(ProviderScope(child: App()));
 }
 

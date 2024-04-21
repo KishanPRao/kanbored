@@ -1,43 +1,36 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:kanbored/constants.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/state.dart';
 import 'package:kanbored/models/column_model.dart';
-import 'package:kanbored/models/project_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/strings.dart';
-import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/add_task.dart';
-import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/ui/board_action_listener.dart';
 import 'package:kanbored/ui/build_subtasks.dart';
 import 'package:kanbored/ui/column_text.dart';
 import 'package:kanbored/ui/editing_state.dart';
-import 'package:kanbored/ui/sizes.dart';
-import 'package:kanbored/utils.dart';
 
-class BoardColumn extends StatefulWidget {
+class BoardColumn extends ConsumerStatefulWidget {
   final ColumnModel column;
-  final ProjectMetadataModel projectMetadataModel;
   final List<GlobalKey<EditableState>> keysEditableText;
   final int baseIdx;
   final BoardActionListener abActionListener;
 
   const BoardColumn(
       {super.key,
-      required this.projectMetadataModel,
       required this.column,
       required this.keysEditableText,
       required this.baseIdx,
       required this.abActionListener});
 
   @override
-  State<StatefulWidget> createState() => BoardColumnState();
+  ConsumerState<ConsumerStatefulWidget> createState() => BoardColumnState();
 }
 
-class BoardColumnState extends State<BoardColumn> {
+class BoardColumnState extends ConsumerState<BoardColumn> {
   late List<TaskModel> tasks;
-  late ProjectMetadataModel projectMetadataModel;
   late ColumnModel column;
   late List<GlobalKey<EditableState>> keysEditableText;
   late int baseIdx;
@@ -66,13 +59,19 @@ class BoardColumnState extends State<BoardColumn> {
       }
       return -1;
     });
-    projectMetadataModel = widget.projectMetadataModel;
     // log("Board column: ${column.id}, ${column.title}, ${column.isActive}, ${projectMetadataModel.closedColumns}");
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
+    // var columns = ref.watch(columnsInProject);
+    // columns.when(
+    //     data: (columns) {
+    //       log("cols: $columns");
+    //     },
+    //     error: (e, s) {},
+    //     loading: () {});
     var tasksLength = (abActionListener.isArchived()
         ? tasks.length
         : tasks.length + 1); // Add new task
@@ -88,7 +87,6 @@ class BoardColumnState extends State<BoardColumn> {
               ColumnText(
                   // TODO: Likely `key` makes deciding refresh required
                   key: keysEditableText[baseIdx],
-                  projectMetadataModel: projectMetadataModel,
                   columnModel: column,
                   abActionListener: abActionListener),
               Expanded(

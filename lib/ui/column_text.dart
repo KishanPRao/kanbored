@@ -15,14 +15,12 @@ import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/utils.dart';
 
 class ColumnText extends ConsumerStatefulWidget {
-  final ProjectMetadataModel projectMetadataModel;
   final ColumnModel columnModel;
   final AppBarActionListener abActionListener;
 
   const ColumnText({
     super.key,
     required this.columnModel,
-    required this.projectMetadataModel,
     required this.abActionListener,
   });
 
@@ -32,7 +30,6 @@ class ColumnText extends ConsumerStatefulWidget {
 
 class ColumnTextState extends EditableState<ColumnText> {
   late ColumnModel columnModel;
-  late ProjectMetadataModel projectMetadataModel;
   late AppBarActionListener abActionListener;
   late TextEditingController controller;
 
@@ -40,7 +37,6 @@ class ColumnTextState extends EditableState<ColumnText> {
   void initState() {
     super.initState();
     columnModel = widget.columnModel;
-    projectMetadataModel = widget.projectMetadataModel;
     abActionListener = widget.abActionListener;
     controller = TextEditingController(text: columnModel.title);
   }
@@ -75,87 +71,87 @@ class ColumnTextState extends EditableState<ColumnText> {
 
   @override
   void delete() {
-    abActionListener.onEditEnd(false);
-    Utils.showAlertDialog(context, "${'delete'.resc()} `${columnModel.title}`?",
-        "alert_del_content".resc(), () {
-      log("column, delete");
-
-      var updateProjMetadata =
-          projectMetadataModel.closedColumns.remove(columnModel.id);
-      Future.wait(columnModel.tasks.map((t) => WebApi.removeTask(t.id)).toList() +
-              [
-                updateProjMetadata
-                    ? WebApi.saveProjectMetadata(
-                        columnModel.projectId, projectMetadataModel)
-                    : Utils.emptyFuture()
-              ])
-          .then((value) {
-        if (value.contains(false)) {
-          Utils.showErrorSnackbar(context, "Could not clear all tasks");
-        } else {
-          removeColumn();
-        }
-      }).onError((e, _) => Utils.showErrorSnackbar(context, e));
-    });
+    // abActionListener.onEditEnd(false);
+    // Utils.showAlertDialog(context, "${'delete'.resc()} `${columnModel.title}`?",
+    //     "alert_del_content".resc(), () {
+    //   log("column, delete");
+    //
+    //   var updateProjMetadata =
+    //       projectMetadataModel.closedColumns.remove(columnModel.id);
+    //   Future.wait(columnModel.tasks.map((t) => WebApi.removeTask(t.id)).toList() +
+    //           [
+    //             updateProjMetadata
+    //                 ? WebApi.saveProjectMetadata(
+    //                     columnModel.projectId, projectMetadataModel)
+    //                 : Utils.emptyFuture()
+    //           ])
+    //       .then((value) {
+    //     if (value.contains(false)) {
+    //       Utils.showErrorSnackbar(context, "Could not clear all tasks");
+    //     } else {
+    //       removeColumn();
+    //     }
+    //   }).onError((e, _) => Utils.showErrorSnackbar(context, e));
+    // });
   }
 
   // TODO: Cannot remove column, kanboard issue?
   @override
   void archive() {
-    abActionListener.onEditEnd(false);
-    Utils.showAlertDialog(
-        context,
-        "${'archive'.resc()} `${columnModel.title}`?",
-        "alert_arch_content".resc(), () {
-      log("column, archive");
-      if (!projectMetadataModel.closedColumns.contains(columnModel.id)) {
-        columnModel.isActive = false;
-        projectMetadataModel.closedColumns.add(columnModel.id);
-        WebApi.saveProjectMetadata(columnModel.projectId, projectMetadataModel)
-            .then((value) {
-          if (!value) {
-            Utils.showErrorSnackbar(context, "Could not save project metadata");
-          } else {
-            abActionListener.refreshUi();
-          }
-        }).onError((e, _) {
-          if (mounted) {
-            Utils.showErrorSnackbar(context, e);
-          } else {
-            log("[Error snackbar] unmounted; $e");
-          }
-        });
-      }
-    });
+    // abActionListener.onEditEnd(false);
+    // Utils.showAlertDialog(
+    //     context,
+    //     "${'archive'.resc()} `${columnModel.title}`?",
+    //     "alert_arch_content".resc(), () {
+    //   log("column, archive");
+    //   if (!projectMetadataModel.closedColumns.contains(columnModel.id)) {
+    //     columnModel.isActive = false;
+    //     projectMetadataModel.closedColumns.add(columnModel.id);
+    //     WebApi.saveProjectMetadata(columnModel.projectId, projectMetadataModel)
+    //         .then((value) {
+    //       if (!value) {
+    //         Utils.showErrorSnackbar(context, "Could not save project metadata");
+    //       } else {
+    //         abActionListener.refreshUi();
+    //       }
+    //     }).onError((e, _) {
+    //       if (mounted) {
+    //         Utils.showErrorSnackbar(context, e);
+    //       } else {
+    //         log("[Error snackbar] unmounted; $e");
+    //       }
+    //     });
+    //   }
+    // });
   }
 
   @override
   void unarchive() {
-    abActionListener.onEditEnd(false);
-    Utils.showAlertDialog(
-        context,
-        "${'unarchive'.resc()} `${columnModel.title}`?",
-        "alert_unarch_content".resc(), () {
-      log("column, unarchive");
-      if (projectMetadataModel.closedColumns.contains(columnModel.id)) {
-        columnModel.isActive = true;
-        projectMetadataModel.closedColumns.remove(columnModel.id);
-        WebApi.saveProjectMetadata(columnModel.projectId, projectMetadataModel)
-            .then((value) {
-          if (!value) {
-            Utils.showErrorSnackbar(context, "Could not save project metadata");
-          } else {
-            abActionListener.refreshUi();
-          }
-        }).onError((e, _) {
-          if (mounted) {
-            Utils.showErrorSnackbar(context, e);
-          } else {
-            log("[Error snackbar] unmounted; $e");
-          }
-        });
-      }
-    });
+    // abActionListener.onEditEnd(false);
+    // Utils.showAlertDialog(
+    //     context,
+    //     "${'unarchive'.resc()} `${columnModel.title}`?",
+    //     "alert_unarch_content".resc(), () {
+    //   log("column, unarchive");
+    //   if (projectMetadataModel.closedColumns.contains(columnModel.id)) {
+    //     columnModel.isActive = true;
+    //     projectMetadataModel.closedColumns.remove(columnModel.id);
+    //     WebApi.saveProjectMetadata(columnModel.projectId, projectMetadataModel)
+    //         .then((value) {
+    //       if (!value) {
+    //         Utils.showErrorSnackbar(context, "Could not save project metadata");
+    //       } else {
+    //         abActionListener.refreshUi();
+    //       }
+    //     }).onError((e, _) {
+    //       if (mounted) {
+    //         Utils.showErrorSnackbar(context, e);
+    //       } else {
+    //         log("[Error snackbar] unmounted; $e");
+    //       }
+    //     });
+    //   }
+    // });
   }
 
   @override

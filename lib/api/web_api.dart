@@ -228,14 +228,14 @@ class WebApi {
       listApi("getBoard", 827046470, BoardModel.fromJson,
           params: {"project_id": projectId});
 
-  static Future<List<ColumnModel>> getColumns(int projectId) async =>
-      listApi("getColumns", 887036325, ColumnModel.fromJson,
-          params: {"project_id": projectId});
+  static Future<List<dynamic>> getColumns(int projectId) async =>
+      await baseApi("getColumns", 887036325, params: {"project_id": projectId})
+          as List<dynamic>;
 
-  static Future<List<TaskModel>> getAllTasks(
-          int projectId, int isActive) async =>
-      listApi("getAllTasks", 133280317, TaskModel.fromJson,
-          params: {"project_id": projectId, "status_id": isActive});
+  static Future<List<dynamic>> getAllTasks(int projectId, int isActive) async =>
+      await baseApi("getAllTasks", 133280317,
+              params: {"project_id": projectId, "status_id": isActive})
+          as List<dynamic>;
 
   static Future<List<SubtaskModel>> getAllSubtasks(int taskId) async =>
       listApi("getAllSubtasks", 2087700490, SubtaskModel.fromJson,
@@ -286,9 +286,8 @@ class WebApi {
       baseApi("searchTasks", 1468511716, params: params);
 
   // TODO: Use for mutliple checklist, shopping list
-  static Future<TaskMetadataModel> getTaskMetadata(int taskId) async =>
-      singleApi("getTaskMetadata", 133280317, TaskMetadataModel.fromJson,
-          params: {"task_id": taskId});
+  static Future<dynamic> getTaskMetadata(int taskId) async =>
+      baseApi("getTaskMetadata", 133280317, params: {"task_id": taskId});
 
   static Future<ProjectMetadataModel> getProjectMetadata(int projectId) async =>
       singleApi("getProjectMetadata", 1797076613, ProjectMetadataModel.fromJson,
@@ -341,7 +340,8 @@ class WebApi {
     );
 
     final decodedData = json.decode(utf8.decode(resp.bodyBytes));
-    // log("decodedData: ${utf8.decode(resp.bodyBytes)}");
+    log("decodedData: ${utf8.decode(resp.bodyBytes)}");
+    // log("decodedData: $decodedData");
 
     if (decodedData['error'] != null) return Future.error(decodedData['error']);
     return decodedData['result'];

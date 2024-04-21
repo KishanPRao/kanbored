@@ -56,73 +56,73 @@ class _TaskState extends State<Task> {
   }
 
   void init() async {
-    log("init");
-    taskModel = await WebApi.getTask(taskId, projectId); // update task info
-    comments = [];
-    subtasks = [];
-    taskMetadata = TaskMetadataModel(checklists: []);
-    keysEditableText = [];
-    keysEditableText.add(GlobalKey()); // description
-    keysEditableText.add(GlobalKey()); // add-comment
-    var loadedSubtasks = <SubtaskModel>[];
-    var loadedComments = <CommentModel>[];
-    TaskMetadataModel loadedTaskMetadata =
-        await WebApi.getTaskMetadata(taskModel.id);
-    // minimum 1, if no subtasks, show add new subtask
-    if (taskModel.nbSubtasks > 0) {
-      loadedSubtasks = await WebApi.getAllSubtasks(taskModel.id);
-      loadedSubtasks.sort((a, b) {
-        // ascending
-        if (a.position > b.position) {
-          return 1;
-        }
-        return -1;
-      });
-      // add a `new subtask` for each checklist
-      if (loadedTaskMetadata.checklists.isEmpty) {
-        var items = <CheckListItemMetadata>[];
-        for (var subtask in loadedSubtasks) {
-          items.add(CheckListItemMetadata(id: subtask.id));
-        }
-        var checklist =
-            CheckListMetadata(name: "Checklist", position: 1, items: items);
-        loadedTaskMetadata.checklists.add(checklist);
-        WebApi.saveTaskMetadata(taskModel.id, loadedTaskMetadata).then((value) {
-          if (!value) {
-            Utils.showErrorSnackbar(context, "Could not save task metadata");
-          } else {
-            log("stored task metadata: $loadedTaskMetadata");
-          }
-        }).catchError((e) => Utils.showErrorSnackbar(context, e));
-      }
-    }
-    log("Loaded task metadata: $loadedTaskMetadata");
-    var checklistSubtaskCount =
-        (loadedTaskMetadata.checklists.length * 2) + loadedSubtasks.length;
-    log("[init] Checklist + subtask count: $checklistSubtaskCount");
-    for (var i = 0; i < checklistSubtaskCount; i++) {
-      keysEditableText.add(GlobalKey());
-    }
-    if (taskModel.nbComments > 0) {
-      loadedComments = await WebApi.getAllComments(taskModel.id);
-      loadedComments.sort((a, b) {
-        if (a.dateCreation > b.dateCreation) {
-          return -1;
-        } else {
-          return 1;
-        }
-      });
-      for (var i = 0; i < loadedComments.length; i++) {
-        keysEditableText.add(GlobalKey());
-      }
-    }
-    log("loadedSubtasks: $loadedSubtasks");
-    setState(() {
-      subtasks = loadedSubtasks;
-      taskMetadata = loadedTaskMetadata;
-      comments = loadedComments;
-      isLoaded = true;
-    });
+    // log("init");
+    // taskModel = await WebApi.getTask(taskId, projectId); // update task info
+    // comments = [];
+    // subtasks = [];
+    // taskMetadata = TaskMetadataModel(checklists: []);
+    // keysEditableText = [];
+    // keysEditableText.add(GlobalKey()); // description
+    // keysEditableText.add(GlobalKey()); // add-comment
+    // var loadedSubtasks = <SubtaskModel>[];
+    // var loadedComments = <CommentModel>[];
+    // TaskMetadataModel loadedTaskMetadata =
+    //     await WebApi.getTaskMetadata(taskModel.id);
+    // // minimum 1, if no subtasks, show add new subtask
+    // if (taskModel.nbSubtasks > 0) {
+    //   loadedSubtasks = await WebApi.getAllSubtasks(taskModel.id);
+    //   loadedSubtasks.sort((a, b) {
+    //     // ascending
+    //     if (a.position > b.position) {
+    //       return 1;
+    //     }
+    //     return -1;
+    //   });
+    //   // add a `new subtask` for each checklist
+    //   if (loadedTaskMetadata.checklists.isEmpty) {
+    //     var items = <CheckListItemMetadata>[];
+    //     for (var subtask in loadedSubtasks) {
+    //       items.add(CheckListItemMetadata(id: subtask.id));
+    //     }
+    //     var checklist =
+    //         CheckListMetadata(name: "Checklist", position: 1, items: items);
+    //     loadedTaskMetadata.checklists.add(checklist);
+    //     WebApi.saveTaskMetadata(taskModel.id, loadedTaskMetadata).then((value) {
+    //       if (!value) {
+    //         Utils.showErrorSnackbar(context, "Could not save task metadata");
+    //       } else {
+    //         log("stored task metadata: $loadedTaskMetadata");
+    //       }
+    //     }).catchError((e) => Utils.showErrorSnackbar(context, e));
+    //   }
+    // }
+    // log("Loaded task metadata: $loadedTaskMetadata");
+    // var checklistSubtaskCount =
+    //     (loadedTaskMetadata.checklists.length * 2) + loadedSubtasks.length;
+    // log("[init] Checklist + subtask count: $checklistSubtaskCount");
+    // for (var i = 0; i < checklistSubtaskCount; i++) {
+    //   keysEditableText.add(GlobalKey());
+    // }
+    // if (taskModel.nbComments > 0) {
+    //   loadedComments = await WebApi.getAllComments(taskModel.id);
+    //   loadedComments.sort((a, b) {
+    //     if (a.dateCreation > b.dateCreation) {
+    //       return -1;
+    //     } else {
+    //       return 1;
+    //     }
+    //   });
+    //   for (var i = 0; i < loadedComments.length; i++) {
+    //     keysEditableText.add(GlobalKey());
+    //   }
+    // }
+    // log("loadedSubtasks: $loadedSubtasks");
+    // setState(() {
+    //   subtasks = loadedSubtasks;
+    //   taskMetadata = loadedTaskMetadata;
+    //   comments = loadedComments;
+    //   isLoaded = true;
+    // });
   }
 
   void onChange(text) {
