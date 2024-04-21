@@ -3,7 +3,6 @@ import 'package:kanbored/db/database.dart';
 import 'package:kanbored/db/database_query.dart';
 
 final activeProject = StateProvider<ProjectModelData?>((ref) => null);
-// final productsProvider = StateNotifierProvider<ProductsNotifier, List<Product>>((ref) => ProductsNotifier());
 final columnsInProject = StreamProvider((ref) {
   final database = ref.watch(AppDatabase.provider);
   final current = ref.watch(activeProject)?.id;
@@ -11,5 +10,7 @@ final columnsInProject = StreamProvider((ref) {
 });
 final currentProjects = StreamProvider((ref) {
   final database = ref.watch(AppDatabase.provider);
-  return database.currentProjects();
+  return database.projects();
 });
+
+// final isLoadingProvider = StateProvider((ref) => false);

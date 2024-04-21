@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/state.dart';
 import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/constants.dart';
-import 'package:kanbored/models/project_model.dart';
+import 'package:kanbored/db/database.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/project_action_listener.dart';
 import 'package:kanbored/ui/project_app_bar.dart';
@@ -19,7 +19,6 @@ class Home extends ConsumerStatefulWidget {
 }
 
 class _HomeState extends ConsumerState<Home> {
-  List<ProjectModel> projects = [];
   var showArchived = false;
 
   @override
@@ -103,75 +102,81 @@ class _HomeState extends ConsumerState<Home> {
     // projects.sort((a, b) => a.name.compareTo(b.name));
     // log("Projects: $projects; orig: ${this.projects}");
     return Scaffold(
-      backgroundColor: "pageBg".themed(context),
-      // floatingActionButton: buildSearchFab(context, () {
-      //   log("home Search");
-      // }),
-      appBar: AppBar(
-        title: Text("app_name".resc()),
-        backgroundColor: "primary".themed(context),
-        actions: [
-          ProjectAppBarActions(
-            // key: keyAppBarActionsState,
-            showArchived: showArchived,
-            abActionListener: ProjectActionListener(
-              onArchived: onArchived,
-              onChange: onChange,
-              onEditStart: (_, __) => {},
-              onEditEnd: onEditEnd,
-              onDelete: onDelete,
-              onMainAction: onAddProject,
-              refreshUi: refreshUi,
-            ),
-          )
-        ],
-      ),
-      body: RefreshIndicator(
+        backgroundColor: "pageBg".themed(context),
+        // floatingActionButton: buildSearchFab(context, () {
+        //   log("home Search");
+        // }),
+        appBar: AppBar(
+          title: Text("app_name".resc()),
+          backgroundColor: "primary".themed(context),
+          actions: [
+            ProjectAppBarActions(
+              // key: keyAppBarActionsState,
+              showArchived: showArchived,
+              abActionListener: ProjectActionListener(
+                onArchived: onArchived,
+                onChange: onChange,
+                onEditStart: (_, __) => {},
+                onEditEnd: onEditEnd,
+                onDelete: onDelete,
+                onMainAction: onAddProject,
+                refreshUi: refreshUi,
+              ),
+            )
+          ],
+        ),
+        body: RefreshIndicator(
           // trigger the _loadData function when the user pulls down
           onRefresh: () {
             refreshUi();
             return Utils.emptyFuture();
           },
-          child: Column(children: [
-            showArchived
-                ? Card(
-                    clipBehavior: Clip.hardEdge,
-                    color: "archivedBg".themed(context),
-                    child: SizedBox(
-                      child: Center(child: Text("archived".resc())),
+          child: projects.when(
+              data: (projects) => Column(children: [
+                    showArchived
+                        ? Card(
+                            clipBehavior: Clip.hardEdge,
+                            color: "archivedBg".themed(context),
+                            child: SizedBox(
+                              child: Center(child: Text("archived".resc())),
+                            ))
+                        : Utils.emptyUi(),
+                    buildProjects(projects),
+                  ]),
+              error: (e, s) {
+                log("error: $e");
+                // TODO: proper text label for error
+                return const Text('error');
+              },
+              loading: () => const Center(
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )),
+        ));
+  }
+
+  Widget buildProjects(List<ProjectModelData> projects) {
+    return Expanded(
+        child: GridView.count(
+            shrinkWrap: true,
+            crossAxisCount: 2,
+            children: projects
+                .map((project) => Card(
+                      color: "projectBg".themed(context),
+                      clipBehavior: Clip.hardEdge,
+                      child: InkWell(
+                          splashColor: "cardHighlight".themed(context),
+                          highlightColor: "cardHighlight".themed(context),
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              routeBoard,
+                              arguments: project,
+                            );
+                          },
+                          child: SizedBox(
+                            child: Center(child: Text(project.name)),
+                          )),
                     ))
-                : Utils.emptyUi(),
-            Expanded(
-                child: GridView.count(
-              shrinkWrap: true,
-              crossAxisCount: 2,
-              children: projects.when(data: (projects) {
-                return projects
-                    .map((project) => Card(
-                          color: "projectBg".themed(context),
-                          clipBehavior: Clip.hardEdge,
-                          child: InkWell(
-                              splashColor: "cardHighlight".themed(context),
-                              highlightColor: "cardHighlight".themed(context),
-                              onTap: () {
-                                Navigator.pushNamed(
-                                  context,
-                                  routeBoard,
-                                  arguments: project,
-                                );
-                              },
-                              child: SizedBox(
-                                child: Center(child: Text(project.name)),
-                              )),
-                        ))
-                    .toList();
-              }, error: (e, s) {
-                return [Utils.emptyUi()];
-              }, loading: () {
-                return [Utils.emptyUi()];
-              }),
-            ))
-          ])),
-    );
+                .toList()));
   }
 }
