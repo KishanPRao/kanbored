@@ -221,8 +221,8 @@ class WebApi {
   // static Future<List<ProjectModel>> getmyProjects() async =>
   //     listApi("getmyProjects", 2134420212, ProjectModel.fromJson);
 
-  static Future<List<ProjectModel>> getAllProjects() async =>
-      listApi("getAllProjects", 2134420212, ProjectModel.fromJson);
+  static Future<List<dynamic>> getAllProjects() async =>
+      baseApi("getAllProjects", 2134420212);
 
   static Future<List<BoardModel>> getBoard(int projectId) async =>
       listApi("getBoard", 827046470, BoardModel.fromJson,

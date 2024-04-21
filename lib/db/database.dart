@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/db/column_model.dart';
 import 'package:kanbored/db/comment_model.dart';
 import 'package:kanbored/db/converters.dart';
@@ -28,6 +29,12 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   int get schemaVersion => 1;
+
+  static final StateProvider<AppDatabase> provider = StateProvider((ref) {
+    final database = AppDatabase();
+    ref.onDispose(database.close);
+    return database;
+  });
 }
 
 LazyDatabase _openConnection() {

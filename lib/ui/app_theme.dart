@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/app_data.dart';
 import 'package:kanbored/constants.dart';
+
 import 'app_colors_extension.dart';
 
 class AppTheme with ChangeNotifier {
@@ -69,3 +71,5 @@ extension AppThemeExtension on ThemeData {
 extension ThemeGetter on BuildContext {
   ThemeData get theme => Theme.of(this);
 }
+
+final themeProvider = ChangeNotifierProvider((_) => AppTheme());

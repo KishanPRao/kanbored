@@ -1,23 +1,24 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/state.dart';
 import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/constants.dart';
 import 'package:kanbored/models/project_model.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/project_action_listener.dart';
 import 'package:kanbored/ui/project_app_bar.dart';
-import 'package:kanbored/ui/search_fab.dart';
 import 'package:kanbored/utils.dart';
 
-class Home extends StatefulWidget {
+class Home extends ConsumerStatefulWidget {
   const Home({super.key});
 
   @override
-  State<StatefulWidget> createState() => _HomeState();
+  ConsumerState<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends ConsumerState<Home> {
   List<ProjectModel> projects = [];
   var showArchived = false;
 
@@ -28,12 +29,7 @@ class _HomeState extends State<Home> {
   }
 
   void init() async {
-    WebApi.getAllProjects()
-        .then((value) => setState(() {
-              projects = value;
-            }))
-        .catchError((e) => ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Error: $e"))));
+    // Api.watchProjects().;
   }
 
   void onChange(text) {
@@ -99,11 +95,12 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    var projects = this
-        .projects
-        .where((project) => project.isActive != showArchived)
-        .toList();
-    projects.sort((a, b) => a.name.compareTo(b.name));
+    final projects = ref.watch(currentProjects);
+    // var projects = this
+    //     .projects
+    //     .where((project) => project.isActive != showArchived)
+    //     .toList();
+    // projects.sort((a, b) => a.name.compareTo(b.name));
     // log("Projects: $projects; orig: ${this.projects}");
     return Scaffold(
       backgroundColor: "pageBg".themed(context),
@@ -148,25 +145,31 @@ class _HomeState extends State<Home> {
                 child: GridView.count(
               shrinkWrap: true,
               crossAxisCount: 2,
-              children: projects
-                  .map((project) => Card(
-                        color: "projectBg".themed(context),
-                        clipBehavior: Clip.hardEdge,
-                        child: InkWell(
-                            splashColor: "cardHighlight".themed(context),
-                            highlightColor: "cardHighlight".themed(context),
-                            onTap: () {
-                              Navigator.pushNamed(
-                                context,
-                                routeBoard,
-                                arguments: project,
-                              );
-                            },
-                            child: SizedBox(
-                              child: Center(child: Text(project.name)),
-                            )),
-                      ))
-                  .toList(),
+              children: projects.when(data: (projects) {
+                return projects
+                    .map((project) => Card(
+                          color: "projectBg".themed(context),
+                          clipBehavior: Clip.hardEdge,
+                          child: InkWell(
+                              splashColor: "cardHighlight".themed(context),
+                              highlightColor: "cardHighlight".themed(context),
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  routeBoard,
+                                  arguments: project,
+                                );
+                              },
+                              child: SizedBox(
+                                child: Center(child: Text(project.name)),
+                              )),
+                        ))
+                    .toList();
+              }, error: (e, s) {
+                return [Utils.emptyUi()];
+              }, loading: () {
+                return [Utils.emptyUi()];
+              }),
             ))
           ])),
     );

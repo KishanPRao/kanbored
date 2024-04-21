@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/app_text_style.dart';
 import 'package:kanbored/ui/app_theme.dart';
@@ -7,14 +8,14 @@ import 'package:provider/provider.dart';
 import 'package:kanbored/app_data.dart';
 import 'package:kanbored/constants.dart';
 
-class Settings extends StatefulWidget {
+class Settings extends ConsumerStatefulWidget {
   const Settings({super.key});
 
   @override
-  State<StatefulWidget> createState() => _SettingsState();
+  ConsumerState<Settings> createState() => _SettingsState();
 }
 
-class _SettingsState extends State<Settings> {
+class _SettingsState extends ConsumerState<Settings> {
   var theme = AppData.theme;
   var apiUsername = AppData.getString(prefApiPassword, "");
   var apiToken = AppData.getString(prefApiPassword, "");
@@ -94,7 +95,7 @@ class _SettingsState extends State<Settings> {
   void _showThemeOptions() async {
     var themes = ThemeMode.values.map((value) => value.name).toList();
     themes.add(themeAmolded);
-    context.read<AppTheme>().themeMode = (await showDialog<String>(
+    ref.refresh(themeProvider).themeMode = (await showDialog<String>(
         context: context,
         builder: (BuildContext context) {
           return SimpleDialog(
@@ -111,7 +112,7 @@ class _SettingsState extends State<Settings> {
         }))!;
     if (context.mounted) {
       setState(() {
-        theme = context.read<AppTheme>().themeMode;
+        theme = ref.watch(themeProvider).themeMode;
       });
     }
   }

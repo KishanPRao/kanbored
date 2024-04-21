@@ -22,6 +22,7 @@ dependencies:
   path: ^1.9.0
   sqlite3:
   json_annotation:
+  flutter_riverpod: ^2.3.0
 
 dev_dependencies:
   flutter_test:
