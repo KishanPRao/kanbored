@@ -86,7 +86,7 @@ class SearchState extends State<Search> {
             scrollDirection: Axis.vertical,
             children: filtered.map((model) {
               if (model is TaskModel) {
-                return buildBoardTask(model, context);
+                // return buildBoardTask(model, context);
               } else if (model is ColumnModel) {
                 return buildBoardColumn(model, context, () {
                   Navigator.pop(context, model);

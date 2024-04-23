@@ -1,22 +1,23 @@
 import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/constants.dart';
-import 'package:kanbored/models/column_model.dart';
+import 'package:kanbored/db/database.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
-import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/sizes.dart';
+import 'package:kanbored/ui/ui_state.dart';
 import 'package:kanbored/utils.dart';
 
 class AddTask extends ConsumerStatefulWidget {
-  final AppBarActionListener abActionListener;
-  final ColumnModel columnModel;
+  // final AppBarActionListener abActionListener;
+  // TODO: avoid sending data?
+  final ColumnModelData columnModel;
 
-  const AddTask(
-      {super.key, required this.columnModel, required this.abActionListener});
+  const AddTask({super.key, required this.columnModel});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => AddTaskState();
@@ -24,15 +25,16 @@ class AddTask extends ConsumerStatefulWidget {
 
 class AddTaskState extends EditableState<AddTask> {
   var focusNode = FocusNode();
-  late ColumnModel columnModel;
-  late AppBarActionListener abActionListener;
+  late ColumnModelData columnModel;
+
+  // late AppBarActionListener abActionListener;
   late TextEditingController controller;
 
   @override
   void initState() {
     super.initState();
     columnModel = widget.columnModel;
-    abActionListener = widget.abActionListener;
+    // abActionListener = widget.abActionListener;
     controller = TextEditingController(text: "");
   }
 
@@ -43,9 +45,14 @@ class AddTaskState extends EditableState<AddTask> {
   }
 
   void startEditing() {
-    abActionListener.onChange(controller.text);
-    abActionListener
-        .onEditStart(1, [AppBarAction.kDiscard, AppBarAction.kDone]);
+    ref.read(UiState.boardActiveText.notifier).state = controller.text;
+    ref.read(UiState.boardActiveState.notifier).state =
+        widget.key as GlobalKey<EditableState>;
+    ref.read(UiState.boardActions.notifier).state = [
+      AppBarAction.kDiscard,
+      AppBarAction.kDone
+    ];
+    ref.read(UiState.boardEditing.notifier).state = true;
   }
 
   @override
@@ -72,9 +79,11 @@ class AddTaskState extends EditableState<AddTask> {
                           controller: controller,
                           onTap: startEditing,
                           onEditingComplete: () {
-                            abActionListener.onEditEnd(true);
+                            ref.read(UiState.boardEditing.notifier).state =
+                                false;
+                            // abActionListener.onEditEnd(true);
                           },
-                          onChanged: abActionListener.onChange,
+                          // onChanged: abActionListener.onChange,
                           focusNode: focusNode,
                           decoration: InputDecoration(
                               hintText: "add_task".resc(),
@@ -98,7 +107,7 @@ class AddTaskState extends EditableState<AddTask> {
       WebApi.createTask(columnModel.projectId, columnModel.id, controller.text)
           .then((taskId) {
         controller.text = "";
-        abActionListener.refreshUi();
+        // abActionListener.refreshUi();
         Navigator.pushNamed(context, routeTask,
             arguments: [taskId, columnModel.projectId]);
       }).onError((e, st) => Utils.showErrorSnackbar(context, e));

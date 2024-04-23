@@ -2,20 +2,18 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/api.dart';
 import 'package:kanbored/api/web_api.dart';
-import 'package:kanbored/models/column_model.dart';
-import 'package:kanbored/models/project_metadata_model.dart';
-import 'package:kanbored/models/task_metadata_model.dart';
-import 'package:kanbored/models/task_model.dart';
+import 'package:kanbored/db/database.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
+import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/ui/board_app_bar.dart';
 import 'package:kanbored/ui/editing_state.dart';
-import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/utils.dart';
 
 class ColumnText extends ConsumerStatefulWidget {
-  final ColumnModel columnModel;
+  final ColumnModelData columnModel;
   final AppBarActionListener abActionListener;
 
   const ColumnText({
@@ -29,7 +27,7 @@ class ColumnText extends ConsumerStatefulWidget {
 }
 
 class ColumnTextState extends EditableState<ColumnText> {
-  late ColumnModel columnModel;
+  late ColumnModelData columnModel;
   late AppBarActionListener abActionListener;
   late TextEditingController controller;
 
@@ -46,12 +44,13 @@ class ColumnTextState extends EditableState<ColumnText> {
     if (saveChanges) {
       log("column, save: ${columnModel.title}");
       if (columnModel.title != controller.text) {
-        columnModel.title = controller.text;
-        WebApi.updateColumn(columnModel).then((value) {
-          if (!value) {
-            Utils.showErrorSnackbar(context, "Could not save column");
-          }
-        }).onError((e, _) => Utils.showErrorSnackbar(context, e));
+        var data = columnModel.copyWith(title: controller.text);
+        Api.updateColumn(ref, data);
+        // WebApi.updateColumn(updatedColumn).then((value) {
+        //   if (!value) {
+        //     Utils.showErrorSnackbar(context, "Could not save column");
+        //   }
+        // }).onError((e, _) => Utils.showErrorSnackbar(context, e));
       }
     } else {
       controller.text = columnModel.title;
@@ -164,9 +163,9 @@ class ColumnTextState extends EditableState<ColumnText> {
         abActionListener.onChange(controller.text);
         abActionListener.onEditStart(0, [
           AppBarAction.kDelete,
-          columnModel.isActive
-              ? BoardAppBarAction.kArchive
-              : BoardAppBarAction.kUnarchive,
+          columnModel.hideInDashboard == 1
+              ? BoardAppBarAction.kUnarchive
+              : BoardAppBarAction.kArchive,
           AppBarAction.kDiscard,
           AppBarAction.kDone
         ]);

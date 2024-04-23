@@ -129,7 +129,7 @@ class WebApi {
       setApi("updateProject", 1853996288,
           params: {"project_id": model.id, "name": model.name});
 
-  static Future<bool> updateColumn(ColumnModel model) async =>
+  static Future<bool> updateColumn(ColumnModelData model) async =>
       setApi("updateColumn", 480740641,
           params: [model.id, model.title, model.taskLimit, model.description]);
 
@@ -340,7 +340,7 @@ class WebApi {
     );
 
     final decodedData = json.decode(utf8.decode(resp.bodyBytes));
-    log("decodedData: ${utf8.decode(resp.bodyBytes)}");
+    // log("decodedData: ${utf8.decode(resp.bodyBytes)}");
     // log("decodedData: $decodedData");
 
     if (decodedData['error'] != null) return Future.error(decodedData['error']);

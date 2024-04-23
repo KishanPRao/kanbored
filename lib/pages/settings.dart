@@ -95,7 +95,7 @@ class _SettingsState extends ConsumerState<Settings> {
   void _showThemeOptions() async {
     var themes = ThemeMode.values.map((value) => value.name).toList();
     themes.add(themeAmolded);
-    ref.refresh(themeProvider).themeMode = (await showDialog<String>(
+    ref.read(themeProvider).themeMode = (await showDialog<String>(
         context: context,
         builder: (BuildContext context) {
           return SimpleDialog(

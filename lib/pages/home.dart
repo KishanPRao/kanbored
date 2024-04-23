@@ -171,7 +171,7 @@ class _HomeState extends ConsumerState<Home> {
                           splashColor: "cardHighlight".themed(context),
                           highlightColor: "cardHighlight".themed(context),
                           onTap: () {
-                            ref.refresh(activeProject.notifier).state = project;
+                            ref.read(activeProject.notifier).state = project;
                             Navigator.pushNamed(context, routeBoard);
                           },
                           child: SizedBox(

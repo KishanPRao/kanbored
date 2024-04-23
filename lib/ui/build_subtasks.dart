@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:kanbored/constants.dart';
+import 'package:kanbored/db/database.dart';
 import 'package:kanbored/models/column_model.dart';
 import 'package:kanbored/models/project_model.dart';
 import 'package:kanbored/models/subtask_model.dart';
@@ -148,7 +149,7 @@ Widget buildChecklistHeader(
           refreshUi: abActionListener.refreshUi,
         ));
 
-Widget buildBoardTask(TaskModel task, BuildContext context) {
+Widget buildBoardTask(TaskModelData task, BuildContext context) {
   // log("Board task: ${task.title} at ${task.position}");
   return Card(
       margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 0.0),

@@ -1,34 +1,44 @@
-import 'dart:developer';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/db/database.dart';
 import 'package:kanbored/db/database_query.dart';
 
-final boardShowArchived = StateProvider<bool>((ref) => false);
 final activeProject = StateProvider<ProjectModelData?>((ref) => null);
+final activeColumn = StateProvider<ColumnModelData?>((ref) => null);
 final activeTask = StateProvider<TaskModelData?>((ref) => null);
 final activeTaskMetadata = StateProvider<TaskMetadataModelData?>((ref) => null);
 
-final columnsInProject = StreamProvider((ref) {
+final columnsInProject = StreamProvider.autoDispose((ref) {
   final database = ref.watch(AppDatabase.provider);
-  final current = ref.watch(activeProject)?.id;
+  final current = ref
+      .watch(activeProject)
+      ?.id;
   return database.columnsInProject(current);
 });
 
-final tasksInProject = StreamProvider((ref) {
+final tasksInProject = StreamProvider.autoDispose((ref) {
   final database = ref.watch(AppDatabase.provider);
-  final current = ref.watch(activeProject)?.id;
+  final current = ref
+      .watch(activeProject)
+      ?.id;
   return database.tasksInProject(current);
 });
 
-final allProjects = StreamProvider((ref) {
+// StreamProvider<List<TaskModelData>> tasksInColumn(int columnId) =>
+//     StreamProvider.autoDispose((ref) {
+//       final database = ref.watch(AppDatabase.provider);
+//       return database.tasksInColumn(columnId);
+//     });
+
+final allProjects = StreamProvider.autoDispose((ref) {
   final database = ref.watch(AppDatabase.provider);
   return database.projects();
 });
 
-final taskMetadata = StreamProvider((ref) {
+final taskMetadata = StreamProvider.autoDispose((ref) {
   final database = ref.watch(AppDatabase.provider);
-  final current = ref.watch(activeTask)?.id;
+  final current = ref
+      .watch(activeTask)
+      ?.id;
   return database.taskMetadata(current);
 });
 
@@ -83,7 +93,9 @@ TaskMetadataModelData updateDbTaskMetadata(WidgetRef ref, dynamic metadata) {
 void removeDbProject(WidgetRef ref, int projectId) {
   final db = ref.watch(AppDatabase.provider);
   db.transaction(() async {
-    await (db.delete(db.projectModel)..where((tbl) => tbl.id.equals(projectId))).go();
+    await (db.delete(db.projectModel)
+      ..where((tbl) => tbl.id.equals(projectId)))
+        .go();
   });
 }
 
@@ -91,6 +103,13 @@ void updateDbProject(WidgetRef ref, ProjectModelData data) {
   final db = ref.watch(AppDatabase.provider);
   db.transaction(() async {
     await db.into(db.projectModel).insertOnConflictUpdate(data);
+  });
+}
+
+void updateDbColumn(WidgetRef ref, ColumnModelData data) {
+  final db = ref.watch(AppDatabase.provider);
+  db.transaction(() async {
+    await db.into(db.columnModel).insertOnConflictUpdate(data);
   });
 }
 

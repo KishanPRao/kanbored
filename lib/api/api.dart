@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -63,16 +62,28 @@ class Api {
 
   static Future<bool> updateProject(WidgetRef ref, ProjectModelData data,
       {webUpdate = true}) async {
-    ref.refresh(activeProject.notifier).state = data;
+    ref.read(activeProject.notifier).state = data;
+    var result = true;
     if (webUpdate) {
-      var result = await WebApi.updateProject(data);
-      if (result) updateDbProject(ref, data);
+      result = await WebApi.updateProject(data);
+    }
+    if (result) updateDbProject(ref, data);
+    return result;
+  }
+
+  static Future<bool> updateColumn(WidgetRef ref, ColumnModelData data,
+      {webUpdate = true}) async {
+    ref.read(activeColumn.notifier).state = data;
+    if (webUpdate) {
+      var result = await WebApi.updateColumn(data);
+      if (result) updateDbColumn(ref, data);
       return result;
     }
     return true;
   }
 
-  static Future<TaskMetadataModelData?> retrieveTaskMetadata(WidgetRef ref, int taskId,
+  static Future<TaskMetadataModelData?> retrieveTaskMetadata(
+      WidgetRef ref, int taskId,
       {webUpdate = true}) async {
     var data = await WebApi.getTaskMetadata(taskId);
     if (data["task_id"] == null) {
@@ -82,11 +93,12 @@ class Api {
     return updateDbTaskMetadata(ref, data);
   }
 
-  static Future<TaskMetadataModelData?> retrieveActiveTaskMetadata(WidgetRef ref,
+  static Future<TaskMetadataModelData?> retrieveActiveTaskMetadata(
+      WidgetRef ref,
       {webUpdate = true}) async {
     var task = ref.read(activeTask)!;
     var metadata = retrieveTaskMetadata(ref, task.id);
-    ref.refresh(activeTaskMetadata.notifier).state = await metadata;
+    ref.read(activeTaskMetadata.notifier).state = await metadata;
     return metadata;
   }
 

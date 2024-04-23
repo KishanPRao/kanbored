@@ -6,18 +6,6 @@ import 'package:json_annotation/json_annotation.dart' as j;
 part 'converters.g.dart';
 
 // MARK: TaskMetadata
-@j.JsonSerializable()
-class TaskMetadata {
-  List<ChecklistMetadata> checklists;
-
-  TaskMetadata(this.checklists);
-
-  factory TaskMetadata.fromJson(Map<String, dynamic> json) =>
-      _$TaskMetadataFromJson(json);
-
-  Map<String, dynamic> toJson() => _$TaskMetadataToJson(this);
-}
-
 class TaskMetadataConverter extends TypeConverter<TaskMetadata, String>
     with JsonTypeConverter2<TaskMetadata, String, String> {
   const TaskMetadataConverter();
@@ -35,6 +23,18 @@ class TaskMetadataConverter extends TypeConverter<TaskMetadata, String>
 
   @override
   String toSql(TaskMetadata value) => jsonEncode(value);
+}
+
+@j.JsonSerializable()
+class TaskMetadata {
+  List<ChecklistMetadata> checklists;
+
+  TaskMetadata(this.checklists);
+
+  factory TaskMetadata.fromJson(Map<String, dynamic> json) =>
+      _$TaskMetadataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TaskMetadataToJson(this);
 }
 
 @j.JsonSerializable()
@@ -64,19 +64,6 @@ class CheckListItemMetadata {
 }
 
 // MARK: Url
-@j.JsonSerializable()
-class Url {
-  String board;
-  String list;
-  String? calendar;
-
-  Url(this.board, this.list, {this.calendar});
-
-  factory Url.fromJson(Map<String, dynamic> json) => _$UrlFromJson(json);
-
-  Map<String, dynamic> toJson() => _$UrlToJson(this);
-}
-
 class UrlConverter extends TypeConverter<Url, String>
     with JsonTypeConverter2<Url, String, Map<String, dynamic>> {
   const UrlConverter();
@@ -93,4 +80,17 @@ class UrlConverter extends TypeConverter<Url, String>
 
   @override
   String toSql(Url value) => jsonEncode(value);
+}
+
+@j.JsonSerializable()
+class Url {
+  String board;
+  String list;
+  String? calendar;
+
+  Url(this.board, this.list, {this.calendar});
+
+  factory Url.fromJson(Map<String, dynamic> json) => _$UrlFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UrlToJson(this);
 }

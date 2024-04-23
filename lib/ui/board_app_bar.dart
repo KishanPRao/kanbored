@@ -9,6 +9,7 @@ import 'package:kanbored/db/database.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/board_action_listener.dart';
+import 'package:kanbored/ui/ui_state.dart';
 import 'package:kanbored/utils.dart';
 
 class BoardAppBarAction extends AppBarAction {
@@ -40,7 +41,7 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
     super.initState();
     // projectModel = widget.projectModel;
     projectModel = ref.read(activeProject)!;
-    showArchived = ref.read(boardShowArchived);
+    showArchived = ref.read(UiState.boardShowArchived);
   }
 
   @override
@@ -71,6 +72,7 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
     // projectModel.isActive = !projectModel.isActive;
     var updatedProject =
         projectModel.copyWith(isActive: 1 - projectModel.isActive);
+    // Update local state, then use different API
     Api.updateProject(ref, updatedProject, webUpdate: false);
     (updatedProject.isActive == 1
             ? WebApi.enableProject(projectModel.id)
@@ -175,7 +177,7 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
     if (projectModel != null) {
       this.projectModel = projectModel;
     }
-    showArchived = ref.watch(boardShowArchived);
+    showArchived = ref.watch(UiState.boardShowArchived);
     return super.build(context);
   }
 }

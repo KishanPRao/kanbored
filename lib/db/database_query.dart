@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:drift/drift.dart';
 import 'package:kanbored/db/database.dart';
 
 extension AppDatabaseQuery on AppDatabase {
@@ -26,7 +29,17 @@ extension AppDatabaseQuery on AppDatabase {
       return const Stream.empty();
     }
     final query = select(taskModel)
-      ..where((tbl) => tbl.projectId.equals(projectId));
+      ..where((tbl) => tbl.projectId.equals(projectId))
+      ..orderBy([(t) => OrderingTerm(expression: t.position)]);
+    return query.watch();
+  }
+
+  Stream<List<TaskModelData>> tasksInColumn(int columnId) {
+    final query = select(taskModel)
+      ..where((tbl) {
+        return tbl.columnId.equals(columnId);
+      })
+      ..orderBy([(t) => OrderingTerm(expression: t.position)]);
     return query.watch();
   }
 }
