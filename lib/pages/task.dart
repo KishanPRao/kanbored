@@ -210,14 +210,14 @@ class _TaskState extends State<Task> {
             TaskAppBarActions(
               key: keyTaskAppBarActionsState,
               taskModel: taskModel,
-              abActionListener: AppBarActionListener(
-                onChange: onChange,
-                onEditStart: (_, __) => onEditStart(0, []),
-                onEditEnd: onEditEnd,
-                onDelete: onDelete,
-                onMainAction: onCreateChecklist,
-                refreshUi: refreshUi,
-              ),
+              // abActionListener: AppBarActionListener(
+              //   onChange: onChange,
+              //   onEditStart: (_, __) => onEditStart(0, []),
+              //   onEditEnd: onEditEnd,
+              //   onDelete: onDelete,
+              //   onMainAction: onCreateChecklist,
+              //   refreshUi: refreshUi,
+              // ),
             )
           ]),
       body: Column(children: [

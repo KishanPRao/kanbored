@@ -6,13 +6,14 @@ import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
+import 'package:kanbored/ui/ui_state.dart';
 import 'package:kanbored/utils.dart';
 
 class TaskAppBarActions extends AppBarActions {
   final TaskModel taskModel;
 
   const TaskAppBarActions(
-      {super.key, required this.taskModel, required super.abActionListener});
+      {super.key, required this.taskModel});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => TaskAppBarActionsState();
@@ -35,7 +36,16 @@ class TaskAppBarActionsState extends AppBarActionsState<TaskAppBarActions> {
       };
 
   @override
-  void delete() => abActionListener.onDelete();
+  void delete() {
+    // abActionListener.onDelete();
+    log("task, delete");
+    ref.read(UiState.boardActiveState.notifier).state?.currentState?.delete();
+  }
+
+  @override
+  void mainAction() {
+    log("task main");
+  }
 
   // TODO: find out why re-build invoked
   @override
@@ -51,8 +61,8 @@ class TaskAppBarActionsState extends AppBarActionsState<TaskAppBarActions> {
           Utils.showErrorSnackbar(context, "Could not update task");
         } else {
           // TODO: bug: Does not refresh archived list
-          abActionListener.refreshUi();
-          log("Updated task");
+          // abActionListener.refreshUi();
+          log("arch/unarch updated task??");
         }
       }).catchError((e) => Utils.showErrorSnackbar(context, e));
     } else if (action == "delete".resc()) {
@@ -70,7 +80,8 @@ class TaskAppBarActionsState extends AppBarActionsState<TaskAppBarActions> {
         taskModel.title = title;
         WebApi.updateTask(taskModel).then((result) {
           if (result) {
-            abActionListener.refreshUi();
+            // abActionListener.refreshUi();
+            log("rename task??");
           } else {
             Utils.showErrorSnackbar(context, "Could not rename task");
           }
@@ -84,10 +95,7 @@ class TaskAppBarActionsState extends AppBarActionsState<TaskAppBarActions> {
     switch (action) {
       case AppBarAction.kMain:
         return IconButton(
-          onPressed: () {
-            log("Add checklist");
-            abActionListener.onMainAction?.call();
-          },
+          onPressed: mainAction,
           icon: const Icon(Icons.format_list_bulleted_add),
           tooltip: "tt_add_checklist".resc(),
         );

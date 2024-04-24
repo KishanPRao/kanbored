@@ -111,16 +111,16 @@ class _HomeState extends ConsumerState<Home> {
           actions: [
             ProjectAppBarActions(
               // key: keyAppBarActionsState,
-              showArchived: showArchived,
-              abActionListener: ProjectActionListener(
-                onArchived: onArchived,
-                onChange: onChange,
-                onEditStart: (_, __) => {},
-                onEditEnd: onEditEnd,
-                onDelete: onDelete,
-                onMainAction: onAddProject,
-                refreshUi: refreshUi,
-              ),
+              // showArchived: showArchived,
+              // abActionListener: ProjectActionListener(
+              //   onArchived: onArchived,
+              //   onChange: onChange,
+              //   onEditStart: (_, __) => {},
+              //   onEditEnd: onEditEnd,
+              //   onDelete: onDelete,
+              //   onMainAction: onAddProject,
+              //   refreshUi: refreshUi,
+              // ),
             )
           ],
         ),

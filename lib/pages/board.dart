@@ -8,7 +8,7 @@ import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/constants.dart';
 import 'package:kanbored/db/database.dart';
 import 'package:kanbored/strings.dart';
-import 'package:kanbored/ui/board_action_listener.dart';
+import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/board_app_bar.dart';
 import 'package:kanbored/ui/board_column.dart';
 import 'package:kanbored/ui/editing_state.dart';
@@ -220,146 +220,83 @@ class _BoardState extends ConsumerState<Board> {
     //     },
     //     error: (e, s) {},
     //     loading: () {});
-    return Scaffold(
-        backgroundColor: "pageBg".themed(context),
-        floatingActionButton: buildSearchFab(context, () {
-          Navigator.pushNamed(context, routeSearch, arguments: [
-            /*projectModel, boards*/
-          ]).then((value) {
-            // TODO: jump to active column
-            // if (value is ColumnModel) {
-            //   var showArchived = !value.isActive;
-            //   var columns = (showArchived
-            //       ? boards.first.inactiveColumns
-            //       : boards.first.activeColumns);
-            //   onArchived(showArchived);
-            //   for (int i = 0; i < columns.length; i++) {
-            //     var c = columns[i];
-            //     if (c.title == value.title && c.position == value.position) {
-            //       WidgetsBinding.instance.addPostFrameCallback((_) {
-            //         // TODO: need more testing; after archive state fixed
-            //         controller.jumpTo(columnWidth * i);
-            //       });
-            //       break;
-            //     }
-            //   }
-            // }
-          });
-        }),
-        appBar: AppBar(
-          title: Text(projectModel.name),
-          backgroundColor: "primary".themed(context),
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(Icons.arrow_back),
-          ),
-          actions: [
-            BoardAppBarActions(
-              key: keyAppBarActionsState,
-              abActionListener: BoardActionListener(
-                onArchive: onArchive,
-                onUnarchive: onUnarchive,
-                onArchived: onArchived,
-                onChange: onChange,
-                onEditStart: (_, __) => {},
-                onEditEnd: onEditEnd,
-                onDelete: onDelete,
-                onMainAction: onAddColumn,
-                refreshUi: refreshUi,
-                isArchived: isArchived,
+    return PopScope(
+        onPopInvoked: (didPop) {
+          log("onPopInvoked: $didPop");
+          ref.read(UiState.boardEditing.notifier).state = false;
+          // ref.read(UiState.boardActions.notifier).state = AppBarActionsState.defaultActions;
+        },
+        child: Scaffold(
+            backgroundColor: "pageBg".themed(context),
+            floatingActionButton: buildSearchFab(context, () {
+              Navigator.pushNamed(context, routeSearch, arguments: [
+                /*projectModel, boards*/
+              ]).then((value) {
+                // TODO: jump to active column
+                // if (value is ColumnModel) {
+                //   var showArchived = !value.isActive;
+                //   var columns = (showArchived
+                //       ? boards.first.inactiveColumns
+                //       : boards.first.activeColumns);
+                //   onArchived(showArchived);
+                //   for (int i = 0; i < columns.length; i++) {
+                //     var c = columns[i];
+                //     if (c.title == value.title && c.position == value.position) {
+                //       WidgetsBinding.instance.addPostFrameCallback((_) {
+                //         // TODO: need more testing; after archive state fixed
+                //         controller.jumpTo(columnWidth * i);
+                //       });
+                //       break;
+                //     }
+                //   }
+                // }
+              });
+            }),
+            appBar: AppBar(
+              title: Text(projectModel.name),
+              backgroundColor: "primary".themed(context),
+              leading: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.arrow_back),
               ),
-            )
-          ],
-        ),
-        // TODO: handle swimlane! Take only first board?
-        body: RefreshIndicator(
-            // trigger the _loadData function when the user pulls down
-            onRefresh: () {
-              refreshUi();
-              return Utils.emptyFuture();
-            },
-            child: Column(children: [
-              showArchived
-                  ? Card(
-                      clipBehavior: Clip.hardEdge,
-                      color: "archivedBg".themed(context),
-                      child: SizedBox(
-                        child: Center(child: Text("archived_col".resc())),
-                      ))
-                  : Utils.emptyUi(),
-              columnsStream
-            ])
-            // columns.when(
-            //     data: (columns) {
-            //       log("cols: ${columns.length}");
-            //       return Column(
-            //         children: [
-            //           showArchived
-            //               ? Card(
-            //                   clipBehavior: Clip.hardEdge,
-            //                   color: "archivedBg".themed(context),
-            //                   child: SizedBox(
-            //                     child:
-            //                         Center(child: Text("archived_col".resc())),
-            //                   ))
-            //               : Utils.emptyUi(),
-            //           // TODO: move each ui element into a function or class?
-            //           // TODO: Keep a setting to enable swimlane info; default disabled; give warning on possible limitations; or keep it simple, avoid using it.
-            //           Expanded(
-            //               child: ListView(
-            //             // TODO: perf: better approach; everything causes refresh
-            //             shrinkWrap: true,
-            //             controller: controller,
-            //             scrollDirection: Axis.horizontal,
-            //             children: columns.mapIndexed((entry) {
-            //               var index = entry.key;
-            //               var column = entry.value;
-            //               // log("col map: ${column.title}");
-            //               return SizedBox(
-            //                   width: columnWidth,
-            //                   child: BoardColumn(
-            //                     key: ObjectKey(column),
-            //                     column: column,
-            //                     // projectMetadataModel: projectMetadataModel,
-            //                     keysEditableText: keysEditableText,
-            //                     baseIdx: (index * 2),
-            //                     abActionListener: BoardActionListener(
-            //                       onChange: onChange,
-            //                       onEditStart: (idx, actions) =>
-            //                           onEditStart((index * 2) + idx!, actions),
-            //                       onEditEnd: onEditEnd,
-            //                       onDelete: onDelete,
-            //                       isArchived: isArchived,
-            //                       onMainAction: null,
-            //                       refreshUi: refreshUi,
-            //                       onArchive: () {},
-            //                       onUnarchive: () {},
-            //                       onArchived: (_) {},
-            //                     ),
-            //                   ));
-            //             }).toList(),
-            //           ))
-            //         ],
-            //       );
-            //     },
-            //     error: (e, s) {
-            //       log("error: $e");
-            //       // TODO: proper text label for error
-            //       return const Text('error');
-            //     },
-            //     loading: () => const Center(
-            //           child: CircularProgressIndicator(strokeWidth: 2),
-            //         ))
-            //     boards.map((board) {
-            //   var columns =
-            //       (showArchived ? board.inactiveColumns : board.activeColumns);
-            //   // for (var c in columns) {
-            //   //   log("Column: ${c.id}, ${c.isActive}, ${c.title}");
-            //   // };
-            // }).toList())),
-            ));
+              actions: [
+                BoardAppBarActions(
+                  key: keyAppBarActionsState,
+                  // abActionListener: BoardActionListener(
+                  //   onArchive: onArchive,
+                  //   onUnarchive: onUnarchive,
+                  //   onArchived: onArchived,
+                  //   onChange: onChange,
+                  //   onEditStart: (_, __) => {},
+                  //   onEditEnd: onEditEnd,
+                  //   onDelete: onDelete,
+                  //   onMainAction: onAddColumn,
+                  //   refreshUi: refreshUi,
+                  //   isArchived: isArchived,
+                  // ),
+                )
+              ],
+            ),
+            // TODO: handle swimlane! Take only first board?
+            body: RefreshIndicator(
+                // trigger the _loadData function when the user pulls down
+                onRefresh: () {
+                  refreshUi();
+                  return Utils.emptyFuture();
+                },
+                child: Column(children: [
+                  showArchived
+                      ? Card(
+                          clipBehavior: Clip.hardEdge,
+                          color: "archivedBg".themed(context),
+                          child: SizedBox(
+                            child: Center(child: Text("archived_col".resc())),
+                          ))
+                      : Utils.emptyUi(),
+                  columnsStream
+                ]))));
   }
 
   StreamBuilder<List<ColumnModelData>> buildColumnsStream(int projectId) {
