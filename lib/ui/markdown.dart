@@ -8,19 +8,25 @@ import 'package:kanbored/models/comment_model.dart';
 import 'package:kanbored/models/model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/strings.dart';
+import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/app_bar_action_listener.dart';
+import 'package:kanbored/ui/ui_state.dart';
 import 'package:kanbored/utils.dart';
 import 'package:markdown/markdown.dart' as md;
 
 class Markdown extends ConsumerStatefulWidget {
-  final Model model;
-  final AppBarActionListener abActionListener;
+  final String content;
+  final Function(String) onSaveCb;
+  // final Model model;
+  // final AppBarActionListener abActionListener;
 
   const Markdown({
     super.key,
-    required this.model,
-    required this.abActionListener,
+    required this.content,
+    required this.onSaveCb,
+    // required this.model,
+    // required this.abActionListener,
   });
 
   // final TextEditingController controller;
@@ -34,51 +40,63 @@ class Markdown extends ConsumerStatefulWidget {
 // NOTE: Assumes `TaskModel` is used for description, `CommentModel` for comments.
 class _MarkdownState extends EditableState<Markdown> {
   // final int maxLines = 8;
-  late Model model;
+  // late Model model;
   late TextEditingController controller;
-  late AppBarActionListener abActionListener;
-  bool editing = false;
+  // late AppBarActionListener abActionListener;
+  // bool editing = false;
   final FocusNode focusNode = FocusNode();
+  late String content;
+  late Function(String) onSaveCb;
 
   @override
   void initState() {
     super.initState();
-    model = widget.model;
-    abActionListener = widget.abActionListener;
-    controller = TextEditingController(text: getModelData());
+    // model = widget.model;
+    // abActionListener = widget.abActionListener;
+    content = widget.content;
+    onSaveCb = widget.onSaveCb;
+    controller = TextEditingController(text: content);
   }
 
-  String getModelData() {
-    var model = this.model;
-    if (model is TaskModel) {
-      return model.description;
-    } else if (model is CommentModel) {
-      return model.comment;
-    }
-    return "invalid".resc();
-  }
-
-  Future<bool> saveModelData() async {
-    var model = this.model;
-    if (model is TaskModel) {
-      model.description = controller.text;
-      log("Save desc: ${model.description}");
-      return await WebApi.updateTask(model);
-    } else if (model is CommentModel) {
-      model.comment = controller.text;
-      log("Save comment: ${model.comment}");
-      return await WebApi.updateComment(model);
-    }
-    return false;
-  }
+  // String getModelData() {
+  //   var model = this.model;
+  //   if (model is TaskModel) {
+  //     return model.description;
+  //   } else if (model is CommentModel) {
+  //     return model.comment;
+  //   }
+  //   return "invalid".resc();
+  // }
+  //
+  // Future<bool> saveModelData() async {
+  //   var model = this.model;
+  //   if (model is TaskModel) {
+  //     model.description = controller.text;
+  //     log("Save desc: ${model.description}");
+  //     return await WebApi.updateTask(model);
+  //   } else if (model is CommentModel) {
+  //     model.comment = controller.text;
+  //     log("Save comment: ${model.comment}");
+  //     return await WebApi.updateComment(model);
+  //   }
+  //   return false;
+  // }
 
   @override
   void startEdit() {
-    abActionListener.onChange(controller.text);
-    abActionListener.onEditStart(null, []);
-    setState(() {
-      editing = true;
-    });
+    ref.read(UiState.boardActiveState.notifier).state =
+    widget.key as GlobalKey<EditableState>;
+    ref.read(UiState.boardActiveText.notifier).state = controller.text;
+    ref.read(UiState.boardActions.notifier).state = [
+      AppBarAction.kDiscard,
+      AppBarAction.kDone
+    ];
+    ref.read(UiState.boardEditing.notifier).state = true;
+    // abActionListener.onChange(controller.text);
+    // abActionListener.onEditStart(null, []);
+    // setState(() {
+    //   editing = true;
+    // });
   }
 
   @override
@@ -86,19 +104,23 @@ class _MarkdownState extends EditableState<Markdown> {
     FocusManager.instance.primaryFocus?.unfocus();
     if (saveChanges) {
       // TODO
-      saveModelData().then((value) {
-        if (!value) {
-          Utils.showErrorSnackbar(context, "Could not save task");
-        }
-      }).onError((e, _) {
-        Utils.showErrorSnackbar(context, e);
-      });
+      content = controller.text;
+      onSaveCb(content);
+      // saveModelData().then((value) {
+      //   if (!value) {
+      //     Utils.showErrorSnackbar(context, "Could not save task");
+      //   }
+      // }).onError((e, _) {
+      //   Utils.showErrorSnackbar(context, e);
+      // });
     } else {
-      controller.text = getModelData();
+      // controller.text = getModelData();
+      controller.text = content;
+      ref.read(UiState.boardEditing.notifier).state = false;
     }
-    setState(() {
-      editing = false;
-    });
+    // setState(() {
+    //   editing = false;
+    // });
     // FocusManager.instance.primaryFocus?.unfocus();
     // if (saveChanges) {
     //   log("Update : ${controller.text}");
@@ -111,28 +133,28 @@ class _MarkdownState extends EditableState<Markdown> {
     // }
     // FocusManager.instance.primaryFocus?.unfocus();
   }
-
-  void deleteComment(CommentModel model) {
-    abActionListener.onEditEnd(false);
-    Utils.showAlertDialog(context, "${'delete'.resc()} `${model.comment}`?",
-        "alert_del_content".resc(), () {
-      WebApi.removeComment(model.id).then((value) {
-        if (!value) {
-          Utils.showErrorSnackbar(context, "Could not delete comment");
-        } else {
-          abActionListener.refreshUi();
-        }
-      }).onError((e, _) => Utils.showErrorSnackbar(context, e));
-    });
-  }
+  //
+  // void deleteComment(CommentModel model) {
+  //   abActionListener.onEditEnd(false);
+  //   Utils.showAlertDialog(context, "${'delete'.resc()} `${model.comment}`?",
+  //       "alert_del_content".resc(), () {
+  //     WebApi.removeComment(model.id).then((value) {
+  //       if (!value) {
+  //         Utils.showErrorSnackbar(context, "Could not delete comment");
+  //       } else {
+  //         abActionListener.refreshUi();
+  //       }
+  //     }).onError((e, _) => Utils.showErrorSnackbar(context, e));
+  //   });
+  // }
 
   @override
   void delete() {
     log("mkdown: delete");
-    var model = this.model;
-    if (model is CommentModel) {
-      deleteComment(model);
-    }
+    // var model = this.model;
+    // if (model is CommentModel) {
+    //   deleteComment(model);
+    // }
   }
 
   void updateFocus() {
@@ -144,6 +166,7 @@ class _MarkdownState extends EditableState<Markdown> {
   Widget build(BuildContext context) {
     TextSelection currentSelection =
         const TextSelection(baseOffset: 0, extentOffset: 0);
+    final editing = ref.read(UiState.boardEditing);
     return Container(
       margin: const EdgeInsets.all(5),
       color: (editing ? "descEditBg" : "descBg").themed(context),
@@ -158,24 +181,27 @@ class _MarkdownState extends EditableState<Markdown> {
                 controller: controller,
                 focusNode: focusNode,
                 onTap: () {
-                  abActionListener.onChange(controller.text);
-                  abActionListener.onEditStart(null, []);
+                  startEdit();
+                  // abActionListener.onChange(controller.text);
+                  // abActionListener.onEditStart(null, []);
                 },
-                onChanged: abActionListener.onChange,
+                onChanged: (value) => ref.read(UiState.boardActiveText.notifier).state = value,
                 onEditingComplete: () {
-                  abActionListener.onEditEnd(true);
+                  endEdit(true);
+                  // abActionListener.onEditEnd(true);
                 },
               ))
           : GestureDetector(
               onTap: () {
                 updateFocus();
                 log("onTap Gesture");
-                abActionListener.onChange(controller.text);
-                abActionListener.onEditStart(null, []);
-                // focusNode.requestFocus();
-                setState(() {
-                  editing = true;
-                });
+                startEdit();
+                // abActionListener.onChange(controller.text);
+                // abActionListener.onEditStart(null, []);
+                // // focusNode.requestFocus();
+                // setState(() {
+                //   editing = true;
+                // });
               },
               child: flmd.Markdown(
                 controller: ScrollController(),
@@ -195,11 +221,11 @@ class _MarkdownState extends EditableState<Markdown> {
                   log("onTapText");
                   updateFocus();
                   controller.selection = currentSelection;
-                  abActionListener.onChange(controller.text);
-                  abActionListener.onEditStart(null, []);
-                  setState(() {
-                    editing = true;
-                  });
+                  // abActionListener.onChange(controller.text);
+                  // abActionListener.onEditStart(null, []);
+                  // setState(() {
+                  //   editing = true;
+                  // });
                 }
                 // onChange(controller.text);
                 ,

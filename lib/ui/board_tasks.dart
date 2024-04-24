@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/state.dart';
 import 'package:kanbored/constants.dart';
 import 'package:kanbored/db/database.dart';
 import 'package:kanbored/strings.dart';
@@ -35,10 +36,10 @@ class BoardTasksState extends ConsumerState<BoardTasks> {
   }
 
   StreamBuilder<List<TaskModelData>> buildTasksStream() {
-    final tasksDao = ref.read(AppDatabase.provider).taskDao;
+    final taskDao = ref.read(AppDatabase.provider).taskDao;
     return StreamBuilder(
         // TODO: distinct matters?
-        stream: tasksDao.watchTasksInColumn(column.id).distinct(),
+        stream: taskDao.watchTasksInColumn(column.id).distinct(),
         builder: (context, AsyncSnapshot<List<TaskModelData>> snapshot) {
           // NOTE: assume rebuilt by column on change of archive, just read
           final showArchived = ref.read(UiState.boardShowArchived);
@@ -81,7 +82,8 @@ class BoardTasksState extends ConsumerState<BoardTasks> {
             splashColor: "cardHighlight".themed(context),
             highlightColor: "cardHighlight".themed(context),
             onTap: () {
-              Navigator.pushNamed(context, routeTask, arguments: task);
+              ref.read(activeTask.notifier).state = task;
+              Navigator.pushNamed(context, routeTask);
             },
             child: Padding(
               padding: const EdgeInsets.all(10.0),

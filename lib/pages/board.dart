@@ -202,8 +202,8 @@ class _BoardState extends ConsumerState<Board> {
     //     tasksDao.addTask(taskJson);
     //   }, child: Text("ADD"))]),
     // );
-    final projectModel = ref.read(activeProject);
-    final showArchived = ref.read(UiState.boardShowArchived);
+    final projectModel = ref.watch(activeProject);
+    final showArchived = ref.watch(UiState.boardShowArchived);
     // if (!isLoaded || projectModel == null) {
     if (projectModel == null) {
       return Utils.emptyUi();

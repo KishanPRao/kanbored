@@ -1,6 +1,9 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/state.dart';
 import 'package:kanbored/api/web_api.dart';
+import 'package:kanbored/db/database.dart';
 import 'package:kanbored/models/comment_model.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
@@ -16,44 +19,44 @@ import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/ui/task_app_bar.dart';
 import 'package:kanbored/utils.dart';
 
-class Task extends StatefulWidget {
+class Task extends ConsumerStatefulWidget {
   const Task({super.key});
 
   @override
-  State<StatefulWidget> createState() => _TaskState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _TaskState();
 }
 
-class _TaskState extends State<Task> {
+class _TaskState extends ConsumerState<Task> {
   late int taskId;
   late int projectId;
-  late TaskModel taskModel;
+  // late TaskModelData taskModel;
   List<SubtaskModel> subtasks = [];
   TaskMetadataModel taskMetadata = TaskMetadataModel(checklists: []);
   List<CommentModel> comments = [];
-  GlobalKey<TaskAppBarActionsState> keyTaskAppBarActionsState = GlobalKey();
-  List<GlobalKey<EditableState>> keysEditableText = [];
-  var activeEditIndex = 0;
-  var activeEditText = "";
-  var isLoaded = false;
+  // GlobalKey<TaskAppBarActionsState> keyTaskAppBarActionsState = GlobalKey();
+  // List<GlobalKey<EditableState>> keysEditableText = [];
+  // var activeEditIndex = 0;
+  // var activeEditText = "";
+  // var isLoaded = false;
   static const kDescriptionCount = 1;
   static const kAddCommentCount = 1;
-
-  @override
-  void didChangeDependencies() {
-    if (!isLoaded) {
-      var args = ModalRoute.of(context)?.settings.arguments;
-      if (args is TaskModel) {
-        taskModel = args;
-        taskId = taskModel.id;
-        projectId = taskModel.projectId;
-      } else if (args is List<int>) {
-        taskId = args[0];
-        projectId = args[1];
-      }
-      init();
-    }
-    super.didChangeDependencies();
-  }
+  //
+  // @override
+  // void didChangeDependencies() {
+  //   if (!isLoaded) {
+  //     var args = ModalRoute.of(context)?.settings.arguments;
+  //     if (args is TaskModel) {
+  //       taskModel = args;
+  //       taskId = taskModel.id;
+  //       projectId = taskModel.projectId;
+  //     } else if (args is List<int>) {
+  //       taskId = args[0];
+  //       projectId = args[1];
+  //     }
+  //     init();
+  //   }
+  //   super.didChangeDependencies();
+  // }
 
   void init() async {
     // log("init");
@@ -126,48 +129,48 @@ class _TaskState extends State<Task> {
   }
 
   void onChange(text) {
-    activeEditText = text;
-    // keyTaskAppBarActionsState.currentState?.updateText(text);
+    // activeEditText = text;
+    // // keyTaskAppBarActionsState.currentState?.updateText(text);
   }
 
   void onEditStart(int index, List<int> actions) {
     log("onEditStart: $index");
-    activeEditIndex = index;
-    keyTaskAppBarActionsState.currentState?.currentActions = actions;
-    keyTaskAppBarActionsState.currentState?.startEdit();
+    // activeEditIndex = index;
+    // keyTaskAppBarActionsState.currentState?.currentActions = actions;
+    // keyTaskAppBarActionsState.currentState?.startEdit();
   }
 
   // TODO: needed?
   bool onEditEnd(bool saveChanges) {
-    if (saveChanges && activeEditIndex != 0 && activeEditText.isEmpty) {
-      return false;
-    }
-    log("onEditEnd: $activeEditIndex, $saveChanges");
-    keysEditableText[activeEditIndex].currentState?.endEdit(saveChanges);
-    keyTaskAppBarActionsState.currentState?.endEdit(saveChanges);
-    // setState(() {});
+    // if (saveChanges && activeEditIndex != 0 && activeEditText.isEmpty) {
+    //   return false;
+    // }
+    // log("onEditEnd: $activeEditIndex, $saveChanges");
+    // keysEditableText[activeEditIndex].currentState?.endEdit(saveChanges);
+    // keyTaskAppBarActionsState.currentState?.endEdit(saveChanges);
+    // // setState(() {});
     return true;
   }
 
   void onDelete() {
-    log("onDelete");
-    keysEditableText[activeEditIndex].currentState?.delete();
+    // log("onDelete");
+    // keysEditableText[activeEditIndex].currentState?.delete();
   }
 
   void onCreateChecklist() {
-    var checklist = CheckListMetadata(
-        name: "Checklist",
-        position: taskMetadata.checklists.length + 1,
-        items: []);
-    taskMetadata.checklists.add(checklist);
-    WebApi.saveTaskMetadata(taskModel.id, taskMetadata).then((value) {
-      if (!value) {
-        Utils.showErrorSnackbar(context, "Could not save task metadata");
-      } else {
-        log("stored new task metadata: $taskMetadata");
-        refreshUi();
-      }
-    }).catchError((e) => Utils.showErrorSnackbar(context, e));
+    // var checklist = CheckListMetadata(
+    //     name: "Checklist",
+    //     position: taskMetadata.checklists.length + 1,
+    //     items: []);
+    // taskMetadata.checklists.add(checklist);
+    // WebApi.saveTaskMetadata(taskModel.id, taskMetadata).then((value) {
+    //   if (!value) {
+    //     Utils.showErrorSnackbar(context, "Could not save task metadata");
+    //   } else {
+    //     log("stored new task metadata: $taskMetadata");
+    //     refreshUi();
+    //   }
+    // }).catchError((e) => Utils.showErrorSnackbar(context, e));
   }
 
   void refreshUi() {
@@ -185,10 +188,12 @@ class _TaskState extends State<Task> {
 
   @override
   Widget build(BuildContext context) {
+    final taskModel = ref.watch(activeTask);
+    if (taskModel == null) return Utils.emptyUi();
     // Do not load until some data is retrieved
-    if (!isLoaded) {
-      return Utils.emptyUi();
-    }
+    // if (!isLoaded) {
+    //   return Utils.emptyUi();
+    // }
 
     ScrollController scrollController = ScrollController();
     var checklistSubtaskCount =
@@ -208,8 +213,8 @@ class _TaskState extends State<Task> {
           ),
           actions: [
             TaskAppBarActions(
-              key: keyTaskAppBarActionsState,
-              taskModel: taskModel,
+              // key: keyTaskAppBarActionsState,
+              // taskModel: taskModel,
               // abActionListener: AppBarActionListener(
               //   onChange: onChange,
               //   onEditStart: (_, __) => onEditStart(0, []),
@@ -221,7 +226,7 @@ class _TaskState extends State<Task> {
             )
           ]),
       body: Column(children: [
-        taskModel.isActive
+        taskModel.isActive == 1
             ? Utils.emptyUi()
             : Card(
                 clipBehavior: Clip.hardEdge,
@@ -236,82 +241,85 @@ class _TaskState extends State<Task> {
                 scrollDirection: Axis.vertical,
                 controller: scrollController,
                 children: <Widget>[
-                      Markdown(
-                          key: keysEditableText[0],
-                          model: taskModel,
-                          abActionListener: AppBarActionListener(
-                            onChange: onChange,
-                            onEditStart: (_, __) => onEditStart(
-                                0, [AppBarAction.kDiscard, AppBarAction.kDone]),
-                            onEditEnd: (saveChanges) {
-                              // TODO: allow empty desc, default hint text
-                              // updateDescription()
-                              return onEditEnd(saveChanges);
-                            },
-                            onDelete: onDelete,
-                            refreshUi: refreshUi,
-                          ))
-                    ] +
-                    buildSubtasks(
-                        context,
-                        taskModel,
-                        subtasks,
-                        taskMetadata,
-                        keysEditableText,
-                        AppBarActionListener(
-                          onChange: onChange,
-                          onEditStart: (index, actions) =>
-                              onEditStart(index!, actions),
-                          onEditEnd: onEditEnd,
-                          onDelete: onDelete,
-                          refreshUi: refreshUi,
-                        ),
-                        toggleStatus) +
-                    [
-                      AddComment(
-                          key: keysEditableText[
-                              checklistSubtaskCount + kDescriptionCount],
-                          task: taskModel,
-                          abActionListener: AppBarActionListener(
-                            onChange: onChange,
-                            onEditStart: (_, actions) => onEditStart(
-                                checklistSubtaskCount + kDescriptionCount,
-                                actions),
-                            onEditEnd: onEditEnd,
-                            onDelete: onDelete,
-                            refreshUi: refreshUi,
-                          ))
-                    ] +
-                    comments.mapIndexed((entry) {
-                      // TODO: Move into Comment & Description ui class, wrap Markdown
-                      int idx = entry.key;
-                      CommentModel comment = entry.value;
-                      return Markdown(
-                          key: keysEditableText[idx +
-                              checklistSubtaskCount +
-                              kDescriptionCount +
-                              kAddCommentCount],
-                          model: comment,
-                          abActionListener: AppBarActionListener(
-                            onChange: onChange,
-                            onEditStart: (_, __) => onEditStart(
-                                idx +
-                                    checklistSubtaskCount +
-                                    kDescriptionCount +
-                                    kAddCommentCount,
-                                [
-                                  AppBarAction.kDelete,
-                                  AppBarAction.kDiscard,
-                                  AppBarAction.kDone
-                                ]),
-                            onEditEnd: (saveChanges) {
-                              // updateComment()
-                              return onEditEnd(saveChanges);
-                            },
-                            onDelete: onDelete,
-                            refreshUi: refreshUi,
-                          ));
-                    }).toList()
+                      Markdown(content: taskModel.description, onSaveCb: (text) {
+                        log("save mkdown desc");
+                      },
+                          // key: keysEditableText[0],
+                          // model: taskModel,
+                          // abActionListener: AppBarActionListener(
+                          //   onChange: onChange,
+                          //   onEditStart: (_, __) => onEditStart(
+                          //       0, [AppBarAction.kDiscard, AppBarAction.kDone]),
+                          //   onEditEnd: (saveChanges) {
+                          //     // TODO: allow empty desc, default hint text
+                          //     // updateDescription()
+                          //     return onEditEnd(saveChanges);
+                          //   },
+                          //   onDelete: onDelete,
+                          //   refreshUi: refreshUi,
+                          // )
+                      )
+                    ]
+                    // buildSubtasks(
+                    //     context,
+                    //     taskModel,
+                    //     subtasks,
+                    //     taskMetadata,
+                    //     keysEditableText,
+                    //     AppBarActionListener(
+                    //       onChange: onChange,
+                    //       onEditStart: (index, actions) =>
+                    //           onEditStart(index!, actions),
+                    //       onEditEnd: onEditEnd,
+                    //       onDelete: onDelete,
+                    //       refreshUi: refreshUi,
+                    //     ),
+                    //     toggleStatus) +
+                    // [
+                    //   AddComment(
+                    //       key: keysEditableText[
+                    //           checklistSubtaskCount + kDescriptionCount],
+                    //       task: taskModel,
+                    //       abActionListener: AppBarActionListener(
+                    //         onChange: onChange,
+                    //         onEditStart: (_, actions) => onEditStart(
+                    //             checklistSubtaskCount + kDescriptionCount,
+                    //             actions),
+                    //         onEditEnd: onEditEnd,
+                    //         onDelete: onDelete,
+                    //         refreshUi: refreshUi,
+                    //       ))
+                    // ] +
+                    // comments.mapIndexed((entry) {
+                    //   // TODO: Move into Comment & Description ui class, wrap Markdown
+                    //   int idx = entry.key;
+                    //   CommentModel comment = entry.value;
+                    //   return Markdown(
+                    //       key: keysEditableText[idx +
+                    //           checklistSubtaskCount +
+                    //           kDescriptionCount +
+                    //           kAddCommentCount],
+                    //       model: comment,
+                    //       abActionListener: AppBarActionListener(
+                    //         onChange: onChange,
+                    //         onEditStart: (_, __) => onEditStart(
+                    //             idx +
+                    //                 checklistSubtaskCount +
+                    //                 kDescriptionCount +
+                    //                 kAddCommentCount,
+                    //             [
+                    //               AppBarAction.kDelete,
+                    //               AppBarAction.kDiscard,
+                    //               AppBarAction.kDone
+                    //             ]),
+                    //         onEditEnd: (saveChanges) {
+                    //           // updateComment()
+                    //           return onEditEnd(saveChanges);
+                    //         },
+                    //         onDelete: onDelete,
+                    //         refreshUi: refreshUi,
+                    //       ));
+                    // }).toList()
                 // markDownEditor.inPlace()
                 // Markdown(
                 //     data: comment.comment,

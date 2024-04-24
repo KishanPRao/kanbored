@@ -3,12 +3,15 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/api.dart';
+import 'package:kanbored/api/state.dart';
+import 'package:kanbored/constants.dart';
 import 'package:kanbored/db/database.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/sizes.dart';
 import 'package:kanbored/ui/ui_state.dart';
+import 'package:kanbored/utils.dart';
 
 class AddTask extends ConsumerStatefulWidget {
   // final AppBarActionListener abActionListener;
@@ -105,20 +108,26 @@ class AddTaskState extends EditableState<AddTask> {
   }
 
   @override
-  void endEdit(bool saveChanges) async {
+  void endEdit(bool saveChanges) {
     log("add task, endEdit: $saveChanges");
     if (saveChanges) {
       log("Add a new task: ${controller.text}, into task: ${columnModel.title}");
-        // final tasksDao = ref.read(AppDatabase.provider).taskDao;
-        // tasksDao.addTask(taskJson);
-      Api.createTask(ref, columnModel.projectId, columnModel.id, controller.text);
-      // WebApi.createTask(columnModel.projectId, columnModel.id, controller.text)
-      //     .then((taskId) {
-        controller.text = "";
-      //   // abActionListener.refreshUi();
-      //   Navigator.pushNamed(context, routeTask,
-      //       arguments: [taskId, columnModel.projectId]);
-      // }).onError((e, st) => Utils.showErrorSnackbar(context, e));
+      // final tasksDao = ref.read(AppDatabase.provider).taskDao;
+      // tasksDao.addTask(taskJson);
+      Api.createTask(
+        ref,
+        columnModel.projectId,
+        columnModel.id,
+        controller.text,
+      ).then((taskId) async {
+        if (taskId is int) {
+          controller.text = "";
+          final taskDao = ref.read(AppDatabase.provider).taskDao;
+          ref.read(activeTask.notifier).state = await taskDao.getTask(taskId);
+          // TODO: await, bad idea?
+          Navigator.pushNamed(context, routeTask);
+        }
+      }).onError((e, st) => Utils.showErrorSnackbar(context, e));
     } else {
       controller.text = "";
     }

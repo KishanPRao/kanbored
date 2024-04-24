@@ -133,7 +133,7 @@ class WebApi {
       setApi("updateColumn", 480740641,
           params: [model.id, model.title, model.taskLimit, model.description]);
 
-  static Future<bool> updateTask(TaskModel taskModel) async =>
+  static Future<bool> updateTask(TaskModelData taskModel) async =>
       setApi("updateTask", 1406803059,
           params: taskModel.toJsonWithKeys([
                 "id",
