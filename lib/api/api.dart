@@ -28,7 +28,10 @@ class Api {
   static void updateColumns(WidgetRef ref, int projectId, {recurring = false}) {
     function() {
       WebApi.getColumns(projectId).then((items) async {
-        updateDbColumns(ref, items);
+        // TODO: alt approach?
+        if (ref.context.mounted) {
+          updateDbColumns(ref, items);
+        }
       });
     }
 

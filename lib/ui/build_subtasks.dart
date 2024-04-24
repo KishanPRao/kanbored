@@ -148,30 +148,30 @@ Widget buildChecklistHeader(
           onDelete: abActionListener.onDelete,
           refreshUi: abActionListener.refreshUi,
         ));
-
-Widget buildBoardTask(TaskModelData task, BuildContext context) {
-  // log("Board task: ${task.title} at ${task.position}");
-  return Card(
-      margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 0.0),
-      clipBehavior: Clip.hardEdge,
-      color: "taskBg".themed(context),
-      child: InkWell(
-          splashColor: "cardHighlight".themed(context),
-          highlightColor: "cardHighlight".themed(context),
-          onTap: () {
-            Navigator.pushNamed(context, routeTask, arguments: task);
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: SizedBox(
-                height: Sizes.kTaskHeight,
-                child: Center(
-                    child: Text(
-                  task.title,
-                  textAlign: TextAlign.center, // horizontal
-                ))),
-          )));
-}
+//
+// Widget buildBoardTask(TaskModelData task, BuildContext context) {
+//   // log("Board task: ${task.title} at ${task.position}");
+//   return Card(
+//       margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 0.0),
+//       clipBehavior: Clip.hardEdge,
+//       color: "taskBg".themed(context),
+//       child: InkWell(
+//           splashColor: "cardHighlight".themed(context),
+//           highlightColor: "cardHighlight".themed(context),
+//           onTap: () {
+//             Navigator.pushNamed(context, routeTask, arguments: task);
+//           },
+//           child: Padding(
+//             padding: const EdgeInsets.all(10.0),
+//             child: SizedBox(
+//                 height: Sizes.kTaskHeight,
+//                 child: Center(
+//                     child: Text(
+//                   task.title,
+//                   textAlign: TextAlign.center, // horizontal
+//                 ))),
+//           )));
+// }
 
 Widget buildBoardColumn(ColumnModel model,
     BuildContext context, VoidCallback onTap) {

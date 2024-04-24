@@ -11,16 +11,17 @@ import 'package:kanbored/ui/editing_state.dart';
 
 class BoardColumn extends ConsumerStatefulWidget {
   final ColumnModelData column;
-  final List<GlobalKey<EditableState>> keysEditableText;
-  final int baseIdx;
-  final BoardActionListener abActionListener;
+  // final List<GlobalKey<EditableState>> keysEditableText;
+  // final int baseIdx;
+  // final BoardActionListener abActionListener;
 
   const BoardColumn(
       {super.key,
       required this.column,
-      required this.keysEditableText,
-      required this.baseIdx,
-      required this.abActionListener});
+      // required this.keysEditableText,
+      // required this.baseIdx,
+      // required this.abActionListener
+      });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => BoardColumnState();
@@ -29,16 +30,16 @@ class BoardColumn extends ConsumerStatefulWidget {
 class BoardColumnState extends ConsumerState<BoardColumn> {
   // late List<TaskModel> tasks;
   late ColumnModelData column;
-  late List<GlobalKey<EditableState>> keysEditableText;
-  late int baseIdx;
-  late BoardActionListener abActionListener;
+  // late List<GlobalKey<EditableState>> keysEditableText;
+  // late int baseIdx;
+  // late BoardActionListener abActionListener;
 
   @override
   void initState() {
     super.initState();
-    abActionListener = widget.abActionListener;
-    keysEditableText = widget.keysEditableText;
-    baseIdx = widget.baseIdx;
+    // abActionListener = widget.abActionListener;
+    // keysEditableText = widget.keysEditableText;
+    // baseIdx = widget.baseIdx;
     column = widget.column;
   }
 
@@ -70,9 +71,10 @@ class BoardColumnState extends ConsumerState<BoardColumn> {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               ColumnText(
                   // TODO: Likely `key` makes deciding refresh required
-                  key: keysEditableText[baseIdx],
+                  // key: keysEditableText[baseIdx],
                   columnModel: column,
-                  abActionListener: abActionListener),
+                  // abActionListener: abActionListener
+              ),
               BoardTasks(column: column)
               // tasks.when(
               //     data: (tasks) {

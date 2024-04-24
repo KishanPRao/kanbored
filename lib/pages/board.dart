@@ -6,6 +6,7 @@ import 'package:kanbored/api/api.dart';
 import 'package:kanbored/api/state.dart';
 import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/constants.dart';
+import 'package:kanbored/db/database.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/board_action_listener.dart';
 import 'package:kanbored/ui/board_app_bar.dart';
@@ -29,7 +30,7 @@ class _BoardState extends ConsumerState<Board> {
   // late ProjectModelData projectModel;
   // late ProjectMetadataModel projectMetadataModel;
   // List<BoardModel> boards = [];
-  var showArchived = false;
+  // var showArchived = false;
   var activeColumnPos = -1;
   var activeTaskId = -1;
   late double columnWidth;
@@ -38,6 +39,8 @@ class _BoardState extends ConsumerState<Board> {
   GlobalKey<BoardAppBarActionsState> keyAppBarActionsState = GlobalKey();
   List<GlobalKey<EditableState>> keysEditableText = [];
   final ScrollController controller = ScrollController();
+  late Stream<List<ColumnModelData>> columns;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -45,6 +48,7 @@ class _BoardState extends ConsumerState<Board> {
     var projectModel = ref.read(activeProject)!;
     Api.updateColumns(ref, projectModel.id, recurring: true);
     Api.updateTasks(ref, projectModel.id, recurring: true);
+    // columns = ref.watch(columnsInProject);
   }
 
   @override
@@ -113,7 +117,7 @@ class _BoardState extends ConsumerState<Board> {
     return true;
   }
 
-  bool isArchived() => showArchived;
+  bool isArchived() => ref.read(UiState.boardShowArchived);
 
   void onDelete() {
     log("board, onDelete");
@@ -163,15 +167,92 @@ class _BoardState extends ConsumerState<Board> {
     updateData();
   }
 
+  StreamBuilder<List<ColumnModelData>> buildColumns(
+      BuildContext context, int projectId, bool showArchived) {
+    final columnDao = ref.read(AppDatabase.provider).columnDao;
+    return StreamBuilder(
+      stream: columnDao.watchColumnsInProject(projectId),
+      builder: (context, AsyncSnapshot<List<ColumnModelData>> snapshot) {
+        var columns = snapshot.data ?? [];
+        columns = columns
+            .where((c) =>
+                (showArchived && c.hideInDashboard == 1) ||
+                (!showArchived && c.hideInDashboard == 0))
+            .toList();
+        log("new columns: ${columns.length}");
+        return Expanded(
+            child: ListView.builder(
+          shrinkWrap: true,
+          scrollDirection: Axis.horizontal,
+          itemCount: columns.length,
+          itemBuilder: (_, index) {
+            final column = columns[index];
+            log("column: ${column.title}, ${column.id}");
+            return SizedBox(
+                width: columnWidth,
+                child: BoardColumn(
+                  key: ObjectKey(column),
+                  column: column,
+                  // projectMetadataModel: projectMetadataModel,
+                  // keysEditableText: keysEditableText,
+                  // baseIdx: (index * 2),
+                  // abActionListener: BoardActionListener(
+                  //   onChange: onChange,
+                  //   onEditStart: (idx, actions) =>
+                  //       onEditStart((index * 2) + idx!, actions),
+                  //   onEditEnd: onEditEnd,
+                  //   onDelete: onDelete,
+                  //   isArchived: isArchived,
+                  //   onMainAction: null,
+                  //   refreshUi: refreshUi,
+                  //   onArchive: () {},
+                  //   onUnarchive: () {},
+                  //   onArchived: (_) {},
+                  // )
+                ));
+          },
+        ));
+      },
+    );
+  }
+
+  final taskJson = """
+  {"id":3,"title":"Task 3","description":"Test","date_creation":1713122401,"color_id":"yellow","project_id":1,"column_id":1,"owner_id":1,"position":1,"is_active":1,"date_completed":null,"score":null,"date_due":null,"category_id":0,"creator_id":1,"date_modification":1713262081,"reference":"","date_started":null,"time_spent":0,"time_estimated":0,"swimlane_id":1,"date_moved":1713122401,"recurrence_status":0,"recurrence_trigger":0,"recurrence_factor":0,"recurrence_timeframe":0,"recurrence_basedate":0,"recurrence_parent":null,"recurrence_child":null,"priority":0,"external_provider":null,"external_uri":null,"url":"https://board.futuregadget.org/task/1","color":{"name":"Yellow","background":"rgb(245, 247, 196)","border":"rgb(223, 227, 45)"}}""";
+
   @override
   Widget build(BuildContext context) {
+    log("rebuild board");
     // Do not load until some data is retrieved
-    var projectModel = ref.watch(activeProject);
-    showArchived = ref.watch(UiState.boardShowArchived);
+    // final dao = p.Provider.of<TasksDao>(context);
+    // StateProvider<AppDatabase> provider = StateProvider((ref) {
+    //   final database = ref.watch(AppDatabase.provider);
+    //   database.tasksDao
+    //   ref.onDispose(database.close);
+    //   return database;
+    // });
+    // return Scaffold(
+    //   appBar: AppBar(
+    //       title: Text("proj"),
+    //       backgroundColor: "primary".themed(context),
+    //       leading: IconButton(
+    //         onPressed: () {
+    //           Navigator.pop(context);
+    //         },
+    //         icon: const Icon(Icons.arrow_back),
+    //       )),
+    //   body: Column(children: [buildTaskList(context), TextButton(onPressed: () {
+    //     log("Add");
+    //     final tasksDao = ref.read(AppDatabase.provider).tasksDao;
+    //     tasksDao.addTask(taskJson);
+    //   }, child: Text("ADD"))]),
+    // );
+    final projectModel = ref.watch(activeProject);
+    final showArchived = ref.watch(UiState.boardShowArchived);
     if (!isLoaded || projectModel == null) {
       return Utils.emptyUi();
     }
-    var columns = ref.watch(columnsInProject);
+    // final columnsDao = ref.read(AppDatabase.provider).columnsDao;
+    // final columns = ref.watch(columnsInProject);
     // columns.when(
     //     data: (columns) {
     //       // log("cols: $columns");
@@ -238,67 +319,78 @@ class _BoardState extends ConsumerState<Board> {
               refreshUi();
               return Utils.emptyFuture();
             },
-            child: columns.when(
-                data: (columns) {
-                  // log("cols: $columns");
-                  return Column(
-                    children: [
-                      showArchived
-                          ? Card(
-                              clipBehavior: Clip.hardEdge,
-                              color: "archivedBg".themed(context),
-                              child: SizedBox(
-                                child:
-                                    Center(child: Text("archived_col".resc())),
-                              ))
-                          : Utils.emptyUi(),
-                      // TODO: move each ui element into a function or class?
-                      // TODO: Keep a setting to enable swimlane info; default disabled; give warning on possible limitations; or keep it simple, avoid using it.
-                      Expanded(
-                          child: ListView(
-                        // TODO: perf: better approach; everything causes refresh
-                        shrinkWrap: true,
-                        controller: controller,
-                        scrollDirection: Axis.horizontal,
-                        children: columns.mapIndexed((entry) {
-                          var index = entry.key;
-                          var column = entry.value;
-                          // log("col map: ${column.title}");
-                          return SizedBox(
-                              width: columnWidth,
-                              child: BoardColumn(
-                                key: ObjectKey(column),
-                                column: column,
-                                // projectMetadataModel: projectMetadataModel,
-                                keysEditableText: keysEditableText,
-                                baseIdx: (index * 2),
-                                abActionListener: BoardActionListener(
-                                  onChange: onChange,
-                                  onEditStart: (idx, actions) =>
-                                      onEditStart((index * 2) + idx!, actions),
-                                  onEditEnd: onEditEnd,
-                                  onDelete: onDelete,
-                                  isArchived: isArchived,
-                                  onMainAction: null,
-                                  refreshUi: refreshUi,
-                                  onArchive: () {},
-                                  onUnarchive: () {},
-                                  onArchived: (_) {},
-                                ),
-                              ));
-                        }).toList(),
+            child: Column(children: [
+              showArchived
+                  ? Card(
+                      clipBehavior: Clip.hardEdge,
+                      color: "archivedBg".themed(context),
+                      child: SizedBox(
+                        child: Center(child: Text("archived_col".resc())),
                       ))
-                    ],
-                  );
-                },
-                error: (e, s) {
-                  log("error: $e");
-                  // TODO: proper text label for error
-                  return const Text('error');
-                },
-                loading: () => const Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ))
+                  : Utils.emptyUi(),
+              buildColumns(context, projectModel.id, showArchived)
+            ])
+            // columns.when(
+            //     data: (columns) {
+            //       log("cols: ${columns.length}");
+            //       return Column(
+            //         children: [
+            //           showArchived
+            //               ? Card(
+            //                   clipBehavior: Clip.hardEdge,
+            //                   color: "archivedBg".themed(context),
+            //                   child: SizedBox(
+            //                     child:
+            //                         Center(child: Text("archived_col".resc())),
+            //                   ))
+            //               : Utils.emptyUi(),
+            //           // TODO: move each ui element into a function or class?
+            //           // TODO: Keep a setting to enable swimlane info; default disabled; give warning on possible limitations; or keep it simple, avoid using it.
+            //           Expanded(
+            //               child: ListView(
+            //             // TODO: perf: better approach; everything causes refresh
+            //             shrinkWrap: true,
+            //             controller: controller,
+            //             scrollDirection: Axis.horizontal,
+            //             children: columns.mapIndexed((entry) {
+            //               var index = entry.key;
+            //               var column = entry.value;
+            //               // log("col map: ${column.title}");
+            //               return SizedBox(
+            //                   width: columnWidth,
+            //                   child: BoardColumn(
+            //                     key: ObjectKey(column),
+            //                     column: column,
+            //                     // projectMetadataModel: projectMetadataModel,
+            //                     keysEditableText: keysEditableText,
+            //                     baseIdx: (index * 2),
+            //                     abActionListener: BoardActionListener(
+            //                       onChange: onChange,
+            //                       onEditStart: (idx, actions) =>
+            //                           onEditStart((index * 2) + idx!, actions),
+            //                       onEditEnd: onEditEnd,
+            //                       onDelete: onDelete,
+            //                       isArchived: isArchived,
+            //                       onMainAction: null,
+            //                       refreshUi: refreshUi,
+            //                       onArchive: () {},
+            //                       onUnarchive: () {},
+            //                       onArchived: (_) {},
+            //                     ),
+            //                   ));
+            //             }).toList(),
+            //           ))
+            //         ],
+            //       );
+            //     },
+            //     error: (e, s) {
+            //       log("error: $e");
+            //       // TODO: proper text label for error
+            //       return const Text('error');
+            //     },
+            //     loading: () => const Center(
+            //           child: CircularProgressIndicator(strokeWidth: 2),
+            //         ))
             //     boards.map((board) {
             //   var columns =
             //       (showArchived ? board.inactiveColumns : board.activeColumns);

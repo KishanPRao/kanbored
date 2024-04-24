@@ -3802,7 +3802,7 @@ class $TaskMetadataModelTable extends TaskMetadataModel
   static const VerificationMeta _taskIdMeta = const VerificationMeta('taskId');
   @override
   late final GeneratedColumn<int> taskId = GeneratedColumn<int>(
-      'task_id', aliasedName, true,
+      'task_id', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: false,
       defaultConstraints:
@@ -3810,11 +3810,11 @@ class $TaskMetadataModelTable extends TaskMetadataModel
   static const VerificationMeta _metadataMeta =
       const VerificationMeta('metadata');
   @override
-  late final GeneratedColumnWithTypeConverter<TaskMetadata?, String> metadata =
-      GeneratedColumn<String>('metadata', aliasedName, true,
-              type: DriftSqlType.string, requiredDuringInsert: false)
-          .withConverter<TaskMetadata?>(
-              $TaskMetadataModelTable.$convertermetadatan);
+  late final GeneratedColumnWithTypeConverter<TaskMetadata, String> metadata =
+      GeneratedColumn<String>('metadata', aliasedName, false,
+              type: DriftSqlType.string, requiredDuringInsert: true)
+          .withConverter<TaskMetadata>(
+              $TaskMetadataModelTable.$convertermetadata);
   @override
   List<GeneratedColumn> get $columns => [taskId, metadata];
   @override
@@ -3843,10 +3843,10 @@ class $TaskMetadataModelTable extends TaskMetadataModel
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return TaskMetadataModelData(
       taskId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}task_id']),
-      metadata: $TaskMetadataModelTable.$convertermetadatan.fromSql(
+          .read(DriftSqlType.int, data['${effectivePrefix}task_id'])!,
+      metadata: $TaskMetadataModelTable.$convertermetadata.fromSql(
           attachedDatabase.typeMapping
-              .read(DriftSqlType.string, data['${effectivePrefix}metadata'])),
+              .read(DriftSqlType.string, data['${effectivePrefix}metadata'])!),
     );
   }
 
@@ -3857,35 +3857,28 @@ class $TaskMetadataModelTable extends TaskMetadataModel
 
   static JsonTypeConverter2<TaskMetadata, String, String> $convertermetadata =
       const TaskMetadataConverter();
-  static JsonTypeConverter2<TaskMetadata?, String?, String?>
-      $convertermetadatan = JsonTypeConverter2.asNullable($convertermetadata);
 }
 
 class TaskMetadataModelData extends DataClass
     implements Insertable<TaskMetadataModelData> {
-  final int? taskId;
-  final TaskMetadata? metadata;
-  const TaskMetadataModelData({this.taskId, this.metadata});
+  final int taskId;
+  final TaskMetadata metadata;
+  const TaskMetadataModelData({required this.taskId, required this.metadata});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    if (!nullToAbsent || taskId != null) {
-      map['task_id'] = Variable<int>(taskId);
-    }
-    if (!nullToAbsent || metadata != null) {
+    map['task_id'] = Variable<int>(taskId);
+    {
       map['metadata'] = Variable<String>(
-          $TaskMetadataModelTable.$convertermetadatan.toSql(metadata));
+          $TaskMetadataModelTable.$convertermetadata.toSql(metadata));
     }
     return map;
   }
 
   TaskMetadataModelCompanion toCompanion(bool nullToAbsent) {
     return TaskMetadataModelCompanion(
-      taskId:
-          taskId == null && nullToAbsent ? const Value.absent() : Value(taskId),
-      metadata: metadata == null && nullToAbsent
-          ? const Value.absent()
-          : Value(metadata),
+      taskId: Value(taskId),
+      metadata: Value(metadata),
     );
   }
 
@@ -3893,27 +3886,25 @@ class TaskMetadataModelData extends DataClass
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return TaskMetadataModelData(
-      taskId: serializer.fromJson<int?>(json['task_id']),
-      metadata: $TaskMetadataModelTable.$convertermetadatan
-          .fromJson(serializer.fromJson<String?>(json['metadata'])),
+      taskId: serializer.fromJson<int>(json['task_id']),
+      metadata: $TaskMetadataModelTable.$convertermetadata
+          .fromJson(serializer.fromJson<String>(json['metadata'])),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'task_id': serializer.toJson<int?>(taskId),
-      'metadata': serializer.toJson<String?>(
-          $TaskMetadataModelTable.$convertermetadatan.toJson(metadata)),
+      'task_id': serializer.toJson<int>(taskId),
+      'metadata': serializer.toJson<String>(
+          $TaskMetadataModelTable.$convertermetadata.toJson(metadata)),
     };
   }
 
-  TaskMetadataModelData copyWith(
-          {Value<int?> taskId = const Value.absent(),
-          Value<TaskMetadata?> metadata = const Value.absent()}) =>
+  TaskMetadataModelData copyWith({int? taskId, TaskMetadata? metadata}) =>
       TaskMetadataModelData(
-        taskId: taskId.present ? taskId.value : this.taskId,
-        metadata: metadata.present ? metadata.value : this.metadata,
+        taskId: taskId ?? this.taskId,
+        metadata: metadata ?? this.metadata,
       );
   @override
   String toString() {
@@ -3936,16 +3927,16 @@ class TaskMetadataModelData extends DataClass
 
 class TaskMetadataModelCompanion
     extends UpdateCompanion<TaskMetadataModelData> {
-  final Value<int?> taskId;
-  final Value<TaskMetadata?> metadata;
+  final Value<int> taskId;
+  final Value<TaskMetadata> metadata;
   const TaskMetadataModelCompanion({
     this.taskId = const Value.absent(),
     this.metadata = const Value.absent(),
   });
   TaskMetadataModelCompanion.insert({
     this.taskId = const Value.absent(),
-    this.metadata = const Value.absent(),
-  });
+    required TaskMetadata metadata,
+  }) : metadata = Value(metadata);
   static Insertable<TaskMetadataModelData> custom({
     Expression<int>? taskId,
     Expression<String>? metadata,
@@ -3957,7 +3948,7 @@ class TaskMetadataModelCompanion
   }
 
   TaskMetadataModelCompanion copyWith(
-      {Value<int?>? taskId, Value<TaskMetadata?>? metadata}) {
+      {Value<int>? taskId, Value<TaskMetadata>? metadata}) {
     return TaskMetadataModelCompanion(
       taskId: taskId ?? this.taskId,
       metadata: metadata ?? this.metadata,
@@ -3972,7 +3963,7 @@ class TaskMetadataModelCompanion
     }
     if (metadata.present) {
       map['metadata'] = Variable<String>(
-          $TaskMetadataModelTable.$convertermetadatan.toSql(metadata.value));
+          $TaskMetadataModelTable.$convertermetadata.toSql(metadata.value));
     }
     return map;
   }
@@ -3996,6 +3987,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $TaskModelTable taskModel = $TaskModelTable(this);
   late final $TaskMetadataModelTable taskMetadataModel =
       $TaskMetadataModelTable(this);
+  late final ProjectDao projectDao = ProjectDao(this as AppDatabase);
+  late final ColumnDao columnDao = ColumnDao(this as AppDatabase);
+  late final TaskDao taskDao = TaskDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4008,4 +4002,17 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         taskModel,
         taskMetadataModel
       ];
+}
+
+mixin _$ProjectDaoMixin on DatabaseAccessor<AppDatabase> {
+  $ProjectModelTable get projectModel => attachedDatabase.projectModel;
+}
+mixin _$ColumnDaoMixin on DatabaseAccessor<AppDatabase> {
+  $ProjectModelTable get projectModel => attachedDatabase.projectModel;
+  $ColumnModelTable get columnModel => attachedDatabase.columnModel;
+}
+mixin _$TaskDaoMixin on DatabaseAccessor<AppDatabase> {
+  $ProjectModelTable get projectModel => attachedDatabase.projectModel;
+  $ColumnModelTable get columnModel => attachedDatabase.columnModel;
+  $TaskModelTable get taskModel => attachedDatabase.taskModel;
 }

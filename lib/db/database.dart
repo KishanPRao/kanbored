@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
@@ -23,6 +25,10 @@ part 'database.g.dart';
   SubtaskModel,
   TaskModel,
   TaskMetadataModel,
+], daos: [
+  ProjectDao,
+  ColumnDao,
+  TaskDao,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -35,6 +41,62 @@ class AppDatabase extends _$AppDatabase {
     ref.onDispose(database.close);
     return database;
   });
+}
+
+@DriftAccessor(tables: [ProjectModel])
+class ProjectDao extends DatabaseAccessor<AppDatabase> with _$ProjectDaoMixin {
+  ProjectDao(super.db);
+  Stream<List<ProjectModelData>> allProjects() {
+    final query = select(projectModel)
+      ..orderBy([(t) => OrderingTerm(expression: t.name)]);
+    return query.watch();
+  }
+}
+
+@DriftAccessor(tables: [ColumnModel])
+class ColumnDao extends DatabaseAccessor<AppDatabase> with _$ColumnDaoMixin {
+  ColumnDao(super.db);
+  Stream<List<ColumnModelData>> watchColumnsInProject(int projectId) {
+    final query = select(columnModel)
+      ..where((tbl) {
+        return tbl.projectId.equals(projectId);
+      })
+      ..orderBy([(t) => OrderingTerm(expression: t.position)]);
+    return query.watch();
+  }
+}
+
+@DriftAccessor(tables: [TaskModel])
+class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
+  TaskDao(super.db);
+
+  // Stream<List<TaskModelData>> watchTasksInProject(int projectId) {
+  //   final query = select(taskModel)
+  //     ..where((tbl) {
+  //       return tbl.projectId.equals(projectId);
+  //     })
+  //     ..orderBy([(t) => OrderingTerm(expression: t.position)]);
+  //   return query.watch();
+  // }
+
+  Stream<List<TaskModelData>> watchTasksInColumn(int columnId) {
+    final query = select(taskModel)
+      ..where((tbl) {
+        return tbl.columnId.equals(columnId);
+      })
+      ..orderBy([(t) => OrderingTerm(expression: t.position)]);
+    return query.watch();
+  }
+
+  void addTask(String jsonData) {
+    final json = jsonDecode(jsonData);
+    transaction(() async {
+        var data = TaskModelData.fromJson(json);
+        // log("project data: ${data.name}");
+        await into(taskModel).insertOnConflictUpdate(data);
+        log("fin add");
+    });
+  }
 }
 
 LazyDatabase _openConnection() {

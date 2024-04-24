@@ -14,12 +14,12 @@ import 'package:kanbored/utils.dart';
 
 class ColumnText extends ConsumerStatefulWidget {
   final ColumnModelData columnModel;
-  final AppBarActionListener abActionListener;
+  // final AppBarActionListener abActionListener;
 
   const ColumnText({
     super.key,
     required this.columnModel,
-    required this.abActionListener,
+    // required this.abActionListener,
   });
 
   @override
@@ -28,14 +28,14 @@ class ColumnText extends ConsumerStatefulWidget {
 
 class ColumnTextState extends EditableState<ColumnText> {
   late ColumnModelData columnModel;
-  late AppBarActionListener abActionListener;
+  // late AppBarActionListener abActionListener;
   late TextEditingController controller;
 
   @override
   void initState() {
     super.initState();
     columnModel = widget.columnModel;
-    abActionListener = widget.abActionListener;
+    // abActionListener = widget.abActionListener;
     controller = TextEditingController(text: columnModel.title);
   }
 
@@ -63,7 +63,7 @@ class ColumnTextState extends EditableState<ColumnText> {
       if (!value) {
         Utils.showErrorSnackbar(context, "Could not remove column");
       } else {
-        abActionListener.refreshUi();
+        // abActionListener.refreshUi();
       }
     }).onError((e, _) => Utils.showErrorSnackbar(context, e));
   }
@@ -160,18 +160,18 @@ class ColumnTextState extends EditableState<ColumnText> {
     return TextField(
       controller: controller,
       onTap: () {
-        abActionListener.onChange(controller.text);
-        abActionListener.onEditStart(0, [
-          AppBarAction.kDelete,
-          columnModel.hideInDashboard == 1
-              ? BoardAppBarAction.kUnarchive
-              : BoardAppBarAction.kArchive,
-          AppBarAction.kDiscard,
-          AppBarAction.kDone
-        ]);
+        // abActionListener.onChange(controller.text);
+        // abActionListener.onEditStart(0, [
+        //   AppBarAction.kDelete,
+        //   columnModel.hideInDashboard == 1
+        //       ? BoardAppBarAction.kUnarchive
+        //       : BoardAppBarAction.kArchive,
+        //   AppBarAction.kDiscard,
+        //   AppBarAction.kDone
+        // ]);
       },
-      onChanged: abActionListener.onChange,
-      onEditingComplete: () => abActionListener.onEditEnd(true),
+      // onChanged: abActionListener.onChange,
+      // onEditingComplete: () => abActionListener.onEditEnd(true),
       decoration: InputDecoration(
           hintText: "column_empty_warn".resc(),
           border: InputBorder.none,

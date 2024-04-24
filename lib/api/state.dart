@@ -41,8 +41,16 @@ final taskMetadata = StreamProvider.autoDispose((ref) {
       ?.id;
   return database.taskMetadata(current);
 });
+// AutoDisposeStreamProvider<Object?> tasksDao = StreamProvider.autoDispose((ref) {
+//   final database = ref.watch(AppDatabase.provider);
+//   return database.tasksDao;
+// });
+// final tasksDao = StreamProvider((ref) {
+//   return ref.read(AppDatabase.provider);
+// });
 
 void updateDbProjects(WidgetRef ref, List<dynamic> projects) {
+  if (!ref.context.mounted) return;
   final db = ref.watch(AppDatabase.provider);
   db.transaction(() async {
     // log("# projects ${projects.length}");
@@ -69,6 +77,7 @@ void updateDbColumns(WidgetRef ref, List<dynamic> columns) {
 }
 
 void updateDbTasks(WidgetRef ref, List<dynamic> tasks) {
+  if (!ref.context.mounted) return;
   final db = ref.watch(AppDatabase.provider);
   db.transaction(() async {
     // log("# projects ${projects.length}");
@@ -91,6 +100,7 @@ TaskMetadataModelData updateDbTaskMetadata(WidgetRef ref, dynamic metadata) {
 }
 
 void removeDbProject(WidgetRef ref, int projectId) {
+  if (!ref.context.mounted) return;
   final db = ref.watch(AppDatabase.provider);
   db.transaction(() async {
     await (db.delete(db.projectModel)
@@ -100,6 +110,7 @@ void removeDbProject(WidgetRef ref, int projectId) {
 }
 
 void updateDbProject(WidgetRef ref, ProjectModelData data) {
+  if (!ref.context.mounted) return;
   final db = ref.watch(AppDatabase.provider);
   db.transaction(() async {
     await db.into(db.projectModel).insertOnConflictUpdate(data);
@@ -107,6 +118,7 @@ void updateDbProject(WidgetRef ref, ProjectModelData data) {
 }
 
 void updateDbColumn(WidgetRef ref, ColumnModelData data) {
+  if (!ref.context.mounted) return;
   final db = ref.watch(AppDatabase.provider);
   db.transaction(() async {
     await db.into(db.columnModel).insertOnConflictUpdate(data);
