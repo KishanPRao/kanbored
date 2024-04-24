@@ -33,6 +33,7 @@ class BoardColumnState extends ConsumerState<BoardColumn> {
   // late List<GlobalKey<EditableState>> keysEditableText;
   // late int baseIdx;
   // late BoardActionListener abActionListener;
+  final keyColumnText = EditableState.createKey();
 
   @override
   void initState() {
@@ -61,15 +62,19 @@ class BoardColumnState extends ConsumerState<BoardColumn> {
     log("load task in col: ${column.id}");
     // var tasks = ref.watch(tasksInColumn(column.id));
     // log("Board column, build: ${column.title}, ${column.isActive}; archived: ${abActionListener.isArchived()}, $baseIdx");
+    // return Text(column.title);
     return Card(
+        key: ObjectKey(column),
         color: "columnBg".themed(context),
         margin: const EdgeInsets.all(10),
         clipBehavior: Clip.hardEdge,
         child: Padding(
+          // key: ObjectKey(column),
             padding: const EdgeInsets.all(8.0),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               ColumnText(
+                key: keyColumnText,
                   // TODO: Likely `key` makes deciding refresh required
                   // key: keysEditableText[baseIdx],
                   columnModel: column,

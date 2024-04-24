@@ -10,6 +10,7 @@ import 'package:kanbored/ui/build_subtasks.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/sizes.dart';
 import 'package:kanbored/ui/ui_state.dart';
+import 'package:kanbored/utils.dart';
 
 class BoardTasks extends ConsumerStatefulWidget {
   final ColumnModelData column;
@@ -25,6 +26,8 @@ class BoardTasks extends ConsumerStatefulWidget {
 class BoardTasksState extends ConsumerState<BoardTasks> {
   late ColumnModelData column;
   final keyAddTask = EditableState.createKey();
+  late TaskDao tasksDao;
+  late StreamBuilder<List<TaskModelData>> tasksStream;
 
   // late int baseIdx;
 
@@ -32,53 +35,53 @@ class BoardTasksState extends ConsumerState<BoardTasks> {
   void initState() {
     super.initState();
     column = widget.column;
+    tasksDao = ref.read(AppDatabase.provider).taskDao;
     // baseIdx = baseIdx;
+
+    tasksStream = buildTasksStream();
   }
 
-  StreamBuilder<List<TaskModelData>> buildTasks(
-      BuildContext context, int columnId) {
-    final tasksDao = ref.read(AppDatabase.provider).taskDao;
+  StreamBuilder<List<TaskModelData>> buildTasksStream() {
     return StreamBuilder(
-      stream: tasksDao.watchTasksInColumn(columnId),
-      builder: (context, AsyncSnapshot<List<TaskModelData>> snapshot) {
-        var tasks = snapshot.data ?? [];
-        log("new tasks: ${tasks.length}");
-        var showArchived = ref.read(UiState.boardShowArchived);
-        // TODO: Use db instead!
-        tasks = tasks.where((t) => t.columnId == column.id).toList();
-        tasks = (showArchived
-                ? (column.hideInDashboard == 1
-                    ? tasks
-                    : tasks.where((t) => t.isActive == 0))
-                : tasks.where((t) => t.isActive == 1))
-            .toList();
-        // TODO: fix incorrect positioning (when remove a middle task, add new one, sometimes doesn't update position correctly)
-        // moveTaskPosition or updateTask for all tasks?
-        // for (var task in tasks) {
-        //   var metadata = await Api.retrieveTaskMetadata(ref, task.id);
-        //   log("metadata: $metadata");
-        // }
-        return Expanded(
-          child: Column(children: [
-            ListView.builder(
-              shrinkWrap: true,
-              itemCount: tasks.length,
-              itemBuilder: (_, index) {
-                final task = tasks[index];
-                log("task: ${task.title}, ${task.id}");
-                return buildBoardTask(tasks.elementAt(index), context);
-              },
-            ),
-            if (!showArchived) AddTask(key: keyAddTask, columnModel: column)
-          ]),
-        );
-      },
-    );
+      // TODO: distinct matters?
+        stream: tasksDao.watchTasksInColumn(column.id).distinct(),
+        builder: (context, AsyncSnapshot<List<TaskModelData>> snapshot) {
+          return StreamBuilder(
+            stream: ref.watch(UiState.boardShowArchived.notifier).stream,
+            builder: (context, snapshot2) {
+              final showArchived = snapshot2.data ?? false;
+              log("tasks, showArchived: $showArchived");
+              var tasks = snapshot.data ?? [];
+              tasks = tasks.where((t) => t.columnId == column.id).toList();
+              tasks = (showArchived
+                  ? (column.hideInDashboard == 1
+                  ? tasks
+                  : tasks.where((t) => t.isActive == 0))
+                  : tasks.where((t) => t.isActive == 1))
+                  .toList();
+              log("new tasks: ${tasks.length}");
+              return Expanded(
+                child: Column(children: [
+                  ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: tasks.length,
+                    itemBuilder: (_, index) {
+                      final task = tasks[index];
+                      log("task: ${task.title}, ${task.id}");
+                      return buildBoardTask(tasks.elementAt(index), context);
+                    },
+                  ),
+                  if (!showArchived) AddTask(key: keyAddTask, columnModel: column)
+                ]),
+              );
+            },
+          );
+        });
   }
 
   @override
   Widget build(BuildContext context) {
-    return buildTasks(context, column.id);
+    return tasksStream;
     // final tasks = ref.watch(tasksInProject);
     // log("build tasks");
     // return tasks.when(
@@ -145,6 +148,7 @@ class BoardTasksState extends ConsumerState<BoardTasks> {
   Widget buildBoardTask(TaskModelData task, BuildContext context) {
     // log("Board task: ${task.title} at ${task.position}");
     return Card(
+        key: ObjectKey(task.id),
         margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 0.0),
         clipBehavior: Clip.hardEdge,
         color: "taskBg".themed(context),

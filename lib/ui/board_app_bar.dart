@@ -177,7 +177,7 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
     if (projectModel != null) {
       this.projectModel = projectModel;
     }
-    showArchived = ref.watch(UiState.boardShowArchived);
+    showArchived = ref.read(UiState.boardShowArchived);
     return super.build(context);
   }
 }

@@ -41,6 +41,9 @@ class _BoardState extends ConsumerState<Board> {
   final ScrollController controller = ScrollController();
   late Stream<List<ColumnModelData>> columns;
   final _formKey = GlobalKey<FormState>();
+  late ColumnDao columnDao;
+  late StreamBuilder<List<ColumnModelData>> columnsStream;
+  late Stream<bool> showArchivedStream;
 
   @override
   void initState() {
@@ -48,7 +51,12 @@ class _BoardState extends ConsumerState<Board> {
     var projectModel = ref.read(activeProject)!;
     Api.updateColumns(ref, projectModel.id, recurring: true);
     Api.updateTasks(ref, projectModel.id, recurring: true);
+    columnDao = ref.read(AppDatabase.provider).columnDao;
     // columns = ref.watch(columnsInProject);
+    // columnsStream = buildColumns(context, projectModel.id);
+    // final showArchived = ref.watch(UiState.boardShowArchived.notifier).stream.distinct();
+    // showArchivedStream = ref.read(UiState.boardShowArchived.notifier).stream;
+    columnsStream = buildColumnsStream(projectModel.id);
   }
 
   @override
@@ -59,7 +67,7 @@ class _BoardState extends ConsumerState<Board> {
       // if (projectModel != null) {
       //   this.projectModel = projectModel;
       // }
-      ref.read(UiState.boardShowArchived.notifier).state = false;
+      // ref.read(UiState.boardShowArchived.notifier).state = false;
       // projectModel =
       //     ModalRoute.of(context)?.settings.arguments as ProjectModelData;
       columnWidth = Utils.getWidth(context) * Sizes.kTaskWidthPercentage;
@@ -69,26 +77,26 @@ class _BoardState extends ConsumerState<Board> {
   }
 
   void updateData() async {
-    List<GlobalKey<EditableState>> keysEditableText = [];
-    var projectModel = ref.read(activeProject)!;
-    var boards = await WebApi.getBoard(projectModel.id);
-    var projectMetadataModel = await WebApi.getProjectMetadata(projectModel.id);
-    for (var board in boards) {
-      for (var column in board.columns) {
-        keysEditableText.add(GlobalKey()); // Column name
-        keysEditableText.add(GlobalKey()); // `Add task`
-        column.isActive =
-            !projectMetadataModel.closedColumns.contains(column.id);
-      }
-    }
-    if (mounted) {
-      setState(() {
-        // this.boards = boards;
-        // this.projectMetadataModel = projectMetadataModel;
-        this.keysEditableText = keysEditableText;
-        isLoaded = true;
-      });
-    }
+    // List<GlobalKey<EditableState>> keysEditableText = [];
+    // var projectModel = ref.read(activeProject)!;
+    // var boards = await WebApi.getBoard(projectModel.id);
+    // var projectMetadataModel = await WebApi.getProjectMetadata(projectModel.id);
+    // for (var board in boards) {
+    //   for (var column in board.columns) {
+    //     keysEditableText.add(GlobalKey()); // Column name
+    //     keysEditableText.add(GlobalKey()); // `Add task`
+    //     column.isActive =
+    //         !projectMetadataModel.closedColumns.contains(column.id);
+    //   }
+    // }
+    // if (mounted) {
+    //   setState(() {
+    //     // this.boards = boards;
+    //     // this.projectMetadataModel = projectMetadataModel;
+    //     this.keysEditableText = keysEditableText;
+    //     isLoaded = true;
+    //   });
+    // }
   }
 
   void onChange(text) {
@@ -158,6 +166,7 @@ class _BoardState extends ConsumerState<Board> {
     //   this.showArchived = showArchived;
     // });
     ref.read(UiState.boardShowArchived.notifier).state = showArchived;
+    // UiState.boardShowArchivedStreamCtller.add(showArchived);
   }
 
   void refreshUi() {
@@ -165,55 +174,6 @@ class _BoardState extends ConsumerState<Board> {
     // TODO
     // Api.updateColumns(ref, projectModel.id);
     updateData();
-  }
-
-  StreamBuilder<List<ColumnModelData>> buildColumns(
-      BuildContext context, int projectId, bool showArchived) {
-    final columnDao = ref.read(AppDatabase.provider).columnDao;
-    return StreamBuilder(
-      stream: columnDao.watchColumnsInProject(projectId),
-      builder: (context, AsyncSnapshot<List<ColumnModelData>> snapshot) {
-        var columns = snapshot.data ?? [];
-        columns = columns
-            .where((c) =>
-                (showArchived && c.hideInDashboard == 1) ||
-                (!showArchived && c.hideInDashboard == 0))
-            .toList();
-        log("new columns: ${columns.length}");
-        return Expanded(
-            child: ListView.builder(
-          shrinkWrap: true,
-          scrollDirection: Axis.horizontal,
-          itemCount: columns.length,
-          itemBuilder: (_, index) {
-            final column = columns[index];
-            log("column: ${column.title}, ${column.id}");
-            return SizedBox(
-                width: columnWidth,
-                child: BoardColumn(
-                  key: ObjectKey(column),
-                  column: column,
-                  // projectMetadataModel: projectMetadataModel,
-                  // keysEditableText: keysEditableText,
-                  // baseIdx: (index * 2),
-                  // abActionListener: BoardActionListener(
-                  //   onChange: onChange,
-                  //   onEditStart: (idx, actions) =>
-                  //       onEditStart((index * 2) + idx!, actions),
-                  //   onEditEnd: onEditEnd,
-                  //   onDelete: onDelete,
-                  //   isArchived: isArchived,
-                  //   onMainAction: null,
-                  //   refreshUi: refreshUi,
-                  //   onArchive: () {},
-                  //   onUnarchive: () {},
-                  //   onArchived: (_) {},
-                  // )
-                ));
-          },
-        ));
-      },
-    );
   }
 
   final taskJson = """
@@ -248,7 +208,8 @@ class _BoardState extends ConsumerState<Board> {
     // );
     final projectModel = ref.watch(activeProject);
     final showArchived = ref.watch(UiState.boardShowArchived);
-    if (!isLoaded || projectModel == null) {
+    // if (!isLoaded || projectModel == null) {
+    if (projectModel == null) {
       return Utils.emptyUi();
     }
     // final columnsDao = ref.read(AppDatabase.provider).columnsDao;
@@ -328,7 +289,7 @@ class _BoardState extends ConsumerState<Board> {
                         child: Center(child: Text("archived_col".resc())),
                       ))
                   : Utils.emptyUi(),
-              buildColumns(context, projectModel.id, showArchived)
+              columnsStream
             ])
             // columns.when(
             //     data: (columns) {
@@ -399,5 +360,45 @@ class _BoardState extends ConsumerState<Board> {
             //   // };
             // }).toList())),
             ));
+  }
+
+  StreamBuilder<List<ColumnModelData>> buildColumnsStream(int projectId) {
+    return StreamBuilder(
+        // TODO: distinct matters?
+        stream: columnDao.watchColumnsInProject(projectId).distinct(),
+        builder: (context, AsyncSnapshot<List<ColumnModelData>> snapshot) {
+          return StreamBuilder(
+            stream: ref.watch(UiState.boardShowArchived.notifier).stream,
+            builder: (context, snapshot2) {
+              final showArchived = snapshot2.data ?? false;
+              log("col, showArchived: $showArchived");
+              var columns = snapshot.data ?? [];
+              columns = columns
+                  .where((c) =>
+                      (showArchived && c.hideInDashboard == 1) ||
+                      (!showArchived && c.hideInDashboard == 0))
+                  .toList();
+              log("new columns: ${columns.length}");
+              return Expanded(
+                  child: ListView.builder(
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                itemCount: columns.length,
+                itemBuilder: (_, index) {
+                  final column = columns[index];
+                  log("column: ${column.title}, ${column.id}");
+                  // return Text(column.title);
+                  return SizedBox(
+                      key: ObjectKey(column.id),
+                      width: columnWidth,
+                      child: BoardColumn(
+                        // key: ObjectKey(column),
+                        column: column,
+                      ));
+                },
+              ));
+            },
+          );
+        });
   }
 }

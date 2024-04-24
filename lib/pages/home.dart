@@ -10,6 +10,7 @@ import 'package:kanbored/db/database.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/project_action_listener.dart';
 import 'package:kanbored/ui/project_app_bar.dart';
+import 'package:kanbored/ui/ui_state.dart';
 import 'package:kanbored/utils.dart';
 
 class Home extends ConsumerStatefulWidget {
@@ -171,6 +172,8 @@ class _HomeState extends ConsumerState<Home> {
                           splashColor: "cardHighlight".themed(context),
                           highlightColor: "cardHighlight".themed(context),
                           onTap: () {
+                            ref.read(UiState.boardShowArchived.notifier).state =
+                                false;
                             ref.read(activeProject.notifier).state = project;
                             Navigator.pushNamed(context, routeBoard);
                           },
