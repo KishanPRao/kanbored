@@ -116,6 +116,7 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
   Future<void> handlePopupAction(String action) async {
     log("board, handlePopupAction: $action");
     if (action == "hide_archived".resc() || action == "show_archived".resc()) {
+      log("flip archived: ${ref.watch(UiState.boardShowArchived)}");
       // showArchived = !showArchived;
       // (abActionListener as BoardActionListener).onArchived(showArchived);
       ref.read(UiState.boardShowArchived.notifier).state =

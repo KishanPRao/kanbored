@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/app_data.dart';
+import 'package:kanbored/constants.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/app_text_style.dart';
 import 'package:kanbored/ui/app_theme.dart';
+import 'package:kanbored/ui/ui_state.dart';
 import 'package:kanbored/utils.dart';
-import 'package:provider/provider.dart';
-import 'package:kanbored/app_data.dart';
-import 'package:kanbored/constants.dart';
 
 class Settings extends ConsumerStatefulWidget {
   const Settings({super.key});
@@ -24,36 +24,39 @@ class _SettingsState extends ConsumerState<Settings> {
   // TODO: extract strings
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: "pageBg".themed(context),
-      appBar: AppBar(
-        title: Text("settings".resc()),
-        backgroundColor: "primary".themed(context),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(Icons.arrow_back),
-        ),
-      ),
-      body: Column(
-        children: [
-          _buildSettingOption(context, "Theme", theme, _showThemeOptions),
-          _buildSettingOption(
-              context,
-              "Logout",
-              "",
-              () => {
-                    _showDialog("Logout?", null, (_) {
-                      AppData.authenticated = false;
-                      Navigator.pop(context); // Pop settings
-                      Navigator.pop(context,
-                          true); // Pop home screen; strange issue, only returns value using this
-                    })
-                  }),
-        ],
-      ),
-    );
+    return PopScope(
+        onPopInvoked: (didPop) =>
+            ref.read(UiState.boardEditing.notifier).state = false,
+        child: Scaffold(
+          backgroundColor: "pageBg".themed(context),
+          appBar: AppBar(
+            title: Text("settings".resc()),
+            backgroundColor: "primary".themed(context),
+            leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.arrow_back),
+            ),
+          ),
+          body: Column(
+            children: [
+              _buildSettingOption(context, "Theme", theme, _showThemeOptions),
+              _buildSettingOption(
+                  context,
+                  "Logout",
+                  "",
+                  () => {
+                        _showDialog("Logout?", null, (_) {
+                          AppData.authenticated = false;
+                          Navigator.pop(context); // Pop settings
+                          Navigator.pop(context,
+                              true); // Pop home screen; strange issue, only returns value using this
+                        })
+                      }),
+            ],
+          ),
+        ));
   }
 
   void _showDialog(String title, String? content, Function cb) async {

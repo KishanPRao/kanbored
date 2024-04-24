@@ -6,14 +6,13 @@ import 'package:kanbored/constants.dart';
 import 'package:kanbored/db/database.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/add_task.dart';
-import 'package:kanbored/ui/build_subtasks.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/sizes.dart';
 import 'package:kanbored/ui/ui_state.dart';
-import 'package:kanbored/utils.dart';
 
 class BoardTasks extends ConsumerStatefulWidget {
   final ColumnModelData column;
+
   const BoardTasks({super.key, required this.column});
 
   @override
@@ -23,7 +22,6 @@ class BoardTasks extends ConsumerStatefulWidget {
 class BoardTasksState extends ConsumerState<BoardTasks> {
   late ColumnModelData column;
   final keyAddTask = EditableState.createKey();
-  late TaskDao tasksDao;
   late StreamBuilder<List<TaskModelData>> tasksStream;
 
   // late int baseIdx;
@@ -32,44 +30,42 @@ class BoardTasksState extends ConsumerState<BoardTasks> {
   void initState() {
     super.initState();
     column = widget.column;
-    tasksDao = ref.read(AppDatabase.provider).taskDao;
     tasksStream = buildTasksStream();
+    log("init board tasks");
   }
 
   StreamBuilder<List<TaskModelData>> buildTasksStream() {
+    final tasksDao = ref.read(AppDatabase.provider).taskDao;
     return StreamBuilder(
-      // TODO: distinct matters?
+        // TODO: distinct matters?
         stream: tasksDao.watchTasksInColumn(column.id).distinct(),
         builder: (context, AsyncSnapshot<List<TaskModelData>> snapshot) {
-          return StreamBuilder(
-            stream: ref.watch(UiState.boardShowArchived.notifier).stream,
-            builder: (context, snapshot2) {
-              final showArchived = snapshot2.data ?? false;
-              log("tasks, showArchived: $showArchived");
-              var tasks = snapshot.data ?? [];
-              tasks = tasks.where((t) => t.columnId == column.id).toList();
-              tasks = (showArchived
+          // NOTE: assume rebuilt by column on change of archive, just read
+          final showArchived = ref.read(UiState.boardShowArchived);
+          var tasks = snapshot.data ?? [];
+          log("tasks, showArchived: $showArchived; ${tasks.length}");
+          tasks = tasks.where((t) => t.columnId == column.id).toList();
+          tasks = (showArchived
                   ? (column.hideInDashboard == 1
-                  ? tasks
-                  : tasks.where((t) => t.isActive == 0))
+                      ? tasks
+                      : tasks.where((t) => t.isActive == 0))
                   : tasks.where((t) => t.isActive == 1))
-                  .toList();
-              log("new tasks: ${tasks.length}");
-              return Expanded(
-                child: Column(children: [
-                  ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: tasks.length,
-                    itemBuilder: (_, index) {
-                      final task = tasks[index];
-                      log("task: ${task.title}, ${task.id}");
-                      return buildBoardTask(tasks.elementAt(index), context);
-                    },
-                  ),
-                  if (!showArchived) AddTask(key: keyAddTask, columnModel: column)
-                ]),
-              );
-            },
+              .toList();
+          log("new tasks: ${tasks.length}");
+          return Expanded(
+            child: Column(children: [
+              Expanded(
+                  child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: tasks.length,
+                itemBuilder: (_, index) {
+                  final task = tasks[index];
+                  log("task: ${task.title}, ${task.id}");
+                  return buildBoardTask(tasks.elementAt(index), context);
+                },
+              )),
+              if (!showArchived) AddTask(key: keyAddTask, columnModel: column)
+            ]),
           );
         });
   }
@@ -93,9 +89,9 @@ class BoardTasksState extends ConsumerState<BoardTasks> {
                   height: Sizes.kTaskHeight,
                   child: Center(
                       child: Text(
-                        task.title,
-                        textAlign: TextAlign.center, // horizontal
-                      ))),
+                    task.title,
+                    textAlign: TextAlign.center, // horizontal
+                  ))),
             )));
   }
 

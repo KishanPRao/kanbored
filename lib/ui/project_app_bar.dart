@@ -57,6 +57,7 @@ class ProjectAppBarActionsState
       // showArchived = !showArchived;
       // log("toggle archive: $showArchived");
       // (abActionListener as ProjectActionListener).onArchived(showArchived);
+      // TODO: project archive status
       ref.read(UiState.boardShowArchived.notifier).state =
           !ref.watch(UiState.boardShowArchived);
     } else if (action == "settings".resc()) {

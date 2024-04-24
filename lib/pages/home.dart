@@ -8,7 +8,6 @@ import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/constants.dart';
 import 'package:kanbored/db/database.dart';
 import 'package:kanbored/strings.dart';
-import 'package:kanbored/ui/project_action_listener.dart';
 import 'package:kanbored/ui/project_app_bar.dart';
 import 'package:kanbored/ui/ui_state.dart';
 import 'package:kanbored/utils.dart';
@@ -100,57 +99,59 @@ class _HomeState extends ConsumerState<Home> {
     //     .toList();
     // projects.sort((a, b) => a.name.compareTo(b.name));
     // log("Projects: $projects; orig: ${this.projects}");
-    return Scaffold(
-        backgroundColor: "pageBg".themed(context),
-        // floatingActionButton: buildSearchFab(context, () {
-        //   log("home Search");
-        // }),
-        appBar: AppBar(
-          title: Text("app_name".resc()),
-          backgroundColor: "primary".themed(context),
-          actions: [
-            ProjectAppBarActions(
-              // key: keyAppBarActionsState,
-              // showArchived: showArchived,
-              // abActionListener: ProjectActionListener(
-              //   onArchived: onArchived,
-              //   onChange: onChange,
-              //   onEditStart: (_, __) => {},
-              //   onEditEnd: onEditEnd,
-              //   onDelete: onDelete,
-              //   onMainAction: onAddProject,
-              //   refreshUi: refreshUi,
-              // ),
-            )
-          ],
-        ),
-        body: RefreshIndicator(
-          // trigger the _loadData function when the user pulls down
-          onRefresh: () {
-            refreshUi();
-            return Utils.emptyFuture();
-          },
-          child: projects.when(
-              data: (projects) => Column(children: [
-                    showArchived
-                        ? Card(
-                            clipBehavior: Clip.hardEdge,
-                            color: "archivedBg".themed(context),
-                            child: SizedBox(
-                              child: Center(child: Text("archived".resc())),
-                            ))
-                        : Utils.emptyUi(),
-                    buildProjects(projects),
-                  ]),
-              error: (e, s) {
-                log("error: $e");
-                // TODO: proper text label for error
-                return const Text('error');
+    return PopScope(
+        onPopInvoked: (didPop) => ref.read(UiState.boardEditing.notifier).state = false,
+        child: Scaffold(
+            backgroundColor: "pageBg".themed(context),
+            // floatingActionButton: buildSearchFab(context, () {
+            //   log("home Search");
+            // }),
+            appBar: AppBar(
+              title: Text("app_name".resc()),
+              backgroundColor: "primary".themed(context),
+              actions: [
+                ProjectAppBarActions(
+                    // key: keyAppBarActionsState,
+                    // showArchived: showArchived,
+                    // abActionListener: ProjectActionListener(
+                    //   onArchived: onArchived,
+                    //   onChange: onChange,
+                    //   onEditStart: (_, __) => {},
+                    //   onEditEnd: onEditEnd,
+                    //   onDelete: onDelete,
+                    //   onMainAction: onAddProject,
+                    //   refreshUi: refreshUi,
+                    // ),
+                    )
+              ],
+            ),
+            body: RefreshIndicator(
+              // trigger the _loadData function when the user pulls down
+              onRefresh: () {
+                refreshUi();
+                return Utils.emptyFuture();
               },
-              loading: () => const Center(
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )),
-        ));
+              child: projects.when(
+                  data: (projects) => Column(children: [
+                        showArchived
+                            ? Card(
+                                clipBehavior: Clip.hardEdge,
+                                color: "archivedBg".themed(context),
+                                child: SizedBox(
+                                  child: Center(child: Text("archived".resc())),
+                                ))
+                            : Utils.emptyUi(),
+                        buildProjects(projects),
+                      ]),
+                  error: (e, s) {
+                    log("error: $e");
+                    // TODO: proper text label for error
+                    return const Text('error');
+                  },
+                  loading: () => const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )),
+            )));
   }
 
   Widget buildProjects(List<ProjectModelData> projects) {

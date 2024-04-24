@@ -46,6 +46,7 @@ class AppDatabase extends _$AppDatabase {
 @DriftAccessor(tables: [ProjectModel])
 class ProjectDao extends DatabaseAccessor<AppDatabase> with _$ProjectDaoMixin {
   ProjectDao(super.db);
+
   Stream<List<ProjectModelData>> allProjects() {
     final query = select(projectModel)
       ..orderBy([(t) => OrderingTerm(expression: t.name)]);
@@ -56,6 +57,7 @@ class ProjectDao extends DatabaseAccessor<AppDatabase> with _$ProjectDaoMixin {
 @DriftAccessor(tables: [ColumnModel])
 class ColumnDao extends DatabaseAccessor<AppDatabase> with _$ColumnDaoMixin {
   ColumnDao(super.db);
+
   Stream<List<ColumnModelData>> watchColumnsInProject(int projectId) {
     final query = select(columnModel)
       ..where((tbl) {
@@ -88,13 +90,12 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
     return query.watch();
   }
 
-  void addTask(String jsonData) {
-    final json = jsonDecode(jsonData);
+  void addTask(Map<String, dynamic> json) {
     transaction(() async {
-        var data = TaskModelData.fromJson(json);
-        // log("project data: ${data.name}");
-        await into(taskModel).insertOnConflictUpdate(data);
-        log("fin add");
+      var data = TaskModelData.fromJson(json);
+      // log("project data: ${data.name}");
+      await into(taskModel).insertOnConflictUpdate(data);
+      log("fin add");
     });
   }
 }

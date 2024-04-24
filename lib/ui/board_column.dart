@@ -80,7 +80,8 @@ class BoardColumnState extends ConsumerState<BoardColumn> {
                   columnModel: column,
                   // abActionListener: abActionListener
               ),
-              BoardTasks(column: column)
+              BoardTasks(
+                  column: column)
               // tasks.when(
               //     data: (tasks) {
               //       log("tasks: ${tasks.length}");

@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/api.dart';
 import 'package:kanbored/db/database.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
@@ -108,9 +109,12 @@ class AddTaskState extends EditableState<AddTask> {
     log("add task, endEdit: $saveChanges");
     if (saveChanges) {
       log("Add a new task: ${controller.text}, into task: ${columnModel.title}");
+        // final tasksDao = ref.read(AppDatabase.provider).taskDao;
+        // tasksDao.addTask(taskJson);
+      Api.createTask(ref, columnModel.projectId, columnModel.id, controller.text);
       // WebApi.createTask(columnModel.projectId, columnModel.id, controller.text)
       //     .then((taskId) {
-      //   controller.text = "";
+        controller.text = "";
       //   // abActionListener.refreshUi();
       //   Navigator.pushNamed(context, routeTask,
       //       arguments: [taskId, columnModel.projectId]);

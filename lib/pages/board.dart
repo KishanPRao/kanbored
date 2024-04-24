@@ -8,7 +8,6 @@ import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/constants.dart';
 import 'package:kanbored/db/database.dart';
 import 'package:kanbored/strings.dart';
-import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/board_app_bar.dart';
 import 'package:kanbored/ui/board_column.dart';
 import 'package:kanbored/ui/editing_state.dart';
@@ -160,14 +159,14 @@ class _BoardState extends ConsumerState<Board> {
     keysEditableText[activeEditIndex].currentState?.unarchive();
   }
 
-  void onArchived(bool showArchived) {
-    log("board, onArchived: $showArchived");
-    // setState(() {
-    //   this.showArchived = showArchived;
-    // });
-    ref.read(UiState.boardShowArchived.notifier).state = showArchived;
-    // UiState.boardShowArchivedStreamCtller.add(showArchived);
-  }
+  // void onArchived(bool showArchived) {
+  //   log("board, onArchived: $showArchived");
+  //   // setState(() {
+  //   //   this.showArchived = showArchived;
+  //   // });
+  //   ref.read(UiState.boardShowArchived.notifier).state = showArchived;
+  //   // UiState.boardShowArchivedStreamCtller.add(showArchived);
+  // }
 
   void refreshUi() {
     log("board, Refresh UI!");
@@ -175,9 +174,6 @@ class _BoardState extends ConsumerState<Board> {
     // Api.updateColumns(ref, projectModel.id);
     updateData();
   }
-
-  final taskJson = """
-  {"id":3,"title":"Task 3","description":"Test","date_creation":1713122401,"color_id":"yellow","project_id":1,"column_id":1,"owner_id":1,"position":1,"is_active":1,"date_completed":null,"score":null,"date_due":null,"category_id":0,"creator_id":1,"date_modification":1713262081,"reference":"","date_started":null,"time_spent":0,"time_estimated":0,"swimlane_id":1,"date_moved":1713122401,"recurrence_status":0,"recurrence_trigger":0,"recurrence_factor":0,"recurrence_timeframe":0,"recurrence_basedate":0,"recurrence_parent":null,"recurrence_child":null,"priority":0,"external_provider":null,"external_uri":null,"url":"https://board.futuregadget.org/task/1","color":{"name":"Yellow","background":"rgb(245, 247, 196)","border":"rgb(223, 227, 45)"}}""";
 
   @override
   Widget build(BuildContext context) {
@@ -206,8 +202,8 @@ class _BoardState extends ConsumerState<Board> {
     //     tasksDao.addTask(taskJson);
     //   }, child: Text("ADD"))]),
     // );
-    final projectModel = ref.watch(activeProject);
-    final showArchived = ref.watch(UiState.boardShowArchived);
+    final projectModel = ref.read(activeProject);
+    final showArchived = ref.read(UiState.boardShowArchived);
     // if (!isLoaded || projectModel == null) {
     if (projectModel == null) {
       return Utils.emptyUi();

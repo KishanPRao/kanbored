@@ -86,8 +86,8 @@ class WebApi {
   static Future<dynamic> addColumn(int projectId, String title) async =>
       setApi("addColumn", 638544704, params: [projectId, title]);
 
-  static Future<int> createTask(
-          int projectId, int columnId, String taskName) async =>
+  static Future<dynamic> createTask(
+          int projectId, int columnId, String title) async =>
       setApi("createTask", 1176509098, params: {
         "owner_id": AppData.userId,
         "creator_id": AppData.userId,
@@ -96,7 +96,7 @@ class WebApi {
         "description": "",
         "category_id": 0,
         "score": null,
-        "title": taskName,
+        "title": title,
         "project_id": projectId,
         "color_id": "yellow",
         "column_id": columnId,
@@ -245,7 +245,7 @@ class WebApi {
       listApi("getAllComments", 148484683, CommentModel.fromJson,
           params: {"task_id": taskId});
 
-  static Future<TaskModel> getTask(int taskId, int projectId) async {
+  static Future<Map<String, dynamic>> getTask(int taskId, int projectId) async {
     dynamic values = await Future.wait([
       _getTask(taskId),
       _searchTasks(params: {"project_id": projectId, "query": "id:$taskId"})
@@ -253,8 +253,9 @@ class WebApi {
     Map<String, dynamic> searchResult = (values[1] as List<dynamic>).first;
     var mergedValues = (values[0] as Map<String, dynamic>);
     mergedValues.addAll(searchResult);
-    var task = TaskModel.fromJson(mergedValues);
-    return task;
+    return mergedValues;
+    // var task = TaskModel.fromJson(mergedValues);
+    // return task;
   }
 
   static Future<dynamic> _getTask(int taskId) async =>

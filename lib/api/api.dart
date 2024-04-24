@@ -6,7 +6,9 @@ import 'package:kanbored/api/state.dart';
 import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/constants.dart';
 import 'package:kanbored/db/database.dart';
+import 'package:kanbored/utils.dart';
 
+// ignore_for_file: use_build_context_synchronously
 class Api {
   static void recurringApi(VoidCallback function) {
     function();
@@ -103,6 +105,20 @@ class Api {
     var metadata = retrieveTaskMetadata(ref, task.id);
     ref.read(activeTaskMetadata.notifier).state = await metadata;
     return metadata;
+  }
+
+  // Create:
+  static Future<dynamic> createTask(
+      WidgetRef ref, int projectId, int columnId, String title) async {
+    final result = await WebApi.createTask(projectId, columnId, title);
+    if (result is int) {
+      final taskData = await WebApi.getTask(result, projectId);
+      final taskDao = ref.read(AppDatabase.provider).taskDao;
+      taskDao.addTask(taskData);
+    } else {
+      Utils.showErrorSnackbar(ref.context, "Could not create task");
+    }
+    return result;
   }
 
 // static Stream<List<ProjectModelData>> watchProjects() {
