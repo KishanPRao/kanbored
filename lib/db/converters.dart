@@ -93,4 +93,8 @@ class Url {
   factory Url.fromJson(Map<String, dynamic> json) => _$UrlFromJson(json);
 
   Map<String, dynamic> toJson() => _$UrlToJson(this);
+
+  static Url create({String board = "", String list = "", String? calendar}) {
+    return Url(board, list, calendar: calendar);
+  }
 }

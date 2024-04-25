@@ -1,5 +1,8 @@
 {
   "app_name": "Kanbored",
+  "logout": "Logout",
+  "logout_alert": "Logout?",
+  "theme": "Theme",
   "select_theme": "Select theme",
   "tt_archived_col": "Archived Columns & Tasks",
   "tt_search": "Search",
@@ -34,5 +37,6 @@
   "alert_rename_proj_content": "Enter the name of the project",
   "alert_rename_task_content": "Enter the name of the task",
   "column_empty_warn": "Column name cannot be empty",
+  "clear_local": "Clear local data",
   "add_task": "Add a task"
 }

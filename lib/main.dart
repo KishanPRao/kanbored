@@ -16,19 +16,26 @@ import 'package:kanbored/pages/task.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/app_theme.dart';
 
+Future<void> deleteEverything() async {
+  final database = AppDatabase();
+  await database.customStatement('PRAGMA foreign_keys = OFF');
+  try {
+    await database.transaction(() async {
+      for (final table in database.allTables) {
+        await database.delete(table).go();
+      }
+    });
+  } finally {
+    await database.customStatement('PRAGMA foreign_keys = ON');
+  }
+  database.close();
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppTheme.initialize();
   await AppData.initialize();
   await Strings.initialize();
-  final database = AppDatabase();
-  database.delete(database.projectModel).go();
-  database.delete(database.columnModel).go();
-  database.delete(database.taskModel).go();
-  database.delete(database.taskMetadataModel).go();
-  database.delete(database.subtaskModel).go();
-  database.delete(database.commentModel).go();
-  database.close();
 
   // WebApi.getTaskMetadata(44).then((value) {
   //   log("task META: $value");

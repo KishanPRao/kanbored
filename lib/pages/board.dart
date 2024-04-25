@@ -6,6 +6,7 @@ import 'package:kanbored/api/api.dart';
 import 'package:kanbored/api/state.dart';
 import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/constants.dart';
+import 'package:kanbored/db/dao/column_dao.dart';
 import 'package:kanbored/db/database.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/board_app_bar.dart';

@@ -6,6 +6,7 @@ import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/editing_state.dart';
 
 class UiState {
+  static final projectShowArchived = StateProvider<bool>((ref) => false);
   static final boardShowArchived = StateProvider<bool>((ref) => false);
   // static final boardShowArchivedStreamCtller = StreamController.broadcast(sync: true);
   // static final boardRefresh = StateProvider<bool>((ref) => false);

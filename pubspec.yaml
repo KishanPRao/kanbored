@@ -23,6 +23,8 @@ dependencies:
   sqlite3:
   json_annotation:
   flutter_riverpod: ^2.3.0
+  drift_db_viewer:
+  collection:
 
 dev_dependencies:
   flutter_test:

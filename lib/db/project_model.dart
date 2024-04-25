@@ -1,11 +1,11 @@
 import 'package:drift/drift.dart';
+import 'package:kanbored/app_data.dart';
 import 'package:kanbored/db/converters.dart';
+import 'package:kanbored/db/database.dart';
+import 'package:kanbored/utils.dart';
 
 class ProjectModel extends Table {
-  @override
-  Set<Column> get primaryKey => {id};
-
-  IntColumn get id => integer()();
+  IntColumn get id => integer().autoIncrement()();
 
   TextColumn get name => text()();
 
@@ -64,4 +64,46 @@ class ProjectModel extends Table {
   IntColumn get isTrelloImported => integer().nullable()();
 
   TextColumn get url => text().map(const UrlConverter())();
+}
+
+extension ProjectModelCompanionExt on ProjectModelCompanion {
+  static ProjectModelCompanion create(String name,
+      {int isActive = 1,
+      String token = "",
+      int? lastModified,
+      int isPublic = 0,
+      int isPrivate = 0,
+      String identifier = "",
+      String startDate = "",
+      String endDate = "",
+      int? ownerId,
+      int priorityDefault = 0,
+      int priorityStart = 0,
+      int priorityEnd = 3, // TODO:?
+      int perSwimlaneTaskLimits = 0,
+      int taskLimit = 0,
+      int enableGlobalTags = 1,
+      Url? url}) {
+    lastModified = lastModified ?? Utils.currentTimestampInSec();
+    ownerId = ownerId ?? AppData.userId;
+    url = url ?? Url.create();
+    return ProjectModelCompanion(
+        name: Value(name),
+        isActive: Value(isActive),
+        token: Value(token),
+        lastModified: Value(lastModified),
+        isPublic: Value(isPublic),
+        isPrivate: Value(isPrivate),
+        identifier: Value(identifier),
+        startDate: Value(startDate),
+        endDate: Value(endDate),
+        ownerId: Value(ownerId),
+        priorityDefault: Value(priorityDefault),
+        priorityStart: Value(priorityStart),
+        priorityEnd: Value(priorityEnd),
+        perSwimlaneTaskLimits: Value(perSwimlaneTaskLimits),
+        taskLimit: Value(taskLimit),
+        enableGlobalTags: Value(enableGlobalTags),
+        url: Value(url));
+  }
 }

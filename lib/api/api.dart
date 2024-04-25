@@ -10,9 +10,9 @@ import 'package:kanbored/utils.dart';
 
 // ignore_for_file: use_build_context_synchronously
 class Api {
-  static void recurringApi(VoidCallback function) {
+  static void recurringApi(VoidCallback function, {int seconds = apiTimerDurationInSec}) {
     function();
-    const oneSec = Duration(seconds: apiTimerDurationInSec);
+    final oneSec = Duration(seconds: seconds);
     Timer.periodic(oneSec, (Timer t) => function());
   }
 
@@ -22,7 +22,8 @@ class Api {
   static void updateProjects(WidgetRef ref, {recurring = false}) {
     function() {
       WebApi.getAllProjects().then((items) async {
-        updateDbProjects(ref, items);
+        ref.read(AppDatabase.provider).projectDao.updateProjects(items);
+        // updateDbProjects(ref, items);
       });
     }
 
@@ -34,9 +35,10 @@ class Api {
     function() {
       WebApi.getColumns(projectId).then((items) async {
         // TODO: alt approach?
-        if (ref.context.mounted) {
-          updateDbColumns(ref, items);
-        }
+        // if (ref.context.mounted) {
+        //   updateDbColumns(ref, items);
+        // }
+        ref.read(AppDatabase.provider).columnDao.updateColumns(items);
       });
     }
 
@@ -46,15 +48,14 @@ class Api {
 
   static void updateTasks(WidgetRef ref, int projectId, {recurring = false}) {
     function() {
-      // active, inactive tasks
       Future.wait([
-        WebApi.getAllTasks(projectId, 1),
-        WebApi.getAllTasks(projectId, 0),
+        WebApi.getAllTasks(projectId, 1), // active
+        WebApi.getAllTasks(projectId, 0), //inactive
       ]).then((value) {
         var tasks = value[0];
         tasks.addAll(value[1]);
         // log("tasks: $tasks");
-        updateDbTasks(ref, tasks);
+        ref.read(AppDatabase.provider).taskDao.updateTasks(tasks);
       });
     }
 
@@ -71,7 +72,7 @@ class Api {
     if (webUpdate) {
       result = await WebApi.updateProject(data);
     }
-    if (result) updateDbProject(ref, data);
+    if (result) ref.read(AppDatabase.provider).projectDao.updateProject(data);
     return result;
   }
 
@@ -80,7 +81,7 @@ class Api {
     ref.read(activeColumn.notifier).state = data;
     if (webUpdate) {
       var result = await WebApi.updateColumn(data);
-      if (result) updateDbColumn(ref, data);
+      if (result) ref.read(AppDatabase.provider).columnDao.updateColumn(data);
       return result;
     }
     return true;
@@ -138,12 +139,26 @@ class Api {
   // }
 
   // Create:
+  static Future<dynamic> createProject(
+      WidgetRef ref, String title) async {
+    // final result = await WebApi.createProject(title);
+    // if (result is int) {
+    //   // ref.read(AppDatabase.provider).projectDao.addTcask(taskData);
+    // } else {
+    //   Utils.showErrorSnackbar(ref.context, "Could not create task");
+    // }
+    // return result;
+    ref.read(AppDatabase.provider).projectDao.createLocalProject(title);
+    // Add to queue
+    // Merge value on result
+  }
+
   static Future<dynamic> createTask(
       WidgetRef ref, int projectId, int columnId, String title) async {
     final result = await WebApi.createTask(projectId, columnId, title);
     if (result is int) {
       final taskData = await WebApi.getTask(result, projectId);
-      ref.read(AppDatabase.provider).taskDao.addTask(taskData);
+      ref.read(AppDatabase.provider).taskDao.createTask(taskData);
     } else {
       Utils.showErrorSnackbar(ref.context, "Could not create task");
     }
@@ -153,7 +168,7 @@ class Api {
   // Remove:
   static Future<bool> removeProject(WidgetRef ref, int projectId) async {
     var result = await WebApi.removeProject(projectId);
-    if (result) removeDbProject(ref, projectId);
+    if (result) ref.read(AppDatabase.provider).projectDao.removeProject(projectId);
     return result;
   }
 

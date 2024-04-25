@@ -1,11 +1,18 @@
+import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
+import 'dart:math' as math;
 
+import 'package:collection/equality.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/api/state.dart';
-import 'package:kanbored/api/web_api.dart';
+import 'package:kanbored/api/web_api_id.dart';
 import 'package:kanbored/constants.dart';
+import 'package:kanbored/db/dao/api_storage_dao.dart';
+import 'package:kanbored/db/dao/project_dao.dart';
+import 'package:kanbored/db/dao/task_dao.dart';
 import 'package:kanbored/db/database.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/project_app_bar.dart';
@@ -20,12 +27,48 @@ class Home extends ConsumerStatefulWidget {
 }
 
 class _HomeState extends ConsumerState<Home> {
-  var showArchived = false;
+  // var showArchived = false;
+  late TaskDao taskDao;
+  late ApiStorageDao apiDao;
+
+  final jsonData = {"jsonrpc":"2.0","method":"createProject","id":1797076613,"params":{"name":"New project","owner_id":1}};
 
   @override
   void initState() {
     super.initState();
+    taskDao = ref.read(AppDatabase.provider).taskDao;
+    apiDao = ref.read(AppDatabase.provider).apiStorageDao;
     Api.updateProjects(ref, recurring: true);
+    // Api.recurringApi(() async {
+    //   var task = await taskDao.getTask(1);
+    //   log("Re-runnning from home! ${task.title}; ${ref.context.mounted}");
+    // }, seconds: 12);
+    apiDao.watchApiTasks().listen((event) {
+      // log("remaining tasks len: ${event.length}");
+    });
+    // final random = math.Random();
+    apiDao.watchApiLatest().listen((event) async {
+      if (event == null) {
+        // log("null task");
+        return;
+      }
+      // log("==> running task: ${event.timestamp}");
+      // int next(int min, int max) => min + random.nextInt(max - min);
+      // sleep(Duration(seconds:next(7, 12)));
+      Future.value(42).then((value) {
+        // var a = 20;
+        // for (int i = 0; i < 99999 * 11111; i++) {
+        //   a += 20;
+        // }
+        // log("==> finished task: ${event.timestamp}; $a");
+        apiDao.removeApiTask(event.id);
+      });
+    });
+    Api.recurringApi(() async {
+      const webApi = WebApiId.createProject;
+      // Api.createProject(ref, "New project");
+      apiDao.addApiTask(webApi.value, webApi.name, json.encode(jsonData));
+    }, seconds: 1);
   }
 
   void onChange(text) {
@@ -61,28 +104,27 @@ class _HomeState extends ConsumerState<Home> {
 
   void onAddProject() {
     log("project, onAddProject");
-    // NOTE: this approach will not work for multiple boards/swimlane; instead, add to board's popup options
-    Utils.showInputAlertDialog(
-        context, "add_project".resc(), "alert_new_proj_content".resc(), "",
-        (title) {
-      log("project, add col: $title");
-      WebApi.createProject(title).then((result) {
-        if (result is int) {
-          // TODO: remove default columns? `getColumns` and `removeColumn`
-          onArchived(false);
-          refreshUi();
-        } else {
-          Utils.showErrorSnackbar(context, "Could not add project");
-        }
-      }).onError((e, st) => Utils.showErrorSnackbar(context, e));
-    });
+    // Utils.showInputAlertDialog(
+    //     context, "add_project".resc(), "alert_new_proj_content".resc(), "",
+    //     (title) {
+    //   log("project, add col: $title");
+    //   WebApi.createProject(title).then((result) {
+    //     if (result is int) {
+    //       // TODO: remove default columns? `getColumns` and `removeColumn`
+    //       onArchived(false);
+    //       refreshUi();
+    //     } else {
+    //       Utils.showErrorSnackbar(context, "Could not add project");
+    //     }
+    //   }).onError((e, st) => Utils.showErrorSnackbar(context, e));
+    // });
   }
 
   void onArchived(showArchived) {
     log("project, onArchived: $showArchived");
-    setState(() {
-      this.showArchived = showArchived;
-    });
+    // setState(() {
+    //   this.showArchived = showArchived;
+    // });
   }
 
   void refreshUi() {
@@ -92,15 +134,9 @@ class _HomeState extends ConsumerState<Home> {
 
   @override
   Widget build(BuildContext context) {
-    final projects = ref.watch(allProjects);
-    // var projects = this
-    //     .projects
-    //     .where((project) => project.isActive != showArchived)
-    //     .toList();
-    // projects.sort((a, b) => a.name.compareTo(b.name));
-    // log("Projects: $projects; orig: ${this.projects}");
     return PopScope(
-        onPopInvoked: (didPop) => ref.read(UiState.boardEditing.notifier).state = false,
+        onPopInvoked: (didPop) =>
+            ref.read(UiState.boardEditing.notifier).state = false,
         child: Scaffold(
             backgroundColor: "pageBg".themed(context),
             // floatingActionButton: buildSearchFab(context, () {
@@ -109,79 +145,91 @@ class _HomeState extends ConsumerState<Home> {
             appBar: AppBar(
               title: Text("app_name".resc()),
               backgroundColor: "primary".themed(context),
-              actions: [
-                ProjectAppBarActions(
-                    // key: keyAppBarActionsState,
-                    // showArchived: showArchived,
-                    // abActionListener: ProjectActionListener(
-                    //   onArchived: onArchived,
-                    //   onChange: onChange,
-                    //   onEditStart: (_, __) => {},
-                    //   onEditEnd: onEditEnd,
-                    //   onDelete: onDelete,
-                    //   onMainAction: onAddProject,
-                    //   refreshUi: refreshUi,
-                    // ),
-                    )
-              ],
+              actions: const [ProjectAppBarActions()],
             ),
             body: RefreshIndicator(
-              // trigger the _loadData function when the user pulls down
-              onRefresh: () {
-                refreshUi();
-                return Utils.emptyFuture();
-              },
-              child: projects.when(
-                  data: (projects) => Column(children: [
-                        showArchived
+                onRefresh: () {
+                  refreshUi();
+                  return Utils.emptyFuture();
+                },
+                child: Column(children: [
+                  StreamBuilder(
+                      stream: ref
+                          .watch(UiState.projectShowArchived.notifier)
+                          .stream,
+                      builder: (context, snapshot2) {
+                        final showArchived = snapshot2.data ?? false;
+                        return showArchived
                             ? Card(
                                 clipBehavior: Clip.hardEdge,
                                 color: "archivedBg".themed(context),
                                 child: SizedBox(
                                   child: Center(child: Text("archived".resc())),
                                 ))
-                            : Utils.emptyUi(),
-                        buildProjects(projects),
-                      ]),
-                  error: (e, s) {
-                    log("error: $e");
-                    // TODO: proper text label for error
-                    return const Text('error');
-                  },
-                  loading: () => const Center(
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )),
-            )));
+                            : Utils.emptyUi();
+                      }),
+                  buildProjectsStream()
+                ]))));
   }
 
-  Widget buildProjects(List<ProjectModelData> projects) {
-    projects = projects
-        .where((project) =>
-            ((project.isActive == 0) && showArchived) ||
-            ((project.isActive == 1) && !showArchived))
-        .toList();
-    // log("build, # projects ${projects.length}");
+  StreamBuilder<List<ProjectModelData>> buildProjectsStream() {
+    log("buildProjectsStream");
+    return StreamBuilder(
+        stream: ref.read(AppDatabase.provider).projectDao.watchProjects(),
+        builder: (context, AsyncSnapshot<List<ProjectModelData>> snapshot) {
+          log("new projects: ${snapshot.data}!");
+          return StreamBuilder(
+            stream: ref.watch(UiState.projectShowArchived.notifier).stream,
+            builder: (context, snapshot2) {
+              final showArchived = snapshot2.data ?? false;
+              // TODO: if used outside 2nd stream builder, data not saved?
+              var projects = snapshot.data ?? [];
+              log("new projects: ${projects.length}, $showArchived");
+              projects = projects
+                  .where((project) =>
+                      ((project.isActive == 0) && showArchived) ||
+                      ((project.isActive == 1) && !showArchived))
+                  .toList();
+              // log("build, # projects ${projects.length}");
+              return buildProjectsUi(projects);
+            },
+          );
+        });
+  }
+
+  Widget buildProjectsUi(List<ProjectModelData> projects) {
     return Expanded(
-        child: GridView.count(
+        child: GridView.builder(
             shrinkWrap: true,
-            crossAxisCount: 2,
-            children: projects
-                .map((project) => Card(
-                      color: "projectBg".themed(context),
-                      clipBehavior: Clip.hardEdge,
-                      child: InkWell(
-                          splashColor: "cardHighlight".themed(context),
-                          highlightColor: "cardHighlight".themed(context),
-                          onTap: () {
-                            ref.read(UiState.boardShowArchived.notifier).state =
-                                false;
-                            ref.read(activeProject.notifier).state = project;
-                            Navigator.pushNamed(context, routeBoard);
-                          },
-                          child: SizedBox(
-                            child: Center(child: Text(project.name)),
-                          )),
-                    ))
-                .toList()));
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2),
+            itemCount: projects.length,
+            itemBuilder: (BuildContext context, int index) {
+              final project = projects[index];
+              return Card(
+                color: "projectBg".themed(context),
+                // clipBehavior: Clip.hardEdge,
+                clipBehavior: Clip.antiAlias,
+                // semanticContainer: true,
+                // shadowColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  // TODO: use percentage of width?
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+                borderOnForeground: false,
+                child: InkWell(
+                    splashColor: "cardHighlight".themed(context),
+                    highlightColor: "cardHighlight".themed(context),
+                    onTap: () {
+                      ref.read(UiState.projectShowArchived.notifier).state =
+                          false;
+                      ref.read(activeProject.notifier).state = project;
+                      Navigator.pushNamed(context, routeBoard);
+                    },
+                    child: SizedBox(
+                      child: Center(child: Text(project.name)),
+                    )),
+              );
+            }));
   }
 }

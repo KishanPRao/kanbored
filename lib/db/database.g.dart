@@ -13,7 +13,11 @@ class $ProjectModelTable extends ProjectModel
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
       'id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: false);
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
@@ -997,7 +1001,11 @@ class $ColumnModelTable extends ColumnModel
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
       'id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
@@ -1051,8 +1059,6 @@ class $ColumnModelTable extends ColumnModel
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
     }
     if (data.containsKey('title')) {
       context.handle(
@@ -1098,7 +1104,7 @@ class $ColumnModelTable extends ColumnModel
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {id, projectId};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   ColumnModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -1249,7 +1255,6 @@ class ColumnModelCompanion extends UpdateCompanion<ColumnModelData> {
   final Value<String> description;
   final Value<int> hideInDashboard;
   final Value<int> projectId;
-  final Value<int> rowid;
   const ColumnModelCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
@@ -1258,19 +1263,16 @@ class ColumnModelCompanion extends UpdateCompanion<ColumnModelData> {
     this.description = const Value.absent(),
     this.hideInDashboard = const Value.absent(),
     this.projectId = const Value.absent(),
-    this.rowid = const Value.absent(),
   });
   ColumnModelCompanion.insert({
-    required int id,
+    this.id = const Value.absent(),
     required String title,
     required int position,
     required int taskLimit,
     required String description,
     required int hideInDashboard,
     required int projectId,
-    this.rowid = const Value.absent(),
-  })  : id = Value(id),
-        title = Value(title),
+  })  : title = Value(title),
         position = Value(position),
         taskLimit = Value(taskLimit),
         description = Value(description),
@@ -1284,7 +1286,6 @@ class ColumnModelCompanion extends UpdateCompanion<ColumnModelData> {
     Expression<String>? description,
     Expression<int>? hideInDashboard,
     Expression<int>? projectId,
-    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1294,7 +1295,6 @@ class ColumnModelCompanion extends UpdateCompanion<ColumnModelData> {
       if (description != null) 'description': description,
       if (hideInDashboard != null) 'hide_in_dashboard': hideInDashboard,
       if (projectId != null) 'project_id': projectId,
-      if (rowid != null) 'rowid': rowid,
     });
   }
 
@@ -1305,8 +1305,7 @@ class ColumnModelCompanion extends UpdateCompanion<ColumnModelData> {
       Value<int>? taskLimit,
       Value<String>? description,
       Value<int>? hideInDashboard,
-      Value<int>? projectId,
-      Value<int>? rowid}) {
+      Value<int>? projectId}) {
     return ColumnModelCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
@@ -1315,7 +1314,6 @@ class ColumnModelCompanion extends UpdateCompanion<ColumnModelData> {
       description: description ?? this.description,
       hideInDashboard: hideInDashboard ?? this.hideInDashboard,
       projectId: projectId ?? this.projectId,
-      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -1343,9 +1341,6 @@ class ColumnModelCompanion extends UpdateCompanion<ColumnModelData> {
     if (projectId.present) {
       map['project_id'] = Variable<int>(projectId.value);
     }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
     return map;
   }
 
@@ -1358,8 +1353,7 @@ class ColumnModelCompanion extends UpdateCompanion<ColumnModelData> {
           ..write('taskLimit: $taskLimit, ')
           ..write('description: $description, ')
           ..write('hideInDashboard: $hideInDashboard, ')
-          ..write('projectId: $projectId, ')
-          ..write('rowid: $rowid')
+          ..write('projectId: $projectId')
           ..write(')'))
         .toString();
   }
@@ -1375,7 +1369,11 @@ class $CommentModelTable extends CommentModel
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
       'id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
   static const VerificationMeta _dateCreationMeta =
       const VerificationMeta('dateCreation');
   @override
@@ -1451,8 +1449,6 @@ class $CommentModelTable extends CommentModel
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
     }
     if (data.containsKey('date_creation')) {
       context.handle(
@@ -1510,7 +1506,7 @@ class $CommentModelTable extends CommentModel
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {id, taskId};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   CommentModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -1714,7 +1710,6 @@ class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
   final Value<String?> name;
   final Value<String?> email;
   final Value<String?> avatarPath;
-  final Value<int> rowid;
   const CommentModelCompanion({
     this.id = const Value.absent(),
     this.dateCreation = const Value.absent(),
@@ -1726,10 +1721,9 @@ class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
     this.name = const Value.absent(),
     this.email = const Value.absent(),
     this.avatarPath = const Value.absent(),
-    this.rowid = const Value.absent(),
   });
   CommentModelCompanion.insert({
-    required int id,
+    this.id = const Value.absent(),
     required int dateCreation,
     required int dateModification,
     required int taskId,
@@ -1739,9 +1733,7 @@ class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
     this.name = const Value.absent(),
     this.email = const Value.absent(),
     this.avatarPath = const Value.absent(),
-    this.rowid = const Value.absent(),
-  })  : id = Value(id),
-        dateCreation = Value(dateCreation),
+  })  : dateCreation = Value(dateCreation),
         dateModification = Value(dateModification),
         taskId = Value(taskId),
         userId = Value(userId),
@@ -1757,7 +1749,6 @@ class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
     Expression<String>? name,
     Expression<String>? email,
     Expression<String>? avatarPath,
-    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1770,7 +1761,6 @@ class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
       if (name != null) 'name': name,
       if (email != null) 'email': email,
       if (avatarPath != null) 'avatar_path': avatarPath,
-      if (rowid != null) 'rowid': rowid,
     });
   }
 
@@ -1784,8 +1774,7 @@ class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
       Value<String?>? username,
       Value<String?>? name,
       Value<String?>? email,
-      Value<String?>? avatarPath,
-      Value<int>? rowid}) {
+      Value<String?>? avatarPath}) {
     return CommentModelCompanion(
       id: id ?? this.id,
       dateCreation: dateCreation ?? this.dateCreation,
@@ -1797,7 +1786,6 @@ class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
       name: name ?? this.name,
       email: email ?? this.email,
       avatarPath: avatarPath ?? this.avatarPath,
-      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -1834,9 +1822,6 @@ class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
     if (avatarPath.present) {
       map['avatar_path'] = Variable<String>(avatarPath.value);
     }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
     return map;
   }
 
@@ -1852,8 +1837,7 @@ class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
           ..write('username: $username, ')
           ..write('name: $name, ')
           ..write('email: $email, ')
-          ..write('avatarPath: $avatarPath, ')
-          ..write('rowid: $rowid')
+          ..write('avatarPath: $avatarPath')
           ..write(')'))
         .toString();
   }
@@ -1869,7 +1853,11 @@ class $SubtaskModelTable extends SubtaskModel
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
       'id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
@@ -1968,8 +1956,6 @@ class $SubtaskModelTable extends SubtaskModel
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
     }
     if (data.containsKey('title')) {
       context.handle(
@@ -2049,7 +2035,7 @@ class $SubtaskModelTable extends SubtaskModel
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {id, taskId};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   SubtaskModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -2301,7 +2287,6 @@ class SubtaskModelCompanion extends UpdateCompanion<SubtaskModelData> {
   final Value<int> timerStartDate;
   final Value<String?> statusName;
   final Value<bool> isTimerStarted;
-  final Value<int> rowid;
   const SubtaskModelCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
@@ -2316,10 +2301,9 @@ class SubtaskModelCompanion extends UpdateCompanion<SubtaskModelData> {
     this.timerStartDate = const Value.absent(),
     this.statusName = const Value.absent(),
     this.isTimerStarted = const Value.absent(),
-    this.rowid = const Value.absent(),
   });
   SubtaskModelCompanion.insert({
-    required int id,
+    this.id = const Value.absent(),
     required String title,
     required int status,
     required int timeEstimated,
@@ -2332,9 +2316,7 @@ class SubtaskModelCompanion extends UpdateCompanion<SubtaskModelData> {
     required int timerStartDate,
     this.statusName = const Value.absent(),
     required bool isTimerStarted,
-    this.rowid = const Value.absent(),
-  })  : id = Value(id),
-        title = Value(title),
+  })  : title = Value(title),
         status = Value(status),
         timeEstimated = Value(timeEstimated),
         timeSpent = Value(timeSpent),
@@ -2357,7 +2339,6 @@ class SubtaskModelCompanion extends UpdateCompanion<SubtaskModelData> {
     Expression<int>? timerStartDate,
     Expression<String>? statusName,
     Expression<bool>? isTimerStarted,
-    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2373,7 +2354,6 @@ class SubtaskModelCompanion extends UpdateCompanion<SubtaskModelData> {
       if (timerStartDate != null) 'timer_start_date': timerStartDate,
       if (statusName != null) 'status_name': statusName,
       if (isTimerStarted != null) 'is_timer_started': isTimerStarted,
-      if (rowid != null) 'rowid': rowid,
     });
   }
 
@@ -2390,8 +2370,7 @@ class SubtaskModelCompanion extends UpdateCompanion<SubtaskModelData> {
       Value<String?>? name,
       Value<int>? timerStartDate,
       Value<String?>? statusName,
-      Value<bool>? isTimerStarted,
-      Value<int>? rowid}) {
+      Value<bool>? isTimerStarted}) {
     return SubtaskModelCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
@@ -2406,7 +2385,6 @@ class SubtaskModelCompanion extends UpdateCompanion<SubtaskModelData> {
       timerStartDate: timerStartDate ?? this.timerStartDate,
       statusName: statusName ?? this.statusName,
       isTimerStarted: isTimerStarted ?? this.isTimerStarted,
-      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -2452,9 +2430,6 @@ class SubtaskModelCompanion extends UpdateCompanion<SubtaskModelData> {
     if (isTimerStarted.present) {
       map['is_timer_started'] = Variable<bool>(isTimerStarted.value);
     }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
     return map;
   }
 
@@ -2473,8 +2448,7 @@ class SubtaskModelCompanion extends UpdateCompanion<SubtaskModelData> {
           ..write('name: $name, ')
           ..write('timerStartDate: $timerStartDate, ')
           ..write('statusName: $statusName, ')
-          ..write('isTimerStarted: $isTimerStarted, ')
-          ..write('rowid: $rowid')
+          ..write('isTimerStarted: $isTimerStarted')
           ..write(')'))
         .toString();
   }
@@ -2490,7 +2464,11 @@ class $TaskModelTable extends TaskModel
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
       'id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
@@ -2714,8 +2692,6 @@ class $TaskModelTable extends TaskModel
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
     }
     if (data.containsKey('title')) {
       context.handle(
@@ -2905,7 +2881,7 @@ class $TaskModelTable extends TaskModel
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {id, columnId, projectId};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   TaskModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -3433,7 +3409,6 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
   final Value<int?> recurrenceParent;
   final Value<int?> recurrenceChild;
   final Value<int> priority;
-  final Value<int> rowid;
   const TaskModelCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
@@ -3465,10 +3440,9 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
     this.recurrenceParent = const Value.absent(),
     this.recurrenceChild = const Value.absent(),
     this.priority = const Value.absent(),
-    this.rowid = const Value.absent(),
   });
   TaskModelCompanion.insert({
-    required int id,
+    this.id = const Value.absent(),
     required String title,
     required String description,
     required int dateCreation,
@@ -3498,9 +3472,7 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
     this.recurrenceParent = const Value.absent(),
     this.recurrenceChild = const Value.absent(),
     required int priority,
-    this.rowid = const Value.absent(),
-  })  : id = Value(id),
-        title = Value(title),
+  })  : title = Value(title),
         description = Value(description),
         dateCreation = Value(dateCreation),
         colorId = Value(colorId),
@@ -3550,7 +3522,6 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
     Expression<int>? recurrenceParent,
     Expression<int>? recurrenceChild,
     Expression<int>? priority,
-    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -3584,7 +3555,6 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
       if (recurrenceParent != null) 'recurrence_parent': recurrenceParent,
       if (recurrenceChild != null) 'recurrence_child': recurrenceChild,
       if (priority != null) 'priority': priority,
-      if (rowid != null) 'rowid': rowid,
     });
   }
 
@@ -3618,8 +3588,7 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
       Value<int>? recurrenceBasedate,
       Value<int?>? recurrenceParent,
       Value<int?>? recurrenceChild,
-      Value<int>? priority,
-      Value<int>? rowid}) {
+      Value<int>? priority}) {
     return TaskModelCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
@@ -3651,7 +3620,6 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
       recurrenceParent: recurrenceParent ?? this.recurrenceParent,
       recurrenceChild: recurrenceChild ?? this.recurrenceChild,
       priority: priority ?? this.priority,
-      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -3748,9 +3716,6 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
     if (priority.present) {
       map['priority'] = Variable<int>(priority.value);
     }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
     return map;
   }
 
@@ -3786,8 +3751,7 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
           ..write('recurrenceBasedate: $recurrenceBasedate, ')
           ..write('recurrenceParent: $recurrenceParent, ')
           ..write('recurrenceChild: $recurrenceChild, ')
-          ..write('priority: $priority, ')
-          ..write('rowid: $rowid')
+          ..write('priority: $priority')
           ..write(')'))
         .toString();
   }
@@ -3978,6 +3942,296 @@ class TaskMetadataModelCompanion
   }
 }
 
+class $ApiStorageModelTable extends ApiStorageModel
+    with TableInfo<$ApiStorageModelTable, ApiStorageModelData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ApiStorageModelTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _apiIdMeta = const VerificationMeta('apiId');
+  @override
+  late final GeneratedColumn<int> apiId = GeneratedColumn<int>(
+      'api_id', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _apiNameMeta =
+      const VerificationMeta('apiName');
+  @override
+  late final GeneratedColumn<String> apiName = GeneratedColumn<String>(
+      'api_name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _apiBodyMeta =
+      const VerificationMeta('apiBody');
+  @override
+  late final GeneratedColumn<String> apiBody = GeneratedColumn<String>(
+      'api_body', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _timestampMeta =
+      const VerificationMeta('timestamp');
+  @override
+  late final GeneratedColumn<int> timestamp = GeneratedColumn<int>(
+      'timestamp', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, apiId, apiName, apiBody, timestamp];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'api_storage_model';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<ApiStorageModelData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('api_id')) {
+      context.handle(
+          _apiIdMeta, apiId.isAcceptableOrUnknown(data['api_id']!, _apiIdMeta));
+    } else if (isInserting) {
+      context.missing(_apiIdMeta);
+    }
+    if (data.containsKey('api_name')) {
+      context.handle(_apiNameMeta,
+          apiName.isAcceptableOrUnknown(data['api_name']!, _apiNameMeta));
+    } else if (isInserting) {
+      context.missing(_apiNameMeta);
+    }
+    if (data.containsKey('api_body')) {
+      context.handle(_apiBodyMeta,
+          apiBody.isAcceptableOrUnknown(data['api_body']!, _apiBodyMeta));
+    } else if (isInserting) {
+      context.missing(_apiBodyMeta);
+    }
+    if (data.containsKey('timestamp')) {
+      context.handle(_timestampMeta,
+          timestamp.isAcceptableOrUnknown(data['timestamp']!, _timestampMeta));
+    } else if (isInserting) {
+      context.missing(_timestampMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ApiStorageModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ApiStorageModelData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      apiId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}api_id'])!,
+      apiName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}api_name'])!,
+      apiBody: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}api_body'])!,
+      timestamp: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}timestamp'])!,
+    );
+  }
+
+  @override
+  $ApiStorageModelTable createAlias(String alias) {
+    return $ApiStorageModelTable(attachedDatabase, alias);
+  }
+}
+
+class ApiStorageModelData extends DataClass
+    implements Insertable<ApiStorageModelData> {
+  final int id;
+  final int apiId;
+  final String apiName;
+  final String apiBody;
+  final int timestamp;
+  const ApiStorageModelData(
+      {required this.id,
+      required this.apiId,
+      required this.apiName,
+      required this.apiBody,
+      required this.timestamp});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['api_id'] = Variable<int>(apiId);
+    map['api_name'] = Variable<String>(apiName);
+    map['api_body'] = Variable<String>(apiBody);
+    map['timestamp'] = Variable<int>(timestamp);
+    return map;
+  }
+
+  ApiStorageModelCompanion toCompanion(bool nullToAbsent) {
+    return ApiStorageModelCompanion(
+      id: Value(id),
+      apiId: Value(apiId),
+      apiName: Value(apiName),
+      apiBody: Value(apiBody),
+      timestamp: Value(timestamp),
+    );
+  }
+
+  factory ApiStorageModelData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ApiStorageModelData(
+      id: serializer.fromJson<int>(json['id']),
+      apiId: serializer.fromJson<int>(json['apiId']),
+      apiName: serializer.fromJson<String>(json['apiName']),
+      apiBody: serializer.fromJson<String>(json['apiBody']),
+      timestamp: serializer.fromJson<int>(json['timestamp']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'apiId': serializer.toJson<int>(apiId),
+      'apiName': serializer.toJson<String>(apiName),
+      'apiBody': serializer.toJson<String>(apiBody),
+      'timestamp': serializer.toJson<int>(timestamp),
+    };
+  }
+
+  ApiStorageModelData copyWith(
+          {int? id,
+          int? apiId,
+          String? apiName,
+          String? apiBody,
+          int? timestamp}) =>
+      ApiStorageModelData(
+        id: id ?? this.id,
+        apiId: apiId ?? this.apiId,
+        apiName: apiName ?? this.apiName,
+        apiBody: apiBody ?? this.apiBody,
+        timestamp: timestamp ?? this.timestamp,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('ApiStorageModelData(')
+          ..write('id: $id, ')
+          ..write('apiId: $apiId, ')
+          ..write('apiName: $apiName, ')
+          ..write('apiBody: $apiBody, ')
+          ..write('timestamp: $timestamp')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, apiId, apiName, apiBody, timestamp);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ApiStorageModelData &&
+          other.id == this.id &&
+          other.apiId == this.apiId &&
+          other.apiName == this.apiName &&
+          other.apiBody == this.apiBody &&
+          other.timestamp == this.timestamp);
+}
+
+class ApiStorageModelCompanion extends UpdateCompanion<ApiStorageModelData> {
+  final Value<int> id;
+  final Value<int> apiId;
+  final Value<String> apiName;
+  final Value<String> apiBody;
+  final Value<int> timestamp;
+  const ApiStorageModelCompanion({
+    this.id = const Value.absent(),
+    this.apiId = const Value.absent(),
+    this.apiName = const Value.absent(),
+    this.apiBody = const Value.absent(),
+    this.timestamp = const Value.absent(),
+  });
+  ApiStorageModelCompanion.insert({
+    this.id = const Value.absent(),
+    required int apiId,
+    required String apiName,
+    required String apiBody,
+    required int timestamp,
+  })  : apiId = Value(apiId),
+        apiName = Value(apiName),
+        apiBody = Value(apiBody),
+        timestamp = Value(timestamp);
+  static Insertable<ApiStorageModelData> custom({
+    Expression<int>? id,
+    Expression<int>? apiId,
+    Expression<String>? apiName,
+    Expression<String>? apiBody,
+    Expression<int>? timestamp,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (apiId != null) 'api_id': apiId,
+      if (apiName != null) 'api_name': apiName,
+      if (apiBody != null) 'api_body': apiBody,
+      if (timestamp != null) 'timestamp': timestamp,
+    });
+  }
+
+  ApiStorageModelCompanion copyWith(
+      {Value<int>? id,
+      Value<int>? apiId,
+      Value<String>? apiName,
+      Value<String>? apiBody,
+      Value<int>? timestamp}) {
+    return ApiStorageModelCompanion(
+      id: id ?? this.id,
+      apiId: apiId ?? this.apiId,
+      apiName: apiName ?? this.apiName,
+      apiBody: apiBody ?? this.apiBody,
+      timestamp: timestamp ?? this.timestamp,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (apiId.present) {
+      map['api_id'] = Variable<int>(apiId.value);
+    }
+    if (apiName.present) {
+      map['api_name'] = Variable<String>(apiName.value);
+    }
+    if (apiBody.present) {
+      map['api_body'] = Variable<String>(apiBody.value);
+    }
+    if (timestamp.present) {
+      map['timestamp'] = Variable<int>(timestamp.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ApiStorageModelCompanion(')
+          ..write('id: $id, ')
+          ..write('apiId: $apiId, ')
+          ..write('apiName: $apiName, ')
+          ..write('apiBody: $apiBody, ')
+          ..write('timestamp: $timestamp')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   late final $ProjectModelTable projectModel = $ProjectModelTable(this);
@@ -3987,9 +4241,12 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $TaskModelTable taskModel = $TaskModelTable(this);
   late final $TaskMetadataModelTable taskMetadataModel =
       $TaskMetadataModelTable(this);
+  late final $ApiStorageModelTable apiStorageModel =
+      $ApiStorageModelTable(this);
   late final ProjectDao projectDao = ProjectDao(this as AppDatabase);
   late final ColumnDao columnDao = ColumnDao(this as AppDatabase);
   late final TaskDao taskDao = TaskDao(this as AppDatabase);
+  late final ApiStorageDao apiStorageDao = ApiStorageDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4000,19 +4257,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         commentModel,
         subtaskModel,
         taskModel,
-        taskMetadataModel
+        taskMetadataModel,
+        apiStorageModel
       ];
-}
-
-mixin _$ProjectDaoMixin on DatabaseAccessor<AppDatabase> {
-  $ProjectModelTable get projectModel => attachedDatabase.projectModel;
-}
-mixin _$ColumnDaoMixin on DatabaseAccessor<AppDatabase> {
-  $ProjectModelTable get projectModel => attachedDatabase.projectModel;
-  $ColumnModelTable get columnModel => attachedDatabase.columnModel;
-}
-mixin _$TaskDaoMixin on DatabaseAccessor<AppDatabase> {
-  $ProjectModelTable get projectModel => attachedDatabase.projectModel;
-  $ColumnModelTable get columnModel => attachedDatabase.columnModel;
-  $TaskModelTable get taskModel => attachedDatabase.taskModel;
 }

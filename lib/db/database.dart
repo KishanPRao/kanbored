@@ -3,10 +3,17 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/web_api_id.dart';
+import 'package:kanbored/db/api_storage_model.dart';
 import 'package:kanbored/db/column_model.dart';
 import 'package:kanbored/db/comment_model.dart';
 import 'package:kanbored/db/converters.dart';
+import 'package:kanbored/db/dao/api_storage_dao.dart';
+import 'package:kanbored/db/dao/column_dao.dart';
+import 'package:kanbored/db/dao/project_dao.dart';
+import 'package:kanbored/db/dao/task_dao.dart';
 import 'package:kanbored/db/project_model.dart';
 import 'package:kanbored/db/subtask_model.dart';
 import 'package:kanbored/db/task_model.dart';
@@ -24,10 +31,12 @@ part 'database.g.dart';
   SubtaskModel,
   TaskModel,
   TaskMetadataModel,
+  ApiStorageModel,
 ], daos: [
   ProjectDao,
   ColumnDao,
   TaskDao,
+  ApiStorageDao,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -42,105 +51,17 @@ class AppDatabase extends _$AppDatabase {
   });
 }
 
-@DriftAccessor(tables: [ProjectModel])
-class ProjectDao extends DatabaseAccessor<AppDatabase> with _$ProjectDaoMixin {
-  ProjectDao(super.db);
-
-  Stream<List<ProjectModelData>> allProjects() {
-    final query = select(projectModel)
-      ..orderBy([(t) => OrderingTerm(expression: t.name)]);
-    return query.watch();
-  }
-}
-
-@DriftAccessor(tables: [ColumnModel])
-class ColumnDao extends DatabaseAccessor<AppDatabase> with _$ColumnDaoMixin {
-  ColumnDao(super.db);
-
-  Stream<List<ColumnModelData>> watchColumnsInProject(int projectId) {
-    final query = select(columnModel)
-      ..where((tbl) {
-        return tbl.projectId.equals(projectId);
-      })
-      ..orderBy([(t) => OrderingTerm(expression: t.position)]);
-    return query.watch();
-  }
-}
-
-@DriftAccessor(tables: [TaskModel])
-class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
-  TaskDao(super.db);
-
-  // Stream<List<TaskModelData>> watchTasksInProject(int projectId) {
-  //   final query = select(taskModel)
-  //     ..where((tbl) {
-  //       return tbl.projectId.equals(projectId);
-  //     })
-  //     ..orderBy([(t) => OrderingTerm(expression: t.position)]);
-  //   return query.watch();
-  // }
-
-  Stream<List<TaskModelData>> watchTasksInColumn(int columnId) {
-    final query = select(taskModel)
-      ..where((tbl) {
-        return tbl.columnId.equals(columnId);
-      })
-      ..orderBy([(t) => OrderingTerm(expression: t.position)]);
-    return query.watch();
-  }
-
-  Future<TaskModelData> getTask(int taskId) {
-    final query = select(taskModel)
-      ..where((tbl) {
-        return tbl.id.equals(taskId);
-      });
-    return query.getSingle();
-  }
-
-  void addTask(Map<String, dynamic> json) {
-    transaction(() async {
-      var data = TaskModelData.fromJson(json);
-      // log("project data: ${data.name}");
-      await into(taskModel).insertOnConflictUpdate(data);
-      log("fin add");
-    });
-  }
-
-  void _updateTask(int taskId, TaskModelCompanion taskModelCompanion) {
-    transaction(() async {
-      await (update(taskModel)..where((tbl) => tbl.id.equals(taskId)))
-          .write(taskModelCompanion);
-      log("fin _updateTask");
-    });
-  }
-
-  void updateTask(TaskModelData data) {
-    transaction(() async {
-      await into(taskModel).insertOnConflictUpdate(data);
-      log("fin updateTask");
-    });
-  }
-
-  void openTask(int taskId) =>
-      _updateTask(taskId, const TaskModelCompanion(isActive: Value(1)));
-
-  void closeTask(int taskId) =>
-      _updateTask(taskId, const TaskModelCompanion(isActive: Value(0)));
-
-  void removeTask(int taskId) {
-    transaction(() async {
-      await (delete(taskModel)..where((tbl) => tbl.id.equals(taskId))).go();
-    });
-  }
-}
-
-LazyDatabase _openConnection() {
+  LazyDatabase _openConnection() {
   // the LazyDatabase util lets us find the right location for the file async.
   return LazyDatabase(() async {
     // put the database file, called db.sqlite here, into the documents folder
     // for your app.
     final dbFolder = await getApplicationDocumentsDirectory();
     final file = File(p.join(dbFolder.path, 'db.sqlite'));
+    if (kDebugMode) {
+      log("deleting database file");
+      await file.delete();
+    }
 
     // Also work around limitations on old Android versions
     if (Platform.isAndroid) {

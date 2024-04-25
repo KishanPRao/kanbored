@@ -4,10 +4,12 @@ import 'package:kanbored/db/converters.dart';
 import 'package:kanbored/db/project_model.dart';
 
 class TaskModel extends Table {
-  @override
-  Set<Column> get primaryKey => {id, columnId, projectId};
-
-  IntColumn get id => integer()();
+  // @override
+  // Set<Column> get primaryKey => {id, columnId, projectId};
+  //
+  // IntColumn get id => integer()();
+  // TODO: confirm if `id` independent of proj, col id
+  IntColumn get id => integer().autoIncrement()();
 
   TextColumn get title => text()();
 

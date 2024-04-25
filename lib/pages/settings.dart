@@ -1,7 +1,11 @@
+import 'dart:developer';
+
+import 'package:drift_db_viewer/drift_db_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/app_data.dart';
 import 'package:kanbored/constants.dart';
+import 'package:kanbored/db/database.dart';
 import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/app_text_style.dart';
 import 'package:kanbored/ui/app_theme.dart';
@@ -41,17 +45,25 @@ class _SettingsState extends ConsumerState<Settings> {
           ),
           body: Column(
             children: [
-              _buildSettingOption(context, "Theme", theme, _showThemeOptions),
+              _buildSettingOption(
+                  context, "theme".resc(), theme, _showThemeOptions),
+              _buildSettingOption(context, "View db", "", () {
+                final db = ref.read(AppDatabase.provider);
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => DriftDbViewer(db)));
+              }),
+              _buildSettingOption(context, "clear_local".resc(), "", () {
+                log("Clear local cache");
+              }),
               _buildSettingOption(
                   context,
-                  "Logout",
+                  "logout".resc(),
                   "",
                   () => {
-                        _showDialog("Logout?", null, (_) {
+                        _showDialog("logout_alert".resc(), null, (_) {
                           AppData.authenticated = false;
                           Navigator.pop(context); // Pop settings
-                          Navigator.pop(context,
-                              true); // Pop home screen; strange issue, only returns value using this
+                          Navigator.pop(context, true);
+                          // Pop home screen; strange issue, only returns value using this
                         })
                       }),
             ],

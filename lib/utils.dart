@@ -34,6 +34,9 @@ class Utils {
     }
   }
 
+  static int currentTimestampInSec() => DateTime.now().millisecondsSinceEpoch ~/ 1000;
+  static int currentTimestampInMsec() => DateTime.now().millisecondsSinceEpoch;
+
   static showAlertDialog(BuildContext context, String title, String content,
       VoidCallback onPressed) {
     return showDialog(

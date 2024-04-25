@@ -298,14 +298,14 @@ class WebApi {
 
   static Future<T> setApi<T>(String method, int id,
       {dynamic params = const {}}) async {
-    return await baseApi(method, id, params: params) as T;
+    return await baseApi(method, id, saveCache: true, params: params) as T;
   }
 
   static Future<T> singleApi<T extends Model>(
       String method, int id, T Function(Map<String, dynamic>) constructor,
       {Map<String, dynamic> params = const {}}) async {
     final dynamic result =
-        await baseApi(method, id, params: params) as Map<String, dynamic>;
+        await baseApi(method, id,params: params) as Map<String, dynamic>;
     return constructor(result);
   }
 
@@ -321,8 +321,8 @@ class WebApi {
     return models;
   }
 
-  static dynamic baseApi<T extends Model>(String method, int id,
-      {dynamic params = const {}}) async {
+  static dynamic baseApi<T extends Model>(String method, int id, {bool saveCache = false,
+    dynamic params = const {}}) async {
     final Map<String, dynamic> parameters = {
       "jsonrpc": "2.0",
       "method": method,
@@ -333,12 +333,18 @@ class WebApi {
     final credentials = "${AppData.username}:${AppData.password}";
     Codec<String, String> stringToBase64 = utf8.fuse(base64);
     String encoded = stringToBase64.encode(credentials);
+    final jsonData = json.encode(parameters);
+    // log("jsonStr: $jsonData");
     final resp = await http.post(
       Uri.parse(AppData.endpoint),
       headers: <String, String>{"Authorization": "Basic $encoded"},
-      body: json.encode(parameters),
+      body: jsonData,
       encoding: Encoding.getByName("utf-8"),
     );
+    // TODO: other errors?
+    if (saveCache && resp.statusCode != 200) {
+      log("save cache");
+    }
 
     final decodedData = json.decode(utf8.decode(resp.bodyBytes));
     // log("decodedData: ${utf8.decode(resp.bodyBytes)}");
