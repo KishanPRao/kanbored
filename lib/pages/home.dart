@@ -1,23 +1,21 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:io';
-import 'dart:math' as math;
 
-import 'package:collection/equality.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/api/state.dart';
 import 'package:kanbored/api/web_api_id.dart';
-import 'package:kanbored/constants.dart';
 import 'package:kanbored/db/dao/api_storage_dao.dart';
-import 'package:kanbored/db/dao/project_dao.dart';
 import 'package:kanbored/db/dao/task_dao.dart';
 import 'package:kanbored/db/database.dart';
-import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/project_app_bar.dart';
 import 'package:kanbored/ui/ui_state.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/utils/app_connection.dart';
+import 'package:kanbored/utils/constants.dart';
+import 'package:kanbored/utils/strings.dart';
+import 'package:kanbored/utils/utils.dart';
 
 class Home extends ConsumerStatefulWidget {
   const Home({super.key});
@@ -30,23 +28,43 @@ class _HomeState extends ConsumerState<Home> {
   // var showArchived = false;
   late TaskDao taskDao;
   late ApiStorageDao apiDao;
+  late AppConnection connection;
 
-  final jsonData = {"jsonrpc":"2.0","method":"createProject","id":1797076613,"params":{"name":"New project","owner_id":1}};
+  final jsonData = {
+    "jsonrpc": "2.0",
+    "method": "createProject",
+    "id": 1797076613,
+    "params": {"name": "New project", "owner_id": 1}
+  };
+
+  void updateData({bool recurring = false}) {
+    Api.updateProjects(ref, recurring: recurring);
+  }
 
   @override
   void initState() {
     super.initState();
     taskDao = ref.read(AppDatabase.provider).taskDao;
     apiDao = ref.read(AppDatabase.provider).apiStorageDao;
-    Api.updateProjects(ref, recurring: true);
+    connection = AppConnection(ref.read(onlineStatus.notifier));
+    ref.read(onlineStatus.notifier).stream.listen((online) {
+      online = online ?? false;
+      if (online) {
+        updateData();
+      }
+    });
+    updateData(recurring: true);
+
     // Api.recurringApi(() async {
     //   var task = await taskDao.getTask(1);
     //   log("Re-runnning from home! ${task.title}; ${ref.context.mounted}");
     // }, seconds: 12);
     apiDao.watchApiTasks().listen((event) {
-      // log("remaining tasks len: ${event.length}");
+      log("remaining tasks len: ${event.length}");
     });
+    var isOffline = false;
     // final random = math.Random();
+    // apiDao.watchApiLatest().
     apiDao.watchApiLatest().listen((event) async {
       if (event == null) {
         // log("null task");
@@ -61,14 +79,27 @@ class _HomeState extends ConsumerState<Home> {
         //   a += 20;
         // }
         // log("==> finished task: ${event.timestamp}; $a");
-        apiDao.removeApiTask(event.id);
+        if (!isOffline) {
+          apiDao.removeApiTask(event.id);
+        } else {
+          log("offline");
+        }
       });
     });
-    Api.recurringApi(() async {
+    Timer? timer;
+    var count = 0;
+    timer = Api.recurringApi(() async {
       const webApi = WebApiId.createProject;
       // Api.createProject(ref, "New project");
       apiDao.addApiTask(webApi.value, webApi.name, json.encode(jsonData));
+      count++;
+      if (count > 15) {
+        timer?.cancel();
+      }
     }, seconds: 1);
+    Api.recurringApi(() {
+      isOffline = !isOffline;
+    }, seconds: 20);
   }
 
   void onChange(text) {
@@ -154,6 +185,19 @@ class _HomeState extends ConsumerState<Home> {
                 },
                 child: Column(children: [
                   StreamBuilder(
+                      stream: ref.watch(onlineStatus.notifier).stream,
+                      builder: (context, snapshot2) {
+                        final isOnline = snapshot2.data ?? false;
+                        return isOnline
+                            ? Utils.emptyUi()
+                            : Card(
+                                clipBehavior: Clip.hardEdge,
+                                color: "offlineBg".themed(context),
+                                child: SizedBox(
+                                  child: Center(child: Text("offline".resc())),
+                                ));
+                      }),
+                  StreamBuilder(
                       stream: ref
                           .watch(UiState.projectShowArchived.notifier)
                           .stream,
@@ -231,5 +275,11 @@ class _HomeState extends ConsumerState<Home> {
                     )),
               );
             }));
+  }
+
+  @override
+  void dispose() {
+    connection.dispose();
+    super.dispose();
   }
 }

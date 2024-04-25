@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/db/database.dart';
-import 'package:kanbored/strings.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/board_action_listener.dart';
 import 'package:kanbored/ui/board_tasks.dart';
 import 'package:kanbored/ui/column_text.dart';

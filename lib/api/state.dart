@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/db/database.dart';
 import 'package:kanbored/db/database_query.dart';
 
+final onlineStatus = StateProvider<bool?>((ref) => null);
 final activeProject = StateProvider<ProjectModelData?>((ref) => null);
 final activeColumn = StateProvider<ColumnModelData?>((ref) => null);
 final activeTask = StateProvider<TaskModelData?>((ref) => null);

@@ -8,6 +8,7 @@
     "descBg": "0xFF101010",
     "descEditBg": "0xFF000000",
     "archivedBg": "0xFF8A6700",
+    "offlineBg": "0xFFce214c",
     "unarchiveBg": "0xFFecb000",
     "cardHighlight": "0x664789f0",
     "searchBar": "0xFF212121",

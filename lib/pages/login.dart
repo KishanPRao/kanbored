@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kanbored/api/web_api.dart';
-import 'package:kanbored/app_data.dart';
-import 'package:kanbored/constants.dart';
-import 'package:kanbored/strings.dart';
+import 'package:kanbored/utils/app_data.dart';
+import 'package:kanbored/utils/constants.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/sizes.dart';
 
 class Login extends StatefulWidget {

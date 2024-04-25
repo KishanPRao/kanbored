@@ -8,7 +8,7 @@ import 'package:kanbored/models/comment_model.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
-import 'package:kanbored/strings.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/add_comment.dart';
 import 'package:kanbored/ui/app_theme.dart';
@@ -17,7 +17,7 @@ import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/markdown.dart';
 import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/ui/task_app_bar.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/utils/utils.dart';
 
 class Task extends ConsumerStatefulWidget {
   const Task({super.key});

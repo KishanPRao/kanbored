@@ -1,8 +1,8 @@
 import 'package:drift/drift.dart';
-import 'package:kanbored/app_data.dart';
+import 'package:kanbored/utils/app_data.dart';
 import 'package:kanbored/db/converters.dart';
 import 'package:kanbored/db/database.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/utils/utils.dart';
 
 class ProjectModel extends Table {
   IntColumn get id => integer().autoIncrement()();

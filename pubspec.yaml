@@ -25,6 +25,7 @@ dependencies:
   flutter_riverpod: ^2.3.0
   drift_db_viewer:
   collection:
+  connectivity_plus:
 
 dev_dependencies:
   flutter_test:

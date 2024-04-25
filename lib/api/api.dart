@@ -4,16 +4,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/state.dart';
 import 'package:kanbored/api/web_api.dart';
-import 'package:kanbored/constants.dart';
+import 'package:kanbored/utils/constants.dart';
 import 'package:kanbored/db/database.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/utils/utils.dart';
 
 // ignore_for_file: use_build_context_synchronously
 class Api {
-  static void recurringApi(VoidCallback function, {int seconds = apiTimerDurationInSec}) {
+  static Timer recurringApi(VoidCallback function, {int seconds = apiTimerDurationInSec}) {
     function();
     final oneSec = Duration(seconds: seconds);
-    Timer.periodic(oneSec, (Timer t) => function());
+    return Timer.periodic(oneSec, (Timer t) => function());
   }
 
   // TODO: use DAO

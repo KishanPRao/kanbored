@@ -5,17 +5,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/api/state.dart';
 import 'package:kanbored/api/web_api.dart';
-import 'package:kanbored/constants.dart';
+import 'package:kanbored/utils/constants.dart';
 import 'package:kanbored/db/dao/column_dao.dart';
 import 'package:kanbored/db/database.dart';
-import 'package:kanbored/strings.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/board_app_bar.dart';
 import 'package:kanbored/ui/board_column.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/search_fab.dart';
 import 'package:kanbored/ui/sizes.dart';
 import 'package:kanbored/ui/ui_state.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/utils/utils.dart';
 
 class Board extends ConsumerStatefulWidget {
   const Board({super.key});

@@ -7,11 +7,11 @@ import 'package:kanbored/models/column_model.dart';
 import 'package:kanbored/models/model.dart';
 import 'package:kanbored/models/project_model.dart';
 import 'package:kanbored/models/task_model.dart';
-import 'package:kanbored/strings.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/build_subtasks.dart';
 import 'package:kanbored/ui/sizes.dart';
 import 'package:kanbored/ui/ui_state.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/utils/utils.dart';
 
 class Search extends ConsumerStatefulWidget {
   const Search({super.key});

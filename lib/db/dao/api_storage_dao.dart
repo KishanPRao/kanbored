@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:drift/drift.dart';
 import 'package:kanbored/db/api_storage_model.dart';
 import 'package:kanbored/db/database.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/utils/utils.dart';
 
 part 'api_storage_dao.g.dart';
 
@@ -26,6 +26,15 @@ class ApiStorageDao extends DatabaseAccessor<AppDatabase>
 
   void removeApiTask(int id) async {
     (delete(apiStorageModel)..where((tbl) => tbl.id.equals(id))).go();
+  }
+
+  Future<ApiStorageModelData?> getApiLatest() {
+    final query = select(apiStorageModel)
+      ..orderBy([
+        (t) => OrderingTerm(expression: t.timestamp, mode: OrderingMode.asc)
+      ])
+      ..limit(1);
+    return query.getSingleOrNull();
   }
 
   Stream<ApiStorageModelData?> watchApiLatest() {

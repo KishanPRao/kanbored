@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/api/web_api.dart';
-import 'package:kanbored/app_data.dart';
-import 'package:kanbored/constants.dart';
+import 'package:kanbored/utils/app_data.dart';
+import 'package:kanbored/utils/constants.dart';
 import 'package:kanbored/db/database.dart';
 import 'package:kanbored/pages/board.dart';
 import 'package:kanbored/pages/home.dart';
@@ -13,23 +13,23 @@ import 'package:kanbored/pages/login.dart';
 import 'package:kanbored/pages/search.dart';
 import 'package:kanbored/pages/settings.dart';
 import 'package:kanbored/pages/task.dart';
-import 'package:kanbored/strings.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/app_theme.dart';
 
-Future<void> deleteEverything() async {
-  final database = AppDatabase();
-  await database.customStatement('PRAGMA foreign_keys = OFF');
-  try {
-    await database.transaction(() async {
-      for (final table in database.allTables) {
-        await database.delete(table).go();
-      }
-    });
-  } finally {
-    await database.customStatement('PRAGMA foreign_keys = ON');
-  }
-  database.close();
-}
+// Future<void> deleteEverything() async {
+//   final database = AppDatabase();
+//   await database.customStatement('PRAGMA foreign_keys = OFF');
+//   try {
+//     await database.transaction(() async {
+//       for (final table in database.allTables) {
+//         await database.delete(table).go();
+//       }
+//     });
+//   } finally {
+//     await database.customStatement('PRAGMA foreign_keys = ON');
+//   }
+//   database.close();
+// }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

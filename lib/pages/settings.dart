@@ -3,14 +3,14 @@ import 'dart:developer';
 import 'package:drift_db_viewer/drift_db_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kanbored/app_data.dart';
-import 'package:kanbored/constants.dart';
+import 'package:kanbored/utils/app_data.dart';
+import 'package:kanbored/utils/constants.dart';
 import 'package:kanbored/db/database.dart';
-import 'package:kanbored/strings.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/app_text_style.dart';
 import 'package:kanbored/ui/app_theme.dart';
 import 'package:kanbored/ui/ui_state.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/utils/utils.dart';
 
 class Settings extends ConsumerStatefulWidget {
   const Settings({super.key});
