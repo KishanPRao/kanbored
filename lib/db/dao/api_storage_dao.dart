@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:drift/drift.dart';
 import 'package:kanbored/db/api_storage_model.dart';
+import 'package:kanbored/db/converters.dart';
 import 'package:kanbored/db/database.dart';
 import 'package:kanbored/utils/utils.dart';
 
@@ -12,13 +14,14 @@ class ApiStorageDao extends DatabaseAccessor<AppDatabase>
     with _$ApiStorageDaoMixin {
   ApiStorageDao(super.db);
 
-  void addApiTask(int apiId, String apiName, String apiBody) async {
+  void addApiTask(WebApiModel webApiModel, Map<String, dynamic> apiBody,
+      int updateId) async {
     final timestamp = Utils.currentTimestampInMsec();
-    // log("add api task: $timestamp");
+    log("add api task: $timestamp");
     var data = ApiStorageModelCompanion(
-      apiId: Value(apiId),
-      apiName: Value(apiName),
-      apiBody: Value(apiBody),
+      webApiInfo: Value(webApiModel),
+      webApiBody: Value(json.encode(apiBody)),
+      updateId: Value(updateId),
       timestamp: Value(timestamp),
     );
     await into(apiStorageModel).insert(data);

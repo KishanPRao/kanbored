@@ -84,9 +84,9 @@ extension ProjectModelCompanionExt on ProjectModelCompanion {
       int taskLimit = 0,
       int enableGlobalTags = 1,
       Url? url}) {
-    lastModified = lastModified ?? Utils.currentTimestampInSec();
-    ownerId = ownerId ?? AppData.userId;
-    url = url ?? Url.create();
+    lastModified ??= Utils.currentTimestampInSec();
+    ownerId ??= AppData.userId;
+    url ??= Url.create();
     return ProjectModelCompanion(
         name: Value(name),
         isActive: Value(isActive),

@@ -56,3 +56,14 @@ Map<String, dynamic> _$UrlToJson(Url instance) => <String, dynamic>{
       'list': instance.list,
       'calendar': instance.calendar,
     };
+
+WebApiModel _$WebApiModelFromJson(Map<String, dynamic> json) => WebApiModel(
+      json['value'] as int,
+      json['apiType'] as int,
+    );
+
+Map<String, dynamic> _$WebApiModelToJson(WebApiModel instance) =>
+    <String, dynamic>{
+      'value': instance.value,
+      'apiType': instance.apiType,
+    };

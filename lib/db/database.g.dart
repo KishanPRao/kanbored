@@ -3957,23 +3957,26 @@ class $ApiStorageModelTable extends ApiStorageModel
       requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
-  static const VerificationMeta _apiIdMeta = const VerificationMeta('apiId');
+  static const VerificationMeta _webApiInfoMeta =
+      const VerificationMeta('webApiInfo');
   @override
-  late final GeneratedColumn<int> apiId = GeneratedColumn<int>(
-      'api_id', aliasedName, false,
+  late final GeneratedColumnWithTypeConverter<WebApiModel, String> webApiInfo =
+      GeneratedColumn<String>('web_api_info', aliasedName, false,
+              type: DriftSqlType.string, requiredDuringInsert: true)
+          .withConverter<WebApiModel>(
+              $ApiStorageModelTable.$converterwebApiInfo);
+  static const VerificationMeta _webApiBodyMeta =
+      const VerificationMeta('webApiBody');
+  @override
+  late final GeneratedColumn<String> webApiBody = GeneratedColumn<String>(
+      'web_api_body', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _updateIdMeta =
+      const VerificationMeta('updateId');
+  @override
+  late final GeneratedColumn<int> updateId = GeneratedColumn<int>(
+      'update_id', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _apiNameMeta =
-      const VerificationMeta('apiName');
-  @override
-  late final GeneratedColumn<String> apiName = GeneratedColumn<String>(
-      'api_name', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _apiBodyMeta =
-      const VerificationMeta('apiBody');
-  @override
-  late final GeneratedColumn<String> apiBody = GeneratedColumn<String>(
-      'api_body', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _timestampMeta =
       const VerificationMeta('timestamp');
   @override
@@ -3982,7 +3985,7 @@ class $ApiStorageModelTable extends ApiStorageModel
       type: DriftSqlType.int, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, apiId, apiName, apiBody, timestamp];
+      [id, webApiInfo, webApiBody, updateId, timestamp];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -3997,23 +4000,20 @@ class $ApiStorageModelTable extends ApiStorageModel
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
-    if (data.containsKey('api_id')) {
+    context.handle(_webApiInfoMeta, const VerificationResult.success());
+    if (data.containsKey('web_api_body')) {
       context.handle(
-          _apiIdMeta, apiId.isAcceptableOrUnknown(data['api_id']!, _apiIdMeta));
+          _webApiBodyMeta,
+          webApiBody.isAcceptableOrUnknown(
+              data['web_api_body']!, _webApiBodyMeta));
     } else if (isInserting) {
-      context.missing(_apiIdMeta);
+      context.missing(_webApiBodyMeta);
     }
-    if (data.containsKey('api_name')) {
-      context.handle(_apiNameMeta,
-          apiName.isAcceptableOrUnknown(data['api_name']!, _apiNameMeta));
+    if (data.containsKey('update_id')) {
+      context.handle(_updateIdMeta,
+          updateId.isAcceptableOrUnknown(data['update_id']!, _updateIdMeta));
     } else if (isInserting) {
-      context.missing(_apiNameMeta);
-    }
-    if (data.containsKey('api_body')) {
-      context.handle(_apiBodyMeta,
-          apiBody.isAcceptableOrUnknown(data['api_body']!, _apiBodyMeta));
-    } else if (isInserting) {
-      context.missing(_apiBodyMeta);
+      context.missing(_updateIdMeta);
     }
     if (data.containsKey('timestamp')) {
       context.handle(_timestampMeta,
@@ -4032,12 +4032,13 @@ class $ApiStorageModelTable extends ApiStorageModel
     return ApiStorageModelData(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      apiId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}api_id'])!,
-      apiName: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}api_name'])!,
-      apiBody: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}api_body'])!,
+      webApiInfo: $ApiStorageModelTable.$converterwebApiInfo.fromSql(
+          attachedDatabase.typeMapping.read(
+              DriftSqlType.string, data['${effectivePrefix}web_api_info'])!),
+      webApiBody: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}web_api_body'])!,
+      updateId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}update_id'])!,
       timestamp: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}timestamp'])!,
     );
@@ -4047,28 +4048,34 @@ class $ApiStorageModelTable extends ApiStorageModel
   $ApiStorageModelTable createAlias(String alias) {
     return $ApiStorageModelTable(attachedDatabase, alias);
   }
+
+  static JsonTypeConverter2<WebApiModel, String, Map<String, dynamic>>
+      $converterwebApiInfo = const WebApiModelConverter();
 }
 
 class ApiStorageModelData extends DataClass
     implements Insertable<ApiStorageModelData> {
   final int id;
-  final int apiId;
-  final String apiName;
-  final String apiBody;
+  final WebApiModel webApiInfo;
+  final String webApiBody;
+  final int updateId;
   final int timestamp;
   const ApiStorageModelData(
       {required this.id,
-      required this.apiId,
-      required this.apiName,
-      required this.apiBody,
+      required this.webApiInfo,
+      required this.webApiBody,
+      required this.updateId,
       required this.timestamp});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['api_id'] = Variable<int>(apiId);
-    map['api_name'] = Variable<String>(apiName);
-    map['api_body'] = Variable<String>(apiBody);
+    {
+      map['web_api_info'] = Variable<String>(
+          $ApiStorageModelTable.$converterwebApiInfo.toSql(webApiInfo));
+    }
+    map['web_api_body'] = Variable<String>(webApiBody);
+    map['update_id'] = Variable<int>(updateId);
     map['timestamp'] = Variable<int>(timestamp);
     return map;
   }
@@ -4076,9 +4083,9 @@ class ApiStorageModelData extends DataClass
   ApiStorageModelCompanion toCompanion(bool nullToAbsent) {
     return ApiStorageModelCompanion(
       id: Value(id),
-      apiId: Value(apiId),
-      apiName: Value(apiName),
-      apiBody: Value(apiBody),
+      webApiInfo: Value(webApiInfo),
+      webApiBody: Value(webApiBody),
+      updateId: Value(updateId),
       timestamp: Value(timestamp),
     );
   }
@@ -4088,9 +4095,10 @@ class ApiStorageModelData extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ApiStorageModelData(
       id: serializer.fromJson<int>(json['id']),
-      apiId: serializer.fromJson<int>(json['apiId']),
-      apiName: serializer.fromJson<String>(json['apiName']),
-      apiBody: serializer.fromJson<String>(json['apiBody']),
+      webApiInfo: $ApiStorageModelTable.$converterwebApiInfo.fromJson(
+          serializer.fromJson<Map<String, dynamic>>(json['webApiInfo'])),
+      webApiBody: serializer.fromJson<String>(json['webApiBody']),
+      updateId: serializer.fromJson<int>(json['updateId']),
       timestamp: serializer.fromJson<int>(json['timestamp']),
     );
   }
@@ -4099,101 +4107,103 @@ class ApiStorageModelData extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'apiId': serializer.toJson<int>(apiId),
-      'apiName': serializer.toJson<String>(apiName),
-      'apiBody': serializer.toJson<String>(apiBody),
+      'webApiInfo': serializer.toJson<Map<String, dynamic>>(
+          $ApiStorageModelTable.$converterwebApiInfo.toJson(webApiInfo)),
+      'webApiBody': serializer.toJson<String>(webApiBody),
+      'updateId': serializer.toJson<int>(updateId),
       'timestamp': serializer.toJson<int>(timestamp),
     };
   }
 
   ApiStorageModelData copyWith(
           {int? id,
-          int? apiId,
-          String? apiName,
-          String? apiBody,
+          WebApiModel? webApiInfo,
+          String? webApiBody,
+          int? updateId,
           int? timestamp}) =>
       ApiStorageModelData(
         id: id ?? this.id,
-        apiId: apiId ?? this.apiId,
-        apiName: apiName ?? this.apiName,
-        apiBody: apiBody ?? this.apiBody,
+        webApiInfo: webApiInfo ?? this.webApiInfo,
+        webApiBody: webApiBody ?? this.webApiBody,
+        updateId: updateId ?? this.updateId,
         timestamp: timestamp ?? this.timestamp,
       );
   @override
   String toString() {
     return (StringBuffer('ApiStorageModelData(')
           ..write('id: $id, ')
-          ..write('apiId: $apiId, ')
-          ..write('apiName: $apiName, ')
-          ..write('apiBody: $apiBody, ')
+          ..write('webApiInfo: $webApiInfo, ')
+          ..write('webApiBody: $webApiBody, ')
+          ..write('updateId: $updateId, ')
           ..write('timestamp: $timestamp')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, apiId, apiName, apiBody, timestamp);
+  int get hashCode =>
+      Object.hash(id, webApiInfo, webApiBody, updateId, timestamp);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is ApiStorageModelData &&
           other.id == this.id &&
-          other.apiId == this.apiId &&
-          other.apiName == this.apiName &&
-          other.apiBody == this.apiBody &&
+          other.webApiInfo == this.webApiInfo &&
+          other.webApiBody == this.webApiBody &&
+          other.updateId == this.updateId &&
           other.timestamp == this.timestamp);
 }
 
 class ApiStorageModelCompanion extends UpdateCompanion<ApiStorageModelData> {
   final Value<int> id;
-  final Value<int> apiId;
-  final Value<String> apiName;
-  final Value<String> apiBody;
+  final Value<WebApiModel> webApiInfo;
+  final Value<String> webApiBody;
+  final Value<int> updateId;
   final Value<int> timestamp;
   const ApiStorageModelCompanion({
     this.id = const Value.absent(),
-    this.apiId = const Value.absent(),
-    this.apiName = const Value.absent(),
-    this.apiBody = const Value.absent(),
+    this.webApiInfo = const Value.absent(),
+    this.webApiBody = const Value.absent(),
+    this.updateId = const Value.absent(),
     this.timestamp = const Value.absent(),
   });
   ApiStorageModelCompanion.insert({
     this.id = const Value.absent(),
-    required int apiId,
-    required String apiName,
-    required String apiBody,
+    required WebApiModel webApiInfo,
+    required String webApiBody,
+    required int updateId,
     required int timestamp,
-  })  : apiId = Value(apiId),
-        apiName = Value(apiName),
-        apiBody = Value(apiBody),
+  })  : webApiInfo = Value(webApiInfo),
+        webApiBody = Value(webApiBody),
+        updateId = Value(updateId),
         timestamp = Value(timestamp);
   static Insertable<ApiStorageModelData> custom({
     Expression<int>? id,
-    Expression<int>? apiId,
-    Expression<String>? apiName,
-    Expression<String>? apiBody,
+    Expression<String>? webApiInfo,
+    Expression<String>? webApiBody,
+    Expression<int>? updateId,
     Expression<int>? timestamp,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (apiId != null) 'api_id': apiId,
-      if (apiName != null) 'api_name': apiName,
-      if (apiBody != null) 'api_body': apiBody,
+      if (webApiInfo != null) 'web_api_info': webApiInfo,
+      if (webApiBody != null) 'web_api_body': webApiBody,
+      if (updateId != null) 'update_id': updateId,
       if (timestamp != null) 'timestamp': timestamp,
     });
   }
 
   ApiStorageModelCompanion copyWith(
       {Value<int>? id,
-      Value<int>? apiId,
-      Value<String>? apiName,
-      Value<String>? apiBody,
+      Value<WebApiModel>? webApiInfo,
+      Value<String>? webApiBody,
+      Value<int>? updateId,
       Value<int>? timestamp}) {
     return ApiStorageModelCompanion(
       id: id ?? this.id,
-      apiId: apiId ?? this.apiId,
-      apiName: apiName ?? this.apiName,
-      apiBody: apiBody ?? this.apiBody,
+      webApiInfo: webApiInfo ?? this.webApiInfo,
+      webApiBody: webApiBody ?? this.webApiBody,
+      updateId: updateId ?? this.updateId,
       timestamp: timestamp ?? this.timestamp,
     );
   }
@@ -4204,14 +4214,15 @@ class ApiStorageModelCompanion extends UpdateCompanion<ApiStorageModelData> {
     if (id.present) {
       map['id'] = Variable<int>(id.value);
     }
-    if (apiId.present) {
-      map['api_id'] = Variable<int>(apiId.value);
+    if (webApiInfo.present) {
+      map['web_api_info'] = Variable<String>(
+          $ApiStorageModelTable.$converterwebApiInfo.toSql(webApiInfo.value));
     }
-    if (apiName.present) {
-      map['api_name'] = Variable<String>(apiName.value);
+    if (webApiBody.present) {
+      map['web_api_body'] = Variable<String>(webApiBody.value);
     }
-    if (apiBody.present) {
-      map['api_body'] = Variable<String>(apiBody.value);
+    if (updateId.present) {
+      map['update_id'] = Variable<int>(updateId.value);
     }
     if (timestamp.present) {
       map['timestamp'] = Variable<int>(timestamp.value);
@@ -4223,9 +4234,9 @@ class ApiStorageModelCompanion extends UpdateCompanion<ApiStorageModelData> {
   String toString() {
     return (StringBuffer('ApiStorageModelCompanion(')
           ..write('id: $id, ')
-          ..write('apiId: $apiId, ')
-          ..write('apiName: $apiName, ')
-          ..write('apiBody: $apiBody, ')
+          ..write('webApiInfo: $webApiInfo, ')
+          ..write('webApiBody: $webApiBody, ')
+          ..write('updateId: $updateId, ')
           ..write('timestamp: $timestamp')
           ..write(')'))
         .toString();

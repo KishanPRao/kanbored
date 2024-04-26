@@ -25,12 +25,10 @@ class ProjectDao extends DatabaseAccessor<AppDatabase> with _$ProjectDaoMixin {
     });
   }
 
-  void createLocalProject(String name) {
-    transaction(() async {
-      var data = ProjectModelCompanionExt.create(name);
-      await into(projectModel).insertOnConflictUpdate(data);
-      log("createLocalProject");
-    });
+  Future<int> createLocalProject(String name) async {
+    var data = ProjectModelCompanionExt.create(name);
+    log("createLocalProject");
+    return await into(projectModel).insertOnConflictUpdate(data);
   }
 
   void updateProjects(List<dynamic> items) {

@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/api/state.dart';
-import 'package:kanbored/api/web_api_id.dart';
+import 'package:kanbored/api/web_api.dart';
+import 'package:kanbored/db/web_api_const.dart';
 import 'package:kanbored/db/dao/api_storage_dao.dart';
 import 'package:kanbored/db/dao/task_dao.dart';
 import 'package:kanbored/db/database.dart';
@@ -37,8 +38,12 @@ class _HomeState extends ConsumerState<Home> {
     "params": {"name": "New project", "owner_id": 1}
   };
 
-  void updateData({bool recurring = false}) {
+  void updateData({bool recurring = false}) async {
     Api.updateProjects(ref, recurring: recurring);
+    final event = await apiDao.getApiLatest();
+    if (event != null) {
+      log("run latest api task: ${event.timestamp}, ${event.updateId}, ${event.webApiInfo}");
+    }
   }
 
   @override
@@ -66,40 +71,43 @@ class _HomeState extends ConsumerState<Home> {
     // final random = math.Random();
     // apiDao.watchApiLatest().
     apiDao.watchApiLatest().listen((event) async {
-      if (event == null) {
-        // log("null task");
+      final online = ref.read(onlineStatus) ?? false;
+      if (event == null || !online) {
+        log("wait api task: ${event?.timestamp}, ${event?.updateId}, ${event?.webApiInfo}");
         return;
       }
+      log("run watched api task: ${event.timestamp}, ${event.updateId}, ${event.webApiInfo}");
+      bool status = await WebApi.handleApiRequest(event);
       // log("==> running task: ${event.timestamp}");
       // int next(int min, int max) => min + random.nextInt(max - min);
       // sleep(Duration(seconds:next(7, 12)));
-      Future.value(42).then((value) {
-        // var a = 20;
-        // for (int i = 0; i < 99999 * 11111; i++) {
-        //   a += 20;
-        // }
-        // log("==> finished task: ${event.timestamp}; $a");
-        if (!isOffline) {
-          apiDao.removeApiTask(event.id);
-        } else {
-          log("offline");
-        }
-      });
+      // Future.value(42).then((value) {
+      //   // var a = 20;
+      //   // for (int i = 0; i < 99999 * 11111; i++) {
+      //   //   a += 20;
+      //   // }
+      //   // log("==> finished task: ${event.timestamp}; $a");
+      //   if (!isOffline) {
+      //     apiDao.removeApiTask(event.id);
+      //   } else {
+      //     log("offline");
+      //   }
+      // });
     });
-    Timer? timer;
-    var count = 0;
-    timer = Api.recurringApi(() async {
-      const webApi = WebApiId.createProject;
-      // Api.createProject(ref, "New project");
-      apiDao.addApiTask(webApi.value, webApi.name, json.encode(jsonData));
-      count++;
-      if (count > 15) {
-        timer?.cancel();
-      }
-    }, seconds: 1);
-    Api.recurringApi(() {
-      isOffline = !isOffline;
-    }, seconds: 20);
+    // Timer? timer;
+    // var count = 0;
+    // timer = Api.recurringApi(() async {
+    //   const webApi = WebApiModel.createProject;
+    //   // Api.createProject(ref, "New project");
+    //   apiDao.addApiTask(webApi, jsonData);
+    //   count++;
+    //   if (count > 15) {
+    //     timer?.cancel();
+    //   }
+    // }, seconds: 1);
+    // Api.recurringApi(() {
+    //   isOffline = !isOffline;
+    // }, seconds: 20);
   }
 
   void onChange(text) {

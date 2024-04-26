@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:http/http.dart' as http;
+import 'package:kanbored/db/web_api_const.dart';
 import 'package:kanbored/utils/app_data.dart';
 import 'package:kanbored/db/database.dart';
 import 'package:kanbored/models/board_model.dart';
@@ -79,11 +80,11 @@ class WebApi {
 
   // CREATE
 
-  static Future<dynamic> createProject(String name) async =>
-      setApi("createProject", 1797076613,
+  static String createProject(String name) =>
+      setApiParams("createProject", 1797076613,
           params: {"name": name, "owner_id": AppData.userId});
 
-  static Future<dynamic> addColumn(int projectId, String title) async =>
+  static Future<dynamic> addColumn(int projectId, String title) =>
       setApi("addColumn", 638544704, params: [projectId, title]);
 
   static Future<dynamic> createTask(
@@ -296,6 +297,17 @@ class WebApi {
 
   //////////////////////////////////// API //////////////////////////////////
 
+  static String setApiParams<T>(String method, int id,
+      {dynamic params = const {}}) {
+    final Map<String, dynamic> parameters = {
+      "jsonrpc": "2.0",
+      "method": method,
+      "id": id,
+      "params": params
+    };
+    return json.encode(parameters);
+  }
+
   static Future<T> setApi<T>(String method, int id,
       {dynamic params = const {}}) async {
     return await baseApi(method, id, saveCache: true, params: params) as T;
@@ -352,5 +364,42 @@ class WebApi {
 
     if (decodedData['error'] != null) return Future.error(decodedData['error']);
     return decodedData['result'];
+  }
+
+  static dynamic api(String body) async {
+    log("api, params: $body");
+    final credentials = "${AppData.username}:${AppData.password}";
+    Codec<String, String> stringToBase64 = utf8.fuse(base64);
+    String encoded = stringToBase64.encode(credentials);
+    // log("jsonStr: $jsonData");
+    final resp = await http.post(
+      Uri.parse(AppData.endpoint),
+      headers: <String, String>{"Authorization": "Basic $encoded"},
+      body: body,
+      encoding: Encoding.getByName("utf-8"),
+    );
+    final decodedData = json.decode(utf8.decode(resp.bodyBytes));
+    // log("decodedData: ${utf8.decode(resp.bodyBytes)}");
+    // log("decodedData: $decodedData");
+
+    if (decodedData['error'] != null) return Future.error(decodedData['error']);
+    return decodedData['result'];
+  }
+
+  static Future<bool> handleApiRequest(ApiStorageModelData apiData) async {
+    final dynamic result = await api(apiData.webApiBody) as Map<String, dynamic>;
+    // All creation APIs result in int or bool
+    if (result is int) {
+      if (apiData.webApiInfo == WebApiConst.createProject) {
+        log("handleApiRequest: create proj");
+        // update project dao, with id
+      }
+    } else if (result is bool) {
+      if (result) {
+      } else {
+        return false;
+      }
+    }
+    return false;
   }
 }

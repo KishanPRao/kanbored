@@ -5,7 +5,7 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kanbored/api/web_api_id.dart';
+import 'package:kanbored/db/web_api_const.dart';
 import 'package:kanbored/db/api_storage_model.dart';
 import 'package:kanbored/db/column_model.dart';
 import 'package:kanbored/db/comment_model.dart';

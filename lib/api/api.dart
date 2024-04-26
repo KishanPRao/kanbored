@@ -1,16 +1,20 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/state.dart';
 import 'package:kanbored/api/web_api.dart';
-import 'package:kanbored/utils/constants.dart';
+import 'package:kanbored/db/web_api_const.dart';
 import 'package:kanbored/db/database.dart';
+import 'package:kanbored/utils/app_data.dart';
+import 'package:kanbored/utils/constants.dart';
 import 'package:kanbored/utils/utils.dart';
 
 // ignore_for_file: use_build_context_synchronously
 class Api {
-  static Timer recurringApi(VoidCallback function, {int seconds = apiTimerDurationInSec}) {
+  static Timer recurringApi(VoidCallback function,
+      {int seconds = apiTimerDurationInSec}) {
     function();
     final oneSec = Duration(seconds: seconds);
     return Timer.periodic(oneSec, (Timer t) => function());
@@ -139,16 +143,20 @@ class Api {
   // }
 
   // Create:
-  static Future<dynamic> createProject(
-      WidgetRef ref, String title) async {
-    // final result = await WebApi.createProject(title);
+  static Future<dynamic> createProject(WidgetRef ref, String name) async {
     // if (result is int) {
     //   // ref.read(AppDatabase.provider).projectDao.addTcask(taskData);
     // } else {
     //   Utils.showErrorSnackbar(ref.context, "Could not create task");
     // }
     // return result;
-    ref.read(AppDatabase.provider).projectDao.createLocalProject(title);
+    // WebApi.createProject(title)
+    final id = await ref.read(AppDatabase.provider).projectDao.createLocalProject(name);
+    log("create local project: $id");
+    ref.read(AppDatabase.provider).apiStorageDao.addApiTask(
+        WebApiConst.createProject,
+        {"name": name, "owner_id": AppData.userId},
+        id,);
     // Add to queue
     // Merge value on result
   }
@@ -168,7 +176,8 @@ class Api {
   // Remove:
   static Future<bool> removeProject(WidgetRef ref, int projectId) async {
     var result = await WebApi.removeProject(projectId);
-    if (result) ref.read(AppDatabase.provider).projectDao.removeProject(projectId);
+    if (result)
+      ref.read(AppDatabase.provider).projectDao.removeProject(projectId);
     return result;
   }
 
