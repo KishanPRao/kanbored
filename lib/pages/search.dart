@@ -1,16 +1,16 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:kanbored/api/api.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/board_model.dart';
 import 'package:kanbored/models/column_model.dart';
 import 'package:kanbored/models/model.dart';
 import 'package:kanbored/models/project_model.dart';
 import 'package:kanbored/models/task_model.dart';
-import 'package:kanbored/strings.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/build_subtasks.dart';
 import 'package:kanbored/ui/sizes.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/utils/utils.dart';
 
 class Search extends StatefulWidget {
   const Search({super.key});

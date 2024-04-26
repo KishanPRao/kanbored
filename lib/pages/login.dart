@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:kanbored/api/api.dart';
-import 'package:kanbored/app_data.dart';
-import 'package:kanbored/constants.dart';
-import 'package:kanbored/strings.dart';
+import 'package:kanbored/api/web_api.dart';
+import 'package:kanbored/utils/app_data.dart';
+import 'package:kanbored/utils/constants.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/sizes.dart';
 
 class Login extends StatefulWidget {
@@ -23,7 +23,8 @@ class _LoginState extends State<Login> {
     return Scaffold(
         backgroundColor: "pageBg".themed(context),
         appBar: AppBar(
-          title: const Text("Login"),
+          title: Text("Login",
+              style: TextStyle(color: "appBarText".themed(context))),
           backgroundColor: "primary".themed(context),
         ),
         body: Form(
@@ -61,7 +62,7 @@ class _LoginState extends State<Login> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     _showLoaderDialog(context);
-                    Api.login(url, username, password).then((value) {
+                    WebApi.login(url, username, password).then((value) {
                       Navigator.pop(context); // dialog
                       setState(() {
                         Navigator.pop(context); // login

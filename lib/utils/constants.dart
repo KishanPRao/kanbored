@@ -21,3 +21,7 @@ const themeDark = "dark";
 const themeLight = "light";
 const themeAmolded = "amolded";
 const themeSystem = "system";
+
+// TODO: settings add duration
+const apiTimerDurationInSec = 30;
+const connTimerDurationInSec = 5;

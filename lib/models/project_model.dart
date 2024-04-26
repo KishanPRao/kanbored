@@ -11,6 +11,7 @@ ProjectModel projectModelFromJson(String str) =>
 
 String projectModelToJson(ProjectModel data) => json.encode(data.toJson());
 
+// TODO: directly use json serializable?
 class ProjectModel extends Model {
   ProjectModel({
     required this.id,
@@ -39,7 +40,7 @@ class ProjectModel extends Model {
 
   int id;
   String name;
-  bool isActive;
+  int isActive;
   String token;
   int lastModified;
   int isPublic;
@@ -63,7 +64,7 @@ class ProjectModel extends Model {
   factory ProjectModel.fromJson(Map<String, dynamic> json) => ProjectModel(
         id: json["id"],
         name: json["name"],
-        isActive: json["is_active"] == 1,
+        isActive: json["is_active"],
         token: json["token"],
         lastModified: json["last_modified"],
         isPublic: json["is_public"],
@@ -90,7 +91,7 @@ class ProjectModel extends Model {
   Map<String, dynamic> toJson() => {
         "id": id,
         "name": name,
-        "is_active": isActive ? 1 : 0,
+        "is_active": isActive,
         "token": token,
         "last_modified": lastModified,
         "is_public": isPublic,

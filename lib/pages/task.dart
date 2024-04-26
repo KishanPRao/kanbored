@@ -1,11 +1,11 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:kanbored/api/api.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/comment_model.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
-import 'package:kanbored/strings.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/add_comment.dart';
 import 'package:kanbored/ui/app_theme.dart';
@@ -14,7 +14,7 @@ import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/markdown.dart';
 import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/ui/task_app_bar.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/utils/utils.dart';
 
 class Task extends StatefulWidget {
   const Task({super.key});
@@ -57,7 +57,7 @@ class _TaskState extends State<Task> {
 
   void init() async {
     log("init");
-    taskModel = await Api.getTask(taskId, projectId); // update task info
+    taskModel = await WebApi.getTask(taskId, projectId); // update task info
     comments = [];
     subtasks = [];
     taskMetadata = TaskMetadataModel(checklists: []);
@@ -67,10 +67,10 @@ class _TaskState extends State<Task> {
     var loadedSubtasks = <SubtaskModel>[];
     var loadedComments = <CommentModel>[];
     TaskMetadataModel loadedTaskMetadata =
-        await Api.getTaskMetadata(taskModel.id);
+        await WebApi.getTaskMetadata(taskModel.id);
     // minimum 1, if no subtasks, show add new subtask
     if (taskModel.nbSubtasks > 0) {
-      loadedSubtasks = await Api.getAllSubtasks(taskModel.id);
+      loadedSubtasks = await WebApi.getAllSubtasks(taskModel.id);
       loadedSubtasks.sort((a, b) {
         // ascending
         if (a.position > b.position) {
@@ -87,7 +87,7 @@ class _TaskState extends State<Task> {
         var checklist =
             CheckListMetadata(name: "Checklist", position: 1, items: items);
         loadedTaskMetadata.checklists.add(checklist);
-        Api.saveTaskMetadata(taskModel.id, loadedTaskMetadata).then((value) {
+        WebApi.saveTaskMetadata(taskModel.id, loadedTaskMetadata).then((value) {
           if (!value) {
             Utils.showErrorSnackbar(context, "Could not save task metadata");
           } else {
@@ -104,7 +104,7 @@ class _TaskState extends State<Task> {
       keysEditableText.add(GlobalKey());
     }
     if (taskModel.nbComments > 0) {
-      loadedComments = await Api.getAllComments(taskModel.id);
+      loadedComments = await WebApi.getAllComments(taskModel.id);
       loadedComments.sort((a, b) {
         if (a.dateCreation > b.dateCreation) {
           return -1;
@@ -160,7 +160,7 @@ class _TaskState extends State<Task> {
         position: taskMetadata.checklists.length + 1,
         items: []);
     taskMetadata.checklists.add(checklist);
-    Api.saveTaskMetadata(taskModel.id, taskMetadata).then((value) {
+    WebApi.saveTaskMetadata(taskModel.id, taskMetadata).then((value) {
       if (!value) {
         Utils.showErrorSnackbar(context, "Could not save task metadata");
       } else {
@@ -208,20 +208,20 @@ class _TaskState extends State<Task> {
           ),
           actions: [
             TaskAppBarActions(
-              key: keyTaskAppBarActionsState,
-              taskModel: taskModel,
-              abActionListener: AppBarActionListener(
-                onChange: onChange,
-                onEditStart: (_, __) => onEditStart(0, []),
-                onEditEnd: onEditEnd,
-                onDelete: onDelete,
-                onMainAction: onCreateChecklist,
-                refreshUi: refreshUi,
-              ),
+              // key: keyTaskAppBarActionsState,
+              // taskModel: taskModel,
+              // abActionListener: AppBarActionListener(
+              //   onChange: onChange,
+              //   onEditStart: (_, __) => onEditStart(0, []),
+              //   onEditEnd: onEditEnd,
+              //   onDelete: onDelete,
+              //   onMainAction: onCreateChecklist,
+              //   refreshUi: refreshUi,
+              // ),
             )
           ]),
       body: Column(children: [
-        taskModel.isActive
+        taskModel.isActive == 1
             ? Utils.emptyUi()
             : Card(
                 clipBehavior: Clip.hardEdge,

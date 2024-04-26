@@ -1,53 +1,75 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:kanbored/constants.dart';
-import 'package:kanbored/models/project_model.dart';
-import 'package:kanbored/strings.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
-import 'package:kanbored/ui/board_action_listener.dart';
-import 'package:kanbored/ui/project_action_listener.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/ui/editing_state.dart';
+import 'package:kanbored/ui/ui_state.dart';
+import 'package:kanbored/utils/constants.dart';
+import 'package:kanbored/utils/strings.dart';
+import 'package:kanbored/utils/utils.dart';
 
 class ProjectAppBarActions extends AppBarActions {
-  final bool showArchived;
-
-  const ProjectAppBarActions(
-      {super.key, required this.showArchived, required super.abActionListener});
+  const ProjectAppBarActions({super.key});
 
   @override
-  State<StatefulWidget> createState() => ProjectAppBarActionsState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      ProjectAppBarActionsState();
 }
 
 class ProjectAppBarActionsState
     extends AppBarActionsState<ProjectAppBarActions> {
-  late bool showArchived;
-
   @override
   void initState() {
     super.initState();
-    showArchived = widget.showArchived;
   }
 
   @override
   Iterable<String> getPopupNames() => {
-    showArchived ? "hide_archived".resc() : "show_archived".resc(),
-    "settings".resc(),
-  };
+        ref.read(UiState.projectShowArchived)
+            ? "hide_archived".resc()
+            : "show_archived".resc(),
+        "settings".resc(),
+      };
 
   @override
   void delete() {
     log("project, delete");
-    abActionListener.onDelete();
+    // abActionListener.onDelete();
+  }
+
+  @override
+  void mainAction() {
+    log("project main");
+    // NOTE: this approach will not work for multiple boards/swimlane; instead, add to board's popup options
+    Utils.showInputAlertDialog(
+        context, "add_project".resc(), "alert_new_proj_content".resc(), "",
+        (title) {
+      log("project, add proj: $title");
+      WebApi.createProject(title).then((result) {
+        if (result is int) {
+          // TODO: remove default columns? `getColumns` and `removeColumn`
+          // onArchived(false);
+          // refreshUi();
+          ref.read(UiState.projectShowArchived.notifier).state = false;
+        } else {
+          Utils.showErrorSnackbar(context, "Could not add project");
+        }
+      }).onError((e, st) => Utils.showErrorSnackbar(context, e));
+    });
   }
 
   @override
   Future<void> handlePopupAction(String action) async {
     log("project, handlePopupAction: $action");
     if (action == "hide_archived".resc() || action == "show_archived".resc()) {
-      showArchived = !showArchived;
-      log("toggle archive: $showArchived");
-      (abActionListener as ProjectActionListener).onArchived(showArchived);
+      // showArchived = !showArchived;
+      // log("toggle archive: $showArchived");
+      // (abActionListener as ProjectActionListener).onArchived(showArchived);
+      // TODO: project archive status
+      ref.read(UiState.projectShowArchived.notifier).state =
+          !ref.watch(UiState.projectShowArchived);
     } else if (action == "settings".resc()) {
       Navigator.pushNamed(context, routeSettings).then((value) {
         if (value is bool && value) {
@@ -63,10 +85,7 @@ class ProjectAppBarActionsState
     switch (action) {
       case AppBarAction.kMain:
         return IconButton(
-          onPressed: () {
-            log("Add new project");
-            abActionListener.onMainAction?.call();
-          },
+          onPressed: mainAction,
           icon: const Icon(Icons.add),
           tooltip: "add_project".resc(),
         );

@@ -1,17 +1,18 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:kanbored/api/api.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
-import 'package:kanbored/strings.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/ui/task_app_bar.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/utils/utils.dart';
 
-class AddComment extends StatefulWidget {
+class AddComment extends ConsumerStatefulWidget {
   final TaskModel task;
   final AppBarActionListener abActionListener;
 
@@ -22,7 +23,7 @@ class AddComment extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() => AddCommentState();
+  ConsumerState<ConsumerStatefulWidget> createState() => AddCommentState();
 }
 
 class AddCommentState extends EditableState<AddComment> {
@@ -42,7 +43,7 @@ class AddCommentState extends EditableState<AddComment> {
   void endEdit(bool saveChanges) async {
     if (saveChanges) {
       log("Add a new comment: ${controller.text}, into task: ${task.title}");
-      Api.createComment(task.id, controller.text).then((result) {
+      WebApi.createComment(task.id, controller.text).then((result) {
         if (result is int) {
           abActionListener.refreshUi();
         } else {

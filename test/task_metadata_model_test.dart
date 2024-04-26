@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:kanbored/main.dart';
+import 'package:kanbored/pages/main.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 
 void main() {

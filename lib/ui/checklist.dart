@@ -1,16 +1,17 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:kanbored/api/api.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
-import 'package:kanbored/strings.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/app_bar_action_listener.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/utils/utils.dart';
 
-class Checklist extends StatefulWidget {
+class Checklist extends ConsumerStatefulWidget {
   // TODO: store taskId in one of the metadata classes / in bridge!
   final CheckListMetadata checklist;
   final TaskMetadataModel taskMetadata;
@@ -26,7 +27,7 @@ class Checklist extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() => ChecklistState();
+  ConsumerState<ConsumerStatefulWidget> createState() => ChecklistState();
 }
 
 class ChecklistState extends EditableState<Checklist> {
@@ -53,7 +54,7 @@ class ChecklistState extends EditableState<Checklist> {
         log("Edit checklist name: ${controller.text}");
         checklist.name = controller.text;
         log("Task metadata, checklist: ${taskMetadata.checklists}");
-        Api.saveTaskMetadata(task.id, taskMetadata).then((value) {
+        WebApi.saveTaskMetadata(task.id, taskMetadata).then((value) {
           // abActionListener.refreshUi();
           if (!value) {
             log("Could not store metadata!");
@@ -72,7 +73,7 @@ class ChecklistState extends EditableState<Checklist> {
 
   void deleteChecklist() async {
     for (var item in checklist.items) {
-      await Api.removeSubtask(item.id);
+      await WebApi.removeSubtask(item.id);
       // TODO: enable async mass delete after local state used
     }
     taskMetadata.checklists.removeWhere((checklist) =>
@@ -89,7 +90,7 @@ class ChecklistState extends EditableState<Checklist> {
       checklist.position = idx;
     }
     log("Task metadata, checklist: ${taskMetadata.checklists}");
-    Api.saveTaskMetadata(task.id, taskMetadata).then((value) {
+    WebApi.saveTaskMetadata(task.id, taskMetadata).then((value) {
       if (!value) {
         log("Could not store metadata!");
         Utils.showErrorSnackbar(context, "Could not save task metadata");

@@ -16,7 +16,8 @@ dependencies:
   flutter_secure_storage:
   flutter_markdown:
   markdown:
-#  flutter_markdown_editor:
+  flutter_riverpod: ^2.3.0
+  connectivity_plus:
 
 dev_dependencies:
   flutter_test:

@@ -1,8 +1,11 @@
 import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:kanbored/strings.dart';
-import 'package:kanbored/ui/app_bar_action_listener.dart';
-import 'package:kanbored/utils.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/ui/ui_state.dart';
+import 'package:kanbored/utils/strings.dart';
+import 'package:kanbored/utils/utils.dart';
+
 import 'editing_state.dart';
 
 class AppBarAction {
@@ -13,49 +16,57 @@ class AppBarAction {
   static const kPopup = 4;
 }
 
-abstract class AppBarActions extends StatefulWidget {
-  final AppBarActionListener abActionListener;
-
-  const AppBarActions({super.key, required this.abActionListener});
+abstract class AppBarActions extends ConsumerStatefulWidget {
+  const AppBarActions({super.key});
 }
 
 abstract class AppBarActionsState<T extends AppBarActions>
     extends EditableState<T> {
-  late AppBarActionListener abActionListener;
-  bool _editing = false;
-  var defaultActions = [
+  static final defaultActions = [
     AppBarAction.kMain,
     AppBarAction.kPopup,
   ];
   var currentActions = [];
+  StreamBuilder<bool>? editingStream;
 
-  @override
-  void initState() {
-    super.initState();
-    abActionListener = widget.abActionListener;
-  }
+  // StreamBuilder<Iterable<int>>? actionsStream;
 
   @override
   void startEdit() {
-    setState(() {
-      _editing = true;
-    });
+    log("app bar start edit");
+    // setState(() {
+    //   _editing = true;
+    // });
   }
 
   @override
   void endEdit(bool saveChanges) {
-    if (_editing) {
-      setState(() {
-        _editing = false;
-      });
+    log("app bar end edit: $saveChanges");
+    final activeText = ref.read(UiState.boardActiveText);
+    if (saveChanges && activeText.isEmpty) {
+      return;
     }
+    ref.read(UiState.boardEditing.notifier).state = false;
+    ref.read(UiState.boardActions.notifier).state = defaultActions;
+    ref
+        .read(UiState.boardActiveState.notifier)
+        .state
+        ?.currentState
+        ?.endEdit(saveChanges);
+    // if (_editing) {
+    //   setState(() {
+    //     _editing = false;
+    //   });
+    // }
   }
 
-  void stopEdit(bool saveChanges) {
-    if (abActionListener.onEditEnd(saveChanges)) {
-      endEdit(saveChanges);
-    }
-  }
+  void mainAction();
+
+  // void stopEdit(bool saveChanges) {
+  //   // if (abActionListener.onEditEnd(saveChanges)) {
+  //   //   endEdit(saveChanges);
+  //   // }
+  // }
 
   Iterable<String> getPopupNames();
 
@@ -74,14 +85,14 @@ abstract class AppBarActionsState<T extends AppBarActions>
         );
       case AppBarAction.kDiscard:
         return IconButton(
-          onPressed: () => stopEdit(false),
+          onPressed: () => endEdit(false),
           // color: showActive ? Colors.grey : Colors.red, //TODO
           icon: const Icon(Icons.undo),
           tooltip: "tt_discard".resc(),
         );
       case AppBarAction.kDone:
         return IconButton(
-          onPressed: () => stopEdit(true),
+          onPressed: () => endEdit(true),
           // color: showActive ? Colors.grey : Colors.red, //TODO
           icon: const Icon(Icons.done),
           tooltip: "tt_done".resc(),
@@ -104,11 +115,36 @@ abstract class AppBarActionsState<T extends AppBarActions>
     }
   }
 
+  void buildEditingStream() {}
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-        children: (_editing ? currentActions : defaultActions)
-            .map((e) => getButton(e))
-            .toList());
+    // TODO
+    // ref.read(UiState.appBarActiveState.notifier).state =
+    //     widget.key as GlobalKey<EditableState>;
+    editingStream ??= StreamBuilder(
+      // TODO: editing state required?
+      stream: ref.watch(UiState.boardEditing.notifier).stream.distinct(),
+      builder: (context, snapshot) {
+        final editing = snapshot.data ?? false;
+        log("edit stream");
+        return Row(
+            children:
+                (editing ? ref.read(UiState.boardActions) : defaultActions)
+                    .map((e) => getButton(e))
+                    .toList());
+      },
+    );
+    // actionsStream ??= StreamBuilder(
+    //   // TODO: editing state required?
+    //   stream: ref.watch(UiState.boardActions.notifier).stream.distinct(),
+    //   builder: (context, snapshot) {
+    //     final actions = snapshot.data ?? [];
+    //     log("edit stream");
+    //     return Row(children: actions.map((e) => getButton(e)).toList());
+    //   },
+    // );
+    // return actionsStream!;
+    return editingStream!;
   }
 }

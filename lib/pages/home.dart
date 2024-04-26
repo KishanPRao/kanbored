@@ -1,39 +1,50 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/api.dart';
-import 'package:kanbored/constants.dart';
+import 'package:kanbored/api/api_state.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/project_model.dart';
-import 'package:kanbored/strings.dart';
-import 'package:kanbored/ui/project_action_listener.dart';
+import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/project_app_bar.dart';
-import 'package:kanbored/ui/search_fab.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/ui/ui_state.dart';
+import 'package:kanbored/utils/app_connection.dart';
+import 'package:kanbored/utils/constants.dart';
+import 'package:kanbored/utils/strings.dart';
+import 'package:kanbored/utils/utils.dart';
 
-class Home extends StatefulWidget {
+class Home extends ConsumerStatefulWidget {
   const Home({super.key});
 
   @override
-  State<StatefulWidget> createState() => _HomeState();
+  ConsumerState<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
-  List<ProjectModel> projects = [];
-  var showArchived = false;
+class _HomeState extends ConsumerState<Home> {
+  // List<ProjectModel> projects = [];
+  // var showArchived = false;
+  late AppConnection connection;
+
+  void updateData({bool recurring = false}) async {
+    Api.updateProjects(ref, recurring: recurring);
+    // TODO
+    // final event = await apiDao.getApiLatest();
+    // if (event != null) {
+    //   log("run latest api task: ${event.timestamp}, ${event.updateId}, ${event.webApiInfo}");
+    // }
+  }
 
   @override
   void initState() {
     super.initState();
-    init();
-  }
-
-  void init() async {
-    Api.getAllProjects()
-        .then((value) => setState(() {
-              projects = value;
-            }))
-        .catchError((e) => ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Error: $e"))));
+    connection = AppConnection(ref.read(ApiState.onlineStatus.notifier));
+    ref.read(ApiState.onlineStatus.notifier).stream.listen((online) {
+      online = online ?? false;
+      if (online) {
+        updateData();
+      }
+    });
   }
 
   void onChange(text) {
@@ -74,7 +85,7 @@ class _HomeState extends State<Home> {
         context, "add_project".resc(), "alert_new_proj_content".resc(), "",
         (title) {
       log("project, add col: $title");
-      Api.createProject(title).then((result) {
+      WebApi.createProject(title).then((result) {
         if (result is int) {
           // TODO: remove default columns? `getColumns` and `removeColumn`
           refreshUi();
@@ -87,88 +98,140 @@ class _HomeState extends State<Home> {
 
   void onArchived(showArchived) {
     log("project, onArchived: $showArchived");
-    setState(() {
-      this.showArchived = showArchived;
-    });
+    // setState(() {
+    //   this.showArchived = showArchived;
+    // });
   }
 
   void refreshUi() {
     log("project, Refresh UI!");
-    init();
+    // init();
   }
 
   @override
   Widget build(BuildContext context) {
-    var projects = this
-        .projects
-        .where((project) => project.isActive != showArchived)
-        .toList();
-    projects.sort((a, b) => a.name.compareTo(b.name));
-    // log("Projects: $projects; orig: ${this.projects}");
-    return Scaffold(
-      backgroundColor: "pageBg".themed(context),
-      // floatingActionButton: buildSearchFab(context, () {
-      //   log("home Search");
-      // }),
-      appBar: AppBar(
-        title: Text("app_name".resc()),
-        backgroundColor: "primary".themed(context),
-        actions: [
-          ProjectAppBarActions(
-            // key: keyAppBarActionsState,
-            showArchived: showArchived,
-            abActionListener: ProjectActionListener(
-              onArchived: onArchived,
-              onChange: onChange,
-              onEditStart: (_, __) => {},
-              onEditEnd: onEditEnd,
-              onDelete: onDelete,
-              onMainAction: onAddProject,
-              refreshUi: refreshUi,
+    return PopScope(
+        onPopInvoked: (didPop) =>
+            ref.read(UiState.boardEditing.notifier).state = false,
+        child: Scaffold(
+            backgroundColor: "pageBg".themed(context),
+            // floatingActionButton: buildSearchFab(context, () {
+            //   log("home Search");
+            // }),
+            appBar: AppBar(
+              title: Text("app_name".resc()),
+              backgroundColor: "primary".themed(context),
+              actions: [
+                ProjectAppBarActions(
+                  key: EditableState.createKey(),
+                )
+              ],
             ),
-          )
-        ],
-      ),
-      body: RefreshIndicator(
-          // trigger the _loadData function when the user pulls down
-          onRefresh: () {
-            refreshUi();
-            return Utils.emptyFuture();
-          },
-          child: Column(children: [
-            showArchived
-                ? Card(
-                    clipBehavior: Clip.hardEdge,
-                    color: "archivedBg".themed(context),
+            body: RefreshIndicator(
+                onRefresh: () {
+                  refreshUi();
+                  return Utils.emptyFuture();
+                },
+                child: Column(children: [
+                  StreamBuilder(
+                      stream: ref.read(ApiState.onlineStatus.notifier).stream,
+                      builder: (context, snapshot2) {
+                        final isOnline = snapshot2.data ?? false;
+                        return isOnline
+                            ? Utils.emptyUi()
+                            : Card(
+                                clipBehavior: Clip.hardEdge,
+                                color: "offlineBg".themed(context),
+                                child: SizedBox(
+                                  child: Center(child: Text("offline".resc())),
+                                ));
+                      }),
+                  StreamBuilder(
+                      stream:
+                          ref.read(UiState.projectShowArchived.notifier).stream,
+                      builder: (context, snapshot2) {
+                        final showArchived = snapshot2.data ?? false;
+                        return showArchived
+                            ? Card(
+                                clipBehavior: Clip.hardEdge,
+                                color: "archivedBg".themed(context),
+                                child: SizedBox(
+                                  child: Center(child: Text("archived".resc())),
+                                ))
+                            : Utils.emptyUi();
+                      }),
+                  buildProjectsStream()
+                ]))));
+  }
+
+  StreamBuilder<List<ProjectModel>> buildProjectsStream() {
+    log("buildProjectsStream");
+    return StreamBuilder(
+        stream: ref.read(ApiState.allProjects.notifier).stream,
+        builder: (context, AsyncSnapshot<List<ProjectModel>> snapshot) {
+          log("new projects: ${snapshot.data}!");
+          return StreamBuilder(
+            stream: ref.read(UiState.projectShowArchived.notifier).stream,
+            builder: (context, snapshot2) {
+              final showArchived = snapshot2.data ?? false;
+              // TODO: if used outside 2nd stream builder, data not saved?
+              var projects = snapshot.data ?? [];
+              log("new projects: ${projects.length}, $showArchived");
+              projects = projects
+                  .where((project) =>
+                      ((project.isActive == 0) && showArchived) ||
+                      ((project.isActive == 1) && !showArchived))
+                  .toList();
+              // log("build, # projects ${projects.length}");
+              return buildProjectsUi(projects);
+            },
+          );
+        });
+  }
+
+  Widget buildProjectsUi(List<ProjectModel> projects) {
+    return Expanded(
+        child: GridView.builder(
+            shrinkWrap: true,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2),
+            itemCount: projects.length,
+            itemBuilder: (BuildContext context, int index) {
+              final project = projects[index];
+              return Card(
+                color: "projectBg".themed(context),
+                // clipBehavior: Clip.hardEdge,
+                clipBehavior: Clip.antiAlias,
+                // semanticContainer: true,
+                // shadowColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  // TODO: use percentage of width?
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+                borderOnForeground: false,
+                child: InkWell(
+                    splashColor: "cardHighlight".themed(context),
+                    highlightColor: "cardHighlight".themed(context),
+                    onTap: () {
+                      ref.read(UiState.projectShowArchived.notifier).state =
+                          false;
+                      ref.read(ApiState.activeProject.notifier).state = project;
+                      Navigator.pushNamed(context, routeBoard).then((value) {
+                        log("return to home");
+                        ref.read(UiState.appBarActiveState.notifier).state =
+                            widget.key as GlobalKey<EditableState>;
+                      });
+                    },
                     child: SizedBox(
-                      child: Center(child: Text("archived".resc())),
-                    ))
-                : Utils.emptyUi(),
-            Expanded(
-                child: GridView.count(
-              shrinkWrap: true,
-              crossAxisCount: 2,
-              children: projects
-                  .map((project) => Card(
-                        color: "projectBg".themed(context),
-                        clipBehavior: Clip.hardEdge,
-                        child: InkWell(
-                            splashColor: "cardHighlight".themed(context),
-                            highlightColor: "cardHighlight".themed(context),
-                            onTap: () {
-                              Navigator.pushNamed(
-                                context,
-                                routeBoard,
-                                arguments: project,
-                              );
-                            },
-                            child: SizedBox(
-                              child: Center(child: Text(project.name)),
-                            )),
-                      ))
-                  .toList(),
-            ))
-          ])),
-    );
+                      child: Center(child: Text(project.name)),
+                    )),
+              );
+            }));
+  }
+
+  @override
+  void dispose() {
+    connection.dispose();
+    super.dispose();
   }
 }

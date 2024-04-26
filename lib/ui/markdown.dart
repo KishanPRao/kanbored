@@ -2,17 +2,18 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart' as flmd;
-import 'package:kanbored/api/api.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/comment_model.dart';
 import 'package:kanbored/models/model.dart';
 import 'package:kanbored/models/task_model.dart';
-import 'package:kanbored/strings.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/app_bar_action_listener.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/utils/utils.dart';
 import 'package:markdown/markdown.dart' as md;
 
-class Markdown extends StatefulWidget {
+class Markdown extends ConsumerStatefulWidget {
   final Model model;
   final AppBarActionListener abActionListener;
 
@@ -27,7 +28,7 @@ class Markdown extends StatefulWidget {
   // final int maxLines;
 
   @override
-  State<StatefulWidget> createState() => _MarkdownState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _MarkdownState();
 }
 
 // NOTE: Assumes `TaskModel` is used for description, `CommentModel` for comments.
@@ -62,11 +63,11 @@ class _MarkdownState extends EditableState<Markdown> {
     if (model is TaskModel) {
       model.description = controller.text;
       log("Save desc: ${model.description}");
-      return await Api.updateTask(model);
+      return await WebApi.updateTask(model);
     } else if (model is CommentModel) {
       model.comment = controller.text;
       log("Save comment: ${model.comment}");
-      return await Api.updateComment(model);
+      return await WebApi.updateComment(model);
     }
     return false;
   }
@@ -115,7 +116,7 @@ class _MarkdownState extends EditableState<Markdown> {
     abActionListener.onEditEnd(false);
     Utils.showAlertDialog(context, "${'delete'.resc()} `${model.comment}`?",
         "alert_del_content".resc(), () {
-      Api.removeComment(model.id).then((value) {
+      WebApi.removeComment(model.id).then((value) {
         if (!value) {
           Utils.showErrorSnackbar(context, "Could not delete comment");
         } else {

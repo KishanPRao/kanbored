@@ -1,46 +1,37 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/api.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/column_model.dart';
-import 'package:kanbored/models/project_metadata_model.dart';
-import 'package:kanbored/models/task_metadata_model.dart';
-import 'package:kanbored/models/task_model.dart';
-import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/board_app_bar.dart';
 import 'package:kanbored/ui/editing_state.dart';
-import 'package:kanbored/ui/app_bar_action_listener.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/ui/ui_state.dart';
+import 'package:kanbored/utils/strings.dart';
+import 'package:kanbored/utils/utils.dart';
 
-class ColumnText extends StatefulWidget {
-  final ProjectMetadataModel projectMetadataModel;
+class ColumnText extends ConsumerStatefulWidget {
   final ColumnModel columnModel;
-  final AppBarActionListener abActionListener;
 
   const ColumnText({
     super.key,
     required this.columnModel,
-    required this.projectMetadataModel,
-    required this.abActionListener,
   });
 
   @override
-  State<StatefulWidget> createState() => ColumnTextState();
+  ConsumerState<ConsumerStatefulWidget> createState() => ColumnTextState();
 }
 
 class ColumnTextState extends EditableState<ColumnText> {
   late ColumnModel columnModel;
-  late ProjectMetadataModel projectMetadataModel;
-  late AppBarActionListener abActionListener;
   late TextEditingController controller;
 
   @override
   void initState() {
     super.initState();
     columnModel = widget.columnModel;
-    projectMetadataModel = widget.projectMetadataModel;
-    abActionListener = widget.abActionListener;
     controller = TextEditingController(text: columnModel.title);
   }
 
@@ -50,7 +41,7 @@ class ColumnTextState extends EditableState<ColumnText> {
       log("column, save: ${columnModel.title}");
       if (columnModel.title != controller.text) {
         columnModel.title = controller.text;
-        Api.updateColumn(columnModel).then((value) {
+        WebApi.updateColumn(columnModel).then((value) {
           if (!value) {
             Utils.showErrorSnackbar(context, "Could not save column");
           }
@@ -63,31 +54,27 @@ class ColumnTextState extends EditableState<ColumnText> {
   }
 
   void removeColumn() {
-    Api.removeColumn(columnModel.id).then((value) {
+    WebApi.removeColumn(columnModel.id).then((value) {
       if (!value) {
         Utils.showErrorSnackbar(context, "Could not remove column");
       } else {
-        abActionListener.refreshUi();
+        // TODO
+        Api.updateColumns(ref, columnModel.projectId);
+        // abActionListener.refreshUi();
       }
     }).onError((e, _) => Utils.showErrorSnackbar(context, e));
   }
 
   @override
   void delete() {
-    abActionListener.onEditEnd(false);
+    ref.read(UiState.boardEditing.notifier).state = false;
+    // abActionListener.onEditEnd(false);
     Utils.showAlertDialog(context, "${'delete'.resc()} `${columnModel.title}`?",
         "alert_del_content".resc(), () {
       log("column, delete");
 
-      var updateProjMetadata =
-          projectMetadataModel.closedColumns.remove(columnModel.id);
-      Future.wait(columnModel.tasks.map((t) => Api.removeTask(t.id)).toList() +
-              [
-                updateProjMetadata
-                    ? Api.saveProjectMetadata(
-                        columnModel.projectId, projectMetadataModel)
-                    : Utils.emptyFuture()
-              ])
+      Future.wait(
+              columnModel.tasks.map((t) => WebApi.removeTask(t.id)).toList())
           .then((value) {
         if (value.contains(false)) {
           Utils.showErrorSnackbar(context, "Could not clear all tasks");
@@ -98,64 +85,33 @@ class ColumnTextState extends EditableState<ColumnText> {
     });
   }
 
-  // TODO: Cannot remove column, kanboard issue?
-  @override
-  void archive() {
-    abActionListener.onEditEnd(false);
+  void updateArchive(bool archive) {
+    ref.read(UiState.boardEditing.notifier).state = false;
+    // abActionListener.onEditEnd(false);
+    final title = archive ? 'archive' : 'unarchive';
+    final content = archive ? 'alert_arch_content' : 'alert_unarch_content';
     Utils.showAlertDialog(
-        context,
-        "${'archive'.resc()} `${columnModel.title}`?",
-        "alert_arch_content".resc(), () {
-      log("column, archive");
-      if (!projectMetadataModel.closedColumns.contains(columnModel.id)) {
-        columnModel.isActive = false;
-        projectMetadataModel.closedColumns.add(columnModel.id);
-        Api.saveProjectMetadata(columnModel.projectId, projectMetadataModel)
-            .then((value) {
-          if (!value) {
-            Utils.showErrorSnackbar(context, "Could not save project metadata");
-          } else {
-            abActionListener.refreshUi();
-          }
-        }).onError((e, _) {
-          if (mounted) {
-            Utils.showErrorSnackbar(context, e);
-          } else {
-            log("[Error snackbar] unmounted; $e");
-          }
-        });
-      }
+        context, "${title.resc()} `${columnModel.title}`?", content.resc(), () {
+      log("column, $title");
+      columnModel.hideInDashboard = archive ? 1 : 0;
+      WebApi.updateColumn(columnModel).then((value) {
+        if (!value) {
+          Utils.showErrorSnackbar(context, "Could not update column");
+        } else {
+          // TODO
+          Api.updateColumns(ref, columnModel.projectId);
+          // abActionListener.refreshUi();
+        }
+      }).onError((e, _) => Utils.showErrorSnackbar(context, e));
     });
   }
 
+  // TODO: Cannot remove column, kanboard issue?
   @override
-  void unarchive() {
-    abActionListener.onEditEnd(false);
-    Utils.showAlertDialog(
-        context,
-        "${'unarchive'.resc()} `${columnModel.title}`?",
-        "alert_unarch_content".resc(), () {
-      log("column, unarchive");
-      if (projectMetadataModel.closedColumns.contains(columnModel.id)) {
-        columnModel.isActive = true;
-        projectMetadataModel.closedColumns.remove(columnModel.id);
-        Api.saveProjectMetadata(columnModel.projectId, projectMetadataModel)
-            .then((value) {
-          if (!value) {
-            Utils.showErrorSnackbar(context, "Could not save project metadata");
-          } else {
-            abActionListener.refreshUi();
-          }
-        }).onError((e, _) {
-          if (mounted) {
-            Utils.showErrorSnackbar(context, e);
-          } else {
-            log("[Error snackbar] unmounted; $e");
-          }
-        });
-      }
-    });
-  }
+  void archive() => updateArchive(true);
+
+  @override
+  void unarchive() => updateArchive(false);
 
   @override
   Widget build(BuildContext context) {
@@ -164,18 +120,35 @@ class ColumnTextState extends EditableState<ColumnText> {
     return TextField(
       controller: controller,
       onTap: () {
-        abActionListener.onChange(controller.text);
-        abActionListener.onEditStart(0, [
+        ref.read(UiState.boardActiveState.notifier).state =
+            widget.key as GlobalKey<EditableState>;
+        ref.read(UiState.boardActiveText.notifier).state = controller.text;
+        ref.read(UiState.boardActions.notifier).state = [
           AppBarAction.kDelete,
-          columnModel.isActive
-              ? BoardAppBarAction.kArchive
-              : BoardAppBarAction.kUnarchive,
+          columnModel.hideInDashboard == 1
+              ? BoardAppBarAction.kUnarchive
+              : BoardAppBarAction.kArchive,
           AppBarAction.kDiscard,
           AppBarAction.kDone
-        ]);
+        ];
+        ref.read(UiState.boardEditing.notifier).state = true;
+        // abActionListener.onChange(controller.text);
+        // abActionListener.onEditStart(0, [
+        //   AppBarAction.kDelete,
+        //   columnModel.isActive
+        //       ? BoardAppBarAction.kArchive
+        //       : BoardAppBarAction.kUnarchive,
+        //   AppBarAction.kDiscard,
+        //   AppBarAction.kDone
+        // ]);
       },
-      onChanged: abActionListener.onChange,
-      onEditingComplete: () => abActionListener.onEditEnd(true),
+      onChanged: (text) =>
+          ref.read(UiState.boardActiveText.notifier).state = text,
+      onEditingComplete: () => ref
+          .read(UiState.appBarActiveState.notifier)
+          .state
+          ?.currentState
+          ?.endEdit(true),
       decoration: InputDecoration(
           hintText: "column_empty_warn".resc(),
           border: InputBorder.none,

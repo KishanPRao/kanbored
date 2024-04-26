@@ -1,17 +1,18 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:kanbored/api/api.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
-import 'package:kanbored/strings.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/ui/task_app_bar.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/utils/utils.dart';
 
-class Subtask extends StatefulWidget {
+class Subtask extends ConsumerStatefulWidget {
   final SubtaskModel subtask;
   final TaskMetadataModel taskMetadata;
   final CheckListMetadata checklist;
@@ -26,7 +27,7 @@ class Subtask extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() => SubtaskState();
+  ConsumerState<ConsumerStatefulWidget> createState() => SubtaskState();
 }
 
 class SubtaskState extends EditableState<Subtask> {
@@ -53,7 +54,7 @@ class SubtaskState extends EditableState<Subtask> {
   }
 
   void updateSubtask() {
-    Api.updateSubtask(subtask).then((value) {
+    WebApi.updateSubtask(subtask).then((value) {
       if (!value) {
         Utils.showErrorSnackbar(context, "Could not update task");
       }
@@ -79,7 +80,7 @@ class SubtaskState extends EditableState<Subtask> {
     checklist.items.removeWhere(
         (checklistItemMetadata) => checklistItemMetadata.id == subtask.id);
     log("Task metadata, checklist: ${taskMetadata.checklists}");
-    Api.saveTaskMetadata(subtask.taskId, taskMetadata).then((value) {
+    WebApi.saveTaskMetadata(subtask.taskId, taskMetadata).then((value) {
       abActionListener.refreshUi();
       if (!value) {
         log("Could not store metadata!");
@@ -97,7 +98,7 @@ class SubtaskState extends EditableState<Subtask> {
     // TODO: on showing dialog, keeps refreshing data, any action, refreshes, with incomplete data
     Utils.showAlertDialog(context, "${'delete'.resc()} `${subtask.title}`?",
         "alert_del_content".resc(), () {
-      Api.removeSubtask(subtask.id).then((value) {
+      WebApi.removeSubtask(subtask.id).then((value) {
         if (!value) {
           Utils.showErrorSnackbar(context, "Could not delete task");
         } else {

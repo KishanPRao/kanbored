@@ -38,10 +38,10 @@ class BoardModel extends Model {
   int score;
 
   List<ColumnModel> get activeColumns =>
-      columns.where((c) => c.isActive).toList();
+      columns.where((c) => c.hideInDashboard == 0).toList();
 
   List<ColumnModel> get inactiveColumns => columns
-      .where((c) => (!c.isActive) || (c.inactiveTasks.isNotEmpty))
+      .where((c) => (c.hideInDashboard == 1) || (c.inactiveTasks.isNotEmpty))
       .toList();
 
   factory BoardModel.fromJson(Map<String, dynamic> json) => BoardModel(

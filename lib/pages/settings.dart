@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:kanbored/strings.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/app_text_style.dart';
 import 'package:kanbored/ui/app_theme.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/utils/utils.dart';
 import 'package:provider/provider.dart';
-import 'package:kanbored/app_data.dart';
-import 'package:kanbored/constants.dart';
+import 'package:kanbored/utils/app_data.dart';
+import 'package:kanbored/utils/constants.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});

@@ -1,12 +1,15 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:kanbored/api/api.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/web_api.dart';
+import 'package:kanbored/api/api_state.dart';
 import 'package:kanbored/models/project_model.dart';
-import 'package:kanbored/strings.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/board_action_listener.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/ui/ui_state.dart';
+import 'package:kanbored/utils/utils.dart';
 
 class BoardAppBarAction extends AppBarAction {
   static const kArchive = 5;
@@ -14,66 +17,99 @@ class BoardAppBarAction extends AppBarAction {
 }
 
 class BoardAppBarActions extends AppBarActions {
-  final ProjectModel projectModel;
-  final bool showArchived;
 
   const BoardAppBarActions(
-      {super.key,
-      required this.projectModel,
-      required this.showArchived,
-      required super.abActionListener});
+      {super.key});
 
   @override
-  State<StatefulWidget> createState() => BoardAppBarActionsState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      BoardAppBarActionsState();
 }
 
 class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
   late ProjectModel projectModel;
-  late bool showArchived;
-
-  @override
-  void initState() {
-    super.initState();
-    projectModel = widget.projectModel;
-    showArchived = widget.showArchived;
-  }
 
   @override
   Iterable<String> getPopupNames() => {
-        "rename".resc(),
-        showArchived ? "hide_archived".resc() : "show_archived".resc(),
-        projectModel.isActive ? "archive".resc() : "unarchive".resc(),
-        // TODO: `show_archived` adds extra spaces in UI?
-        "delete".resc(),
-      };
+    "rename".resc(),
+    ref.watch(UiState.boardShowArchived) ? "hide_archived".resc() : "show_archived".resc(),
+    (projectModel.isActive == 1) ? "archive".resc() : "unarchive".resc(),
+    // TODO: `show_archived` adds extra spaces in UI?
+    "delete".resc(),
+  };
 
   @override
   void delete() {
     log("board, delete");
-    abActionListener.onDelete();
+    ref.read(UiState.boardActiveState.notifier).state?.currentState?.delete();
+    // abActionListener.onDelete();
   }
 
   @override
   void archive() {
     log("board, archive");
-    (abActionListener as BoardActionListener).onArchive();
+    // (abActionListener as BoardActionListener).onArchive();
+    ref.read(UiState.boardActiveState.notifier).state?.currentState?.archive();
   }
 
   @override
-  void unarchive() => (abActionListener as BoardActionListener).onUnarchive();
+  void unarchive() {
+    // (abActionListener as BoardActionListener).onUnarchive();
+    ref
+        .read(UiState.boardActiveState.notifier)
+        .state
+        ?.currentState
+        ?.unarchive();
+  }
+
+  @override
+  void mainAction() {
+    log("board, onAddColumn");
+    // NOTE: this approach will not work for multiple boards/swimlane; instead, add to board's popup options
+    // Utils.showInputAlertDialog(
+    //     context, "add_column".resc(), "alert_new_col_content".resc(), "",
+    //         (title) {
+    //       log("board, add col: $title");
+    //       var projectModel = ref.read(activeProject)!;
+    //       WebApi.addColumn(projectModel.id, title).then((result) {
+    //         if (result is int) {
+    //           refreshUi();
+    //         } else {
+    //           Utils.showErrorSnackbar(context, "Could not add column");
+    //         }
+    //       }).onError((e, st) => Utils.showErrorSnackbar(context, e));
+    //     });
+    // NOTE: this approach will not work for multiple boards/swimlane; instead, add to board's popup options
+    Utils.showInputAlertDialog(
+        context, "add_column".resc(), "alert_new_col_content".resc(), "",
+            (title) {
+          log("board, add col: $title");
+          WebApi.addColumn(projectModel.id, title).then((result) {
+            if (result is int) {
+              // refreshUi();
+              // TODO: Only get/update columns? Or update entire board?
+            } else {
+              Utils.showErrorSnackbar(context, "Could not add column");
+            }
+          }).onError((e, st) => Utils.showErrorSnackbar(context, e));
+        });
+  }
 
   void toggleArchive() {
-    projectModel.isActive = !projectModel.isActive;
-    (projectModel.isActive
-            ? Api.enableProject(projectModel.id)
-            : Api.disableProject(projectModel.id))
+    // projectModel.isActive = !projectModel.isActive;
+    projectModel.isActive = 1 - projectModel.isActive;
+    (projectModel.isActive == 1
+        ? WebApi.enableProject(projectModel.id)
+        : WebApi.disableProject(projectModel.id))
         .then((value) {
       if (!value) {
+        // TODO: better way?
         Utils.showErrorSnackbar(context, "Could not update project");
       } else {
         // TODO: bug: Does not refresh archived list
-        abActionListener.refreshUi();
-        log("Updated project");
+        // abActionListener.refreshUi();
+        ref.read(ApiState.activeProject.notifier).state = projectModel;
+        log("Updated project??");
       }
     }).catchError((e) => Utils.showErrorSnackbar(context, e));
   }
@@ -83,11 +119,14 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
   Future<void> handlePopupAction(String action) async {
     log("board, handlePopupAction: $action");
     if (action == "hide_archived".resc() || action == "show_archived".resc()) {
-      showArchived = !showArchived;
-      (abActionListener as BoardActionListener).onArchived(showArchived);
+      log("flip archived: ${ref.watch(UiState.boardShowArchived)}");
+      // showArchived = !showArchived;
+      // (abActionListener as BoardActionListener).onArchived(showArchived);
+      ref.read(UiState.boardShowArchived.notifier).state =
+      !ref.watch(UiState.boardShowArchived);
     } else if (action == "archive".resc() || action == "unarchive".resc()) {
       log("Archive/Unarchive");
-      if (projectModel.isActive) {
+      if (projectModel.isActive == 1) {
         Utils.showAlertDialog(
             context,
             "${'archive'.resc()} `${projectModel.name}`?",
@@ -106,9 +145,10 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
           "alert_rename_proj_content".resc(), projectModel.name, (title) {
         log("project, rename col: $title");
         projectModel.name = title;
-        Api.updateProject(projectModel).then((result) {
+        WebApi.updateProject(projectModel).then((result) {
           if (result) {
-            abActionListener.refreshUi();
+            // abActionListener.refreshUi();
+            ref.read(ApiState.activeProject.notifier).state = projectModel;
           } else {
             Utils.showErrorSnackbar(context, "Could not rename project");
           }
@@ -120,9 +160,11 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
           "${'delete'.resc()} `${projectModel.name}`?",
           "alert_del_content".resc(), () {
         log("Delete project");
-        Api.removeProject(projectModel.id).then((result) {
+        WebApi.removeProject(projectModel.id).then((result) {
           if (result) {
-            abActionListener.refreshUi();
+            log("refresh remove??");
+            // abActionListener.refreshUi();
+            ref.read(ApiState.activeProject.notifier).state = projectModel;
             Navigator.pop(context);
           } else {
             Utils.showErrorSnackbar(context, "Could not delete project");
@@ -138,7 +180,7 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
     switch (action) {
       case AppBarAction.kMain:
         return IconButton(
-          onPressed: () => abActionListener.onMainAction?.call(),
+          onPressed: () => mainAction(),
           icon: const Icon(Icons.playlist_add),
           tooltip: "add_column".resc(),
         );
@@ -160,4 +202,15 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
         return super.getButton(action);
     }
   }
+
+  @override
+  Widget build(BuildContext context) {
+    var projectModel = ref.watch(ApiState.activeProject);
+    if (projectModel != null) {
+      this.projectModel = projectModel;
+    }
+    // showArchived = ref.read(UiState.boardShowArchived);
+    return super.build(context);
+  }
 }
+

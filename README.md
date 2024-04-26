@@ -72,3 +72,9 @@ Test:
 Possible Kanboard bugs:
 - Inaccurate position info when deleting middle position items
 - `removeColumn` not working
+
+Offline limitations:
+- new `id` related:
+  - creating new project/task/
+  - **possible workaround**
+    - use proj/task/col id -1, -2 etc, use only for subsequent tasks; use some pattern: {%column{%-1%}%} as the id, run tasks once online; refresh after all api tasks finished.

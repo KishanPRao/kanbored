@@ -1,20 +1,20 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:kanbored/constants.dart';
+import 'package:kanbored/utils/constants.dart';
 import 'package:kanbored/models/column_model.dart';
 import 'package:kanbored/models/project_model.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
-import 'package:kanbored/strings.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/add_subtask.dart';
 import 'package:kanbored/ui/checklist.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/sizes.dart';
 import 'package:kanbored/ui/subtask.dart';
 import 'package:kanbored/ui/app_bar_action_listener.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/utils/utils.dart';
 
 List<Widget> buildSubtasks(
     BuildContext context,

@@ -1,37 +1,37 @@
 import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/api.dart';
-import 'package:kanbored/constants.dart';
+import 'package:kanbored/api/api_state.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/column_model.dart';
-import 'package:kanbored/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
-import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/sizes.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/ui/ui_state.dart';
+import 'package:kanbored/utils/constants.dart';
+import 'package:kanbored/utils/strings.dart';
+import 'package:kanbored/utils/utils.dart';
 
-class AddTask extends StatefulWidget {
-  final AppBarActionListener abActionListener;
+class AddTask extends ConsumerStatefulWidget {
   final ColumnModel columnModel;
 
-  const AddTask(
-      {super.key, required this.columnModel, required this.abActionListener});
+  const AddTask({super.key, required this.columnModel});
 
   @override
-  State<StatefulWidget> createState() => AddTaskState();
+  ConsumerState<ConsumerStatefulWidget> createState() => AddTaskState();
 }
 
 class AddTaskState extends EditableState<AddTask> {
   var focusNode = FocusNode();
   late ColumnModel columnModel;
-  late AppBarActionListener abActionListener;
   late TextEditingController controller;
 
   @override
   void initState() {
     super.initState();
     columnModel = widget.columnModel;
-    abActionListener = widget.abActionListener;
     controller = TextEditingController(text: "");
   }
 
@@ -42,9 +42,17 @@ class AddTaskState extends EditableState<AddTask> {
   }
 
   void startEditing() {
-    abActionListener.onChange(controller.text);
-    abActionListener
-        .onEditStart(1, [AppBarAction.kDiscard, AppBarAction.kDone]);
+    // abActionListener.onChange(controller.text);
+    // abActionListener
+    //     .onEditStart(1, [AppBarAction.kDiscard, AppBarAction.kDone]);
+    ref.read(UiState.boardActiveState.notifier).state =
+        widget.key as GlobalKey<EditableState>;
+    ref.read(UiState.boardActiveText.notifier).state = controller.text;
+    ref.read(UiState.boardActions.notifier).state = [
+      AppBarAction.kDiscard,
+      AppBarAction.kDone
+    ];
+    ref.read(UiState.boardEditing.notifier).state = true;
   }
 
   @override
@@ -70,10 +78,14 @@ class AddTaskState extends EditableState<AddTask> {
                       child: TextField(
                           controller: controller,
                           onTap: startEditing,
-                          onEditingComplete: () {
-                            abActionListener.onEditEnd(true);
-                          },
-                          onChanged: abActionListener.onChange,
+                          onEditingComplete: () => ref
+                              .read(UiState.appBarActiveState.notifier)
+                              .state
+                              ?.currentState
+                              ?.endEdit(true),
+                          onChanged: (value) => ref
+                              .read(UiState.boardActiveText.notifier)
+                              .state = controller.text,
                           focusNode: focusNode,
                           decoration: InputDecoration(
                               hintText: "add_task".resc(),
@@ -94,12 +106,15 @@ class AddTaskState extends EditableState<AddTask> {
     log("endEdit: $saveChanges");
     if (saveChanges) {
       log("Add a new task: ${controller.text}, into task: ${columnModel.title}");
-      Api.createTask(columnModel.projectId, columnModel.id, controller.text)
+      WebApi.createTask(columnModel.projectId, columnModel.id, controller.text)
           .then((taskId) {
         controller.text = "";
-        abActionListener.refreshUi();
-        Navigator.pushNamed(context, routeTask,
-            arguments: [taskId, columnModel.projectId]);
+        // abActionListener.refreshUi();
+        WebApi.getTask(taskId, columnModel.projectId).then((taskModel) {
+          Api.updateTasks(ref, columnModel.projectId);
+          ref.read(ApiState.activeTask.notifier).state = taskModel;
+          Navigator.pushNamed(context, routeTask);
+        });
       }).onError((e, st) => Utils.showErrorSnackbar(context, e));
     } else {
       controller.text = "";

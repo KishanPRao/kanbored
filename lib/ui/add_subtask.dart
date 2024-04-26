@@ -1,17 +1,18 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:kanbored/api/api.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
-import 'package:kanbored/strings.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/app_bar_action_listener.dart';
 import 'package:kanbored/ui/task_app_bar.dart';
-import 'package:kanbored/utils.dart';
+import 'package:kanbored/utils/utils.dart';
 
-class AddSubtask extends StatefulWidget {
+class AddSubtask extends ConsumerStatefulWidget {
   final CheckListMetadata checklist;
   final TaskMetadataModel taskMetadata;
   final TaskModel task;
@@ -26,7 +27,7 @@ class AddSubtask extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() => AddSubtaskState();
+  ConsumerState<ConsumerStatefulWidget> createState() => AddSubtaskState();
 }
 
 class AddSubtaskState extends EditableState<AddSubtask> {
@@ -58,7 +59,7 @@ class AddSubtaskState extends EditableState<AddSubtask> {
     // }
     checklist.items.add(CheckListItemMetadata(id: subtaskId));
     log("Task metadata, checklist: ${taskMetadata.checklists}");
-    Api.saveTaskMetadata(task.id, taskMetadata).then((value) {
+    WebApi.saveTaskMetadata(task.id, taskMetadata).then((value) {
       abActionListener.refreshUi();
       if (!value) {
         log("Could not store metadata!");
@@ -74,7 +75,7 @@ class AddSubtaskState extends EditableState<AddSubtask> {
   void endEdit(bool saveChanges) async {
     if (saveChanges) {
       log("Add a new subtask: ${controller.text}, into task: ${task.title} & checklist: ${taskMetadata.checklists}");
-      Api.createSubtask(task.id, controller.text)
+      WebApi.createSubtask(task.id, controller.text)
           .then((subtaskId) => updateTaskMetadata(subtaskId))
           .catchError((e) => Utils.showErrorSnackbar(context, e));
     } else {
