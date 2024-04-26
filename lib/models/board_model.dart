@@ -36,13 +36,13 @@ class BoardModel extends Model {
   int nbColumns;
   int nbTasks;
   int score;
-
-  List<ColumnModel> get activeColumns =>
-      columns.where((c) => c.hideInDashboard == 0).toList();
-
-  List<ColumnModel> get inactiveColumns => columns
-      .where((c) => (c.hideInDashboard == 1) || (c.inactiveTasks.isNotEmpty))
-      .toList();
+  //
+  // List<ColumnModel> get activeColumns =>
+  //     columns.where((c) => c.hideInDashboard == 0).toList();
+  //
+  // List<ColumnModel> get inactiveColumns => columns
+  //     .where((c) => (c.hideInDashboard == 1) || (c.inactiveTasks.isNotEmpty))
+  //     .toList();
 
   factory BoardModel.fromJson(Map<String, dynamic> json) => BoardModel(
         id: json["id"],

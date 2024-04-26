@@ -14,7 +14,7 @@ class UiState {
   static final boardEditing = StateProvider<bool>((ref) => false);
   static final boardActiveText = StateProvider<String>((ref) => "");
   static final boardActiveIdx = StateProvider<int>((ref) => 0);
-  static final appBarActiveState = StateProvider<GlobalKey<EditableState>?>((ref) => null);
+  // static final appBarActiveState = StateProvider<GlobalKey<EditableState>?>((ref) => null);
   static final boardActiveState = StateProvider<GlobalKey<EditableState>?>((ref) => null);
   static final boardActions = StateProvider<Iterable<int>>((ref) => []);
 }

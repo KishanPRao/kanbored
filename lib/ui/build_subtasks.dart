@@ -33,26 +33,26 @@ List<Widget> buildSubtasks(
     log("checklist: $checklist: $currentIndex");
     return Column(
         children: <Widget>[
-              buildChecklistHeader(checklist, taskMetadata, task,
-                  keysEditableText, currentIndex++, abActionListener)
-            ] +
-            checklist.items.map((item) {
-              var subtask =
-                  subtasks.singleWhere((element) => element.id == item.id);
-              log("subtask: ${subtask.title}: $currentIndex");
-              return buildSingleSubtask(
-                  context,
-                  subtask,
-                  checklist,
-                  taskMetadata,
-                  keysEditableText,
-                  currentIndex++,
-                  abActionListener,
-                  toggleCb);
-            }).toList() +
-            <Widget>[
-              buildAddSubtask(checklist, taskMetadata, task, keysEditableText,
-                  currentIndex++, abActionListener)
+            //   buildChecklistHeader(checklist, taskMetadata, task,
+            //       keysEditableText, currentIndex++, abActionListener)
+            // ] +
+            // checklist.items.map((item) {
+            //   var subtask =
+            //       subtasks.singleWhere((element) => element.id == item.id);
+            //   log("subtask: ${subtask.title}: $currentIndex");
+            //   return buildSingleSubtask(
+            //       context,
+            //       subtask,
+            //       checklist,
+            //       taskMetadata,
+            //       keysEditableText,
+            //       currentIndex++,
+            //       abActionListener,
+            //       toggleCb);
+            // }).toList() +
+            // <Widget>[
+            //   buildAddSubtask(checklist, taskMetadata, task, keysEditableText,
+            //       currentIndex++, abActionListener)
             ]);
   }).toList();
 }

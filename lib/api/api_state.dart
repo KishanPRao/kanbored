@@ -13,13 +13,17 @@ class ApiState {
   static final allProjects = StateProvider<List<ProjectModel>>((ref) => []);
   static final columnsInActiveProject = StateProvider<List<ColumnModel>>((ref) => []);
   static final tasksInActiveProject = StateProvider<List<TaskModel>>((ref) => []);
+
+  // static final tasksInActiveProjectProvider = StreamProvider((ref) {
+  //   return ref.watch(tasksInActiveProject.notifier).stream;
+  // });
   static final subtasksInActiveTask = StateProvider<List<SubtaskModel>>((ref) => []);
   static final commentsInActiveTask = StateProvider<List<CommentModel>>((ref) => []);
   // static final activeBoards = StateProvider<List<BoardModel>>((ref) => []);
 
   static final activeProject = StateProvider<ProjectModel?>((ref) => null);
-  // static final activeProjectMetadata =
-  //     StateProvider<ProjectMetadataModel?>((ref) => null);
+  static final activeProjectMetadata =
+      StateProvider<ProjectMetadataModel?>((ref) => null);
   // static final activeColumn = StateProvider<ColumnModel?>((ref) => null);
   static final activeTask = StateProvider<TaskModel?>((ref) => null);
   static final activeTaskMetadata =

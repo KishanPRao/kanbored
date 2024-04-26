@@ -136,7 +136,6 @@ class WebApi {
         model.title,
         model.taskLimit,
         model.description,
-        model.hideInDashboard
       ]);
 
   static Future<bool> updateTask(TaskModel taskModel) async =>
@@ -213,6 +212,10 @@ class WebApi {
   static Future<bool> removeColumn(int id) async =>
       setApi("removeColumn", 1433237746, params: {"column_id": id});
 
+  static Future<Iterable<bool>> removeAllTasks(Iterable<int> ids) async =>
+      setMultiApi("removeTask", 1423501287,
+          multiParams: ids.map((id) => {"task_id": id}));
+
   static Future<bool> removeTask(int id) async =>
       setApi("removeTask", 1423501287, params: {"task_id": id});
 
@@ -253,6 +256,7 @@ class WebApi {
 
   static Future<TaskModel> getTask(int taskId, int projectId) async {
     dynamic values = await Future.wait([
+      // TODO: multiple APIs possible
       _getTask(taskId),
       _searchTasks(params: {"project_id": projectId, "query": "id:$taskId"})
     ]);
@@ -302,6 +306,11 @@ class WebApi {
 
   //////////////////////////////////// API //////////////////////////////////
 
+  static Future<Iterable<T>> setMultiApi<T>(String method, int id,
+      {Iterable<dynamic> multiParams = const []}) async {
+    return await baseMultiApi(method, id, multiParams: multiParams);
+  }
+
   static Future<T> setApi<T>(String method, int id,
       {dynamic params = const {}}) async {
     return await baseApi(method, id, params: params) as T;
@@ -327,6 +336,30 @@ class WebApi {
     return models;
   }
 
+  static Future<List<T>> baseMultiApi<T>(String method, int id,
+      {Iterable<dynamic> multiParams = const []}) async {
+    var parameters = multiParams
+        .map((params) =>
+            {"jsonrpc": "2.0", "method": method, "id": id, "params": params})
+        .toList();
+    // log("Multi base api, params: $parameters");
+    final credentials = "${AppData.username}:${AppData.password}";
+    Codec<String, String> stringToBase64 = utf8.fuse(base64);
+    String encoded = stringToBase64.encode(credentials);
+    final resp = await http.post(
+      Uri.parse(AppData.endpoint),
+      headers: <String, String>{"Authorization": "Basic $encoded"},
+      body: json.encode(parameters),
+      encoding: Encoding.getByName("utf-8"),
+    );
+    List<dynamic> decodedDataList = json.decode(utf8.decode(resp.bodyBytes));
+    // log("Multi base api, decodedData: ${utf8.decode(resp.bodyBytes)}");
+    // log("Multi base api, decodedData: $decodedData");
+    return decodedDataList
+        .map<T>((decodedData) => decodedData['result'])
+        .toList();
+  }
+
   static dynamic baseApi<T extends Model>(String method, int id,
       {dynamic params = const {}}) async {
     final Map<String, dynamic> parameters = {
@@ -347,6 +380,7 @@ class WebApi {
     );
 
     final decodedData = json.decode(utf8.decode(resp.bodyBytes));
+    // log("decodedData: ${utf8.decode(resp.bodyBytes)}");
     // log("decodedData: $decodedData");
 
     if (decodedData['error'] != null) return Future.error(decodedData['error']);

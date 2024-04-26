@@ -21,17 +21,13 @@ abstract class AppBarActions extends ConsumerStatefulWidget {
 }
 
 abstract class AppBarActionsState<T extends AppBarActions>
-    extends EditableState<T> {
-  static final defaultActions = [
-    AppBarAction.kMain,
-    AppBarAction.kPopup,
-  ];
+    extends ConsumerState<T> {
   var currentActions = [];
   StreamBuilder<bool>? editingStream;
 
   // StreamBuilder<Iterable<int>>? actionsStream;
 
-  @override
+  // @override
   void startEdit() {
     log("app bar start edit");
     // setState(() {
@@ -39,15 +35,15 @@ abstract class AppBarActionsState<T extends AppBarActions>
     // });
   }
 
-  @override
-  void endEdit(bool saveChanges) {
+  // @override
+  bool endEdit(bool saveChanges) {
     log("app bar end edit: $saveChanges");
-    final activeText = ref.read(UiState.boardActiveText);
-    if (saveChanges && activeText.isEmpty) {
-      return;
-    }
-    ref.read(UiState.boardEditing.notifier).state = false;
-    ref.read(UiState.boardActions.notifier).state = defaultActions;
+    // final activeText = ref.read(UiState.boardActiveText);
+    // if (saveChanges && activeText.isEmpty) {
+    //   return;
+    // }
+    // ref.read(UiState.boardEditing.notifier).state = false;
+    // ref.read(UiState.boardActions.notifier).state = defaultActions;
     ref
         .read(UiState.boardActiveState.notifier)
         .state
@@ -58,6 +54,7 @@ abstract class AppBarActionsState<T extends AppBarActions>
     //     _editing = false;
     //   });
     // }
+    return true;
   }
 
   void mainAction();
@@ -67,6 +64,8 @@ abstract class AppBarActionsState<T extends AppBarActions>
   //   //   endEdit(saveChanges);
   //   // }
   // }
+
+  void delete();
 
   Iterable<String> getPopupNames();
 
@@ -129,10 +128,11 @@ abstract class AppBarActionsState<T extends AppBarActions>
         final editing = snapshot.data ?? false;
         log("edit stream");
         return Row(
-            children:
-                (editing ? ref.read(UiState.boardActions) : defaultActions)
-                    .map((e) => getButton(e))
-                    .toList());
+            children: (editing
+                    ? ref.read(UiState.boardActions)
+                    : EditableState.defaultActions)
+                .map((e) => getButton(e))
+                .toList());
       },
     );
     // actionsStream ??= StreamBuilder(

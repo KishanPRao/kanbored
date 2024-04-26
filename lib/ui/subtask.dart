@@ -5,11 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
-import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
-import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/app_bar_action_listener.dart';
-import 'package:kanbored/ui/task_app_bar.dart';
+import 'package:kanbored/ui/editing_state.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/utils/utils.dart';
 
 class Subtask extends ConsumerStatefulWidget {
@@ -34,7 +33,6 @@ class SubtaskState extends EditableState<Subtask> {
   late SubtaskModel subtask;
   late TaskMetadataModel taskMetadata;
   late CheckListMetadata checklist;
-  late TextEditingController controller;
   late AppBarActionListener abActionListener;
 
   @override
@@ -44,7 +42,11 @@ class SubtaskState extends EditableState<Subtask> {
     taskMetadata = widget.taskMetadata;
     checklist = widget.checklist;
     abActionListener = widget.abActionListener;
-    controller = TextEditingController(text: "");
+    editActions = [
+      AppBarAction.kDelete,
+      AppBarAction.kDiscard,
+      AppBarAction.kDone
+    ];
   }
 
   @override
@@ -64,7 +66,7 @@ class SubtaskState extends EditableState<Subtask> {
   }
 
   @override
-  void endEdit(bool saveChanges) {
+  Future<bool> endEdit(bool saveChanges) async {
     if (saveChanges) {
       if (subtask.title != controller.text) {
         subtask.title = controller.text;
@@ -74,6 +76,7 @@ class SubtaskState extends EditableState<Subtask> {
       controller.text = subtask.title;
     }
     FocusManager.instance.primaryFocus?.unfocus();
+    return true;
   }
 
   void updateTaskMetadata() {

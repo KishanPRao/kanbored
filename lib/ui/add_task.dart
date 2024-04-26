@@ -26,33 +26,21 @@ class AddTask extends ConsumerStatefulWidget {
 class AddTaskState extends EditableState<AddTask> {
   var focusNode = FocusNode();
   late ColumnModel columnModel;
-  late TextEditingController controller;
 
   @override
   void initState() {
     super.initState();
     columnModel = widget.columnModel;
-    controller = TextEditingController(text: "");
+    editActions = [
+      AppBarAction.kDiscard,
+      AppBarAction.kDone
+    ];
   }
 
   @override
   void dispose() {
     focusNode.dispose();
     super.dispose();
-  }
-
-  void startEditing() {
-    // abActionListener.onChange(controller.text);
-    // abActionListener
-    //     .onEditStart(1, [AppBarAction.kDiscard, AppBarAction.kDone]);
-    ref.read(UiState.boardActiveState.notifier).state =
-        widget.key as GlobalKey<EditableState>;
-    ref.read(UiState.boardActiveText.notifier).state = controller.text;
-    ref.read(UiState.boardActions.notifier).state = [
-      AppBarAction.kDiscard,
-      AppBarAction.kDone
-    ];
-    ref.read(UiState.boardEditing.notifier).state = true;
   }
 
   @override
@@ -65,7 +53,7 @@ class AddTaskState extends EditableState<AddTask> {
           // splashColor: "primary".themed(context).withAlpha(30),
           onTap: () {
             setState(() {
-              startEditing();
+              startEdit();
               focusNode.requestFocus();
             });
           },
@@ -77,12 +65,8 @@ class AddTaskState extends EditableState<AddTask> {
                   Expanded(
                       child: TextField(
                           controller: controller,
-                          onTap: startEditing,
-                          onEditingComplete: () => ref
-                              .read(UiState.appBarActiveState.notifier)
-                              .state
-                              ?.currentState
-                              ?.endEdit(true),
+                          onTap: startEdit,
+                          onEditingComplete: () => endEdit(true),
                           onChanged: (value) => ref
                               .read(UiState.boardActiveText.notifier)
                               .state = controller.text,
@@ -102,9 +86,9 @@ class AddTaskState extends EditableState<AddTask> {
   }
 
   @override
-  void endEdit(bool saveChanges) async {
+  Future<bool> endEdit(bool saveChanges) async {
     log("endEdit: $saveChanges");
-    if (saveChanges) {
+    if (await super.endEdit(saveChanges)) {
       log("Add a new task: ${controller.text}, into task: ${columnModel.title}");
       WebApi.createTask(columnModel.projectId, columnModel.id, controller.text)
           .then((taskId) {
@@ -112,13 +96,14 @@ class AddTaskState extends EditableState<AddTask> {
         // abActionListener.refreshUi();
         WebApi.getTask(taskId, columnModel.projectId).then((taskModel) {
           Api.updateTasks(ref, columnModel.projectId);
-          ref.read(ApiState.activeTask.notifier).state = taskModel;
-          Navigator.pushNamed(context, routeTask);
+          // ref.read(ApiState.activeTask.notifier).state = taskModel;
+          // Navigator.pushNamed(context, routeTask);
         });
       }).onError((e, st) => Utils.showErrorSnackbar(context, e));
     } else {
       controller.text = "";
     }
     FocusManager.instance.primaryFocus?.unfocus();
+    return true;
   }
 }

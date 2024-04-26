@@ -34,17 +34,19 @@ class AddSubtaskState extends EditableState<AddSubtask> {
   late CheckListMetadata checklist;
   late TaskMetadataModel taskMetadata;
   late TaskModel task;
-  late TextEditingController controller;
   late AppBarActionListener abActionListener;
 
   @override
   void initState() {
     super.initState();
-    controller = TextEditingController(text: "");
     abActionListener = widget.abActionListener;
     task = widget.task;
     taskMetadata = widget.taskMetadata;
     checklist = widget.checklist;
+    editActions = [
+      AppBarAction.kDiscard,
+      AppBarAction.kDone
+    ];
     log("Task metadata, checklist: ${taskMetadata.checklists}");
   }
 
@@ -72,7 +74,7 @@ class AddSubtaskState extends EditableState<AddSubtask> {
   }
 
   @override
-  void endEdit(bool saveChanges) async {
+  Future<bool> endEdit(bool saveChanges) async {
     if (saveChanges) {
       log("Add a new subtask: ${controller.text}, into task: ${task.title} & checklist: ${taskMetadata.checklists}");
       WebApi.createSubtask(task.id, controller.text)
@@ -82,6 +84,7 @@ class AddSubtaskState extends EditableState<AddSubtask> {
       controller.text = "";
     }
     FocusManager.instance.primaryFocus?.unfocus();
+    return true;
   }
 
   @override

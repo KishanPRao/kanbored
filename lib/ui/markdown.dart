@@ -7,9 +7,10 @@ import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/models/comment_model.dart';
 import 'package:kanbored/models/model.dart';
 import 'package:kanbored/models/task_model.dart';
-import 'package:kanbored/utils/strings.dart';
-import 'package:kanbored/ui/editing_state.dart';
+import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/app_bar_action_listener.dart';
+import 'package:kanbored/ui/editing_state.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/utils/utils.dart';
 import 'package:markdown/markdown.dart' as md;
 
@@ -35,7 +36,6 @@ class Markdown extends ConsumerStatefulWidget {
 class _MarkdownState extends EditableState<Markdown> {
   // final int maxLines = 8;
   late Model model;
-  late TextEditingController controller;
   late AppBarActionListener abActionListener;
   bool editing = false;
   final FocusNode focusNode = FocusNode();
@@ -46,6 +46,13 @@ class _MarkdownState extends EditableState<Markdown> {
     model = widget.model;
     abActionListener = widget.abActionListener;
     controller = TextEditingController(text: getModelData());
+    controller.text = getModelData();
+    editActions = [
+      // TODO
+      // AppBarAction.kDelete,
+      AppBarAction.kDiscard,
+      AppBarAction.kDone
+    ];
   }
 
   String getModelData() {
@@ -82,7 +89,7 @@ class _MarkdownState extends EditableState<Markdown> {
   }
 
   @override
-  void endEdit(bool saveChanges) {
+  Future<bool> endEdit(bool saveChanges) async {
     FocusManager.instance.primaryFocus?.unfocus();
     if (saveChanges) {
       // TODO
@@ -110,6 +117,7 @@ class _MarkdownState extends EditableState<Markdown> {
     //   controller.text = "";
     // }
     // FocusManager.instance.primaryFocus?.unfocus();
+    return true;
   }
 
   void deleteComment(CommentModel model) {

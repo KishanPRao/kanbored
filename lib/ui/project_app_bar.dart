@@ -2,9 +2,9 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/api.dart';
 import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
-import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/ui_state.dart';
 import 'package:kanbored/utils/constants.dart';
 import 'package:kanbored/utils/strings.dart';
@@ -50,8 +50,7 @@ class ProjectAppBarActionsState
       WebApi.createProject(title).then((result) {
         if (result is int) {
           // TODO: remove default columns? `getColumns` and `removeColumn`
-          // onArchived(false);
-          // refreshUi();
+          Api.updateProjects(ref);
           ref.read(UiState.projectShowArchived.notifier).state = false;
         } else {
           Utils.showErrorSnackbar(context, "Could not add project");

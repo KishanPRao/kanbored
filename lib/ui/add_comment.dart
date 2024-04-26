@@ -28,19 +28,21 @@ class AddComment extends ConsumerStatefulWidget {
 
 class AddCommentState extends EditableState<AddComment> {
   late TaskModel task;
-  late TextEditingController controller;
   late AppBarActionListener abActionListener;
 
   @override
   void initState() {
     super.initState();
-    controller = TextEditingController(text: "");
     abActionListener = widget.abActionListener;
     task = widget.task;
+    editActions = [
+      AppBarAction.kDiscard,
+      AppBarAction.kDone
+    ];
   }
 
   @override
-  void endEdit(bool saveChanges) async {
+  Future<bool> endEdit(bool saveChanges) async {
     if (saveChanges) {
       log("Add a new comment: ${controller.text}, into task: ${task.title}");
       WebApi.createComment(task.id, controller.text).then((result) {
@@ -56,6 +58,7 @@ class AddCommentState extends EditableState<AddComment> {
       controller.text = "";
     }
     FocusManager.instance.primaryFocus?.unfocus();
+    return true;
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/src/scheduler/binding.dart';
 import 'package:kanbored/utils/strings.dart';
 
 extension StringExtension on String {
@@ -94,7 +95,30 @@ class Utils {
         });
   }
 
+  static void showLoaderDialog(BuildContext context, String content) {
+    AlertDialog alert = AlertDialog(
+      content: Row(
+        children: [
+          const CircularProgressIndicator(),
+          Container(
+              margin: const EdgeInsets.only(left: 20), child: Text(content)),
+        ],
+      ),
+    );
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   static void printStacktrace() {
     log("[stacktrace] ${StackTrace.current}");
+  }
+
+  static void runOnDraw(FrameCallback cb) {
+    WidgetsBinding.instance.addPostFrameCallback(cb);
   }
 }

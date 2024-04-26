@@ -35,7 +35,6 @@ class ChecklistState extends EditableState<Checklist> {
   late TaskMetadataModel taskMetadata;
   late TaskModel task;
   late AppBarActionListener abActionListener;
-  late TextEditingController controller;
 
   @override
   void initState() {
@@ -44,11 +43,16 @@ class ChecklistState extends EditableState<Checklist> {
     taskMetadata = widget.taskMetadata;
     task = widget.task;
     abActionListener = widget.abActionListener;
-    controller = TextEditingController(text: widget.checklist.name);
+    controller.text = widget.checklist.name;
+    editActions = [
+      AppBarAction.kDelete,
+      AppBarAction.kDiscard,
+      AppBarAction.kDone
+    ];
   }
 
   @override
-  void endEdit(bool saveChanges) {
+  Future<bool> endEdit(bool saveChanges) async {
     if (saveChanges) {
       if (checklist.name != controller.text) {
         log("Edit checklist name: ${controller.text}");
@@ -69,6 +73,7 @@ class ChecklistState extends EditableState<Checklist> {
       controller.text = widget.checklist.name;
     }
     FocusManager.instance.primaryFocus?.unfocus();
+    return true;
   }
 
   void deleteChecklist() async {

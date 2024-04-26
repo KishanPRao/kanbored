@@ -11,6 +11,7 @@ import 'package:kanbored/ui/sizes.dart';
 import 'package:kanbored/ui/ui_state.dart';
 import 'package:kanbored/utils/constants.dart';
 import 'package:kanbored/utils/strings.dart';
+import 'package:kanbored/utils/utils.dart';
 
 class BoardTasks extends ConsumerStatefulWidget {
   final ColumnModel column;
@@ -39,21 +40,26 @@ class BoardTasksState extends ConsumerState<BoardTasks> {
   StreamBuilder<List<TaskModel>> buildTasksStream() {
     return StreamBuilder(
         // TODO: distinct matters?
-        stream: ref.read(ApiState.tasksInActiveProject.notifier).stream.map(
-            (tasks) => tasks.where((t) => t.columnId == column.id).toList()),
+        stream: ref
+            .read(ApiState.tasksInActiveProject.notifier)
+            .stream
+            .map(
+                (tasks) => tasks.where((t) => t.columnId == column.id).toList())
+            .distinct(),
         builder: (context, AsyncSnapshot<List<TaskModel>> snapshot) {
+          log("new tasks, is null: ${snapshot.data == null}; ${column.id}");
           // NOTE: assume rebuilt by column on change of archive, just read
           final showArchived = ref.read(UiState.boardShowArchived);
           var tasks = snapshot.data ?? [];
           log("tasks, showArchived: $showArchived; ${tasks.length}");
           // tasks = tasks.where((t) => t.columnId == column.id).toList();
           tasks = (showArchived
-                  ? (column.hideInDashboard == 1
+                  ? (!column.isActive
                       ? tasks
                       : tasks.where((t) => t.isActive == 0))
                   : tasks.where((t) => t.isActive == 1))
               .toList();
-          log("new tasks: ${tasks.length}");
+          log("new tasks: ${tasks.length} under ${column.title}");
           return Expanded(
             child: Column(children: [
               Expanded(
@@ -62,8 +68,8 @@ class BoardTasksState extends ConsumerState<BoardTasks> {
                 itemCount: tasks.length,
                 itemBuilder: (_, index) {
                   final task = tasks[index];
-                  log("task: ${task.title}, ${task.id}");
-                  return buildBoardTask(tasks.elementAt(index), context);
+                  // log("task: ${task.title}, ${task.id}");
+                  return buildBoardTask(task, context);
                 },
               )),
               if (!showArchived) AddTask(key: keyAddTask, columnModel: column)

@@ -1,26 +1,18 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/api/api_state.dart';
-import 'package:kanbored/ui/ui_state.dart';
-import 'package:kanbored/utils/constants.dart';
 import 'package:kanbored/models/column_model.dart';
-import 'package:kanbored/utils/strings.dart';
-import 'package:kanbored/api/web_api.dart';
-import 'package:kanbored/models/project_metadata_model.dart';
-import 'package:kanbored/ui/abstract_app_bar.dart';
-import 'package:kanbored/ui/app_bar_action_listener.dart';
-import 'package:kanbored/ui/board_action_listener.dart';
 import 'package:kanbored/ui/board_app_bar.dart';
-import 'package:kanbored/ui/editing_state.dart';
+import 'package:kanbored/ui/board_column.dart';
 import 'package:kanbored/ui/search_fab.dart';
 import 'package:kanbored/ui/sizes.dart';
-import 'package:kanbored/models/board_model.dart';
-import 'package:kanbored/models/project_model.dart';
-import 'package:kanbored/ui/board_column.dart';
-import 'package:kanbored/ui/task_app_bar.dart';
+import 'package:kanbored/ui/ui_state.dart';
+import 'package:kanbored/utils/constants.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/utils/utils.dart';
 
 class Board extends ConsumerStatefulWidget {
@@ -32,6 +24,7 @@ class Board extends ConsumerStatefulWidget {
 
 class _BoardState extends ConsumerState<Board> {
   bool isLoaded = false;
+
   // late ProjectModel projectModel;
   // late ProjectMetadataModel projectMetadataModel;
   // List<BoardModel> boards = [];
@@ -39,6 +32,7 @@ class _BoardState extends ConsumerState<Board> {
   var activeColumnPos = -1;
   var activeTaskId = -1;
   late double columnWidth;
+
   // var activeEditIndex = 0;
   // var activeEditText = "";
   // GlobalKey<BoardAppBarActionsState> keyAppBarActionsState = GlobalKey();
@@ -46,16 +40,7 @@ class _BoardState extends ConsumerState<Board> {
   final ScrollController controller = ScrollController();
   late StreamBuilder<List<ColumnModel>> columnsStream;
   late Stream<bool> showArchivedStream;
-
-  @override
-  void didChangeDependencies() {
-    if (!isLoaded) {
-      // projectModel = ModalRoute.of(context)?.settings.arguments as ProjectModel;
-      columnWidth = Utils.getWidth(context) * Sizes.kTaskWidthPercentage;
-      updateData();
-    }
-    super.didChangeDependencies();
-  }
+  List<Timer?> timers = [];
 
   @override
   void initState() {
@@ -63,13 +48,30 @@ class _BoardState extends ConsumerState<Board> {
     var projectModel = ref.read(ApiState.activeProject)!;
     // Api.updateColumns(ref, projectModel.id, recurring: true);
     // Api.updateTasks(ref, projectModel.id, recurring: true);
-    updateData(recurring: true);
+    updateData(recurring: true).then((timers) {
+      this.timers = timers;
+    });
     columnsStream = buildColumnsStream(projectModel.id);
+    Utils.runOnDraw((_) {
+      columnWidth = Utils.getWidth(context) * Sizes.kTaskWidthPercentage;
+    });
   }
-  void updateData({bool recurring = false}) async {
+
+  @override
+  void dispose() {
+    log("board dispose");
+    for (var timer in timers) {
+      timer?.cancel();
+    }
+    super.dispose();
+  }
+
+  Future<List<Timer?>> updateData({bool recurring = false}) async {
     var projectModel = ref.read(ApiState.activeProject)!;
-    Api.updateColumns(ref, projectModel.id, recurring: recurring);
-    Api.updateTasks(ref, projectModel.id, recurring: recurring);
+    return [
+      Api.updateColumns(ref, projectModel.id, recurring: recurring),
+      Api.updateTasks(ref, projectModel.id, recurring: recurring)
+    ];
   }
 
   // void updateData() async {
@@ -153,7 +155,6 @@ class _BoardState extends ConsumerState<Board> {
   //   log("board, Refresh UI!");
   //   updateData();
   // }
-
 
   @override
   Widget build(BuildContext context) {
@@ -239,38 +240,39 @@ class _BoardState extends ConsumerState<Board> {
               ),
               actions: [
                 BoardAppBarActions(
-                  // key: keyAppBarActionsState,
-                  // abActionListener: BoardActionListener(
-                  //   onArchive: onArchive,
-                  //   onUnarchive: onUnarchive,
-                  //   onArchived: onArchived,
-                  //   onChange: onChange,
-                  //   onEditStart: (_, __) => {},
-                  //   onEditEnd: onEditEnd,
-                  //   onDelete: onDelete,
-                  //   onMainAction: onAddColumn,
-                  //   refreshUi: refreshUi,
-                  //   isArchived: isArchived,
-                  // ),
-                )
+                    // key: keyAppBarActionsState,
+                    // abActionListener: BoardActionListener(
+                    //   onArchive: onArchive,
+                    //   onUnarchive: onUnarchive,
+                    //   onArchived: onArchived,
+                    //   onChange: onChange,
+                    //   onEditStart: (_, __) => {},
+                    //   onEditEnd: onEditEnd,
+                    //   onDelete: onDelete,
+                    //   onMainAction: onAddColumn,
+                    //   refreshUi: refreshUi,
+                    //   isArchived: isArchived,
+                    // ),
+                    )
               ],
             ),
             // TODO: handle swimlane! Take only first board?
             body: RefreshIndicator(
-              // trigger the _loadData function when the user pulls down
+                // trigger the _loadData function when the user pulls down
                 onRefresh: () {
                   // refreshUi();
                   // TODO
+                  updateData();
                   return Utils.emptyFuture();
                 },
                 child: Column(children: [
                   showArchived
                       ? Card(
-                      clipBehavior: Clip.hardEdge,
-                      color: "archivedBg".themed(context),
-                      child: SizedBox(
-                        child: Center(child: Text("archived_col".resc())),
-                      ))
+                          clipBehavior: Clip.hardEdge,
+                          color: "archivedBg".themed(context),
+                          child: SizedBox(
+                            child: Center(child: Text("archived_col".resc())),
+                          ))
                       : Utils.emptyUi(),
                   columnsStream
                 ]))));
@@ -278,39 +280,46 @@ class _BoardState extends ConsumerState<Board> {
 
   StreamBuilder<List<ColumnModel>> buildColumnsStream(int projectId) {
     return StreamBuilder(
-      // TODO: distinct matters?
+        // TODO: distinct matters?
         stream: ref.read(ApiState.columnsInActiveProject.notifier).stream,
         builder: (context, AsyncSnapshot<List<ColumnModel>> snapshot) {
           return StreamBuilder(
             stream: ref.watch(UiState.boardShowArchived.notifier).stream,
             builder: (context, snapshot2) {
+              var projectMetadataModel =
+                  ref.read(ApiState.activeProjectMetadata)!;
               final showArchived = snapshot2.data ?? false;
               log("col, showArchived: $showArchived");
               var columns = snapshot.data ?? [];
+              for (var c in columns) {
+                c.isActive = !projectMetadataModel.closedColumns.contains(c.id);
+              }
               columns = columns
                   .where((c) =>
-              (showArchived && c.hideInDashboard == 1) ||
-                  (!showArchived && c.hideInDashboard == 0))
+                      (showArchived && !c.isActive) ||
+                      (!showArchived && c.isActive))
                   .toList();
               log("new columns: ${columns.length}");
               return Expanded(
                   child: ListView.builder(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: columns.length,
-                    itemBuilder: (_, index) {
-                      final column = columns[index];
-                      log("column: ${column.title}, ${column.id}");
-                      // return Text(column.title);
-                      return SizedBox(
-                          key: ObjectKey(column.id),
-                          width: columnWidth,
-                          child: BoardColumn(
-                            // key: ObjectKey(column),
-                            column: column,
-                          ));
-                    },
-                  ));
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                itemCount: columns.length,
+                itemBuilder: (_, index) {
+                  final column = columns[index];
+                  final projectMetadataModel =
+                      ref.read(ApiState.activeProjectMetadata)!;
+                  log("column: ${column.title}, ${column.id}");
+                  // return Text(column.title);
+                  return SizedBox(
+                      key: ObjectKey(column.id),
+                      width: columnWidth,
+                      child: BoardColumn(
+                        // key: ObjectKey(column),
+                        column: column,
+                      ));
+                },
+              ));
             },
           );
         });

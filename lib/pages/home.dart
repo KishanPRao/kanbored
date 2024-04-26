@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -25,9 +26,13 @@ class _HomeState extends ConsumerState<Home> {
   // List<ProjectModel> projects = [];
   // var showArchived = false;
   late AppConnection connection;
+  Timer? timer;
 
   void updateData({bool recurring = false}) async {
-    Api.updateProjects(ref, recurring: recurring);
+    var timer = Api.updateProjects(ref, recurring: recurring);
+    if (recurring) {
+      this.timer = timer;
+    }
     // TODO
     // final event = await apiDao.getApiLatest();
     // if (event != null) {
@@ -39,6 +44,7 @@ class _HomeState extends ConsumerState<Home> {
   void initState() {
     super.initState();
     connection = AppConnection(ref.read(ApiState.onlineStatus.notifier));
+    updateData(recurring: true);
     ref.read(ApiState.onlineStatus.notifier).stream.listen((online) {
       online = online ?? false;
       if (online) {
@@ -47,66 +53,68 @@ class _HomeState extends ConsumerState<Home> {
     });
   }
 
-  void onChange(text) {
-    // activeEditText = text;
-    // keyTaskAppBarActionsState.currentState?.updateText(text);
-  }
-
-  void onEditStart(int index, List<int> actions) {
-    log("onEditStart: $index, $actions");
-    // activeEditIndex = index;
-    // keyAppBarActionsState.currentState?.currentActions = actions;
-    // keyAppBarActionsState.currentState?.startEdit();
-    // keysEditableText[activeEditIndex].currentState?.startEdit();
-  }
-
-  // TODO: needed?
-  bool onEditEnd(bool saveChanges) {
-    // if (saveChanges && activeEditText.isEmpty) {
-    //   return false;
-    // }
-    // // Utils.printStacktrace();
-    // log("project, onEditEnd: $activeEditIndex, $saveChanges");
-    // keysEditableText[activeEditIndex].currentState?.endEdit(saveChanges);
-    // keyAppBarActionsState.currentState?.endEdit(saveChanges);
-    // setState(() {});
-    return true;
-  }
-
-  void onDelete() {
-    log("project, onDelete");
-    // keysEditableText[activeEditIndex].currentState?.delete();
-  }
-
-  void onAddProject() {
-    log("project, onAddProject");
-    // NOTE: this approach will not work for multiple boards/swimlane; instead, add to board's popup options
-    Utils.showInputAlertDialog(
-        context, "add_project".resc(), "alert_new_proj_content".resc(), "",
-        (title) {
-      log("project, add col: $title");
-      WebApi.createProject(title).then((result) {
-        if (result is int) {
-          // TODO: remove default columns? `getColumns` and `removeColumn`
-          refreshUi();
-        } else {
-          Utils.showErrorSnackbar(context, "Could not add project");
-        }
-      }).onError((e, st) => Utils.showErrorSnackbar(context, e));
-    });
-  }
-
-  void onArchived(showArchived) {
-    log("project, onArchived: $showArchived");
-    // setState(() {
-    //   this.showArchived = showArchived;
-    // });
-  }
-
-  void refreshUi() {
-    log("project, Refresh UI!");
-    // init();
-  }
+  // void onChange(text) {
+  //   // activeEditText = text;
+  //   // keyTaskAppBarActionsState.currentState?.updateText(text);
+  // }
+  //
+  // void onEditStart(int index, List<int> actions) {
+  //   log("onEditStart: $index, $actions");
+  //   // activeEditIndex = index;
+  //   // keyAppBarActionsState.currentState?.currentActions = actions;
+  //   // keyAppBarActionsState.currentState?.startEdit();
+  //   // keysEditableText[activeEditIndex].currentState?.startEdit();
+  // }
+  //
+  // // TODO: needed?
+  // bool onEditEnd(bool saveChanges) {
+  //   // if (saveChanges && activeEditText.isEmpty) {
+  //   //   return false;
+  //   // }
+  //   // // Utils.printStacktrace();
+  //   // log("project, onEditEnd: $activeEditIndex, $saveChanges");
+  //   // keysEditableText[activeEditIndex].currentState?.endEdit(saveChanges);
+  //   // keyAppBarActionsState.currentState?.endEdit(saveChanges);
+  //   // setState(() {});
+  //   return true;
+  // }
+  //
+  // void onDelete() {
+  //   log("project, onDelete");
+  //   // keysEditableText[activeEditIndex].currentState?.delete();
+  // }
+  //
+  // void onAddProject() {
+  //   log("project, onAddProject");
+  //   // NOTE: this approach will not work for multiple boards/swimlane; instead, add to board's popup options
+  //   Utils.showInputAlertDialog(
+  //       context, "add_project".resc(), "alert_new_proj_content".resc(), "",
+  //       (title) {
+  //     log("project, add col: $title");
+  //     WebApi.createProject(title).then((result) {
+  //       log("createProject, result: $result");
+  //       if (result is int) {
+  //         // TODO: remove default columns? `getColumns` and `removeColumn`
+  //         refreshUi();
+  //       } else {
+  //         Utils.showErrorSnackbar(context, "Could not add project");
+  //       }
+  //     }).onError((e, st) => Utils.showErrorSnackbar(context, e));
+  //   });
+  // }
+  //
+  // void onArchived(showArchived) {
+  //   log("project, onArchived: $showArchived");
+  //   // setState(() {
+  //   //   this.showArchived = showArchived;
+  //   // });
+  // }
+  //
+  // void refreshUi() {
+  //   log("project, Refresh UI!");
+  //   // init();
+  //   updateData();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +137,7 @@ class _HomeState extends ConsumerState<Home> {
             ),
             body: RefreshIndicator(
                 onRefresh: () {
-                  refreshUi();
+                  updateData();
                   return Utils.emptyFuture();
                 },
                 child: Column(children: [
@@ -212,14 +220,26 @@ class _HomeState extends ConsumerState<Home> {
                 child: InkWell(
                     splashColor: "cardHighlight".themed(context),
                     highlightColor: "cardHighlight".themed(context),
-                    onTap: () {
-                      ref.read(UiState.projectShowArchived.notifier).state =
-                          false;
+                    onTap: () async {
+                      // ref.read(UiState.projectShowArchived.notifier).state =
+                      //     false;
                       ref.read(ApiState.activeProject.notifier).state = project;
+                      // TODO
+                      var projectMetadataModel = await WebApi.getProjectMetadata(project.id);
+                      ref.read(ApiState.activeProjectMetadata.notifier).state = projectMetadataModel;
                       Navigator.pushNamed(context, routeBoard).then((value) {
                         log("return to home");
-                        ref.read(UiState.appBarActiveState.notifier).state =
-                            widget.key as GlobalKey<EditableState>;
+                        updateData();
+                        // ref.read(ApiState.allProjects).forEach((element) {
+                        //   log("project: ${element.name}");
+                        // });
+                        // ref.read(ApiState.allProjects.notifier).state = ref.read(ApiState.allProjects);
+                        // ref.read(ApiState.allProjects.notifier).update((state) => ref.read(ApiState.allProjects));
+                        // ref.refresh(ApiState.allProjects.notifier).state = ref.read(ApiState.allProjects);
+                        // TODO: doesn't work correctly
+                        // ref.invalidate(ApiState.allProjects);
+                        // ref.read(UiState.appBarActiveState.notifier).state =
+                        //     widget.key as GlobalKey<EditableState>;
                       });
                     },
                     child: SizedBox(
@@ -231,6 +251,8 @@ class _HomeState extends ConsumerState<Home> {
 
   @override
   void dispose() {
+    log("home dispose");
+    timer?.cancel();
     connection.dispose();
     super.dispose();
   }

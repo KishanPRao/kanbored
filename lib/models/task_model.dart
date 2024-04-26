@@ -43,12 +43,12 @@ class TaskModel extends Model {
     required this.recurrenceParent,
     required this.recurrenceChild,
     required this.priority,
-    required this.nbComments,
-    required this.nbFiles,
-    required this.nbLinks,
-    required this.nbExternalLinks,
-    required this.nbSubtasks,
-    required this.nbCompletedSubtasks,
+    // required this.nbComments,
+    // required this.nbFiles,
+    // required this.nbLinks,
+    // required this.nbExternalLinks,
+    // required this.nbSubtasks,
+    // required this.nbCompletedSubtasks,
   });
 
   int id;
@@ -81,12 +81,12 @@ class TaskModel extends Model {
   int? recurrenceParent;
   int? recurrenceChild;
   int priority;
-  int nbComments;
-  int nbFiles;
-  int nbLinks;
-  int nbExternalLinks;
-  int nbSubtasks;
-  int nbCompletedSubtasks;
+  // int nbComments;
+  // int nbFiles;
+  // int nbLinks;
+  // int nbExternalLinks;
+  // int nbSubtasks;
+  // int nbCompletedSubtasks;
 
   Map<String, Color> taskColors = {
     "yellow": Colors.yellow.shade600,
@@ -186,12 +186,12 @@ class TaskModel extends Model {
         recurrenceParent: json["recurrence_parent"],
         recurrenceChild: json["recurrence_child"],
         priority: json["priority"],
-        nbComments: json["nb_comments"],
-        nbFiles: json["nb_files"],
-        nbLinks: json["nb_links"],
-        nbExternalLinks: json["nb_external_links"],
-        nbSubtasks: json["nb_subtasks"],
-        nbCompletedSubtasks: json["nb_completed_subtasks"],
+        // nbComments: json["nb_comments"],
+        // nbFiles: json["nb_files"],
+        // nbLinks: json["nb_links"],
+        // nbExternalLinks: json["nb_external_links"],
+        // nbSubtasks: json["nb_subtasks"],
+        // nbCompletedSubtasks: json["nb_completed_subtasks"],
       );
 
   @override
@@ -226,12 +226,12 @@ class TaskModel extends Model {
         "recurrence_parent": recurrenceParent,
         "recurrence_child": recurrenceChild,
         "priority": priority,
-        "nb_comments": nbComments,
-        "nb_files": nbFiles,
-        "nb_links": nbLinks,
-        "nb_external_links": nbExternalLinks,
-        "nb_subtasks": nbSubtasks,
-        "nb_completed_subtasks": nbCompletedSubtasks,
+        // "nb_comments": nbComments,
+        // "nb_files": nbFiles,
+        // "nb_links": nbLinks,
+        // "nb_external_links": nbExternalLinks,
+        // "nb_subtasks": nbSubtasks,
+        // "nb_completed_subtasks": nbCompletedSubtasks,
       };
 
   List<Model> filter(String query) {
