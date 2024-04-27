@@ -50,6 +50,7 @@ TODO:
 - Store updated accurate position info when deleting middle position items
 - Show metadata of task (num comments, num of subtasks)
 - Show progress of subtasks
+- Enforce loading atleast once after clearing local data
 
 Limitations:
 These features are unlikely to be worked on either due to complexity, or due to limited understanding of its expected workflow.

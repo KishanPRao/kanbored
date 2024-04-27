@@ -1,18 +1,18 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
-import 'package:kanbored/db/web_api_const.dart';
-import 'package:kanbored/utils/app_data.dart';
 import 'package:kanbored/db/database.dart';
+import 'package:kanbored/db/web_api_const.dart';
 import 'package:kanbored/models/board_model.dart';
-import 'package:kanbored/models/column_model.dart';
 import 'package:kanbored/models/comment_model.dart';
 import 'package:kanbored/models/model.dart';
 import 'package:kanbored/models/project_metadata_model.dart';
 import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
+import 'package:kanbored/utils/app_data.dart';
 
 class WebApi {
   static Future<bool> login(
@@ -317,7 +317,7 @@ class WebApi {
       String method, int id, T Function(Map<String, dynamic>) constructor,
       {Map<String, dynamic> params = const {}}) async {
     final dynamic result =
-        await baseApi(method, id,params: params) as Map<String, dynamic>;
+        await baseApi(method, id, params: params) as Map<String, dynamic>;
     return constructor(result);
   }
 
@@ -333,8 +333,8 @@ class WebApi {
     return models;
   }
 
-  static dynamic baseApi<T extends Model>(String method, int id, {bool saveCache = false,
-    dynamic params = const {}}) async {
+  static dynamic baseApi<T extends Model>(String method, int id,
+      {bool saveCache = false, dynamic params = const {}}) async {
     final Map<String, dynamic> parameters = {
       "jsonrpc": "2.0",
       "method": method,
@@ -366,8 +366,14 @@ class WebApi {
     return decodedData['result'];
   }
 
-  static dynamic api(String body) async {
-    log("api, params: $body");
+  static dynamic api(ApiStorageModelData apiData) async {
+    final Map<String, dynamic> parameters = {
+      "jsonrpc": "2.0",
+      "method": apiData.webApiInfo.apiName,
+      "id": apiData.webApiInfo.apiId,
+      "params": json.decode(apiData.webApiParams)
+    };
+    log("api, params: ${apiData.webApiParams}");
     final credentials = "${AppData.username}:${AppData.password}";
     Codec<String, String> stringToBase64 = utf8.fuse(base64);
     String encoded = stringToBase64.encode(credentials);
@@ -375,7 +381,7 @@ class WebApi {
     final resp = await http.post(
       Uri.parse(AppData.endpoint),
       headers: <String, String>{"Authorization": "Basic $encoded"},
-      body: body,
+      body: json.encode(parameters),
       encoding: Encoding.getByName("utf-8"),
     );
     final decodedData = json.decode(utf8.decode(resp.bodyBytes));
@@ -386,13 +392,20 @@ class WebApi {
     return decodedData['result'];
   }
 
-  static Future<bool> handleApiRequest(ApiStorageModelData apiData) async {
-    final dynamic result = await api(apiData.webApiBody) as Map<String, dynamic>;
+  static Future<bool> handleApiRequest(
+      WidgetRef ref, ApiStorageModelData apiData) async {
+    final dynamic result = await api(apiData);
+    final apiDao = ref.read(AppDatabase.provider).apiStorageDao;
     // All creation APIs result in int or bool
     if (result is int) {
-      if (apiData.webApiInfo == WebApiConst.createProject) {
+      log("handleApiRequest: creation API; ${apiData.webApiInfo.apiName}");
+      if (apiData.webApiInfo.apiType == WebApiConst.createProject.apiType) {
         log("handleApiRequest: create proj");
         // update project dao, with id
+        final dao = ref.read(AppDatabase.provider).projectDao;
+        dao.updateId(apiData.updateId, result);
+        log("handleApiRequest: update id ${apiData.updateId} => $result");
+        apiDao.removeApiTask(apiData.id);
       }
     } else if (result is bool) {
       if (result) {

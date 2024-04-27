@@ -10,7 +10,8 @@ class ApiStorageModel extends Table {
   // TextColumn get webApiInfo => text()();
   TextColumn get webApiInfo => text().map(const WebApiModelConverter())();
 
-  TextColumn get webApiBody => text()();
+  // TODO: Directly store json instead of unnecessary encode, decode
+  TextColumn get webApiParams => text()();
 
   IntColumn get updateId => integer()();
 

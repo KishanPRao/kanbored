@@ -1,11 +1,14 @@
 import 'package:drift/drift.dart';
-import 'package:kanbored/utils/app_data.dart';
 import 'package:kanbored/db/converters.dart';
 import 'package:kanbored/db/database.dart';
+import 'package:kanbored/utils/app_data.dart';
 import 'package:kanbored/utils/utils.dart';
 
 class ProjectModel extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  @override
+  Set<Column> get primaryKey => {id};
+
+  IntColumn get id => integer()();
 
   TextColumn get name => text()();
 
@@ -67,7 +70,7 @@ class ProjectModel extends Table {
 }
 
 extension ProjectModelCompanionExt on ProjectModelCompanion {
-  static ProjectModelCompanion create(String name,
+  static ProjectModelCompanion create(int id, String name,
       {int isActive = 1,
       String token = "",
       int? lastModified,
@@ -88,6 +91,7 @@ extension ProjectModelCompanionExt on ProjectModelCompanion {
     ownerId ??= AppData.userId;
     url ??= Url.create();
     return ProjectModelCompanion(
+        id: Value(id),
         name: Value(name),
         isActive: Value(isActive),
         token: Value(token),

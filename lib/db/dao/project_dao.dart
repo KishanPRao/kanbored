@@ -26,9 +26,18 @@ class ProjectDao extends DatabaseAccessor<AppDatabase> with _$ProjectDaoMixin {
   }
 
   Future<int> createLocalProject(String name) async {
-    var data = ProjectModelCompanionExt.create(name);
-    log("createLocalProject");
-    return await into(projectModel).insertOnConflictUpdate(data);
+    return transaction(() async {
+      var lowestIdProj = await (select(projectModel)
+            ..orderBy(
+                [(t) => OrderingTerm(expression: t.id, mode: OrderingMode.asc)])
+            ..limit(1))
+          .getSingleOrNull();
+      log("lowestIdProj: ${lowestIdProj?.id}, ${lowestIdProj?.name}");
+      final lowestId = lowestIdProj?.id ?? 0;
+      var data = ProjectModelCompanionExt.create(lowestId - 1, name);
+      log("createLocalProject");
+      return await into(projectModel).insertOnConflictUpdate(data);
+    });
   }
 
   void updateProjects(List<dynamic> items) {
@@ -42,6 +51,16 @@ class ProjectDao extends DatabaseAccessor<AppDatabase> with _$ProjectDaoMixin {
         await into(projectModel).insertOnConflictUpdate(data);
       }
     });
+  }
+
+  Future<ProjectModelData?> getProject(int id) async {
+    return await (select(projectModel)..where((tbl) => tbl.id.equals(id)))
+        .getSingleOrNull();
+  }
+
+  void updateId(int oldId, int newId) async {
+    (update(projectModel)..where((tbl) => tbl.id.equals(oldId)))
+        .write(ProjectModelCompanion(id: Value(newId)));
   }
 
   void updateProject(ProjectModelData data) async {

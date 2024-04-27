@@ -14,13 +14,13 @@ class ApiStorageDao extends DatabaseAccessor<AppDatabase>
     with _$ApiStorageDaoMixin {
   ApiStorageDao(super.db);
 
-  void addApiTask(WebApiModel webApiModel, Map<String, dynamic> apiBody,
+  void addApiTask(WebApiModel webApiModel, Map<String, dynamic> apiParams,
       int updateId) async {
     final timestamp = Utils.currentTimestampInMsec();
     log("add api task: $timestamp");
     var data = ApiStorageModelCompanion(
       webApiInfo: Value(webApiModel),
-      webApiBody: Value(json.encode(apiBody)),
+      webApiParams: Value(json.encode(apiParams)),
       updateId: Value(updateId),
       timestamp: Value(timestamp),
     );

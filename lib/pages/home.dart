@@ -38,11 +38,19 @@ class _HomeState extends ConsumerState<Home> {
     "params": {"name": "New project", "owner_id": 1}
   };
 
+  void runApiTask(ApiStorageModelData event) async {
+    bool status = await WebApi.handleApiRequest(ref, event);
+    log("runApiTask: $status");
+  }
+
   void updateData({bool recurring = false}) async {
     Api.updateProjects(ref, recurring: recurring);
     final event = await apiDao.getApiLatest();
     if (event != null) {
       log("run latest api task: ${event.timestamp}, ${event.updateId}, ${event.webApiInfo}");
+      runApiTask(event);
+    } else {
+      log("no latest api");
     }
   }
 
@@ -58,6 +66,7 @@ class _HomeState extends ConsumerState<Home> {
         updateData();
       }
     });
+    // TODO: Check works on offline
     updateData(recurring: true);
 
     // Api.recurringApi(() async {
@@ -70,14 +79,14 @@ class _HomeState extends ConsumerState<Home> {
     var isOffline = false;
     // final random = math.Random();
     // apiDao.watchApiLatest().
-    apiDao.watchApiLatest().listen((event) async {
+    apiDao.watchApiLatest().listen((event) {
       final online = ref.read(onlineStatus) ?? false;
       if (event == null || !online) {
         log("wait api task: ${event?.timestamp}, ${event?.updateId}, ${event?.webApiInfo}");
         return;
       }
       log("run watched api task: ${event.timestamp}, ${event.updateId}, ${event.webApiInfo}");
-      bool status = await WebApi.handleApiRequest(event);
+      runApiTask(event);
       // log("==> running task: ${event.timestamp}");
       // int next(int min, int max) => min + random.nextInt(max - min);
       // sleep(Duration(seconds:next(7, 12)));
@@ -229,7 +238,7 @@ class _HomeState extends ConsumerState<Home> {
     return StreamBuilder(
         stream: ref.read(AppDatabase.provider).projectDao.watchProjects(),
         builder: (context, AsyncSnapshot<List<ProjectModelData>> snapshot) {
-          log("new projects: ${snapshot.data}!");
+          log("new projects: ${snapshot.data?.length}!");
           return StreamBuilder(
             stream: ref.watch(UiState.projectShowArchived.notifier).stream,
             builder: (context, snapshot2) {

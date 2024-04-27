@@ -120,9 +120,10 @@ class WebApiModelConverter extends TypeConverter<WebApiModel, String>
 
 @j.JsonSerializable()
 class WebApiModel {
-  const WebApiModel(this.value, this.apiType);
+  const WebApiModel(this.apiId, this.apiName, this.apiType);
 
-  final int value;
+  final int apiId;
+  final String apiName;
   final int apiType;
 
   factory WebApiModel.fromJson(Map<String, dynamic> json) =>

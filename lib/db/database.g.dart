@@ -13,11 +13,7 @@ class $ProjectModelTable extends ProjectModel
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
       'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+      type: DriftSqlType.int, requiredDuringInsert: false);
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
@@ -1001,11 +997,7 @@ class $ColumnModelTable extends ColumnModel
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
       'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+      type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
@@ -1059,6 +1051,8 @@ class $ColumnModelTable extends ColumnModel
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
     }
     if (data.containsKey('title')) {
       context.handle(
@@ -1104,7 +1098,7 @@ class $ColumnModelTable extends ColumnModel
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {id};
+  Set<GeneratedColumn> get $primaryKey => {id, projectId};
   @override
   ColumnModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -1255,6 +1249,7 @@ class ColumnModelCompanion extends UpdateCompanion<ColumnModelData> {
   final Value<String> description;
   final Value<int> hideInDashboard;
   final Value<int> projectId;
+  final Value<int> rowid;
   const ColumnModelCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
@@ -1263,16 +1258,19 @@ class ColumnModelCompanion extends UpdateCompanion<ColumnModelData> {
     this.description = const Value.absent(),
     this.hideInDashboard = const Value.absent(),
     this.projectId = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   ColumnModelCompanion.insert({
-    this.id = const Value.absent(),
+    required int id,
     required String title,
     required int position,
     required int taskLimit,
     required String description,
     required int hideInDashboard,
     required int projectId,
-  })  : title = Value(title),
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        title = Value(title),
         position = Value(position),
         taskLimit = Value(taskLimit),
         description = Value(description),
@@ -1286,6 +1284,7 @@ class ColumnModelCompanion extends UpdateCompanion<ColumnModelData> {
     Expression<String>? description,
     Expression<int>? hideInDashboard,
     Expression<int>? projectId,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1295,6 +1294,7 @@ class ColumnModelCompanion extends UpdateCompanion<ColumnModelData> {
       if (description != null) 'description': description,
       if (hideInDashboard != null) 'hide_in_dashboard': hideInDashboard,
       if (projectId != null) 'project_id': projectId,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
@@ -1305,7 +1305,8 @@ class ColumnModelCompanion extends UpdateCompanion<ColumnModelData> {
       Value<int>? taskLimit,
       Value<String>? description,
       Value<int>? hideInDashboard,
-      Value<int>? projectId}) {
+      Value<int>? projectId,
+      Value<int>? rowid}) {
     return ColumnModelCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
@@ -1314,6 +1315,7 @@ class ColumnModelCompanion extends UpdateCompanion<ColumnModelData> {
       description: description ?? this.description,
       hideInDashboard: hideInDashboard ?? this.hideInDashboard,
       projectId: projectId ?? this.projectId,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -1341,6 +1343,9 @@ class ColumnModelCompanion extends UpdateCompanion<ColumnModelData> {
     if (projectId.present) {
       map['project_id'] = Variable<int>(projectId.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -1353,7 +1358,8 @@ class ColumnModelCompanion extends UpdateCompanion<ColumnModelData> {
           ..write('taskLimit: $taskLimit, ')
           ..write('description: $description, ')
           ..write('hideInDashboard: $hideInDashboard, ')
-          ..write('projectId: $projectId')
+          ..write('projectId: $projectId, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -1369,11 +1375,7 @@ class $CommentModelTable extends CommentModel
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
       'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+      type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _dateCreationMeta =
       const VerificationMeta('dateCreation');
   @override
@@ -1449,6 +1451,8 @@ class $CommentModelTable extends CommentModel
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
     }
     if (data.containsKey('date_creation')) {
       context.handle(
@@ -1506,7 +1510,7 @@ class $CommentModelTable extends CommentModel
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {id};
+  Set<GeneratedColumn> get $primaryKey => {id, taskId};
   @override
   CommentModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -1710,6 +1714,7 @@ class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
   final Value<String?> name;
   final Value<String?> email;
   final Value<String?> avatarPath;
+  final Value<int> rowid;
   const CommentModelCompanion({
     this.id = const Value.absent(),
     this.dateCreation = const Value.absent(),
@@ -1721,9 +1726,10 @@ class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
     this.name = const Value.absent(),
     this.email = const Value.absent(),
     this.avatarPath = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   CommentModelCompanion.insert({
-    this.id = const Value.absent(),
+    required int id,
     required int dateCreation,
     required int dateModification,
     required int taskId,
@@ -1733,7 +1739,9 @@ class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
     this.name = const Value.absent(),
     this.email = const Value.absent(),
     this.avatarPath = const Value.absent(),
-  })  : dateCreation = Value(dateCreation),
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        dateCreation = Value(dateCreation),
         dateModification = Value(dateModification),
         taskId = Value(taskId),
         userId = Value(userId),
@@ -1749,6 +1757,7 @@ class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
     Expression<String>? name,
     Expression<String>? email,
     Expression<String>? avatarPath,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1761,6 +1770,7 @@ class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
       if (name != null) 'name': name,
       if (email != null) 'email': email,
       if (avatarPath != null) 'avatar_path': avatarPath,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
@@ -1774,7 +1784,8 @@ class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
       Value<String?>? username,
       Value<String?>? name,
       Value<String?>? email,
-      Value<String?>? avatarPath}) {
+      Value<String?>? avatarPath,
+      Value<int>? rowid}) {
     return CommentModelCompanion(
       id: id ?? this.id,
       dateCreation: dateCreation ?? this.dateCreation,
@@ -1786,6 +1797,7 @@ class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
       name: name ?? this.name,
       email: email ?? this.email,
       avatarPath: avatarPath ?? this.avatarPath,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -1822,6 +1834,9 @@ class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
     if (avatarPath.present) {
       map['avatar_path'] = Variable<String>(avatarPath.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -1837,7 +1852,8 @@ class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
           ..write('username: $username, ')
           ..write('name: $name, ')
           ..write('email: $email, ')
-          ..write('avatarPath: $avatarPath')
+          ..write('avatarPath: $avatarPath, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -1853,11 +1869,7 @@ class $SubtaskModelTable extends SubtaskModel
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
       'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+      type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
@@ -1956,6 +1968,8 @@ class $SubtaskModelTable extends SubtaskModel
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
     }
     if (data.containsKey('title')) {
       context.handle(
@@ -2035,7 +2049,7 @@ class $SubtaskModelTable extends SubtaskModel
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {id};
+  Set<GeneratedColumn> get $primaryKey => {id, taskId};
   @override
   SubtaskModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -2287,6 +2301,7 @@ class SubtaskModelCompanion extends UpdateCompanion<SubtaskModelData> {
   final Value<int> timerStartDate;
   final Value<String?> statusName;
   final Value<bool> isTimerStarted;
+  final Value<int> rowid;
   const SubtaskModelCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
@@ -2301,9 +2316,10 @@ class SubtaskModelCompanion extends UpdateCompanion<SubtaskModelData> {
     this.timerStartDate = const Value.absent(),
     this.statusName = const Value.absent(),
     this.isTimerStarted = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   SubtaskModelCompanion.insert({
-    this.id = const Value.absent(),
+    required int id,
     required String title,
     required int status,
     required int timeEstimated,
@@ -2316,7 +2332,9 @@ class SubtaskModelCompanion extends UpdateCompanion<SubtaskModelData> {
     required int timerStartDate,
     this.statusName = const Value.absent(),
     required bool isTimerStarted,
-  })  : title = Value(title),
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        title = Value(title),
         status = Value(status),
         timeEstimated = Value(timeEstimated),
         timeSpent = Value(timeSpent),
@@ -2339,6 +2357,7 @@ class SubtaskModelCompanion extends UpdateCompanion<SubtaskModelData> {
     Expression<int>? timerStartDate,
     Expression<String>? statusName,
     Expression<bool>? isTimerStarted,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2354,6 +2373,7 @@ class SubtaskModelCompanion extends UpdateCompanion<SubtaskModelData> {
       if (timerStartDate != null) 'timer_start_date': timerStartDate,
       if (statusName != null) 'status_name': statusName,
       if (isTimerStarted != null) 'is_timer_started': isTimerStarted,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
@@ -2370,7 +2390,8 @@ class SubtaskModelCompanion extends UpdateCompanion<SubtaskModelData> {
       Value<String?>? name,
       Value<int>? timerStartDate,
       Value<String?>? statusName,
-      Value<bool>? isTimerStarted}) {
+      Value<bool>? isTimerStarted,
+      Value<int>? rowid}) {
     return SubtaskModelCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
@@ -2385,6 +2406,7 @@ class SubtaskModelCompanion extends UpdateCompanion<SubtaskModelData> {
       timerStartDate: timerStartDate ?? this.timerStartDate,
       statusName: statusName ?? this.statusName,
       isTimerStarted: isTimerStarted ?? this.isTimerStarted,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -2430,6 +2452,9 @@ class SubtaskModelCompanion extends UpdateCompanion<SubtaskModelData> {
     if (isTimerStarted.present) {
       map['is_timer_started'] = Variable<bool>(isTimerStarted.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -2448,7 +2473,8 @@ class SubtaskModelCompanion extends UpdateCompanion<SubtaskModelData> {
           ..write('name: $name, ')
           ..write('timerStartDate: $timerStartDate, ')
           ..write('statusName: $statusName, ')
-          ..write('isTimerStarted: $isTimerStarted')
+          ..write('isTimerStarted: $isTimerStarted, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -2464,11 +2490,7 @@ class $TaskModelTable extends TaskModel
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
       'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+      type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
@@ -2692,6 +2714,8 @@ class $TaskModelTable extends TaskModel
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
     }
     if (data.containsKey('title')) {
       context.handle(
@@ -2881,7 +2905,7 @@ class $TaskModelTable extends TaskModel
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {id};
+  Set<GeneratedColumn> get $primaryKey => {id, columnId, projectId};
   @override
   TaskModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -3409,6 +3433,7 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
   final Value<int?> recurrenceParent;
   final Value<int?> recurrenceChild;
   final Value<int> priority;
+  final Value<int> rowid;
   const TaskModelCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
@@ -3440,9 +3465,10 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
     this.recurrenceParent = const Value.absent(),
     this.recurrenceChild = const Value.absent(),
     this.priority = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   TaskModelCompanion.insert({
-    this.id = const Value.absent(),
+    required int id,
     required String title,
     required String description,
     required int dateCreation,
@@ -3472,7 +3498,9 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
     this.recurrenceParent = const Value.absent(),
     this.recurrenceChild = const Value.absent(),
     required int priority,
-  })  : title = Value(title),
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        title = Value(title),
         description = Value(description),
         dateCreation = Value(dateCreation),
         colorId = Value(colorId),
@@ -3522,6 +3550,7 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
     Expression<int>? recurrenceParent,
     Expression<int>? recurrenceChild,
     Expression<int>? priority,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -3555,6 +3584,7 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
       if (recurrenceParent != null) 'recurrence_parent': recurrenceParent,
       if (recurrenceChild != null) 'recurrence_child': recurrenceChild,
       if (priority != null) 'priority': priority,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
@@ -3588,7 +3618,8 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
       Value<int>? recurrenceBasedate,
       Value<int?>? recurrenceParent,
       Value<int?>? recurrenceChild,
-      Value<int>? priority}) {
+      Value<int>? priority,
+      Value<int>? rowid}) {
     return TaskModelCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
@@ -3620,6 +3651,7 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
       recurrenceParent: recurrenceParent ?? this.recurrenceParent,
       recurrenceChild: recurrenceChild ?? this.recurrenceChild,
       priority: priority ?? this.priority,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -3716,6 +3748,9 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
     if (priority.present) {
       map['priority'] = Variable<int>(priority.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -3751,7 +3786,8 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
           ..write('recurrenceBasedate: $recurrenceBasedate, ')
           ..write('recurrenceParent: $recurrenceParent, ')
           ..write('recurrenceChild: $recurrenceChild, ')
-          ..write('priority: $priority')
+          ..write('priority: $priority, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -3965,11 +4001,11 @@ class $ApiStorageModelTable extends ApiStorageModel
               type: DriftSqlType.string, requiredDuringInsert: true)
           .withConverter<WebApiModel>(
               $ApiStorageModelTable.$converterwebApiInfo);
-  static const VerificationMeta _webApiBodyMeta =
-      const VerificationMeta('webApiBody');
+  static const VerificationMeta _webApiParamsMeta =
+      const VerificationMeta('webApiParams');
   @override
-  late final GeneratedColumn<String> webApiBody = GeneratedColumn<String>(
-      'web_api_body', aliasedName, false,
+  late final GeneratedColumn<String> webApiParams = GeneratedColumn<String>(
+      'web_api_params', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _updateIdMeta =
       const VerificationMeta('updateId');
@@ -3985,7 +4021,7 @@ class $ApiStorageModelTable extends ApiStorageModel
       type: DriftSqlType.int, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, webApiInfo, webApiBody, updateId, timestamp];
+      [id, webApiInfo, webApiParams, updateId, timestamp];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -4001,13 +4037,13 @@ class $ApiStorageModelTable extends ApiStorageModel
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     context.handle(_webApiInfoMeta, const VerificationResult.success());
-    if (data.containsKey('web_api_body')) {
+    if (data.containsKey('web_api_params')) {
       context.handle(
-          _webApiBodyMeta,
-          webApiBody.isAcceptableOrUnknown(
-              data['web_api_body']!, _webApiBodyMeta));
+          _webApiParamsMeta,
+          webApiParams.isAcceptableOrUnknown(
+              data['web_api_params']!, _webApiParamsMeta));
     } else if (isInserting) {
-      context.missing(_webApiBodyMeta);
+      context.missing(_webApiParamsMeta);
     }
     if (data.containsKey('update_id')) {
       context.handle(_updateIdMeta,
@@ -4035,8 +4071,8 @@ class $ApiStorageModelTable extends ApiStorageModel
       webApiInfo: $ApiStorageModelTable.$converterwebApiInfo.fromSql(
           attachedDatabase.typeMapping.read(
               DriftSqlType.string, data['${effectivePrefix}web_api_info'])!),
-      webApiBody: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}web_api_body'])!,
+      webApiParams: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}web_api_params'])!,
       updateId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}update_id'])!,
       timestamp: attachedDatabase.typeMapping
@@ -4057,13 +4093,13 @@ class ApiStorageModelData extends DataClass
     implements Insertable<ApiStorageModelData> {
   final int id;
   final WebApiModel webApiInfo;
-  final String webApiBody;
+  final String webApiParams;
   final int updateId;
   final int timestamp;
   const ApiStorageModelData(
       {required this.id,
       required this.webApiInfo,
-      required this.webApiBody,
+      required this.webApiParams,
       required this.updateId,
       required this.timestamp});
   @override
@@ -4074,7 +4110,7 @@ class ApiStorageModelData extends DataClass
       map['web_api_info'] = Variable<String>(
           $ApiStorageModelTable.$converterwebApiInfo.toSql(webApiInfo));
     }
-    map['web_api_body'] = Variable<String>(webApiBody);
+    map['web_api_params'] = Variable<String>(webApiParams);
     map['update_id'] = Variable<int>(updateId);
     map['timestamp'] = Variable<int>(timestamp);
     return map;
@@ -4084,7 +4120,7 @@ class ApiStorageModelData extends DataClass
     return ApiStorageModelCompanion(
       id: Value(id),
       webApiInfo: Value(webApiInfo),
-      webApiBody: Value(webApiBody),
+      webApiParams: Value(webApiParams),
       updateId: Value(updateId),
       timestamp: Value(timestamp),
     );
@@ -4097,7 +4133,7 @@ class ApiStorageModelData extends DataClass
       id: serializer.fromJson<int>(json['id']),
       webApiInfo: $ApiStorageModelTable.$converterwebApiInfo.fromJson(
           serializer.fromJson<Map<String, dynamic>>(json['webApiInfo'])),
-      webApiBody: serializer.fromJson<String>(json['webApiBody']),
+      webApiParams: serializer.fromJson<String>(json['webApiParams']),
       updateId: serializer.fromJson<int>(json['updateId']),
       timestamp: serializer.fromJson<int>(json['timestamp']),
     );
@@ -4109,7 +4145,7 @@ class ApiStorageModelData extends DataClass
       'id': serializer.toJson<int>(id),
       'webApiInfo': serializer.toJson<Map<String, dynamic>>(
           $ApiStorageModelTable.$converterwebApiInfo.toJson(webApiInfo)),
-      'webApiBody': serializer.toJson<String>(webApiBody),
+      'webApiParams': serializer.toJson<String>(webApiParams),
       'updateId': serializer.toJson<int>(updateId),
       'timestamp': serializer.toJson<int>(timestamp),
     };
@@ -4118,13 +4154,13 @@ class ApiStorageModelData extends DataClass
   ApiStorageModelData copyWith(
           {int? id,
           WebApiModel? webApiInfo,
-          String? webApiBody,
+          String? webApiParams,
           int? updateId,
           int? timestamp}) =>
       ApiStorageModelData(
         id: id ?? this.id,
         webApiInfo: webApiInfo ?? this.webApiInfo,
-        webApiBody: webApiBody ?? this.webApiBody,
+        webApiParams: webApiParams ?? this.webApiParams,
         updateId: updateId ?? this.updateId,
         timestamp: timestamp ?? this.timestamp,
       );
@@ -4133,7 +4169,7 @@ class ApiStorageModelData extends DataClass
     return (StringBuffer('ApiStorageModelData(')
           ..write('id: $id, ')
           ..write('webApiInfo: $webApiInfo, ')
-          ..write('webApiBody: $webApiBody, ')
+          ..write('webApiParams: $webApiParams, ')
           ..write('updateId: $updateId, ')
           ..write('timestamp: $timestamp')
           ..write(')'))
@@ -4142,14 +4178,14 @@ class ApiStorageModelData extends DataClass
 
   @override
   int get hashCode =>
-      Object.hash(id, webApiInfo, webApiBody, updateId, timestamp);
+      Object.hash(id, webApiInfo, webApiParams, updateId, timestamp);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is ApiStorageModelData &&
           other.id == this.id &&
           other.webApiInfo == this.webApiInfo &&
-          other.webApiBody == this.webApiBody &&
+          other.webApiParams == this.webApiParams &&
           other.updateId == this.updateId &&
           other.timestamp == this.timestamp);
 }
@@ -4157,37 +4193,37 @@ class ApiStorageModelData extends DataClass
 class ApiStorageModelCompanion extends UpdateCompanion<ApiStorageModelData> {
   final Value<int> id;
   final Value<WebApiModel> webApiInfo;
-  final Value<String> webApiBody;
+  final Value<String> webApiParams;
   final Value<int> updateId;
   final Value<int> timestamp;
   const ApiStorageModelCompanion({
     this.id = const Value.absent(),
     this.webApiInfo = const Value.absent(),
-    this.webApiBody = const Value.absent(),
+    this.webApiParams = const Value.absent(),
     this.updateId = const Value.absent(),
     this.timestamp = const Value.absent(),
   });
   ApiStorageModelCompanion.insert({
     this.id = const Value.absent(),
     required WebApiModel webApiInfo,
-    required String webApiBody,
+    required String webApiParams,
     required int updateId,
     required int timestamp,
   })  : webApiInfo = Value(webApiInfo),
-        webApiBody = Value(webApiBody),
+        webApiParams = Value(webApiParams),
         updateId = Value(updateId),
         timestamp = Value(timestamp);
   static Insertable<ApiStorageModelData> custom({
     Expression<int>? id,
     Expression<String>? webApiInfo,
-    Expression<String>? webApiBody,
+    Expression<String>? webApiParams,
     Expression<int>? updateId,
     Expression<int>? timestamp,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (webApiInfo != null) 'web_api_info': webApiInfo,
-      if (webApiBody != null) 'web_api_body': webApiBody,
+      if (webApiParams != null) 'web_api_params': webApiParams,
       if (updateId != null) 'update_id': updateId,
       if (timestamp != null) 'timestamp': timestamp,
     });
@@ -4196,13 +4232,13 @@ class ApiStorageModelCompanion extends UpdateCompanion<ApiStorageModelData> {
   ApiStorageModelCompanion copyWith(
       {Value<int>? id,
       Value<WebApiModel>? webApiInfo,
-      Value<String>? webApiBody,
+      Value<String>? webApiParams,
       Value<int>? updateId,
       Value<int>? timestamp}) {
     return ApiStorageModelCompanion(
       id: id ?? this.id,
       webApiInfo: webApiInfo ?? this.webApiInfo,
-      webApiBody: webApiBody ?? this.webApiBody,
+      webApiParams: webApiParams ?? this.webApiParams,
       updateId: updateId ?? this.updateId,
       timestamp: timestamp ?? this.timestamp,
     );
@@ -4218,8 +4254,8 @@ class ApiStorageModelCompanion extends UpdateCompanion<ApiStorageModelData> {
       map['web_api_info'] = Variable<String>(
           $ApiStorageModelTable.$converterwebApiInfo.toSql(webApiInfo.value));
     }
-    if (webApiBody.present) {
-      map['web_api_body'] = Variable<String>(webApiBody.value);
+    if (webApiParams.present) {
+      map['web_api_params'] = Variable<String>(webApiParams.value);
     }
     if (updateId.present) {
       map['update_id'] = Variable<int>(updateId.value);
@@ -4235,7 +4271,7 @@ class ApiStorageModelCompanion extends UpdateCompanion<ApiStorageModelData> {
     return (StringBuffer('ApiStorageModelCompanion(')
           ..write('id: $id, ')
           ..write('webApiInfo: $webApiInfo, ')
-          ..write('webApiBody: $webApiBody, ')
+          ..write('webApiParams: $webApiParams, ')
           ..write('updateId: $updateId, ')
           ..write('timestamp: $timestamp')
           ..write(')'))

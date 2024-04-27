@@ -1,12 +1,10 @@
 import 'package:drift/drift.dart';
 
 class CommentModel extends Table {
-  // @override
-  // Set<Column> get primaryKey => {id, taskId};
-  //
-  // IntColumn get id => integer()();
-  // TODO: confirm if `id` independent of task id
-  IntColumn get id => integer().autoIncrement()();
+  @override
+  Set<Column> get primaryKey => {id, taskId};
+
+  IntColumn get id => integer()();
 
   @JsonKey('date_creation')
   IntColumn get dateCreation => integer()();
