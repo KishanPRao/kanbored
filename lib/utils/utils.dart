@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:kanbored/utils/strings.dart';
@@ -34,7 +35,9 @@ class Utils {
     }
   }
 
-  static int currentTimestampInSec() => DateTime.now().millisecondsSinceEpoch ~/ 1000;
+  static int currentTimestampInSec() =>
+      DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
   static int currentTimestampInMsec() => DateTime.now().millisecondsSinceEpoch;
 
   static showAlertDialog(BuildContext context, String title, String content,
@@ -99,5 +102,9 @@ class Utils {
 
   static void printStacktrace() {
     log("[stacktrace] ${StackTrace.current}");
+  }
+
+  static void runOnDraw(FrameCallback cb) {
+    WidgetsBinding.instance.addPostFrameCallback(cb);
   }
 }

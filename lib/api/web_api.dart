@@ -4,7 +4,7 @@ import 'dart:developer';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:kanbored/db/database.dart';
-import 'package:kanbored/db/web_api_const.dart';
+import 'package:kanbored/db/web_api_model.dart';
 import 'package:kanbored/models/board_model.dart';
 import 'package:kanbored/models/comment_model.dart';
 import 'package:kanbored/models/model.dart';
@@ -13,6 +13,7 @@ import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/utils/app_data.dart';
+import 'package:kanbored/utils/constants.dart';
 
 class WebApi {
   static Future<bool> login(
@@ -367,13 +368,15 @@ class WebApi {
   }
 
   static dynamic api(ApiStorageModelData apiData) async {
+    final params = apiData.webApiParams
+        .replaceAll("\"$apiUpdateId\"", apiData.updateId.toString());
     final Map<String, dynamic> parameters = {
       "jsonrpc": "2.0",
-      "method": apiData.webApiInfo.apiName,
-      "id": apiData.webApiInfo.apiId,
-      "params": json.decode(apiData.webApiParams)
+      "method": apiData.apiName,
+      "id": apiData.apiId,
+      "params": json.decode(params)
     };
-    log("api, params: ${apiData.webApiParams}");
+    log("api, params: ${apiData.webApiParams} => $params");
     final credentials = "${AppData.username}:${AppData.password}";
     Codec<String, String> stringToBase64 = utf8.fuse(base64);
     String encoded = stringToBase64.encode(credentials);
@@ -398,18 +401,23 @@ class WebApi {
     final apiDao = ref.read(AppDatabase.provider).apiStorageDao;
     // All creation APIs result in int or bool
     if (result is int) {
-      log("handleApiRequest: creation API; ${apiData.webApiInfo.apiName}");
-      if (apiData.webApiInfo.apiType == WebApiConst.createProject.apiType) {
+      log("handleApiRequest: creation API; ${apiData.apiName}");
+      if (apiData.apiId == WebApiModel.createProject.apiId) {
         log("handleApiRequest: create proj");
         // update project dao, with id
         final dao = ref.read(AppDatabase.provider).projectDao;
         dao.updateId(apiData.updateId, result);
         log("handleApiRequest: update id ${apiData.updateId} => $result");
+        // TODO: outside, if successful
         apiDao.removeApiTask(apiData.id);
       }
+      // NOTE: Only creation needs updating, internal `updateId`
+      apiDao.updateApiTask(apiData.updateId, result, apiData.apiType);
     } else if (result is bool) {
       if (result) {
+        apiDao.removeApiTask(apiData.id);
       } else {
+        log("Failed to finish task: ${apiData.apiName}, ${apiData.webApiParams}");
         return false;
       }
     }

@@ -96,19 +96,19 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
     var updatedProject =
         projectModel.copyWith(isActive: 1 - projectModel.isActive);
     // Update local state, then use different API
-    Api.updateProject(ref, updatedProject, webUpdate: false);
-    (updatedProject.isActive == 1
-            ? WebApi.enableProject(projectModel.id)
-            : WebApi.disableProject(projectModel.id))
-        .then((value) {
-      if (!value) {
-        Utils.showErrorSnackbar(context, "Could not update project");
-      } else {
-        // TODO: bug: Does not refresh archived list
-        // abActionListener.refreshUi();
-        log("Updated project??");
-      }
-    }).catchError((e) => Utils.showErrorSnackbar(context, e));
+    Api.updateProject(ref, updatedProject);
+    // (updatedProject.isActive == 1
+    //         ? WebApi.enableProject(projectModel.id)
+    //         : WebApi.disableProject(projectModel.id))
+    //     .then((value) {
+    //   if (!value) {
+    //     Utils.showErrorSnackbar(context, "Could not update project");
+    //   } else {
+    //     // TODO: bug: Does not refresh archived list
+    //     // abActionListener.refreshUi();
+    //     log("Updated project??");
+    //   }
+    // }).catchError((e) => Utils.showErrorSnackbar(context, e));
   }
 
   // Project level
@@ -142,14 +142,17 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
           "alert_rename_proj_content".resc(), projectModel.name, (title) {
         log("project, rename col: $title");
         var updatedProject = projectModel.copyWith(name: title);
-        Api.updateProject(ref, updatedProject).then((result) {
-          if (result) {
-            // abActionListener.refreshUi();
-            log("refresh rename??");
-          } else {
-            Utils.showErrorSnackbar(context, "Could not rename project");
-          }
-        }).onError((e, st) => Utils.showErrorSnackbar(context, e));
+        Api.updateProject(ref, updatedProject);
+        ref.read(activeProject.notifier).state = updatedProject;
+        // TODO: update active project
+        // Api.updateProject(ref, updatedProject).then((result) {
+        //   if (result) {
+        //     // abActionListener.refreshUi();
+        //     log("refresh rename??");
+        //   } else {
+        //     Utils.showErrorSnackbar(context, "Could not rename project");
+        //   }
+        // }).onError((e, st) => Utils.showErrorSnackbar(context, e));
       });
     } else if (action == "delete".resc()) {
       Utils.showAlertDialog(

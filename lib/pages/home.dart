@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -7,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/api/state.dart';
 import 'package:kanbored/api/web_api.dart';
-import 'package:kanbored/db/web_api_const.dart';
 import 'package:kanbored/db/dao/api_storage_dao.dart';
 import 'package:kanbored/db/dao/task_dao.dart';
 import 'package:kanbored/db/database.dart';
@@ -30,6 +28,7 @@ class _HomeState extends ConsumerState<Home> {
   late TaskDao taskDao;
   late ApiStorageDao apiDao;
   late AppConnection connection;
+  Timer? timer;
 
   final jsonData = {
     "jsonrpc": "2.0",
@@ -44,10 +43,13 @@ class _HomeState extends ConsumerState<Home> {
   }
 
   void updateData({bool recurring = false}) async {
-    Api.updateProjects(ref, recurring: recurring);
+    var timer = Api.updateProjects(ref, recurring: recurring);
+    if (recurring) {
+      this.timer = timer;
+    }
     final event = await apiDao.getApiLatest();
     if (event != null) {
-      log("run latest api task: ${event.timestamp}, ${event.updateId}, ${event.webApiInfo}");
+      log("run latest api task: ${event.timestamp}, ${event.updateId}, ${event.apiName}, ${event.apiType}");
       runApiTask(event);
     } else {
       log("no latest api");
@@ -82,10 +84,10 @@ class _HomeState extends ConsumerState<Home> {
     apiDao.watchApiLatest().listen((event) {
       final online = ref.read(onlineStatus) ?? false;
       if (event == null || !online) {
-        log("wait api task: ${event?.timestamp}, ${event?.updateId}, ${event?.webApiInfo}");
+        log("wait api task: ${event?.timestamp}, ${event?.updateId}, ${event?.apiName}, ${event?.apiType}");
         return;
       }
-      log("run watched api task: ${event.timestamp}, ${event.updateId}, ${event.webApiInfo}");
+      log("run watched api task: ${event.timestamp}, ${event.updateId}, ${event.apiName}, ${event.apiType}");
       runApiTask(event);
       // log("==> running task: ${event.timestamp}");
       // int next(int min, int max) => min + random.nextInt(max - min);
@@ -296,6 +298,8 @@ class _HomeState extends ConsumerState<Home> {
 
   @override
   void dispose() {
+    log("home dispose");
+    timer?.cancel();
     connection.dispose();
     super.dispose();
   }

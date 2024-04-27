@@ -15,15 +15,30 @@ class ProjectDao extends DatabaseAccessor<AppDatabase> with _$ProjectDaoMixin {
       ..orderBy([(t) => OrderingTerm(expression: t.name)]);
     return query.watch();
   }
-
-  void createProject(Map<String, dynamic> json) {
-    transaction(() async {
-      var data = TaskModelData.fromJson(json);
-      // log("project data: ${data.name}");
-      // await into(projectModel).insertOnConflictUpdate(data);
-      log("createProject");
-    });
-  }
+  //
+  // void createProject(Map<String, dynamic> json) {
+  //   transaction(() async {
+  //     var data = TaskModelData.fromJson(json);
+  //     // log("project data: ${data.name}");
+  //     // await into(projectModel).insertOnConflictUpdate(data);
+  //     log("createProject");
+  //   });
+  // }
+  //
+  // Future<int> createLocalProject(String name) async {
+  //   return transaction(() async {
+  //     var lowestIdProj = await (select(projectModel)
+  //           ..orderBy(
+  //               [(t) => OrderingTerm(expression: t.id, mode: OrderingMode.asc)])
+  //           ..limit(1))
+  //         .getSingleOrNull();
+  //     log("lowestIdProj: ${lowestIdProj?.id}, ${lowestIdProj?.name}");
+  //     final lowestId = lowestIdProj?.id ?? 0;
+  //     var data = ProjectModelCompanionExt.create(lowestId - 1, name);
+  //     log("createLocalProject");
+  //     return await into(projectModel).insertOnConflictUpdate(data);
+  //   });
+  // }
 
   Future<int> createLocalProject(String name) async {
     return transaction(() async {

@@ -100,34 +100,34 @@ class Url {
 }
 
 // MARK: WebApi
-class WebApiModelConverter extends TypeConverter<WebApiModel, String>
-    with JsonTypeConverter2<WebApiModel, String, Map<String, dynamic>> {
-  const WebApiModelConverter();
-
-  @override
-  Map<String, dynamic> toJson(WebApiModel value) => value.toJson();
-
-  @override
-  WebApiModel fromJson(Map<String, dynamic> json) => WebApiModel.fromJson(json);
-
-  @override
-  WebApiModel fromSql(String fromDb) =>
-      WebApiModel.fromJson(jsonDecode(fromDb) as Map<String, dynamic>);
-
-  @override
-  String toSql(WebApiModel value) => jsonEncode(value);
-}
-
-@j.JsonSerializable()
-class WebApiModel {
-  const WebApiModel(this.apiId, this.apiName, this.apiType);
-
-  final int apiId;
-  final String apiName;
-  final int apiType;
-
-  factory WebApiModel.fromJson(Map<String, dynamic> json) =>
-      _$WebApiModelFromJson(json);
-
-  Map<String, dynamic> toJson() => _$WebApiModelToJson(this);
-}
+// class WebApiModelConverter extends TypeConverter<WebApiModel, String>
+//     with JsonTypeConverter2<WebApiModel, String, Map<String, dynamic>> {
+//   const WebApiModelConverter();
+//
+//   @override
+//   Map<String, dynamic> toJson(WebApiModel value) => value.toJson();
+//
+//   @override
+//   WebApiModel fromJson(Map<String, dynamic> json) => WebApiModel.fromJson(json);
+//
+//   @override
+//   WebApiModel fromSql(String fromDb) =>
+//       WebApiModel.fromJson(jsonDecode(fromDb) as Map<String, dynamic>);
+//
+//   @override
+//   String toSql(WebApiModel value) => jsonEncode(value);
+// }
+//
+// @j.JsonSerializable()
+// class WebApiModel {
+//   const WebApiModel(this.apiId, this.apiName, this.apiType);
+//
+//   final int apiId;
+//   final String apiName;
+//   final int apiType;
+//
+//   factory WebApiModel.fromJson(Map<String, dynamic> json) =>
+//       _$WebApiModelFromJson(json);
+//
+//   Map<String, dynamic> toJson() => _$WebApiModelToJson(this);
+// }

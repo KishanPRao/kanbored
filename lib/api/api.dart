@@ -6,16 +6,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/state.dart';
 import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/db/database.dart';
-import 'package:kanbored/db/web_api_const.dart';
+import 'package:kanbored/db/web_api_model.dart';
 import 'package:kanbored/utils/app_data.dart';
 import 'package:kanbored/utils/constants.dart';
 import 'package:kanbored/utils/utils.dart';
 
 // ignore_for_file: use_build_context_synchronously
 class Api {
-  static Timer recurringApi(VoidCallback function,
+  static Timer recurringApi(void Function() function,
       {int seconds = apiTimerDurationInSec}) {
-    function();
     final oneSec = Duration(seconds: seconds);
     return Timer.periodic(oneSec, (Timer t) => function());
   }
@@ -23,7 +22,7 @@ class Api {
   // TODO: use DAO
 
   // List update:
-  static void updateProjects(WidgetRef ref, {recurring = false}) {
+  static Timer? updateProjects(WidgetRef ref, {recurring = false}) {
     function() {
       WebApi.getAllProjects().then((items) async {
         ref.read(AppDatabase.provider).projectDao.updateProjects(items);
@@ -32,10 +31,11 @@ class Api {
     }
 
     function();
-    if (recurring) recurringApi(function);
+    if (recurring) return recurringApi(function);
+    return null;
   }
 
-  static void updateColumns(WidgetRef ref, int projectId, {recurring = false}) {
+  static Timer? updateColumns(WidgetRef ref, int projectId, {recurring = false}) {
     function() {
       WebApi.getColumns(projectId).then((items) async {
         // TODO: alt approach?
@@ -47,10 +47,11 @@ class Api {
     }
 
     function();
-    if (recurring) recurringApi(function);
+    if (recurring) return recurringApi(function);
+    return null;
   }
 
-  static void updateTasks(WidgetRef ref, int projectId, {recurring = false}) {
+  static Timer? updateTasks(WidgetRef ref, int projectId, {recurring = false}) {
     function() {
       Future.wait([
         WebApi.getAllTasks(projectId, 1), // active
@@ -64,20 +65,29 @@ class Api {
     }
 
     function();
-    if (recurring) recurringApi(function);
+    if (recurring) return recurringApi(function);
+    return null;
   }
 
   // Single update:
 
-  static Future<bool> updateProject(WidgetRef ref, ProjectModelData data,
+  static void updateProject(WidgetRef ref, ProjectModelData data,
       {webUpdate = true}) async {
-    ref.read(activeProject.notifier).state = data;
-    var result = true;
-    if (webUpdate) {
-      result = await WebApi.updateProject(data);
-    }
-    if (result) ref.read(AppDatabase.provider).projectDao.updateProject(data);
-    return result;
+    // ref.read(activeProject.notifier).state = data;
+    // var result = true;
+    // if (webUpdate) {
+    //   result = await WebApi.updateProject(data);
+    // }
+    // if (result) ref.read(AppDatabase.provider).projectDao.updateProject(data);
+    // return result;
+    ref.read(AppDatabase.provider).projectDao.updateProject(data);
+    log("updateProject");
+    ref.read(AppDatabase.provider).apiStorageDao.addApiTask(
+          WebApiModel.updateProject,
+          {"project_id": apiUpdateId, "name": data.name},
+          data.id,
+        );
+    // TODO: call enable/disable project
   }
 
   static Future<bool> updateColumn(WidgetRef ref, ColumnModelData data,
@@ -157,7 +167,7 @@ class Api {
         .createLocalProject(name);
     log("create local project: $id");
     ref.read(AppDatabase.provider).apiStorageDao.addApiTask(
-          WebApiConst.createProject,
+          WebApiModel.createProject,
           {"name": name, "owner_id": AppData.userId},
           id,
         );

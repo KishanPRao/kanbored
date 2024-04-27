@@ -1,6 +1,4 @@
-import 'package:kanbored/db/converters.dart';
-
-class WebApiConst {
+class WebApiModel {
   static const createProject =
       WebApiModel(1797076613, "createProject", typeProject);
   static const addColumn = WebApiModel(638544704, "addColumn", typeColumn);
@@ -60,4 +58,10 @@ class WebApiConst {
   static const typeComment = 5;
   static const typeProjectMetadata = 6;
   static const typeTaskMetadata = 7;
+
+  const WebApiModel(this.apiId, this.apiName, this.apiType);
+
+  final int apiId;
+  final String apiName;
+  final int apiType;
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -5,16 +6,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/api/state.dart';
 import 'package:kanbored/api/web_api.dart';
-import 'package:kanbored/utils/constants.dart';
 import 'package:kanbored/db/dao/column_dao.dart';
 import 'package:kanbored/db/database.dart';
-import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/board_app_bar.dart';
 import 'package:kanbored/ui/board_column.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/search_fab.dart';
 import 'package:kanbored/ui/sizes.dart';
 import 'package:kanbored/ui/ui_state.dart';
+import 'package:kanbored/utils/constants.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/utils/utils.dart';
 
 class Board extends ConsumerStatefulWidget {
@@ -44,39 +45,67 @@ class _BoardState extends ConsumerState<Board> {
   late ColumnDao columnDao;
   late StreamBuilder<List<ColumnModelData>> columnsStream;
   late Stream<bool> showArchivedStream;
+  List<Timer?> timers = [];
+
+  Future<List<Timer?>?> updateData({bool recurring = false}) async {
+    var projectModel = ref.read(activeProject)!;
+    if (!recurring) return null;
+    return [
+      Api.updateColumns(ref, projectModel.id, recurring: recurring),
+      Api.updateTasks(ref, projectModel.id, recurring: recurring)
+    ];
+  }
 
   @override
   void initState() {
     super.initState();
     var projectModel = ref.read(activeProject)!;
-    Api.updateColumns(ref, projectModel.id, recurring: true);
-    Api.updateTasks(ref, projectModel.id, recurring: true);
+    updateData(recurring: true).then((timers) {
+      if (timers != null) {
+        this.timers = timers;
+      }
+    });
+    // TODO: stop timer on dispose.
+    // Api.updateColumns(ref, projectModel.id, recurring: true);
+    // Api.updateTasks(ref, projectModel.id, recurring: true);
     columnDao = ref.read(AppDatabase.provider).columnDao;
     // columns = ref.watch(columnsInProject);
     // columnsStream = buildColumns(context, projectModel.id);
     // final showArchived = ref.watch(UiState.boardShowArchived.notifier).stream.distinct();
     // showArchivedStream = ref.read(UiState.boardShowArchived.notifier).stream;
     columnsStream = buildColumnsStream(projectModel.id);
+    Utils.runOnDraw((_) {
+      columnWidth = Utils.getWidth(context) * Sizes.kTaskWidthPercentage;
+    });
   }
 
   @override
-  void didChangeDependencies() {
-    if (!isLoaded) {
-      // var projectModel = ref.read(activeProject);
-      // columns = ref.read(columnsInProject);
-      // if (projectModel != null) {
-      //   this.projectModel = projectModel;
-      // }
-      // ref.read(UiState.boardShowArchived.notifier).state = false;
-      // projectModel =
-      //     ModalRoute.of(context)?.settings.arguments as ProjectModelData;
-      columnWidth = Utils.getWidth(context) * Sizes.kTaskWidthPercentage;
-      updateData();
+  void dispose() {
+    log("board dispose");
+    for (var timer in timers) {
+      timer?.cancel();
     }
-    super.didChangeDependencies();
+    super.dispose();
   }
+  //
+  // @override
+  // void didChangeDependencies() {
+  //   if (!isLoaded) {
+  //     // var projectModel = ref.read(activeProject);
+  //     // columns = ref.read(columnsInProject);
+  //     // if (projectModel != null) {
+  //     //   this.projectModel = projectModel;
+  //     // }
+  //     // ref.read(UiState.boardShowArchived.notifier).state = false;
+  //     // projectModel =
+  //     //     ModalRoute.of(context)?.settings.arguments as ProjectModelData;
+  //     columnWidth = Utils.getWidth(context) * Sizes.kTaskWidthPercentage;
+  //     updateData();
+  //   }
+  //   super.didChangeDependencies();
+  // }
 
-  void updateData() async {
+  // void updateData() async {
     // List<GlobalKey<EditableState>> keysEditableText = [];
     // var projectModel = ref.read(activeProject)!;
     // var boards = await WebApi.getBoard(projectModel.id);
@@ -97,7 +126,7 @@ class _BoardState extends ConsumerState<Board> {
     //     isLoaded = true;
     //   });
     // }
-  }
+  // }
 
   void onChange(text) {
     activeEditText = text;

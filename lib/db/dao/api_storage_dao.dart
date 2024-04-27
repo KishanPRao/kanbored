@@ -3,8 +3,8 @@ import 'dart:developer';
 
 import 'package:drift/drift.dart';
 import 'package:kanbored/db/api_storage_model.dart';
-import 'package:kanbored/db/converters.dart';
 import 'package:kanbored/db/database.dart';
+import 'package:kanbored/db/web_api_model.dart';
 import 'package:kanbored/utils/utils.dart';
 
 part 'api_storage_dao.g.dart';
@@ -19,12 +19,34 @@ class ApiStorageDao extends DatabaseAccessor<AppDatabase>
     final timestamp = Utils.currentTimestampInMsec();
     log("add api task: $timestamp");
     var data = ApiStorageModelCompanion(
-      webApiInfo: Value(webApiModel),
+      apiId: Value(webApiModel.apiId),
+      apiType: Value(webApiModel.apiType),
+      apiName: Value(webApiModel.apiName),
       webApiParams: Value(json.encode(apiParams)),
       updateId: Value(updateId),
       timestamp: Value(timestamp),
     );
     await into(apiStorageModel).insert(data);
+  }
+
+  void updateApiTask(int oldId, int newId, int apiType) async {
+    // (delete(apiStorageModel)..where((tbl) => tbl.id.equals(oldId))).go();
+    log("updateApiTask: $oldId => $newId; $apiType");
+    // final apiTasks = await (select(apiStorageModel)
+    //       ..where((tbl) => tbl.updateId.equals(oldId))
+    //       ..where((tbl) => tbl.apiType.equals(apiType)))
+    //     .get();
+    // for (var apiTask in apiTasks) {
+    //   var updatedApiTask = apiTask.copyWith(
+    //       webApiParams: apiTask.webApiParams
+    //           .replaceAll("\"$apiUpdateId\"", newId.toString()));
+    //   (update(apiStorageModel)..where((tbl) => tbl.id.equals(apiTask.id)))
+    //       .write(updatedApiTask);
+    // }
+    (update(apiStorageModel)
+          ..where((tbl) => tbl.updateId.equals(oldId))
+          ..where((tbl) => tbl.apiType.equals(apiType)))
+        .write(ApiStorageModelCompanion(updateId: Value(newId)));
   }
 
   void removeApiTask(int id) async {
