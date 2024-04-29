@@ -1,4 +1,3 @@
-
 import 'dart:developer';
 
 import 'package:drift/drift.dart';
@@ -42,12 +41,28 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
     return query.getSingle();
   }
 
-  void createTask(Map<String, dynamic> json) {
-    transaction(() async {
-      var data = TaskModelData.fromJson(json);
-      // log("project data: ${data.name}");
-      await into(taskModel).insertOnConflictUpdate(data);
-      log("fin add");
+  Future<int> createTask(int id, int projectId, int columnId, String title) {
+    return transaction(() async {
+      var highestPositionItem = await (select(taskModel)
+            ..where((tbl) => tbl.columnId.equals(columnId))
+            ..where((tbl) => tbl.projectId.equals(projectId))
+            ..orderBy([
+              (t) =>
+                  OrderingTerm(expression: t.position, mode: OrderingMode.desc)
+            ])
+            ..limit(1))
+          .getSingleOrNull();
+      // log("lowestIdItem: ${lowestIdItem?.id}, ${lowestIdItem?.title}");
+      final highestPosition = highestPositionItem?.position ?? 0;
+      var data = TaskModelCompanionExt.create(
+        id,
+        title,
+        projectId,
+        columnId,
+        highestPosition,
+      );
+      log("dao, createTask");
+      return await into(taskModel).insertOnConflictUpdate(data);
     });
   }
 
@@ -86,5 +101,10 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
         await into(taskModel).insertOnConflictUpdate(data);
       }
     });
+  }
+
+  void updateId(int oldId, int newId) async {
+    (update(taskModel)..where((tbl) => tbl.id.equals(oldId)))
+        .write(TaskModelCompanion(id: Value(newId)));
   }
 }

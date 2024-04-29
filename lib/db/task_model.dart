@@ -1,7 +1,10 @@
 import 'package:drift/drift.dart';
 import 'package:kanbored/db/column_model.dart';
 import 'package:kanbored/db/converters.dart';
+import 'package:kanbored/db/database.dart';
 import 'package:kanbored/db/project_model.dart';
+import 'package:kanbored/utils/app_data.dart';
+import 'package:kanbored/utils/utils.dart';
 
 class TaskModel extends Table {
   @override
@@ -14,7 +17,7 @@ class TaskModel extends Table {
   TextColumn get description => text()();
 
   @JsonKey('date_creation')
-  IntColumn get dateCreation => integer()();
+  IntColumn get dateCreation => integer().nullable()();
 
   @JsonKey('color_id')
   TextColumn get colorId => text()();
@@ -98,6 +101,50 @@ class TaskMetadataModel extends Table {
   @JsonKey('task_id')
   IntColumn get taskId => integer().references(TaskModel, #id)();
 
-  TextColumn get metadata =>
-      text().map(const TaskMetadataConverter())();
+  TextColumn get metadata => text().map(const TaskMetadataConverter())();
+}
+
+extension TaskModelCompanionExt on TaskModelCompanion {
+  /*
+[log] err: InvalidDataException: Sorry, TaskModelCompanion(id: Value(-1), title: Value(dasdsa), description: Value(), dateCreation: Value.absent(), colorId: Value.absent(), projectId: Value(24), columnId: Value(98), ownerId: Value.absent(), position: Value(0), isActive: Value.absent(), dateCompleted: Value.absent(), score: Value.absent(), dateDue: Value.absent(), categoryId: Value.absent(), creatorId: Value.absent(), dateModification: Value.absent(), reference: Value.absent(), dateStarted: Value.absent(), timeSpent: Value.absent(), timeEstimated: Value.absent(), swimlaneId: Value.absent(), dateMoved: Value.absent(), recurrenceStatus: Value.absent(), recurrenceTrigger: Value.absent(), recurrenceFactor: Value.absent(), recurrenceTimeframe: Value.absent(), recurrenceBasedate: Value.absent(), recurrenceParent: Value.absent(), recurrenceChild: Value.absent(), priority: Value.absent(), rowid: Value.absent()) cannot be used for that because:
+• dateCreation: This value was required, but isn't present
+• colorId: This value was required, but isn't present
+• ownerId: This value was required, but isn't present
+• isActive: This value was required, but isn't present
+• categoryId: This value was required, but isn't present
+• creatorId: This value was required, but isn't present
+• swimlaneId: This value was required, but isn't present
+• dateMoved: This value was required, but isn't present
+• recurrenceStatus: This value was required, but isn't present
+• recurrenceTrigger: This value was required, but isn't present
+• recurrenceFactor: This value was required, but isn't present
+• recurrenceTimeframe: This value was required, but isn't present
+• recurrenceBasedate: This value was required, but isn't present
+• priority: This value was required, but isn't present
+   */
+  static TaskModelCompanion create(
+      int id, String title, int projectId, int columnId, int position,
+      {String description = ""}) {
+    return TaskModelCompanion(
+      id: Value(id),
+      title: Value(title),
+      projectId: Value(projectId),
+      columnId: Value(columnId),
+      description: Value(description),
+      position: Value(position),
+      colorId: const Value("yellow"), // TODO: language dependent?
+      ownerId: Value(AppData.userId),
+      isActive: const Value(1),
+      categoryId: const Value(0),
+      creatorId: Value(AppData.userId),
+      swimlaneId: const Value(0), //TODO?
+      dateMoved: Value(Utils.currentTimestampInSec()),
+      recurrenceStatus: const Value(0),
+      recurrenceTrigger: const Value(0),
+      recurrenceFactor: const Value(0),
+      recurrenceTimeframe: const Value(0),
+      recurrenceBasedate: const Value(0),
+      priority: const Value(0),
+    );
+  }
 }

@@ -3,6 +3,880 @@
 part of 'database.dart';
 
 // ignore_for_file: type=lint
+class $ColumnModelTable extends ColumnModel
+    with TableInfo<$ColumnModelTable, ColumnModelData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ColumnModelTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+      'title', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _positionMeta =
+      const VerificationMeta('position');
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+      'position', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _taskLimitMeta =
+      const VerificationMeta('taskLimit');
+  @override
+  late final GeneratedColumn<int> taskLimit = GeneratedColumn<int>(
+      'task_limit', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _descriptionMeta =
+      const VerificationMeta('description');
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+      'description', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _hideInDashboardMeta =
+      const VerificationMeta('hideInDashboard');
+  @override
+  late final GeneratedColumn<int> hideInDashboard = GeneratedColumn<int>(
+      'hide_in_dashboard', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _projectIdMeta =
+      const VerificationMeta('projectId');
+  @override
+  late final GeneratedColumn<int> projectId = GeneratedColumn<int>(
+      'project_id', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES column_model (id)'));
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, title, position, taskLimit, description, hideInDashboard, projectId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'column_model';
+  @override
+  VerificationContext validateIntegrity(Insertable<ColumnModelData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+          _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(_positionMeta,
+          position.isAcceptableOrUnknown(data['position']!, _positionMeta));
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    if (data.containsKey('task_limit')) {
+      context.handle(_taskLimitMeta,
+          taskLimit.isAcceptableOrUnknown(data['task_limit']!, _taskLimitMeta));
+    } else if (isInserting) {
+      context.missing(_taskLimitMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+          _descriptionMeta,
+          description.isAcceptableOrUnknown(
+              data['description']!, _descriptionMeta));
+    } else if (isInserting) {
+      context.missing(_descriptionMeta);
+    }
+    if (data.containsKey('hide_in_dashboard')) {
+      context.handle(
+          _hideInDashboardMeta,
+          hideInDashboard.isAcceptableOrUnknown(
+              data['hide_in_dashboard']!, _hideInDashboardMeta));
+    } else if (isInserting) {
+      context.missing(_hideInDashboardMeta);
+    }
+    if (data.containsKey('project_id')) {
+      context.handle(_projectIdMeta,
+          projectId.isAcceptableOrUnknown(data['project_id']!, _projectIdMeta));
+    } else if (isInserting) {
+      context.missing(_projectIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id, projectId};
+  @override
+  ColumnModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ColumnModelData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      title: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
+      position: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}position'])!,
+      taskLimit: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}task_limit'])!,
+      description: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}description'])!,
+      hideInDashboard: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}hide_in_dashboard'])!,
+      projectId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}project_id'])!,
+    );
+  }
+
+  @override
+  $ColumnModelTable createAlias(String alias) {
+    return $ColumnModelTable(attachedDatabase, alias);
+  }
+}
+
+class ColumnModelData extends DataClass implements Insertable<ColumnModelData> {
+  final int id;
+  final String title;
+  final int position;
+  final int taskLimit;
+  final String description;
+  final int hideInDashboard;
+  final int projectId;
+  const ColumnModelData(
+      {required this.id,
+      required this.title,
+      required this.position,
+      required this.taskLimit,
+      required this.description,
+      required this.hideInDashboard,
+      required this.projectId});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['title'] = Variable<String>(title);
+    map['position'] = Variable<int>(position);
+    map['task_limit'] = Variable<int>(taskLimit);
+    map['description'] = Variable<String>(description);
+    map['hide_in_dashboard'] = Variable<int>(hideInDashboard);
+    map['project_id'] = Variable<int>(projectId);
+    return map;
+  }
+
+  ColumnModelCompanion toCompanion(bool nullToAbsent) {
+    return ColumnModelCompanion(
+      id: Value(id),
+      title: Value(title),
+      position: Value(position),
+      taskLimit: Value(taskLimit),
+      description: Value(description),
+      hideInDashboard: Value(hideInDashboard),
+      projectId: Value(projectId),
+    );
+  }
+
+  factory ColumnModelData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ColumnModelData(
+      id: serializer.fromJson<int>(json['id']),
+      title: serializer.fromJson<String>(json['title']),
+      position: serializer.fromJson<int>(json['position']),
+      taskLimit: serializer.fromJson<int>(json['task_limit']),
+      description: serializer.fromJson<String>(json['description']),
+      hideInDashboard: serializer.fromJson<int>(json['hide_in_dashboard']),
+      projectId: serializer.fromJson<int>(json['project_id']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'title': serializer.toJson<String>(title),
+      'position': serializer.toJson<int>(position),
+      'task_limit': serializer.toJson<int>(taskLimit),
+      'description': serializer.toJson<String>(description),
+      'hide_in_dashboard': serializer.toJson<int>(hideInDashboard),
+      'project_id': serializer.toJson<int>(projectId),
+    };
+  }
+
+  ColumnModelData copyWith(
+          {int? id,
+          String? title,
+          int? position,
+          int? taskLimit,
+          String? description,
+          int? hideInDashboard,
+          int? projectId}) =>
+      ColumnModelData(
+        id: id ?? this.id,
+        title: title ?? this.title,
+        position: position ?? this.position,
+        taskLimit: taskLimit ?? this.taskLimit,
+        description: description ?? this.description,
+        hideInDashboard: hideInDashboard ?? this.hideInDashboard,
+        projectId: projectId ?? this.projectId,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('ColumnModelData(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('position: $position, ')
+          ..write('taskLimit: $taskLimit, ')
+          ..write('description: $description, ')
+          ..write('hideInDashboard: $hideInDashboard, ')
+          ..write('projectId: $projectId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id, title, position, taskLimit, description, hideInDashboard, projectId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ColumnModelData &&
+          other.id == this.id &&
+          other.title == this.title &&
+          other.position == this.position &&
+          other.taskLimit == this.taskLimit &&
+          other.description == this.description &&
+          other.hideInDashboard == this.hideInDashboard &&
+          other.projectId == this.projectId);
+}
+
+class ColumnModelCompanion extends UpdateCompanion<ColumnModelData> {
+  final Value<int> id;
+  final Value<String> title;
+  final Value<int> position;
+  final Value<int> taskLimit;
+  final Value<String> description;
+  final Value<int> hideInDashboard;
+  final Value<int> projectId;
+  final Value<int> rowid;
+  const ColumnModelCompanion({
+    this.id = const Value.absent(),
+    this.title = const Value.absent(),
+    this.position = const Value.absent(),
+    this.taskLimit = const Value.absent(),
+    this.description = const Value.absent(),
+    this.hideInDashboard = const Value.absent(),
+    this.projectId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ColumnModelCompanion.insert({
+    required int id,
+    required String title,
+    required int position,
+    required int taskLimit,
+    required String description,
+    required int hideInDashboard,
+    required int projectId,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        title = Value(title),
+        position = Value(position),
+        taskLimit = Value(taskLimit),
+        description = Value(description),
+        hideInDashboard = Value(hideInDashboard),
+        projectId = Value(projectId);
+  static Insertable<ColumnModelData> custom({
+    Expression<int>? id,
+    Expression<String>? title,
+    Expression<int>? position,
+    Expression<int>? taskLimit,
+    Expression<String>? description,
+    Expression<int>? hideInDashboard,
+    Expression<int>? projectId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (title != null) 'title': title,
+      if (position != null) 'position': position,
+      if (taskLimit != null) 'task_limit': taskLimit,
+      if (description != null) 'description': description,
+      if (hideInDashboard != null) 'hide_in_dashboard': hideInDashboard,
+      if (projectId != null) 'project_id': projectId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ColumnModelCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? title,
+      Value<int>? position,
+      Value<int>? taskLimit,
+      Value<String>? description,
+      Value<int>? hideInDashboard,
+      Value<int>? projectId,
+      Value<int>? rowid}) {
+    return ColumnModelCompanion(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      position: position ?? this.position,
+      taskLimit: taskLimit ?? this.taskLimit,
+      description: description ?? this.description,
+      hideInDashboard: hideInDashboard ?? this.hideInDashboard,
+      projectId: projectId ?? this.projectId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (taskLimit.present) {
+      map['task_limit'] = Variable<int>(taskLimit.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (hideInDashboard.present) {
+      map['hide_in_dashboard'] = Variable<int>(hideInDashboard.value);
+    }
+    if (projectId.present) {
+      map['project_id'] = Variable<int>(projectId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ColumnModelCompanion(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('position: $position, ')
+          ..write('taskLimit: $taskLimit, ')
+          ..write('description: $description, ')
+          ..write('hideInDashboard: $hideInDashboard, ')
+          ..write('projectId: $projectId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CommentModelTable extends CommentModel
+    with TableInfo<$CommentModelTable, CommentModelData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CommentModelTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _dateCreationMeta =
+      const VerificationMeta('dateCreation');
+  @override
+  late final GeneratedColumn<int> dateCreation = GeneratedColumn<int>(
+      'date_creation', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _dateModificationMeta =
+      const VerificationMeta('dateModification');
+  @override
+  late final GeneratedColumn<int> dateModification = GeneratedColumn<int>(
+      'date_modification', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _taskIdMeta = const VerificationMeta('taskId');
+  @override
+  late final GeneratedColumn<int> taskId = GeneratedColumn<int>(
+      'task_id', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+      'user_id', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _commentMeta =
+      const VerificationMeta('comment');
+  @override
+  late final GeneratedColumn<String> comment = GeneratedColumn<String>(
+      'comment', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _usernameMeta =
+      const VerificationMeta('username');
+  @override
+  late final GeneratedColumn<String> username = GeneratedColumn<String>(
+      'username', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _emailMeta = const VerificationMeta('email');
+  @override
+  late final GeneratedColumn<String> email = GeneratedColumn<String>(
+      'email', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _avatarPathMeta =
+      const VerificationMeta('avatarPath');
+  @override
+  late final GeneratedColumn<String> avatarPath = GeneratedColumn<String>(
+      'avatar_path', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        dateCreation,
+        dateModification,
+        taskId,
+        userId,
+        comment,
+        username,
+        name,
+        email,
+        avatarPath
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'comment_model';
+  @override
+  VerificationContext validateIntegrity(Insertable<CommentModelData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('date_creation')) {
+      context.handle(
+          _dateCreationMeta,
+          dateCreation.isAcceptableOrUnknown(
+              data['date_creation']!, _dateCreationMeta));
+    }
+    if (data.containsKey('date_modification')) {
+      context.handle(
+          _dateModificationMeta,
+          dateModification.isAcceptableOrUnknown(
+              data['date_modification']!, _dateModificationMeta));
+    } else if (isInserting) {
+      context.missing(_dateModificationMeta);
+    }
+    if (data.containsKey('task_id')) {
+      context.handle(_taskIdMeta,
+          taskId.isAcceptableOrUnknown(data['task_id']!, _taskIdMeta));
+    } else if (isInserting) {
+      context.missing(_taskIdMeta);
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(_userIdMeta,
+          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('comment')) {
+      context.handle(_commentMeta,
+          comment.isAcceptableOrUnknown(data['comment']!, _commentMeta));
+    } else if (isInserting) {
+      context.missing(_commentMeta);
+    }
+    if (data.containsKey('username')) {
+      context.handle(_usernameMeta,
+          username.isAcceptableOrUnknown(data['username']!, _usernameMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    }
+    if (data.containsKey('email')) {
+      context.handle(
+          _emailMeta, email.isAcceptableOrUnknown(data['email']!, _emailMeta));
+    }
+    if (data.containsKey('avatar_path')) {
+      context.handle(
+          _avatarPathMeta,
+          avatarPath.isAcceptableOrUnknown(
+              data['avatar_path']!, _avatarPathMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id, taskId};
+  @override
+  CommentModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CommentModelData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      dateCreation: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}date_creation']),
+      dateModification: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}date_modification'])!,
+      taskId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}task_id'])!,
+      userId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}user_id'])!,
+      comment: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}comment'])!,
+      username: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}username']),
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name']),
+      email: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}email']),
+      avatarPath: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}avatar_path']),
+    );
+  }
+
+  @override
+  $CommentModelTable createAlias(String alias) {
+    return $CommentModelTable(attachedDatabase, alias);
+  }
+}
+
+class CommentModelData extends DataClass
+    implements Insertable<CommentModelData> {
+  final int id;
+  final int? dateCreation;
+  final int dateModification;
+  final int taskId;
+  final int userId;
+  final String comment;
+  final String? username;
+  final String? name;
+  final String? email;
+  final String? avatarPath;
+  const CommentModelData(
+      {required this.id,
+      this.dateCreation,
+      required this.dateModification,
+      required this.taskId,
+      required this.userId,
+      required this.comment,
+      this.username,
+      this.name,
+      this.email,
+      this.avatarPath});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    if (!nullToAbsent || dateCreation != null) {
+      map['date_creation'] = Variable<int>(dateCreation);
+    }
+    map['date_modification'] = Variable<int>(dateModification);
+    map['task_id'] = Variable<int>(taskId);
+    map['user_id'] = Variable<int>(userId);
+    map['comment'] = Variable<String>(comment);
+    if (!nullToAbsent || username != null) {
+      map['username'] = Variable<String>(username);
+    }
+    if (!nullToAbsent || name != null) {
+      map['name'] = Variable<String>(name);
+    }
+    if (!nullToAbsent || email != null) {
+      map['email'] = Variable<String>(email);
+    }
+    if (!nullToAbsent || avatarPath != null) {
+      map['avatar_path'] = Variable<String>(avatarPath);
+    }
+    return map;
+  }
+
+  CommentModelCompanion toCompanion(bool nullToAbsent) {
+    return CommentModelCompanion(
+      id: Value(id),
+      dateCreation: dateCreation == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dateCreation),
+      dateModification: Value(dateModification),
+      taskId: Value(taskId),
+      userId: Value(userId),
+      comment: Value(comment),
+      username: username == null && nullToAbsent
+          ? const Value.absent()
+          : Value(username),
+      name: name == null && nullToAbsent ? const Value.absent() : Value(name),
+      email:
+          email == null && nullToAbsent ? const Value.absent() : Value(email),
+      avatarPath: avatarPath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(avatarPath),
+    );
+  }
+
+  factory CommentModelData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CommentModelData(
+      id: serializer.fromJson<int>(json['id']),
+      dateCreation: serializer.fromJson<int?>(json['date_creation']),
+      dateModification: serializer.fromJson<int>(json['date_modification']),
+      taskId: serializer.fromJson<int>(json['task_id']),
+      userId: serializer.fromJson<int>(json['user_id']),
+      comment: serializer.fromJson<String>(json['comment']),
+      username: serializer.fromJson<String?>(json['username']),
+      name: serializer.fromJson<String?>(json['name']),
+      email: serializer.fromJson<String?>(json['email']),
+      avatarPath: serializer.fromJson<String?>(json['avatar_path']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'date_creation': serializer.toJson<int?>(dateCreation),
+      'date_modification': serializer.toJson<int>(dateModification),
+      'task_id': serializer.toJson<int>(taskId),
+      'user_id': serializer.toJson<int>(userId),
+      'comment': serializer.toJson<String>(comment),
+      'username': serializer.toJson<String?>(username),
+      'name': serializer.toJson<String?>(name),
+      'email': serializer.toJson<String?>(email),
+      'avatar_path': serializer.toJson<String?>(avatarPath),
+    };
+  }
+
+  CommentModelData copyWith(
+          {int? id,
+          Value<int?> dateCreation = const Value.absent(),
+          int? dateModification,
+          int? taskId,
+          int? userId,
+          String? comment,
+          Value<String?> username = const Value.absent(),
+          Value<String?> name = const Value.absent(),
+          Value<String?> email = const Value.absent(),
+          Value<String?> avatarPath = const Value.absent()}) =>
+      CommentModelData(
+        id: id ?? this.id,
+        dateCreation:
+            dateCreation.present ? dateCreation.value : this.dateCreation,
+        dateModification: dateModification ?? this.dateModification,
+        taskId: taskId ?? this.taskId,
+        userId: userId ?? this.userId,
+        comment: comment ?? this.comment,
+        username: username.present ? username.value : this.username,
+        name: name.present ? name.value : this.name,
+        email: email.present ? email.value : this.email,
+        avatarPath: avatarPath.present ? avatarPath.value : this.avatarPath,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('CommentModelData(')
+          ..write('id: $id, ')
+          ..write('dateCreation: $dateCreation, ')
+          ..write('dateModification: $dateModification, ')
+          ..write('taskId: $taskId, ')
+          ..write('userId: $userId, ')
+          ..write('comment: $comment, ')
+          ..write('username: $username, ')
+          ..write('name: $name, ')
+          ..write('email: $email, ')
+          ..write('avatarPath: $avatarPath')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, dateCreation, dateModification, taskId,
+      userId, comment, username, name, email, avatarPath);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CommentModelData &&
+          other.id == this.id &&
+          other.dateCreation == this.dateCreation &&
+          other.dateModification == this.dateModification &&
+          other.taskId == this.taskId &&
+          other.userId == this.userId &&
+          other.comment == this.comment &&
+          other.username == this.username &&
+          other.name == this.name &&
+          other.email == this.email &&
+          other.avatarPath == this.avatarPath);
+}
+
+class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
+  final Value<int> id;
+  final Value<int?> dateCreation;
+  final Value<int> dateModification;
+  final Value<int> taskId;
+  final Value<int> userId;
+  final Value<String> comment;
+  final Value<String?> username;
+  final Value<String?> name;
+  final Value<String?> email;
+  final Value<String?> avatarPath;
+  final Value<int> rowid;
+  const CommentModelCompanion({
+    this.id = const Value.absent(),
+    this.dateCreation = const Value.absent(),
+    this.dateModification = const Value.absent(),
+    this.taskId = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.comment = const Value.absent(),
+    this.username = const Value.absent(),
+    this.name = const Value.absent(),
+    this.email = const Value.absent(),
+    this.avatarPath = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CommentModelCompanion.insert({
+    required int id,
+    this.dateCreation = const Value.absent(),
+    required int dateModification,
+    required int taskId,
+    required int userId,
+    required String comment,
+    this.username = const Value.absent(),
+    this.name = const Value.absent(),
+    this.email = const Value.absent(),
+    this.avatarPath = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        dateModification = Value(dateModification),
+        taskId = Value(taskId),
+        userId = Value(userId),
+        comment = Value(comment);
+  static Insertable<CommentModelData> custom({
+    Expression<int>? id,
+    Expression<int>? dateCreation,
+    Expression<int>? dateModification,
+    Expression<int>? taskId,
+    Expression<int>? userId,
+    Expression<String>? comment,
+    Expression<String>? username,
+    Expression<String>? name,
+    Expression<String>? email,
+    Expression<String>? avatarPath,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (dateCreation != null) 'date_creation': dateCreation,
+      if (dateModification != null) 'date_modification': dateModification,
+      if (taskId != null) 'task_id': taskId,
+      if (userId != null) 'user_id': userId,
+      if (comment != null) 'comment': comment,
+      if (username != null) 'username': username,
+      if (name != null) 'name': name,
+      if (email != null) 'email': email,
+      if (avatarPath != null) 'avatar_path': avatarPath,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CommentModelCompanion copyWith(
+      {Value<int>? id,
+      Value<int?>? dateCreation,
+      Value<int>? dateModification,
+      Value<int>? taskId,
+      Value<int>? userId,
+      Value<String>? comment,
+      Value<String?>? username,
+      Value<String?>? name,
+      Value<String?>? email,
+      Value<String?>? avatarPath,
+      Value<int>? rowid}) {
+    return CommentModelCompanion(
+      id: id ?? this.id,
+      dateCreation: dateCreation ?? this.dateCreation,
+      dateModification: dateModification ?? this.dateModification,
+      taskId: taskId ?? this.taskId,
+      userId: userId ?? this.userId,
+      comment: comment ?? this.comment,
+      username: username ?? this.username,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      avatarPath: avatarPath ?? this.avatarPath,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (dateCreation.present) {
+      map['date_creation'] = Variable<int>(dateCreation.value);
+    }
+    if (dateModification.present) {
+      map['date_modification'] = Variable<int>(dateModification.value);
+    }
+    if (taskId.present) {
+      map['task_id'] = Variable<int>(taskId.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<int>(userId.value);
+    }
+    if (comment.present) {
+      map['comment'] = Variable<String>(comment.value);
+    }
+    if (username.present) {
+      map['username'] = Variable<String>(username.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (email.present) {
+      map['email'] = Variable<String>(email.value);
+    }
+    if (avatarPath.present) {
+      map['avatar_path'] = Variable<String>(avatarPath.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CommentModelCompanion(')
+          ..write('id: $id, ')
+          ..write('dateCreation: $dateCreation, ')
+          ..write('dateModification: $dateModification, ')
+          ..write('taskId: $taskId, ')
+          ..write('userId: $userId, ')
+          ..write('comment: $comment, ')
+          ..write('username: $username, ')
+          ..write('name: $name, ')
+          ..write('email: $email, ')
+          ..write('avatarPath: $avatarPath, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $ProjectModelTable extends ProjectModel
     with TableInfo<$ProjectModelTable, ProjectModelData> {
   @override
@@ -987,878 +1861,6 @@ class ProjectModelCompanion extends UpdateCompanion<ProjectModelData> {
   }
 }
 
-class $ColumnModelTable extends ColumnModel
-    with TableInfo<$ColumnModelTable, ColumnModelData> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $ColumnModelTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _titleMeta = const VerificationMeta('title');
-  @override
-  late final GeneratedColumn<String> title = GeneratedColumn<String>(
-      'title', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _positionMeta =
-      const VerificationMeta('position');
-  @override
-  late final GeneratedColumn<int> position = GeneratedColumn<int>(
-      'position', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _taskLimitMeta =
-      const VerificationMeta('taskLimit');
-  @override
-  late final GeneratedColumn<int> taskLimit = GeneratedColumn<int>(
-      'task_limit', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _descriptionMeta =
-      const VerificationMeta('description');
-  @override
-  late final GeneratedColumn<String> description = GeneratedColumn<String>(
-      'description', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _hideInDashboardMeta =
-      const VerificationMeta('hideInDashboard');
-  @override
-  late final GeneratedColumn<int> hideInDashboard = GeneratedColumn<int>(
-      'hide_in_dashboard', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _projectIdMeta =
-      const VerificationMeta('projectId');
-  @override
-  late final GeneratedColumn<int> projectId = GeneratedColumn<int>(
-      'project_id', aliasedName, false,
-      type: DriftSqlType.int,
-      requiredDuringInsert: true,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('REFERENCES project_model (id)'));
-  @override
-  List<GeneratedColumn> get $columns =>
-      [id, title, position, taskLimit, description, hideInDashboard, projectId];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'column_model';
-  @override
-  VerificationContext validateIntegrity(Insertable<ColumnModelData> instance,
-      {bool isInserting = false}) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
-    }
-    if (data.containsKey('title')) {
-      context.handle(
-          _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
-    } else if (isInserting) {
-      context.missing(_titleMeta);
-    }
-    if (data.containsKey('position')) {
-      context.handle(_positionMeta,
-          position.isAcceptableOrUnknown(data['position']!, _positionMeta));
-    } else if (isInserting) {
-      context.missing(_positionMeta);
-    }
-    if (data.containsKey('task_limit')) {
-      context.handle(_taskLimitMeta,
-          taskLimit.isAcceptableOrUnknown(data['task_limit']!, _taskLimitMeta));
-    } else if (isInserting) {
-      context.missing(_taskLimitMeta);
-    }
-    if (data.containsKey('description')) {
-      context.handle(
-          _descriptionMeta,
-          description.isAcceptableOrUnknown(
-              data['description']!, _descriptionMeta));
-    } else if (isInserting) {
-      context.missing(_descriptionMeta);
-    }
-    if (data.containsKey('hide_in_dashboard')) {
-      context.handle(
-          _hideInDashboardMeta,
-          hideInDashboard.isAcceptableOrUnknown(
-              data['hide_in_dashboard']!, _hideInDashboardMeta));
-    } else if (isInserting) {
-      context.missing(_hideInDashboardMeta);
-    }
-    if (data.containsKey('project_id')) {
-      context.handle(_projectIdMeta,
-          projectId.isAcceptableOrUnknown(data['project_id']!, _projectIdMeta));
-    } else if (isInserting) {
-      context.missing(_projectIdMeta);
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id, projectId};
-  @override
-  ColumnModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return ColumnModelData(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      title: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
-      position: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}position'])!,
-      taskLimit: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}task_limit'])!,
-      description: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}description'])!,
-      hideInDashboard: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}hide_in_dashboard'])!,
-      projectId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}project_id'])!,
-    );
-  }
-
-  @override
-  $ColumnModelTable createAlias(String alias) {
-    return $ColumnModelTable(attachedDatabase, alias);
-  }
-}
-
-class ColumnModelData extends DataClass implements Insertable<ColumnModelData> {
-  final int id;
-  final String title;
-  final int position;
-  final int taskLimit;
-  final String description;
-  final int hideInDashboard;
-  final int projectId;
-  const ColumnModelData(
-      {required this.id,
-      required this.title,
-      required this.position,
-      required this.taskLimit,
-      required this.description,
-      required this.hideInDashboard,
-      required this.projectId});
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['title'] = Variable<String>(title);
-    map['position'] = Variable<int>(position);
-    map['task_limit'] = Variable<int>(taskLimit);
-    map['description'] = Variable<String>(description);
-    map['hide_in_dashboard'] = Variable<int>(hideInDashboard);
-    map['project_id'] = Variable<int>(projectId);
-    return map;
-  }
-
-  ColumnModelCompanion toCompanion(bool nullToAbsent) {
-    return ColumnModelCompanion(
-      id: Value(id),
-      title: Value(title),
-      position: Value(position),
-      taskLimit: Value(taskLimit),
-      description: Value(description),
-      hideInDashboard: Value(hideInDashboard),
-      projectId: Value(projectId),
-    );
-  }
-
-  factory ColumnModelData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return ColumnModelData(
-      id: serializer.fromJson<int>(json['id']),
-      title: serializer.fromJson<String>(json['title']),
-      position: serializer.fromJson<int>(json['position']),
-      taskLimit: serializer.fromJson<int>(json['task_limit']),
-      description: serializer.fromJson<String>(json['description']),
-      hideInDashboard: serializer.fromJson<int>(json['hide_in_dashboard']),
-      projectId: serializer.fromJson<int>(json['project_id']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'title': serializer.toJson<String>(title),
-      'position': serializer.toJson<int>(position),
-      'task_limit': serializer.toJson<int>(taskLimit),
-      'description': serializer.toJson<String>(description),
-      'hide_in_dashboard': serializer.toJson<int>(hideInDashboard),
-      'project_id': serializer.toJson<int>(projectId),
-    };
-  }
-
-  ColumnModelData copyWith(
-          {int? id,
-          String? title,
-          int? position,
-          int? taskLimit,
-          String? description,
-          int? hideInDashboard,
-          int? projectId}) =>
-      ColumnModelData(
-        id: id ?? this.id,
-        title: title ?? this.title,
-        position: position ?? this.position,
-        taskLimit: taskLimit ?? this.taskLimit,
-        description: description ?? this.description,
-        hideInDashboard: hideInDashboard ?? this.hideInDashboard,
-        projectId: projectId ?? this.projectId,
-      );
-  @override
-  String toString() {
-    return (StringBuffer('ColumnModelData(')
-          ..write('id: $id, ')
-          ..write('title: $title, ')
-          ..write('position: $position, ')
-          ..write('taskLimit: $taskLimit, ')
-          ..write('description: $description, ')
-          ..write('hideInDashboard: $hideInDashboard, ')
-          ..write('projectId: $projectId')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(
-      id, title, position, taskLimit, description, hideInDashboard, projectId);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is ColumnModelData &&
-          other.id == this.id &&
-          other.title == this.title &&
-          other.position == this.position &&
-          other.taskLimit == this.taskLimit &&
-          other.description == this.description &&
-          other.hideInDashboard == this.hideInDashboard &&
-          other.projectId == this.projectId);
-}
-
-class ColumnModelCompanion extends UpdateCompanion<ColumnModelData> {
-  final Value<int> id;
-  final Value<String> title;
-  final Value<int> position;
-  final Value<int> taskLimit;
-  final Value<String> description;
-  final Value<int> hideInDashboard;
-  final Value<int> projectId;
-  final Value<int> rowid;
-  const ColumnModelCompanion({
-    this.id = const Value.absent(),
-    this.title = const Value.absent(),
-    this.position = const Value.absent(),
-    this.taskLimit = const Value.absent(),
-    this.description = const Value.absent(),
-    this.hideInDashboard = const Value.absent(),
-    this.projectId = const Value.absent(),
-    this.rowid = const Value.absent(),
-  });
-  ColumnModelCompanion.insert({
-    required int id,
-    required String title,
-    required int position,
-    required int taskLimit,
-    required String description,
-    required int hideInDashboard,
-    required int projectId,
-    this.rowid = const Value.absent(),
-  })  : id = Value(id),
-        title = Value(title),
-        position = Value(position),
-        taskLimit = Value(taskLimit),
-        description = Value(description),
-        hideInDashboard = Value(hideInDashboard),
-        projectId = Value(projectId);
-  static Insertable<ColumnModelData> custom({
-    Expression<int>? id,
-    Expression<String>? title,
-    Expression<int>? position,
-    Expression<int>? taskLimit,
-    Expression<String>? description,
-    Expression<int>? hideInDashboard,
-    Expression<int>? projectId,
-    Expression<int>? rowid,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (title != null) 'title': title,
-      if (position != null) 'position': position,
-      if (taskLimit != null) 'task_limit': taskLimit,
-      if (description != null) 'description': description,
-      if (hideInDashboard != null) 'hide_in_dashboard': hideInDashboard,
-      if (projectId != null) 'project_id': projectId,
-      if (rowid != null) 'rowid': rowid,
-    });
-  }
-
-  ColumnModelCompanion copyWith(
-      {Value<int>? id,
-      Value<String>? title,
-      Value<int>? position,
-      Value<int>? taskLimit,
-      Value<String>? description,
-      Value<int>? hideInDashboard,
-      Value<int>? projectId,
-      Value<int>? rowid}) {
-    return ColumnModelCompanion(
-      id: id ?? this.id,
-      title: title ?? this.title,
-      position: position ?? this.position,
-      taskLimit: taskLimit ?? this.taskLimit,
-      description: description ?? this.description,
-      hideInDashboard: hideInDashboard ?? this.hideInDashboard,
-      projectId: projectId ?? this.projectId,
-      rowid: rowid ?? this.rowid,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<int>(id.value);
-    }
-    if (title.present) {
-      map['title'] = Variable<String>(title.value);
-    }
-    if (position.present) {
-      map['position'] = Variable<int>(position.value);
-    }
-    if (taskLimit.present) {
-      map['task_limit'] = Variable<int>(taskLimit.value);
-    }
-    if (description.present) {
-      map['description'] = Variable<String>(description.value);
-    }
-    if (hideInDashboard.present) {
-      map['hide_in_dashboard'] = Variable<int>(hideInDashboard.value);
-    }
-    if (projectId.present) {
-      map['project_id'] = Variable<int>(projectId.value);
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('ColumnModelCompanion(')
-          ..write('id: $id, ')
-          ..write('title: $title, ')
-          ..write('position: $position, ')
-          ..write('taskLimit: $taskLimit, ')
-          ..write('description: $description, ')
-          ..write('hideInDashboard: $hideInDashboard, ')
-          ..write('projectId: $projectId, ')
-          ..write('rowid: $rowid')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class $CommentModelTable extends CommentModel
-    with TableInfo<$CommentModelTable, CommentModelData> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $CommentModelTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _dateCreationMeta =
-      const VerificationMeta('dateCreation');
-  @override
-  late final GeneratedColumn<int> dateCreation = GeneratedColumn<int>(
-      'date_creation', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _dateModificationMeta =
-      const VerificationMeta('dateModification');
-  @override
-  late final GeneratedColumn<int> dateModification = GeneratedColumn<int>(
-      'date_modification', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _taskIdMeta = const VerificationMeta('taskId');
-  @override
-  late final GeneratedColumn<int> taskId = GeneratedColumn<int>(
-      'task_id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
-  @override
-  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
-      'user_id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _commentMeta =
-      const VerificationMeta('comment');
-  @override
-  late final GeneratedColumn<String> comment = GeneratedColumn<String>(
-      'comment', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _usernameMeta =
-      const VerificationMeta('username');
-  @override
-  late final GeneratedColumn<String> username = GeneratedColumn<String>(
-      'username', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _nameMeta = const VerificationMeta('name');
-  @override
-  late final GeneratedColumn<String> name = GeneratedColumn<String>(
-      'name', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _emailMeta = const VerificationMeta('email');
-  @override
-  late final GeneratedColumn<String> email = GeneratedColumn<String>(
-      'email', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _avatarPathMeta =
-      const VerificationMeta('avatarPath');
-  @override
-  late final GeneratedColumn<String> avatarPath = GeneratedColumn<String>(
-      'avatar_path', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  @override
-  List<GeneratedColumn> get $columns => [
-        id,
-        dateCreation,
-        dateModification,
-        taskId,
-        userId,
-        comment,
-        username,
-        name,
-        email,
-        avatarPath
-      ];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'comment_model';
-  @override
-  VerificationContext validateIntegrity(Insertable<CommentModelData> instance,
-      {bool isInserting = false}) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
-    }
-    if (data.containsKey('date_creation')) {
-      context.handle(
-          _dateCreationMeta,
-          dateCreation.isAcceptableOrUnknown(
-              data['date_creation']!, _dateCreationMeta));
-    } else if (isInserting) {
-      context.missing(_dateCreationMeta);
-    }
-    if (data.containsKey('date_modification')) {
-      context.handle(
-          _dateModificationMeta,
-          dateModification.isAcceptableOrUnknown(
-              data['date_modification']!, _dateModificationMeta));
-    } else if (isInserting) {
-      context.missing(_dateModificationMeta);
-    }
-    if (data.containsKey('task_id')) {
-      context.handle(_taskIdMeta,
-          taskId.isAcceptableOrUnknown(data['task_id']!, _taskIdMeta));
-    } else if (isInserting) {
-      context.missing(_taskIdMeta);
-    }
-    if (data.containsKey('user_id')) {
-      context.handle(_userIdMeta,
-          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
-    } else if (isInserting) {
-      context.missing(_userIdMeta);
-    }
-    if (data.containsKey('comment')) {
-      context.handle(_commentMeta,
-          comment.isAcceptableOrUnknown(data['comment']!, _commentMeta));
-    } else if (isInserting) {
-      context.missing(_commentMeta);
-    }
-    if (data.containsKey('username')) {
-      context.handle(_usernameMeta,
-          username.isAcceptableOrUnknown(data['username']!, _usernameMeta));
-    }
-    if (data.containsKey('name')) {
-      context.handle(
-          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
-    }
-    if (data.containsKey('email')) {
-      context.handle(
-          _emailMeta, email.isAcceptableOrUnknown(data['email']!, _emailMeta));
-    }
-    if (data.containsKey('avatar_path')) {
-      context.handle(
-          _avatarPathMeta,
-          avatarPath.isAcceptableOrUnknown(
-              data['avatar_path']!, _avatarPathMeta));
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id, taskId};
-  @override
-  CommentModelData map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return CommentModelData(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      dateCreation: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}date_creation'])!,
-      dateModification: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}date_modification'])!,
-      taskId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}task_id'])!,
-      userId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}user_id'])!,
-      comment: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}comment'])!,
-      username: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}username']),
-      name: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}name']),
-      email: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}email']),
-      avatarPath: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}avatar_path']),
-    );
-  }
-
-  @override
-  $CommentModelTable createAlias(String alias) {
-    return $CommentModelTable(attachedDatabase, alias);
-  }
-}
-
-class CommentModelData extends DataClass
-    implements Insertable<CommentModelData> {
-  final int id;
-  final int dateCreation;
-  final int dateModification;
-  final int taskId;
-  final int userId;
-  final String comment;
-  final String? username;
-  final String? name;
-  final String? email;
-  final String? avatarPath;
-  const CommentModelData(
-      {required this.id,
-      required this.dateCreation,
-      required this.dateModification,
-      required this.taskId,
-      required this.userId,
-      required this.comment,
-      this.username,
-      this.name,
-      this.email,
-      this.avatarPath});
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['date_creation'] = Variable<int>(dateCreation);
-    map['date_modification'] = Variable<int>(dateModification);
-    map['task_id'] = Variable<int>(taskId);
-    map['user_id'] = Variable<int>(userId);
-    map['comment'] = Variable<String>(comment);
-    if (!nullToAbsent || username != null) {
-      map['username'] = Variable<String>(username);
-    }
-    if (!nullToAbsent || name != null) {
-      map['name'] = Variable<String>(name);
-    }
-    if (!nullToAbsent || email != null) {
-      map['email'] = Variable<String>(email);
-    }
-    if (!nullToAbsent || avatarPath != null) {
-      map['avatar_path'] = Variable<String>(avatarPath);
-    }
-    return map;
-  }
-
-  CommentModelCompanion toCompanion(bool nullToAbsent) {
-    return CommentModelCompanion(
-      id: Value(id),
-      dateCreation: Value(dateCreation),
-      dateModification: Value(dateModification),
-      taskId: Value(taskId),
-      userId: Value(userId),
-      comment: Value(comment),
-      username: username == null && nullToAbsent
-          ? const Value.absent()
-          : Value(username),
-      name: name == null && nullToAbsent ? const Value.absent() : Value(name),
-      email:
-          email == null && nullToAbsent ? const Value.absent() : Value(email),
-      avatarPath: avatarPath == null && nullToAbsent
-          ? const Value.absent()
-          : Value(avatarPath),
-    );
-  }
-
-  factory CommentModelData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return CommentModelData(
-      id: serializer.fromJson<int>(json['id']),
-      dateCreation: serializer.fromJson<int>(json['date_creation']),
-      dateModification: serializer.fromJson<int>(json['date_modification']),
-      taskId: serializer.fromJson<int>(json['task_id']),
-      userId: serializer.fromJson<int>(json['user_id']),
-      comment: serializer.fromJson<String>(json['comment']),
-      username: serializer.fromJson<String?>(json['username']),
-      name: serializer.fromJson<String?>(json['name']),
-      email: serializer.fromJson<String?>(json['email']),
-      avatarPath: serializer.fromJson<String?>(json['avatar_path']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'date_creation': serializer.toJson<int>(dateCreation),
-      'date_modification': serializer.toJson<int>(dateModification),
-      'task_id': serializer.toJson<int>(taskId),
-      'user_id': serializer.toJson<int>(userId),
-      'comment': serializer.toJson<String>(comment),
-      'username': serializer.toJson<String?>(username),
-      'name': serializer.toJson<String?>(name),
-      'email': serializer.toJson<String?>(email),
-      'avatar_path': serializer.toJson<String?>(avatarPath),
-    };
-  }
-
-  CommentModelData copyWith(
-          {int? id,
-          int? dateCreation,
-          int? dateModification,
-          int? taskId,
-          int? userId,
-          String? comment,
-          Value<String?> username = const Value.absent(),
-          Value<String?> name = const Value.absent(),
-          Value<String?> email = const Value.absent(),
-          Value<String?> avatarPath = const Value.absent()}) =>
-      CommentModelData(
-        id: id ?? this.id,
-        dateCreation: dateCreation ?? this.dateCreation,
-        dateModification: dateModification ?? this.dateModification,
-        taskId: taskId ?? this.taskId,
-        userId: userId ?? this.userId,
-        comment: comment ?? this.comment,
-        username: username.present ? username.value : this.username,
-        name: name.present ? name.value : this.name,
-        email: email.present ? email.value : this.email,
-        avatarPath: avatarPath.present ? avatarPath.value : this.avatarPath,
-      );
-  @override
-  String toString() {
-    return (StringBuffer('CommentModelData(')
-          ..write('id: $id, ')
-          ..write('dateCreation: $dateCreation, ')
-          ..write('dateModification: $dateModification, ')
-          ..write('taskId: $taskId, ')
-          ..write('userId: $userId, ')
-          ..write('comment: $comment, ')
-          ..write('username: $username, ')
-          ..write('name: $name, ')
-          ..write('email: $email, ')
-          ..write('avatarPath: $avatarPath')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(id, dateCreation, dateModification, taskId,
-      userId, comment, username, name, email, avatarPath);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is CommentModelData &&
-          other.id == this.id &&
-          other.dateCreation == this.dateCreation &&
-          other.dateModification == this.dateModification &&
-          other.taskId == this.taskId &&
-          other.userId == this.userId &&
-          other.comment == this.comment &&
-          other.username == this.username &&
-          other.name == this.name &&
-          other.email == this.email &&
-          other.avatarPath == this.avatarPath);
-}
-
-class CommentModelCompanion extends UpdateCompanion<CommentModelData> {
-  final Value<int> id;
-  final Value<int> dateCreation;
-  final Value<int> dateModification;
-  final Value<int> taskId;
-  final Value<int> userId;
-  final Value<String> comment;
-  final Value<String?> username;
-  final Value<String?> name;
-  final Value<String?> email;
-  final Value<String?> avatarPath;
-  final Value<int> rowid;
-  const CommentModelCompanion({
-    this.id = const Value.absent(),
-    this.dateCreation = const Value.absent(),
-    this.dateModification = const Value.absent(),
-    this.taskId = const Value.absent(),
-    this.userId = const Value.absent(),
-    this.comment = const Value.absent(),
-    this.username = const Value.absent(),
-    this.name = const Value.absent(),
-    this.email = const Value.absent(),
-    this.avatarPath = const Value.absent(),
-    this.rowid = const Value.absent(),
-  });
-  CommentModelCompanion.insert({
-    required int id,
-    required int dateCreation,
-    required int dateModification,
-    required int taskId,
-    required int userId,
-    required String comment,
-    this.username = const Value.absent(),
-    this.name = const Value.absent(),
-    this.email = const Value.absent(),
-    this.avatarPath = const Value.absent(),
-    this.rowid = const Value.absent(),
-  })  : id = Value(id),
-        dateCreation = Value(dateCreation),
-        dateModification = Value(dateModification),
-        taskId = Value(taskId),
-        userId = Value(userId),
-        comment = Value(comment);
-  static Insertable<CommentModelData> custom({
-    Expression<int>? id,
-    Expression<int>? dateCreation,
-    Expression<int>? dateModification,
-    Expression<int>? taskId,
-    Expression<int>? userId,
-    Expression<String>? comment,
-    Expression<String>? username,
-    Expression<String>? name,
-    Expression<String>? email,
-    Expression<String>? avatarPath,
-    Expression<int>? rowid,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (dateCreation != null) 'date_creation': dateCreation,
-      if (dateModification != null) 'date_modification': dateModification,
-      if (taskId != null) 'task_id': taskId,
-      if (userId != null) 'user_id': userId,
-      if (comment != null) 'comment': comment,
-      if (username != null) 'username': username,
-      if (name != null) 'name': name,
-      if (email != null) 'email': email,
-      if (avatarPath != null) 'avatar_path': avatarPath,
-      if (rowid != null) 'rowid': rowid,
-    });
-  }
-
-  CommentModelCompanion copyWith(
-      {Value<int>? id,
-      Value<int>? dateCreation,
-      Value<int>? dateModification,
-      Value<int>? taskId,
-      Value<int>? userId,
-      Value<String>? comment,
-      Value<String?>? username,
-      Value<String?>? name,
-      Value<String?>? email,
-      Value<String?>? avatarPath,
-      Value<int>? rowid}) {
-    return CommentModelCompanion(
-      id: id ?? this.id,
-      dateCreation: dateCreation ?? this.dateCreation,
-      dateModification: dateModification ?? this.dateModification,
-      taskId: taskId ?? this.taskId,
-      userId: userId ?? this.userId,
-      comment: comment ?? this.comment,
-      username: username ?? this.username,
-      name: name ?? this.name,
-      email: email ?? this.email,
-      avatarPath: avatarPath ?? this.avatarPath,
-      rowid: rowid ?? this.rowid,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<int>(id.value);
-    }
-    if (dateCreation.present) {
-      map['date_creation'] = Variable<int>(dateCreation.value);
-    }
-    if (dateModification.present) {
-      map['date_modification'] = Variable<int>(dateModification.value);
-    }
-    if (taskId.present) {
-      map['task_id'] = Variable<int>(taskId.value);
-    }
-    if (userId.present) {
-      map['user_id'] = Variable<int>(userId.value);
-    }
-    if (comment.present) {
-      map['comment'] = Variable<String>(comment.value);
-    }
-    if (username.present) {
-      map['username'] = Variable<String>(username.value);
-    }
-    if (name.present) {
-      map['name'] = Variable<String>(name.value);
-    }
-    if (email.present) {
-      map['email'] = Variable<String>(email.value);
-    }
-    if (avatarPath.present) {
-      map['avatar_path'] = Variable<String>(avatarPath.value);
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('CommentModelCompanion(')
-          ..write('id: $id, ')
-          ..write('dateCreation: $dateCreation, ')
-          ..write('dateModification: $dateModification, ')
-          ..write('taskId: $taskId, ')
-          ..write('userId: $userId, ')
-          ..write('comment: $comment, ')
-          ..write('username: $username, ')
-          ..write('name: $name, ')
-          ..write('email: $email, ')
-          ..write('avatarPath: $avatarPath, ')
-          ..write('rowid: $rowid')
-          ..write(')'))
-        .toString();
-  }
-}
-
 class $SubtaskModelTable extends SubtaskModel
     with TableInfo<$SubtaskModelTable, SubtaskModelData> {
   @override
@@ -2506,8 +2508,8 @@ class $TaskModelTable extends TaskModel
       const VerificationMeta('dateCreation');
   @override
   late final GeneratedColumn<int> dateCreation = GeneratedColumn<int>(
-      'date_creation', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+      'date_creation', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   static const VerificationMeta _colorIdMeta =
       const VerificationMeta('colorId');
   @override
@@ -2736,8 +2738,6 @@ class $TaskModelTable extends TaskModel
           _dateCreationMeta,
           dateCreation.isAcceptableOrUnknown(
               data['date_creation']!, _dateCreationMeta));
-    } else if (isInserting) {
-      context.missing(_dateCreationMeta);
     }
     if (data.containsKey('color_id')) {
       context.handle(_colorIdMeta,
@@ -2917,7 +2917,7 @@ class $TaskModelTable extends TaskModel
       description: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}description'])!,
       dateCreation: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}date_creation'])!,
+          .read(DriftSqlType.int, data['${effectivePrefix}date_creation']),
       colorId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}color_id'])!,
       projectId: attachedDatabase.typeMapping
@@ -2983,7 +2983,7 @@ class TaskModelData extends DataClass implements Insertable<TaskModelData> {
   final int id;
   final String title;
   final String description;
-  final int dateCreation;
+  final int? dateCreation;
   final String colorId;
   final int projectId;
   final int columnId;
@@ -3014,7 +3014,7 @@ class TaskModelData extends DataClass implements Insertable<TaskModelData> {
       {required this.id,
       required this.title,
       required this.description,
-      required this.dateCreation,
+      this.dateCreation,
       required this.colorId,
       required this.projectId,
       required this.columnId,
@@ -3047,7 +3047,9 @@ class TaskModelData extends DataClass implements Insertable<TaskModelData> {
     map['id'] = Variable<int>(id);
     map['title'] = Variable<String>(title);
     map['description'] = Variable<String>(description);
-    map['date_creation'] = Variable<int>(dateCreation);
+    if (!nullToAbsent || dateCreation != null) {
+      map['date_creation'] = Variable<int>(dateCreation);
+    }
     map['color_id'] = Variable<String>(colorId);
     map['project_id'] = Variable<int>(projectId);
     map['column_id'] = Variable<int>(columnId);
@@ -3102,7 +3104,9 @@ class TaskModelData extends DataClass implements Insertable<TaskModelData> {
       id: Value(id),
       title: Value(title),
       description: Value(description),
-      dateCreation: Value(dateCreation),
+      dateCreation: dateCreation == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dateCreation),
       colorId: Value(colorId),
       projectId: Value(projectId),
       columnId: Value(columnId),
@@ -3158,7 +3162,7 @@ class TaskModelData extends DataClass implements Insertable<TaskModelData> {
       id: serializer.fromJson<int>(json['id']),
       title: serializer.fromJson<String>(json['title']),
       description: serializer.fromJson<String>(json['description']),
-      dateCreation: serializer.fromJson<int>(json['date_creation']),
+      dateCreation: serializer.fromJson<int?>(json['date_creation']),
       colorId: serializer.fromJson<String>(json['color_id']),
       projectId: serializer.fromJson<int>(json['project_id']),
       columnId: serializer.fromJson<int>(json['column_id']),
@@ -3195,7 +3199,7 @@ class TaskModelData extends DataClass implements Insertable<TaskModelData> {
       'id': serializer.toJson<int>(id),
       'title': serializer.toJson<String>(title),
       'description': serializer.toJson<String>(description),
-      'date_creation': serializer.toJson<int>(dateCreation),
+      'date_creation': serializer.toJson<int?>(dateCreation),
       'color_id': serializer.toJson<String>(colorId),
       'project_id': serializer.toJson<int>(projectId),
       'column_id': serializer.toJson<int>(columnId),
@@ -3229,7 +3233,7 @@ class TaskModelData extends DataClass implements Insertable<TaskModelData> {
           {int? id,
           String? title,
           String? description,
-          int? dateCreation,
+          Value<int?> dateCreation = const Value.absent(),
           String? colorId,
           int? projectId,
           int? columnId,
@@ -3260,7 +3264,8 @@ class TaskModelData extends DataClass implements Insertable<TaskModelData> {
         id: id ?? this.id,
         title: title ?? this.title,
         description: description ?? this.description,
-        dateCreation: dateCreation ?? this.dateCreation,
+        dateCreation:
+            dateCreation.present ? dateCreation.value : this.dateCreation,
         colorId: colorId ?? this.colorId,
         projectId: projectId ?? this.projectId,
         columnId: columnId ?? this.columnId,
@@ -3406,7 +3411,7 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
   final Value<int> id;
   final Value<String> title;
   final Value<String> description;
-  final Value<int> dateCreation;
+  final Value<int?> dateCreation;
   final Value<String> colorId;
   final Value<int> projectId;
   final Value<int> columnId;
@@ -3471,7 +3476,7 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
     required int id,
     required String title,
     required String description,
-    required int dateCreation,
+    this.dateCreation = const Value.absent(),
     required String colorId,
     required int projectId,
     required int columnId,
@@ -3502,7 +3507,6 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
   })  : id = Value(id),
         title = Value(title),
         description = Value(description),
-        dateCreation = Value(dateCreation),
         colorId = Value(colorId),
         projectId = Value(projectId),
         columnId = Value(columnId),
@@ -3592,7 +3596,7 @@ class TaskModelCompanion extends UpdateCompanion<TaskModelData> {
       {Value<int>? id,
       Value<String>? title,
       Value<String>? description,
-      Value<int>? dateCreation,
+      Value<int?>? dateCreation,
       Value<String>? colorId,
       Value<int>? projectId,
       Value<int>? columnId,
@@ -4345,9 +4349,9 @@ class ApiStorageModelCompanion extends UpdateCompanion<ApiStorageModelData> {
 
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
-  late final $ProjectModelTable projectModel = $ProjectModelTable(this);
   late final $ColumnModelTable columnModel = $ColumnModelTable(this);
   late final $CommentModelTable commentModel = $CommentModelTable(this);
+  late final $ProjectModelTable projectModel = $ProjectModelTable(this);
   late final $SubtaskModelTable subtaskModel = $SubtaskModelTable(this);
   late final $TaskModelTable taskModel = $TaskModelTable(this);
   late final $TaskMetadataModelTable taskMetadataModel =
@@ -4363,9 +4367,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
-        projectModel,
         columnModel,
         commentModel,
+        projectModel,
         subtaskModel,
         taskModel,
         taskMetadataModel,

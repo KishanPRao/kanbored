@@ -7,7 +7,7 @@ class CommentModel extends Table {
   IntColumn get id => integer()();
 
   @JsonKey('date_creation')
-  IntColumn get dateCreation => integer()();
+  IntColumn get dateCreation => integer().nullable()();
 
   @JsonKey('date_modification')
   IntColumn get dateModification => integer()();

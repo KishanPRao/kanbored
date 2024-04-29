@@ -70,7 +70,10 @@ extension ApiProject on Api {
     log("updateProject");
     ref.read(AppDatabase.provider).apiStorageDao.addApiTask(
           WebApiModel.updateProject,
-          {"project_id": Utils.generateUpdateIdString(data.id), "name": data.name},
+          {
+            "project_id": Utils.generateUpdateIdString(data.id),
+            "name": data.name,
+          },
           data.id,
         );
     // TODO: call enable/disable project
@@ -110,7 +113,7 @@ extension ApiColumn on Api {
     ref.read(AppDatabase.provider).apiStorageDao.addApiTask(
           WebApiModel.addColumn,
           [Utils.generateUpdateIdString(projectId), title],
-      localId,
+          localId,
         );
   }
 
@@ -119,7 +122,12 @@ extension ApiColumn on Api {
     log("[api] updateColumn");
     ref.read(AppDatabase.provider).apiStorageDao.addApiTask(
           WebApiModel.updateColumn,
-          [Utils.generateUpdateIdString(data.id), data.title, data.taskLimit, data.description],
+          [
+            Utils.generateUpdateIdString(data.id),
+            data.title,
+            data.taskLimit,
+            data.description,
+          ],
           data.id,
         );
     // TODO: call enable/disable project
@@ -191,16 +199,40 @@ extension ApiTask on Api {
     return result;
   }
 
-  Future<dynamic> createTask(
+  Future<int> createTask(
       WidgetRef ref, int projectId, int columnId, String title) async {
-    final result = await WebApi.createTask(projectId, columnId, title);
-    if (result is int) {
-      final taskData = await WebApi.getTask(result, projectId);
-      ref.read(AppDatabase.provider).taskDao.createTask(taskData);
-    } else {
-      Utils.showErrorSnackbar(ref.context, "Could not create task");
-    }
-    return result;
+    final localId = await ref.read(AppDatabase.provider).apiStorageDao.nextId();
+    await ref
+        .read(AppDatabase.provider)
+        .taskDao
+        .createTask(localId, projectId, columnId, title);
+    log("[api] createTask: $localId");
+    ref.read(AppDatabase.provider).apiStorageDao.addApiTask(
+      WebApiModel.createTask,
+      {
+        "owner_id": AppData.userId,
+        "creator_id": AppData.userId,
+        "date_started": null,
+        "date_due": null,
+        "description": "",
+        "category_id": 0,
+        "score": null,
+        "title": title,
+        "project_id": Utils.generateUpdateIdString(projectId),
+        "color_id": "yellow",
+        "column_id": Utils.generateUpdateIdString(columnId),
+        "recurrence_status": 0,
+        "recurrence_trigger": 0,
+        "recurrence_factor": 0,
+        "recurrence_timeframe": 0,
+        "recurrence_basedate": 0,
+        "time_estimated": 0,
+        "time_spent": 0,
+        "nb_comments": 0,
+      },
+      localId,
+    );
+    return localId;
   }
 
   // Remove:

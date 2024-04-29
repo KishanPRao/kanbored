@@ -428,6 +428,14 @@ class WebApi {
             .updateId(apiData.updateId, result);
         log("handleApiRequest: update id ${apiData.updateId} => $result");
         apiDao.removeApiTask(apiData.id);
+      } else if (apiData.apiId == WebApiModel.createTask.apiId) {
+        log("handleApiRequest: createTask");
+        ref
+            .read(AppDatabase.provider)
+            .taskDao
+            .updateId(apiData.updateId, result);
+        log("handleApiRequest: update task id ${apiData.updateId} => $result");
+        apiDao.removeApiTask(apiData.id);
       }
       // NOTE: Only creation needs updating, internal `updateId`
       apiDao.updateApiTask(apiData.updateId, result, apiData);

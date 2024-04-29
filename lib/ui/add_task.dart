@@ -120,14 +120,15 @@ class AddTaskState extends EditableState<AddTask> {
         columnModel.id,
         controller.text,
       ).then((taskId) async {
-        if (taskId is int) {
-          controller.text = "";
-          final taskDao = ref.read(AppDatabase.provider).taskDao;
-          ref.read(activeTask.notifier).state = await taskDao.getTask(taskId);
-          // TODO: await, bad idea?
-          Navigator.pushNamed(context, routeTask);
-        }
-      }).onError((e, st) => Utils.showErrorSnackbar(context, e));
+        controller.text = "";
+        // final taskDao = ref.read(AppDatabase.provider).taskDao;
+        // ref.read(activeTask.notifier).state = await taskDao.getTask(taskId);
+        // // TODO: await, bad idea?
+        // Navigator.pushNamed(context, routeTask);
+      }).onError((e, st) {
+        log("err: $e, $st");
+        return Utils.showErrorSnackbar(context, e);
+      });
     } else {
       controller.text = "";
     }
