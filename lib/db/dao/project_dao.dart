@@ -40,16 +40,17 @@ class ProjectDao extends DatabaseAccessor<AppDatabase> with _$ProjectDaoMixin {
   //   });
   // }
 
-  Future<int> createLocalProject(String name) async {
+  Future<int> createLocalProject(int localId, String name) async {
     return transaction(() async {
-      var lowestIdProj = await (select(projectModel)
-            ..orderBy(
-                [(t) => OrderingTerm(expression: t.id, mode: OrderingMode.asc)])
-            ..limit(1))
-          .getSingleOrNull();
-      log("lowestIdProj: ${lowestIdProj?.id}, ${lowestIdProj?.name}");
-      final lowestId = lowestIdProj?.id ?? 0;
-      var data = ProjectModelCompanionExt.create(lowestId - 1, name);
+      // var lowestIdProj = await (select(projectModel)
+      //       ..orderBy(
+      //           [(t) => OrderingTerm(expression: t.id, mode: OrderingMode.asc)])
+      //       ..limit(1))
+      //     .getSingleOrNull();
+      // log("lowestIdProj: ${lowestIdProj?.id}, ${lowestIdProj?.name}");
+      // final lowestId = lowestIdProj?.id ?? 0;
+      // var data = ProjectModelCompanionExt.create(lowestId - 1, name);
+      var data = ProjectModelCompanionExt.create(localId, name);
       log("createLocalProject");
       return await into(projectModel).insertOnConflictUpdate(data);
     });

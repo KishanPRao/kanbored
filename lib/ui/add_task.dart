@@ -114,7 +114,7 @@ class AddTaskState extends EditableState<AddTask> {
       log("Add a new task: ${controller.text}, into task: ${columnModel.title}");
       // final tasksDao = ref.read(AppDatabase.provider).taskDao;
       // tasksDao.addTask(taskJson);
-      Api.createTask(
+      Api.instance.createTask(
         ref,
         columnModel.projectId,
         columnModel.id,

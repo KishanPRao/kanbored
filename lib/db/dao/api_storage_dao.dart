@@ -14,8 +14,8 @@ class ApiStorageDao extends DatabaseAccessor<AppDatabase>
     with _$ApiStorageDaoMixin {
   ApiStorageDao(super.db);
 
-  void addApiTask(WebApiModel webApiModel, Map<String, dynamic> apiParams,
-      int updateId) async {
+  void addApiTask(
+      WebApiModel webApiModel, dynamic apiParams, int updateId) async {
     final timestamp = Utils.currentTimestampInMsec();
     log("add api task: $timestamp");
     var data = ApiStorageModelCompanion(
@@ -29,9 +29,9 @@ class ApiStorageDao extends DatabaseAccessor<AppDatabase>
     await into(apiStorageModel).insert(data);
   }
 
-  void updateApiTask(int oldId, int newId, int apiType) async {
+  void updateApiTask(int oldId, int newId, ApiStorageModelData _) async {
     // (delete(apiStorageModel)..where((tbl) => tbl.id.equals(oldId))).go();
-    log("updateApiTask: $oldId => $newId; $apiType");
+    log("updateApiTask: $oldId => $newId; ${_.apiType}");
     // final apiTasks = await (select(apiStorageModel)
     //       ..where((tbl) => tbl.updateId.equals(oldId))
     //       ..where((tbl) => tbl.apiType.equals(apiType)))
@@ -43,10 +43,64 @@ class ApiStorageDao extends DatabaseAccessor<AppDatabase>
     //   (update(apiStorageModel)..where((tbl) => tbl.id.equals(apiTask.id)))
     //       .write(updatedApiTask);
     // }
-    (update(apiStorageModel)
-          ..where((tbl) => tbl.updateId.equals(oldId))
-          ..where((tbl) => tbl.apiType.equals(apiType)))
-        .write(ApiStorageModelCompanion(updateId: Value(newId)));
+    // (update(apiStorageModel)
+    //       ..where((tbl) => tbl.updateId.equals(oldId))
+    //       ..where((tbl) => tbl.apiType.equals(apiType)))
+    //     .write(ApiStorageModelCompanion(updateId: Value(newId)));
+    // TODO: use directly `id`?
+    // (update(apiStorageModel)
+    //       ..where((tbl) => tbl.updateId.equals(oldId))
+    //       // ..where((tbl) => tbl.apiType.equals(apiTask.apiType))
+    // ).write(
+    //   ApiStorageModelCompanion(
+    //     webApiParams: Value(entity.webApiParams.replaceAll(
+    //         "\"${Utils.generateUpdateIdString(oldId)}\"",
+    //         "\"${Utils.generateUpdateIdString(newId)}\"")),
+    //     updateId: Value(newId),
+    //   ),
+    // );
+    // into(apiStorageModel).insert(
+    //   ApiStorageModelCompanion.insert(
+    //     apiName: apiTask.apiName,
+    //     apiId: apiTask.apiId,
+    //     apiType: apiTask.apiType,
+    //     id: Value(apiTask.id),
+    //     webApiParams: Value.absent(),
+    //   ),
+    //   onConflict: DoUpdate((old) =>
+    //       ApiStorageModelCompanion.custom(webApiParams: old.webApiParams)),
+    // );
+    await transaction(() async {
+      final apiTasks = await (select(apiStorageModel)).get();
+      for (var apiTask in apiTasks) {
+        var updatedApiTask = apiTask.copyWith(
+          webApiParams: apiTask.webApiParams.replaceAll(
+              "\"${Utils.generateUpdateIdString(oldId)}\"",
+              "$newId"
+          ),
+        );
+        // log("update api: \"${Utils.generateUpdateIdString(oldId)}\" => \"${Utils.generateUpdateIdString(newId)}\"");
+        log("update api: ${apiTask.webApiParams} => ${updatedApiTask.webApiParams}");
+        // (update(apiStorageModel)..where((tbl) => tbl.id.equals(apiTask.id)))
+        // (update(apiStorageModel))
+        //     .write(updatedApiTask);
+        await into(apiStorageModel).insertOnConflictUpdate(updatedApiTask);
+        log("update db FIN: $oldId => $newId");
+      }
+    });
+    final apiTasks = await (select(apiStorageModel)).get();
+    for (var apiTask in apiTasks) {
+      log("all tasks: ${apiTask.apiName}, ${apiTask.webApiParams}");
+    }
+    log("updateApiTask FIN: $oldId => $newId; ${_.apiType}");
+  }
+
+  Future<List<ApiStorageModelData>> getTasks() async {
+    final apiTasks = await (select(apiStorageModel)).get();
+    for (var apiTask in apiTasks) {
+      log("getTasks: ${apiTask.apiName}, ${apiTask.webApiParams}, ${apiTask.id}, ${apiTask.updateId}");
+    }
+    return apiTasks;
   }
 
   void removeApiTask(int id) async {
@@ -60,6 +114,19 @@ class ApiStorageDao extends DatabaseAccessor<AppDatabase>
       ])
       ..limit(1);
     return query.getSingleOrNull();
+  }
+
+  // Get next lowest update id
+  Future<int> nextId() async {
+    var lowestIdItem = await (select(apiStorageModel)
+          ..orderBy(
+              [(t) => OrderingTerm(expression: t.updateId, mode: OrderingMode.asc)])
+          ..limit(1))
+        .getSingleOrNull();
+    // TODO: directly use `id` instead?
+    log("lowest id: ${lowestIdItem?.updateId}, ${lowestIdItem?.apiName}, ${lowestIdItem?.updateId}; new: ${(lowestIdItem?.updateId ?? 0) - 1}");
+    getTasks();
+    return (lowestIdItem?.updateId ?? 0) - 1;
   }
 
   Stream<ApiStorageModelData?> watchApiLatest() {

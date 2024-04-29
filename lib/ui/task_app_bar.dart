@@ -47,8 +47,8 @@ class TaskAppBarActionsState extends AppBarActionsState<TaskAppBarActions> {
       log("Archive/Unarchive");
       final updatedTask = taskModel.copyWith(isActive: 1 - taskModel.isActive);
       (updatedTask.isActive == 1
-              ? Api.openTask(ref, taskModel.id)
-              : Api.closeTask(ref, taskModel.id))
+              ? Api.instance.openTask(ref, taskModel.id)
+              : Api.instance.closeTask(ref, taskModel.id))
           .then((value) {
         if (!value) {
           Utils.showErrorSnackbar(context, "Could not update task");
@@ -63,7 +63,7 @@ class TaskAppBarActionsState extends AppBarActionsState<TaskAppBarActions> {
       Utils.showAlertDialog(context, "${'delete'.resc()} `${taskModel.title}`?",
           "alert_del_content".resc(), () {
         log("Delete task");
-        Api.removeTask(ref, taskModel.id);
+        Api.instance.removeTask(ref, taskModel.id);
         ref.read(activeTask.notifier).state = null;
         Navigator.pop(context);
       });
@@ -73,7 +73,7 @@ class TaskAppBarActionsState extends AppBarActionsState<TaskAppBarActions> {
           "alert_rename_task_content".resc(), taskModel.title, (title) {
         log("project, rename task: $title");
         final updatedTask = taskModel.copyWith(title: title);
-        Api.updateTask(ref, updatedTask).then((result) {
+        Api.instance.updateTask(ref, updatedTask).then((result) {
           if (result) {
             ref.read(activeTask.notifier).state = updatedTask;
             // abActionListener.refreshUi();

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -13,7 +14,6 @@ import 'package:kanbored/models/subtask_model.dart';
 import 'package:kanbored/models/task_metadata_model.dart';
 import 'package:kanbored/models/task_model.dart';
 import 'package:kanbored/utils/app_data.dart';
-import 'package:kanbored/utils/constants.dart';
 
 class WebApi {
   static Future<bool> login(
@@ -348,12 +348,17 @@ class WebApi {
     String encoded = stringToBase64.encode(credentials);
     final jsonData = json.encode(parameters);
     // log("jsonStr: $jsonData");
-    final resp = await http.post(
-      Uri.parse(AppData.endpoint),
-      headers: <String, String>{"Authorization": "Basic $encoded"},
-      body: jsonData,
-      encoding: Encoding.getByName("utf-8"),
-    );
+    final http.Response resp;
+    try {
+      resp = await http.post(
+        Uri.parse(AppData.endpoint),
+        headers: <String, String>{"Authorization": "Basic $encoded"},
+        body: jsonData,
+        encoding: Encoding.getByName("utf-8"),
+      );
+    } on SocketException catch (e) {
+      return Future.error("Couldn't connect to server");
+    }
     // TODO: other errors?
     if (saveCache && resp.statusCode != 200) {
       log("save cache");
@@ -369,7 +374,10 @@ class WebApi {
 
   static dynamic api(ApiStorageModelData apiData) async {
     final params = apiData.webApiParams
-        .replaceAll("\"$apiUpdateId\"", apiData.updateId.toString());
+        // .replaceAll("\"$apiProjectUpdateId\"", apiData.updateId.toString())
+        // .replaceAll("\"$apiColumnUpdateId\"", apiData.updateId.toString()
+        // TODO: with create task
+        ;
     final Map<String, dynamic> parameters = {
       "jsonrpc": "2.0",
       "method": apiData.apiName,
@@ -405,14 +413,24 @@ class WebApi {
       if (apiData.apiId == WebApiModel.createProject.apiId) {
         log("handleApiRequest: create proj");
         // update project dao, with id
-        final dao = ref.read(AppDatabase.provider).projectDao;
-        dao.updateId(apiData.updateId, result);
+        ref
+            .read(AppDatabase.provider)
+            .projectDao
+            .updateId(apiData.updateId, result);
         log("handleApiRequest: update id ${apiData.updateId} => $result");
         // TODO: outside, if successful
         apiDao.removeApiTask(apiData.id);
+      } else if (apiData.apiId == WebApiModel.addColumn.apiId) {
+        log("handleApiRequest: addColumn");
+        ref
+            .read(AppDatabase.provider)
+            .columnDao
+            .updateId(apiData.updateId, result);
+        log("handleApiRequest: update id ${apiData.updateId} => $result");
+        apiDao.removeApiTask(apiData.id);
       }
       // NOTE: Only creation needs updating, internal `updateId`
-      apiDao.updateApiTask(apiData.updateId, result, apiData.apiType);
+      apiDao.updateApiTask(apiData.updateId, result, apiData);
     } else if (result is bool) {
       if (result) {
         apiDao.removeApiTask(apiData.id);

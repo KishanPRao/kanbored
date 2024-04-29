@@ -25,7 +25,7 @@ class AppConnection {
       }
     } on SocketException catch (e) {
       onlineStatus.state = false;
-      log('not connected: $e');
+      // log('not connected: $e');
     }
   }
 

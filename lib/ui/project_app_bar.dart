@@ -58,7 +58,7 @@ class ProjectAppBarActionsState
             - if offline, save task with appropriate , sync when online
               - create proj, delete => remove any task w/ same id, to be synced
            */
-              Api.createProject(ref, title);
+              Api.instance.createProject(ref, title);
           // WebApi.createProject(title).then((result) {
           //   if (result is int) {
           //     // TODO: remove default columns? `getColumns` and `removeColumn`

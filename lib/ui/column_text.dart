@@ -45,7 +45,7 @@ class ColumnTextState extends EditableState<ColumnText> {
       log("column, save: ${columnModel.title}");
       if (columnModel.title != controller.text) {
         var data = columnModel.copyWith(title: controller.text);
-        Api.updateColumn(ref, data);
+        Api.instance.updateColumn(ref, data);
         // WebApi.updateColumn(updatedColumn).then((value) {
         //   if (!value) {
         //     Utils.showErrorSnackbar(context, "Could not save column");

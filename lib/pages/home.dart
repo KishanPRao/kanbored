@@ -38,12 +38,13 @@ class _HomeState extends ConsumerState<Home> {
   };
 
   void runApiTask(ApiStorageModelData event) async {
+    apiDao.getTasks();
     bool status = await WebApi.handleApiRequest(ref, event);
     log("runApiTask: $status");
   }
 
   void updateData({bool recurring = false}) async {
-    var timer = Api.updateProjects(ref, recurring: recurring);
+    var timer = Api.instance.updateProjects(ref, recurring: recurring);
     if (recurring) {
       this.timer = timer;
     }
@@ -87,7 +88,7 @@ class _HomeState extends ConsumerState<Home> {
         log("wait api task: ${event?.timestamp}, ${event?.updateId}, ${event?.apiName}, ${event?.apiType}");
         return;
       }
-      log("run watched api task: ${event.timestamp}, ${event.updateId}, ${event.apiName}, ${event.apiType}");
+      log("run watched api task: ${event.timestamp}, ${event.updateId}, ${event.apiName}, ${event.apiType}; ${event.webApiParams}");
       runApiTask(event);
       // log("==> running task: ${event.timestamp}");
       // int next(int min, int max) => min + random.nextInt(max - min);
@@ -179,7 +180,7 @@ class _HomeState extends ConsumerState<Home> {
 
   void refreshUi() {
     log("project, Refresh UI!");
-    Api.updateProjects(ref);
+    Api.instance.updateProjects(ref);
   }
 
   @override

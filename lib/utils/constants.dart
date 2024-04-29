@@ -25,4 +25,5 @@ const themeSystem = "system";
 // TODO: settings add duration
 const apiTimerDurationInSec = 30;
 
-const apiUpdateId = "%UPDATE_ID%";
+// const apiProjectUpdateId = "%UPDATE_ID%";
+const apiColumnUpdateId = "%COLUMN_UPDATE_ID%";

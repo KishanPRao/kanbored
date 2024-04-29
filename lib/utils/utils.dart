@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:kanbored/utils/constants.dart';
 import 'package:kanbored/utils/strings.dart';
 
 extension StringExtension on String {
@@ -102,6 +103,19 @@ class Utils {
 
   static void printStacktrace() {
     log("[stacktrace] ${StackTrace.current}");
+  }
+
+  // eg, %%UPDATE_ID%{-1}%
+  static String generateUpdateIdString(int id) {
+    return "%%UPDATE_ID%{$id}%";
+  }
+
+  static int getUpdateIdFromGenString(String idString) {
+    String regexString = r'\%\%UPDATE_ID\%{(-?\d+)}\%';
+    RegExp regExp = RegExp(regexString);
+    var matches = regExp.allMatches(idString);
+    var match = matches.elementAt(0);
+    return int.parse(match.group(1)!);
   }
 
   static void runOnDraw(FrameCallback cb) {

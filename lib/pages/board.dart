@@ -35,10 +35,10 @@ class _BoardState extends ConsumerState<Board> {
   var activeColumnPos = -1;
   var activeTaskId = -1;
   late double columnWidth;
-  var activeEditIndex = 0;
-  var activeEditText = "";
-  GlobalKey<BoardAppBarActionsState> keyAppBarActionsState = GlobalKey();
-  List<GlobalKey<EditableState>> keysEditableText = [];
+  // var activeEditIndex = 0;
+  // var activeEditText = "";
+  // GlobalKey<BoardAppBarActionsState> keyAppBarActionsState = GlobalKey();
+  // List<GlobalKey<EditableState>> keysEditableText = [];
   final ScrollController controller = ScrollController();
   late Stream<List<ColumnModelData>> columns;
   final _formKey = GlobalKey<FormState>();
@@ -51,8 +51,8 @@ class _BoardState extends ConsumerState<Board> {
     var projectModel = ref.read(activeProject)!;
     if (!recurring) return null;
     return [
-      Api.updateColumns(ref, projectModel.id, recurring: recurring),
-      Api.updateTasks(ref, projectModel.id, recurring: recurring)
+      Api.instance.updateColumns(ref, projectModel.id, recurring: recurring),
+      Api.instance.updateTasks(ref, projectModel.id, recurring: recurring)
     ];
   }
 
@@ -128,66 +128,66 @@ class _BoardState extends ConsumerState<Board> {
     // }
   // }
 
-  void onChange(text) {
-    activeEditText = text;
-    // keyTaskAppBarActionsState.currentState?.updateText(text);
-  }
-
-  void onEditStart(int index, List<int> actions) {
-    log("onEditStart: $index, $actions");
-    activeEditIndex = index;
-    keyAppBarActionsState.currentState?.currentActions = actions;
-    keyAppBarActionsState.currentState?.startEdit();
-    keysEditableText[activeEditIndex].currentState?.startEdit();
-  }
-
-  // TODO: needed?
-  bool onEditEnd(bool saveChanges) {
-    if (saveChanges && activeEditText.isEmpty) {
-      return false;
-    }
-    // Utils.printStacktrace();
-    log("board, onEditEnd: $activeEditIndex, $saveChanges");
-    keysEditableText[activeEditIndex].currentState?.endEdit(saveChanges);
-    keyAppBarActionsState.currentState?.endEdit(saveChanges);
-    // setState(() {});
-    return true;
-  }
-
-  bool isArchived() => ref.read(UiState.boardShowArchived);
-
-  void onDelete() {
-    log("board, onDelete");
-    keysEditableText[activeEditIndex].currentState?.delete();
-  }
-
-  void onAddColumn() {
-    log("board, onAddColumn");
-    // NOTE: this approach will not work for multiple boards/swimlane; instead, add to board's popup options
-    Utils.showInputAlertDialog(
-        context, "add_column".resc(), "alert_new_col_content".resc(), "",
-        (title) {
-      log("board, add col: $title");
-      var projectModel = ref.read(activeProject)!;
-      WebApi.addColumn(projectModel.id, title).then((result) {
-        if (result is int) {
-          refreshUi();
-        } else {
-          Utils.showErrorSnackbar(context, "Could not add column");
-        }
-      }).onError((e, st) => Utils.showErrorSnackbar(context, e));
-    });
-  }
-
-  void onArchive() {
-    log("board, onArchive");
-    keysEditableText[activeEditIndex].currentState?.archive();
-  }
-
-  void onUnarchive() {
-    log("board, onUnarchive");
-    keysEditableText[activeEditIndex].currentState?.unarchive();
-  }
+  // void onChange(text) {
+  //   activeEditText = text;
+  //   // keyTaskAppBarActionsState.currentState?.updateText(text);
+  // }
+  //
+  // void onEditStart(int index, List<int> actions) {
+  //   log("onEditStart: $index, $actions");
+  //   activeEditIndex = index;
+  //   keyAppBarActionsState.currentState?.currentActions = actions;
+  //   keyAppBarActionsState.currentState?.startEdit();
+  //   keysEditableText[activeEditIndex].currentState?.startEdit();
+  // }
+  //
+  // // TODO: needed?
+  // bool onEditEnd(bool saveChanges) {
+  //   if (saveChanges && activeEditText.isEmpty) {
+  //     return false;
+  //   }
+  //   // Utils.printStacktrace();
+  //   log("board, onEditEnd: $activeEditIndex, $saveChanges");
+  //   keysEditableText[activeEditIndex].currentState?.endEdit(saveChanges);
+  //   keyAppBarActionsState.currentState?.endEdit(saveChanges);
+  //   // setState(() {});
+  //   return true;
+  // }
+  //
+  // bool isArchived() => ref.read(UiState.boardShowArchived);
+  //
+  // void onDelete() {
+  //   log("board, onDelete");
+  //   keysEditableText[activeEditIndex].currentState?.delete();
+  // }
+  //
+  // void onAddColumn() {
+  //   log("board, onAddColumn");
+  //   // NOTE: this approach will not work for multiple boards/swimlane; instead, add to board's popup options
+  //   Utils.showInputAlertDialog(
+  //       context, "add_column".resc(), "alert_new_col_content".resc(), "",
+  //       (title) {
+  //     log("board, add col: $title");
+  //     var projectModel = ref.read(activeProject)!;
+  //     WebApi.addColumn(projectModel.id, title).then((result) {
+  //       if (result is int) {
+  //         refreshUi();
+  //       } else {
+  //         Utils.showErrorSnackbar(context, "Could not add column");
+  //       }
+  //     }).onError((e, st) => Utils.showErrorSnackbar(context, e));
+  //   });
+  // }
+  //
+  // void onArchive() {
+  //   log("board, onArchive");
+  //   keysEditableText[activeEditIndex].currentState?.archive();
+  // }
+  //
+  // void onUnarchive() {
+  //   log("board, onUnarchive");
+  //   keysEditableText[activeEditIndex].currentState?.unarchive();
+  // }
 
   // void onArchived(bool showArchived) {
   //   log("board, onArchived: $showArchived");
@@ -207,7 +207,7 @@ class _BoardState extends ConsumerState<Board> {
 
   @override
   Widget build(BuildContext context) {
-    log("rebuild board");
+    // log("rebuild board");
     // Do not load until some data is retrieved
     // final dao = p.Provider.of<TasksDao>(context);
     // StateProvider<AppDatabase> provider = StateProvider((ref) {
@@ -289,7 +289,7 @@ class _BoardState extends ConsumerState<Board> {
               ),
               actions: [
                 BoardAppBarActions(
-                  key: keyAppBarActionsState,
+                  // key: keyAppBarActionsState,
                   // abActionListener: BoardActionListener(
                   //   onArchive: onArchive,
                   //   onUnarchive: onUnarchive,

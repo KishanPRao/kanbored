@@ -6,9 +6,9 @@ import 'package:kanbored/api/api.dart';
 import 'package:kanbored/api/state.dart';
 import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/db/database.dart';
-import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/ui_state.dart';
+import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/utils/utils.dart';
 
 class BoardAppBarAction extends AppBarAction {
@@ -29,6 +29,7 @@ class BoardAppBarActions extends AppBarActions {
 
 class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
   late ProjectModelData projectModel;
+
   // late bool showArchived;
   //
   // @override
@@ -42,7 +43,9 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
   @override
   Iterable<String> getPopupNames() => {
         "rename".resc(),
-    ref.watch(UiState.boardShowArchived) ? "hide_archived".resc() : "show_archived".resc(),
+        ref.watch(UiState.boardShowArchived)
+            ? "hide_archived".resc()
+            : "show_archived".resc(),
         (projectModel.isActive == 1) ? "archive".resc() : "unarchive".resc(),
         // TODO: `show_archived` adds extra spaces in UI?
         "delete".resc(),
@@ -76,19 +79,12 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
   void mainAction() {
     log("board, onAddColumn");
     // NOTE: this approach will not work for multiple boards/swimlane; instead, add to board's popup options
-    // Utils.showInputAlertDialog(
-    //     context, "add_column".resc(), "alert_new_col_content".resc(), "",
-    //         (title) {
-    //       log("board, add col: $title");
-    //       var projectModel = ref.read(activeProject)!;
-    //       WebApi.addColumn(projectModel.id, title).then((result) {
-    //         if (result is int) {
-    //           refreshUi();
-    //         } else {
-    //           Utils.showErrorSnackbar(context, "Could not add column");
-    //         }
-    //       }).onError((e, st) => Utils.showErrorSnackbar(context, e));
-    //     });
+    Utils.showInputAlertDialog(
+        context, "add_column".resc(), "alert_new_col_content".resc(), "",
+        (title) {
+          log("board, add col: $title");
+          Api.instance.addColumn(ref, projectModel.id, title);
+        });
   }
 
   void toggleArchive() {
@@ -96,7 +92,7 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
     var updatedProject =
         projectModel.copyWith(isActive: 1 - projectModel.isActive);
     // Update local state, then use different API
-    Api.updateProject(ref, updatedProject);
+    Api.instance.updateProject(ref, updatedProject);
     // (updatedProject.isActive == 1
     //         ? WebApi.enableProject(projectModel.id)
     //         : WebApi.disableProject(projectModel.id))
@@ -111,7 +107,7 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
     // }).catchError((e) => Utils.showErrorSnackbar(context, e));
   }
 
-  // Project level
+// Project level
   @override
   Future<void> handlePopupAction(String action) async {
     log("board, handlePopupAction: $action");
@@ -142,7 +138,7 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
           "alert_rename_proj_content".resc(), projectModel.name, (title) {
         log("project, rename col: $title");
         var updatedProject = projectModel.copyWith(name: title);
-        Api.updateProject(ref, updatedProject);
+        Api.instance.updateProject(ref, updatedProject);
         ref.read(activeProject.notifier).state = updatedProject;
         // TODO: update active project
         // Api.updateProject(ref, updatedProject).then((result) {
@@ -160,7 +156,7 @@ class BoardAppBarActionsState extends AppBarActionsState<BoardAppBarActions> {
           "${'delete'.resc()} `${projectModel.name}`?",
           "alert_del_content".resc(), () {
         log("Delete project");
-        Api.removeProject(ref, projectModel.id).then((result) {
+        Api.instance.removeProject(ref, projectModel.id).then((result) {
           if (result) {
             log("refresh remove??");
             // abActionListener.refreshUi();
