@@ -58,8 +58,8 @@ class App extends ConsumerWidget {
           AppData.theme == themeAmolded ? AppTheme.amolded : AppTheme.dark,
       themeMode: AppTheme.strToThemeMode(themeMode),
       debugShowCheckedModeBanner: false,
-      initialRoute: authenticated ? 'home' : 'login',
-      // TODO: re-use pages
+      initialRoute: authenticated ? routeHome : routeLogin,
+      // TODO: re-use pages, mainly search -> board -> search etc
       routes: {
         routeHome: (BuildContext context) => const Home(),
         routeLogin: (BuildContext context) => const Login(),

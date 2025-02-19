@@ -48,13 +48,15 @@ class _HomeState extends ConsumerState<Home> {
     if (recurring) {
       this.timer = timer;
     }
+    // apiDao.transaction(() async {
     final event = await apiDao.getApiLatest();
-    if (event != null) {
+    if (event != null && (ref.read(onlineStatus.notifier).state ?? false)) {
       log("run latest api task: ${event.timestamp}, ${event.updateId}, ${event.apiName}, ${event.apiType}");
       runApiTask(event);
     } else {
-      log("no latest api");
+      log("no latest api / offline");
     }
+    // });
   }
 
   @override
@@ -89,7 +91,9 @@ class _HomeState extends ConsumerState<Home> {
         return;
       }
       log("run watched api task: ${event.timestamp}, ${event.updateId}, ${event.apiName}, ${event.apiType}; ${event.webApiParams}");
+      // apiDao.transaction(() async {
       runApiTask(event);
+      // });
       // log("==> running task: ${event.timestamp}");
       // int next(int min, int max) => min + random.nextInt(max - min);
       // sleep(Duration(seconds:next(7, 12)));
@@ -207,7 +211,10 @@ class _HomeState extends ConsumerState<Home> {
                   StreamBuilder(
                       stream: ref.watch(onlineStatus.notifier).stream,
                       builder: (context, snapshot2) {
-                        final isOnline = snapshot2.data ?? false;
+                        final isOnline = snapshot2.data ?? true;  // If not loaded yet, don't show offline
+                        if (!isOnline) {
+                          log("offline! ${snapshot2.data}");
+                        }
                         return isOnline
                             ? Utils.emptyUi()
                             : Card(
@@ -241,14 +248,14 @@ class _HomeState extends ConsumerState<Home> {
     return StreamBuilder(
         stream: ref.read(AppDatabase.provider).projectDao.watchProjects(),
         builder: (context, AsyncSnapshot<List<ProjectModelData>> snapshot) {
-          log("new projects: ${snapshot.data?.length}!");
+          // log("new projects: ${snapshot.data?.length}!");
           return StreamBuilder(
             stream: ref.watch(UiState.projectShowArchived.notifier).stream,
             builder: (context, snapshot2) {
               final showArchived = snapshot2.data ?? false;
               // TODO: if used outside 2nd stream builder, data not saved?
               var projects = snapshot.data ?? [];
-              log("new projects: ${projects.length}, $showArchived");
+              // log("new projects: ${projects.length}, $showArchived");
               projects = projects
                   .where((project) =>
                       ((project.isActive == 0) && showArchived) ||
@@ -285,8 +292,8 @@ class _HomeState extends ConsumerState<Home> {
                     splashColor: "cardHighlight".themed(context),
                     highlightColor: "cardHighlight".themed(context),
                     onTap: () {
-                      ref.read(UiState.projectShowArchived.notifier).state =
-                          false;
+                      // ref.read(UiState.projectShowArchived.notifier).state =
+                      //     false;
                       ref.read(activeProject.notifier).state = project;
                       Navigator.pushNamed(context, routeBoard);
                     },

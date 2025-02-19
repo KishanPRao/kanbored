@@ -156,10 +156,12 @@ extension ApiTask on Api {
       Future.wait([
         WebApi.getAllTasks(projectId, 1), // active
         WebApi.getAllTasks(projectId, 0), //inactive
-      ]).then((value) {
-        var tasks = value[0];
-        tasks.addAll(value[1]);
+      ]).then((values) {
+        var tasks = values[0];
+        tasks.addAll(values[1]);
         // log("tasks: $tasks");
+        log("update tasks: ${tasks.length}");
+        // TODO: ref.readIfMounted()
         ref.read(AppDatabase.provider).taskDao.updateTasks(tasks);
       });
     }
@@ -270,3 +272,13 @@ extension ApiTaskMetadata on Api {
 extension ApiSubtask on Api {}
 
 extension ApiComment on Api {}
+
+// TODO: remove if unneeded
+extension WidgetRefExt on WidgetRef {
+  T? readIfMounted<T>(ProviderListenable<T> provider) {
+    if (context.mounted) {
+      return read(provider);
+    }
+    return null;
+  }
+}

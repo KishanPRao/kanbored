@@ -105,9 +105,12 @@ class Utils {
     log("[stacktrace] ${StackTrace.current}");
   }
 
-  // eg, %%UPDATE_ID%{-1}%
-  static String generateUpdateIdString(int id) {
-    return "%%UPDATE_ID%{$id}%";
+  // eg, %%UPDATE_ID%{-1}% or <id>
+  static dynamic generateUpdateIdString(int id) {
+    if (id < 0) {
+      return "%%UPDATE_ID%{$id}%";
+    }
+    return id;
   }
 
   static int getUpdateIdFromGenString(String idString) {

@@ -218,6 +218,12 @@ class WebApi {
   static Future<bool> removeSubtask(int id) async =>
       setApi("removeSubtask", 1382487306, params: {"subtask_id": id});
 
+  // Delete multiple
+  // TODO
+  static Future<Iterable<bool>> removeAllTasks(Iterable<int> ids) async =>
+      setMultiApi("removeTask", 1423501287,
+          multiParams: ids.map((id) => {"task_id": id}));
+
   //////////////////////////////////// GETTER //////////////////////////////////
   //
   // static Future<List<ProjectModel>> getmyProjects() async =>
@@ -309,6 +315,11 @@ class WebApi {
     return json.encode(parameters);
   }
 
+  static Future<Iterable<T>> setMultiApi<T>(String method, int id,
+      {Iterable<dynamic> multiParams = const []}) async {
+    return await baseMultiApi(method, id, multiParams: multiParams);
+  }
+
   static Future<T> setApi<T>(String method, int id,
       {dynamic params = const {}}) async {
     return await baseApi(method, id, saveCache: true, params: params) as T;
@@ -334,6 +345,30 @@ class WebApi {
     return models;
   }
 
+  static Future<List<T>> baseMultiApi<T>(String method, int id,
+      {Iterable<dynamic> multiParams = const []}) async {
+    var parameters = multiParams
+        .map((params) =>
+    {"jsonrpc": "2.0", "method": method, "id": id, "params": params})
+        .toList();
+    // log("Multi base api, params: $parameters");
+    final credentials = "${AppData.username}:${AppData.password}";
+    Codec<String, String> stringToBase64 = utf8.fuse(base64);
+    String encoded = stringToBase64.encode(credentials);
+    final resp = await http.post(
+      Uri.parse(AppData.endpoint),
+      headers: <String, String>{"Authorization": "Basic $encoded"},
+      body: json.encode(parameters),
+      encoding: Encoding.getByName("utf-8"),
+    );
+    List<dynamic> decodedDataList = json.decode(utf8.decode(resp.bodyBytes));
+    // log("Multi base api, decodedData: ${utf8.decode(resp.bodyBytes)}");
+    // log("Multi base api, decodedData: $decodedData");
+    return decodedDataList
+        .map<T>((decodedData) => decodedData['result'])
+        .toList();
+  }
+
   static dynamic baseApi<T extends Model>(String method, int id,
       {bool saveCache = false, dynamic params = const {}}) async {
     final Map<String, dynamic> parameters = {
@@ -348,6 +383,8 @@ class WebApi {
     String encoded = stringToBase64.encode(credentials);
     final jsonData = json.encode(parameters);
     // log("jsonStr: $jsonData");
+    // log("creds: $credentials, ${AppData.endpoint}");
+    // log("creds: $encoded");
     final http.Response resp;
     try {
       resp = await http.post(
@@ -358,6 +395,8 @@ class WebApi {
       );
     } on SocketException catch (e) {
       return Future.error("Couldn't connect to server");
+    } on Exception catch (e) {
+      return Future.error("Couldn't connect to server: ${e.toString()}");
     }
     // TODO: other errors?
     if (saveCache && resp.statusCode != 200) {
@@ -366,7 +405,9 @@ class WebApi {
 
     final decodedData = json.decode(utf8.decode(resp.bodyBytes));
     // log("decodedData: ${utf8.decode(resp.bodyBytes)}");
-    // log("decodedData: $decodedData");
+    if (resp.statusCode != 200) {
+      log("decodedData: $decodedData");
+    }
 
     if (decodedData['error'] != null) return Future.error(decodedData['error']);
     return decodedData['result'];
@@ -388,7 +429,9 @@ class WebApi {
     final credentials = "${AppData.username}:${AppData.password}";
     Codec<String, String> stringToBase64 = utf8.fuse(base64);
     String encoded = stringToBase64.encode(credentials);
-    // log("jsonStr: $jsonData");
+    // log("creds: $credentials, ${AppData.endpoint}");
+    // log("creds: $encoded");
+    log("parameters: $parameters");
     final resp = await http.post(
       Uri.parse(AppData.endpoint),
       headers: <String, String>{"Authorization": "Basic $encoded"},
@@ -397,7 +440,9 @@ class WebApi {
     );
     final decodedData = json.decode(utf8.decode(resp.bodyBytes));
     // log("decodedData: ${utf8.decode(resp.bodyBytes)}");
-    // log("decodedData: $decodedData");
+    if (resp.statusCode != 200) {
+      log("decodedData: $decodedData");
+    }
 
     if (decodedData['error'] != null) return Future.error(decodedData['error']);
     return decodedData['result'];
@@ -429,7 +474,7 @@ class WebApi {
         log("handleApiRequest: update id ${apiData.updateId} => $result");
         apiDao.removeApiTask(apiData.id);
       } else if (apiData.apiId == WebApiModel.createTask.apiId) {
-        log("handleApiRequest: createTask");
+        log("handleApiRequest: createTask: ${apiData.updateId}, ${apiData.webApiParams}");
         ref
             .read(AppDatabase.provider)
             .taskDao

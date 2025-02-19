@@ -41,6 +41,7 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
     return query.getSingle();
   }
 
+  /// Creates a task, get highest task position to place at the end of the column
   Future<int> createTask(int id, int projectId, int columnId, String title) {
     return transaction(() async {
       var highestPositionItem = await (select(taskModel)

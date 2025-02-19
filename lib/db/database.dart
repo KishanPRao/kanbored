@@ -58,10 +58,12 @@ class AppDatabase extends _$AppDatabase {
     // for your app.
     final dbFolder = await getApplicationDocumentsDirectory();
     final file = File(p.join(dbFolder.path, 'db.sqlite'));
-    if (kDebugMode) {
-      log("deleting database file");
-      await file.delete();
-    }
+    // if (kDebugMode) {
+    //   log("deleting database file");
+    //   if (await file.exists()) {
+    //     await file.delete();
+    //   }
+    // }
 
     // Also work around limitations on old Android versions
     if (Platform.isAndroid) {

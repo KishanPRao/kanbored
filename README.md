@@ -73,3 +73,43 @@ Test:
 Possible Kanboard bugs:
 - Inaccurate position info when deleting middle position items
 - `removeColumn` not working
+
+Offline limitations:
+- new `id` related:
+    - creating new project/task/
+    - **possible workaround**
+        - use proj/task/col id -1, -2 etc, use only for subsequent tasks; use some pattern: {%column{%-1%}%} as the id, run tasks once online; refresh after all api tasks finished.
+
+Actions:
+- Home
+    - Create proj - x
+    - Show arch (proj) - x
+    - Settings -
+- Board
+    - Actions
+        - Add column -
+        - Rename proj - x
+        - Show arch (col/task) -
+        - Archive proj - x
+        - Delete proj - x
+    - Add task
+        - back button, deselect before exit -
+    - Rename col - x
+    - Archive col - x
+    - Delete col -
+    - Search proj -
+- Task
+    - Actions
+        - Add clist -
+        - Archive task -
+        - Rename task -
+        - Delete task -
+    - Edit / discard changes Desc -
+    - Edit / discard changes clist -
+    - Delete clist -
+    - Add subtask -
+    - Edit / discard changes subtask -
+    - Delete subtask -
+    - Add comment -
+    - Edit / discard changes comment -
+    - Delete comment - 

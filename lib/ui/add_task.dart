@@ -46,7 +46,7 @@ class AddTaskState extends EditableState<AddTask> {
   }
 
   void startEditing() {
-    log("startEditing");
+    log("add task: startEditing");
     ref.read(UiState.boardActiveState.notifier).state =
         widget.key as GlobalKey<EditableState>;
     ref.read(UiState.boardActiveText.notifier).state = controller.text;
@@ -86,10 +86,15 @@ class AddTaskState extends EditableState<AddTask> {
                               .state = controller.text,
                           controller: controller,
                           onTap: startEditing,
-                          onEditingComplete: () {
-                            ref.read(UiState.boardEditing.notifier).state =
-                                false;
-                            // abActionListener.onEditEnd(true);
+                          // onEditingComplete: () {
+                          //   ref.read(UiState.boardEditing.notifier).state =
+                          //       false;
+                          //   // TODO!
+                          //   // abActionListener.onEditEnd(true);
+                          // },
+                          onSubmitted: (value) {
+                            log("onSubmitted: $value");
+                            endEdit(true);
                           },
                           // onChanged: abActionListener.onChange,
                           focusNode: focusNode,

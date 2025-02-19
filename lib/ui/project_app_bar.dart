@@ -82,6 +82,7 @@ class ProjectAppBarActionsState
   Future<void> handlePopupAction(String action) async {
     log("project, handlePopupAction: $action");
     if (action == "hide_archived".resc() || action == "show_archived".resc()) {
+      log("flip archived: ${ref.watch(UiState.boardShowArchived)}");
       // showArchived = !showArchived;
       // log("toggle archive: $showArchived");
       // (abActionListener as ProjectActionListener).onArchived(showArchived);

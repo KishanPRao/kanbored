@@ -31,7 +31,7 @@ class ApiStorageDao extends DatabaseAccessor<AppDatabase>
 
   void updateApiTask(int oldId, int newId, ApiStorageModelData _) async {
     // (delete(apiStorageModel)..where((tbl) => tbl.id.equals(oldId))).go();
-    log("updateApiTask: $oldId => $newId; ${_.apiType}");
+    log("updateApiTask: $oldId => $newId; type=${_.apiType}");
     // final apiTasks = await (select(apiStorageModel)
     //       ..where((tbl) => tbl.updateId.equals(oldId))
     //       ..where((tbl) => tbl.apiType.equals(apiType)))
