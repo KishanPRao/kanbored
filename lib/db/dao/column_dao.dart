@@ -38,11 +38,6 @@ class ColumnDao extends DatabaseAccessor<AppDatabase> with _$ColumnDaoMixin {
     await into(columnModel).insertOnConflictUpdate(data);
   }
 
-  void updateId(int oldId, int newId) async {
-    (update(columnModel)..where((tbl) => tbl.id.equals(oldId)))
-        .write(ColumnModelCompanion(id: Value(newId)));
-  }
-
   Stream<List<ColumnModelData>> watchColumnsInProject(int projectId) {
     final query = select(columnModel)
       ..where((tbl) {
@@ -62,5 +57,15 @@ class ColumnDao extends DatabaseAccessor<AppDatabase> with _$ColumnDaoMixin {
         await into(columnModel).insertOnConflictUpdate(data);
       }
     });
+  }
+
+  void updateId(int oldId, int newId) async {
+    (update(columnModel)..where((tbl) => tbl.id.equals(oldId)))
+        .write(ColumnModelCompanion(id: Value(newId)));
+  }
+
+  void updateProjectId(int oldId, int newId) async {
+    (update(columnModel)..where((tbl) => tbl.projectId.equals(oldId)))
+        .write(ColumnModelCompanion(projectId: Value(newId)));
   }
 }

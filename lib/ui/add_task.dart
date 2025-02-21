@@ -94,7 +94,9 @@ class AddTaskState extends EditableState<AddTask> {
                           // },
                           onSubmitted: (value) {
                             log("onSubmitted: $value");
-                            endEdit(true);
+                            ref.read(UiState.boardEditing.notifier).state =
+                                false;
+                            endEdit(value.isNotEmpty);
                           },
                           // onChanged: abActionListener.onChange,
                           focusNode: focusNode,
@@ -119,12 +121,14 @@ class AddTaskState extends EditableState<AddTask> {
       log("Add a new task: ${controller.text}, into task: ${columnModel.title}");
       // final tasksDao = ref.read(AppDatabase.provider).taskDao;
       // tasksDao.addTask(taskJson);
-      Api.instance.createTask(
+      Api.instance
+          .createTask(
         ref,
         columnModel.projectId,
         columnModel.id,
         controller.text,
-      ).then((taskId) async {
+      )
+          .then((taskId) async {
         controller.text = "";
         // final taskDao = ref.read(AppDatabase.provider).taskDao;
         // ref.read(activeTask.notifier).state = await taskDao.getTask(taskId);

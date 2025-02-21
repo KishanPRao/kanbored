@@ -84,6 +84,7 @@ class _MarkdownState extends EditableState<Markdown> {
 
   @override
   void startEdit() {
+    log("widget.key: ${widget.key}");
     ref.read(UiState.boardActiveState.notifier).state =
     widget.key as GlobalKey<EditableState>;
     ref.read(UiState.boardActiveText.notifier).state = controller.text;

@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:kanbored/api/state.dart';
 import 'package:kanbored/db/database.dart';
 import 'package:kanbored/db/web_api_model.dart';
 import 'package:kanbored/models/board_model.dart';
@@ -232,18 +233,30 @@ class WebApi {
   static Future<List<dynamic>> getAllProjects() async =>
       await baseApi("getAllProjects", 2134420212) as List<dynamic>;
 
-  static Future<List<BoardModel>> getBoard(int projectId) async =>
-      listApi("getBoard", 827046470, BoardModel.fromJson,
-          params: {"project_id": projectId});
+  static Future<List<BoardModel>> getBoard(int projectId) async {
+    if (projectId < 0) {
+      return Future.error("getBoard: Invalid project id: $projectId");
+    }
+    return listApi("getBoard", 827046470, BoardModel.fromJson,
+        params: {"project_id": projectId});
+  }
 
-  static Future<List<dynamic>> getColumns(int projectId) async =>
-      await baseApi("getColumns", 887036325, params: {"project_id": projectId})
-          as List<dynamic>;
+  static Future<List<dynamic>> getColumns(int projectId) async {
+    if (projectId < 0) {
+      return Future.error("getColumns: Invalid project id: $projectId");
+    }
+    return await baseApi("getColumns", 887036325,
+        params: {"project_id": projectId}) as List<dynamic>;
+  }
 
-  static Future<List<dynamic>> getAllTasks(int projectId, int isActive) async =>
-      await baseApi("getAllTasks", 133280317,
-              params: {"project_id": projectId, "status_id": isActive})
-          as List<dynamic>;
+  static Future<List<dynamic>> getAllTasks(int projectId, int isActive) async {
+    if (projectId < 0) {
+      return Future.error("getAllTasks: Invalid project id: $projectId");
+    }
+    return await baseApi("getAllTasks", 133280317,
+            params: {"project_id": projectId, "status_id": isActive})
+        as List<dynamic>;
+  }
 
   static Future<List<SubtaskModel>> getAllSubtasks(int taskId) async =>
       listApi("getAllSubtasks", 2087700490, SubtaskModel.fromJson,
@@ -349,7 +362,7 @@ class WebApi {
       {Iterable<dynamic> multiParams = const []}) async {
     var parameters = multiParams
         .map((params) =>
-    {"jsonrpc": "2.0", "method": method, "id": id, "params": params})
+            {"jsonrpc": "2.0", "method": method, "id": id, "params": params})
         .toList();
     // log("Multi base api, params: $parameters");
     final credentials = "${AppData.username}:${AppData.password}";
@@ -406,7 +419,7 @@ class WebApi {
     final decodedData = json.decode(utf8.decode(resp.bodyBytes));
     // log("decodedData: ${utf8.decode(resp.bodyBytes)}");
     if (resp.statusCode != 200) {
-      log("decodedData: $decodedData");
+      log("baseapi: $params, decodedData: $decodedData");
     }
 
     if (decodedData['error'] != null) return Future.error(decodedData['error']);
@@ -441,7 +454,7 @@ class WebApi {
     final decodedData = json.decode(utf8.decode(resp.bodyBytes));
     // log("decodedData: ${utf8.decode(resp.bodyBytes)}");
     if (resp.statusCode != 200) {
-      log("decodedData: $decodedData");
+      log("api: $params, decodedData: $decodedData");
     }
 
     if (decodedData['error'] != null) return Future.error(decodedData['error']);
@@ -462,15 +475,33 @@ class WebApi {
             .read(AppDatabase.provider)
             .projectDao
             .updateId(apiData.updateId, result);
+        ref
+            .read(AppDatabase.provider)
+            .columnDao
+            .updateProjectId(apiData.updateId, result);
+        ref
+            .read(AppDatabase.provider)
+            .taskDao
+            .updateProjectId(apiData.updateId, result);
         log("handleApiRequest: update id ${apiData.updateId} => $result");
         // TODO: outside, if successful
         apiDao.removeApiTask(apiData.id);
+        var projectModel = ref.read(activeProject);
+        if (projectModel != null && projectModel.id == apiData.updateId) {
+          ref.read(activeProject.notifier).state =
+              projectModel.copyWith(id: result);
+          log("Update active proj: ${apiData.updateId} => $result");
+        }
       } else if (apiData.apiId == WebApiModel.addColumn.apiId) {
         log("handleApiRequest: addColumn");
         ref
             .read(AppDatabase.provider)
             .columnDao
             .updateId(apiData.updateId, result);
+        ref
+            .read(AppDatabase.provider)
+            .taskDao
+            .updateColumnId(apiData.updateId, result);
         log("handleApiRequest: update id ${apiData.updateId} => $result");
         apiDao.removeApiTask(apiData.id);
       } else if (apiData.apiId == WebApiModel.createTask.apiId) {

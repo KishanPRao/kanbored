@@ -41,9 +41,6 @@ android {
     }
 
     defaultConfig {
-//        ndk {
-//            abiFilters 'x86_64'
-//        }
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.kanbored.kanbored"
         // You can update the following values to match your application needs.

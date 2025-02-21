@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:drift/drift.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/state.dart';
 import 'package:kanbored/db/api_storage_model.dart';
 import 'package:kanbored/db/database.dart';
 import 'package:kanbored/db/web_api_model.dart';
@@ -29,9 +31,9 @@ class ApiStorageDao extends DatabaseAccessor<AppDatabase>
     await into(apiStorageModel).insert(data);
   }
 
-  void updateApiTask(int oldId, int newId, ApiStorageModelData _) async {
+  void updateApiTask(int oldId, int newId, ApiStorageModelData updateApi) async {
     // (delete(apiStorageModel)..where((tbl) => tbl.id.equals(oldId))).go();
-    log("updateApiTask: $oldId => $newId; type=${_.apiType}");
+    log("updateApiTask: $oldId => $newId; type=${updateApi.apiType}");
     // final apiTasks = await (select(apiStorageModel)
     //       ..where((tbl) => tbl.updateId.equals(oldId))
     //       ..where((tbl) => tbl.apiType.equals(apiType)))
@@ -73,6 +75,10 @@ class ApiStorageDao extends DatabaseAccessor<AppDatabase>
     await transaction(() async {
       final apiTasks = await (select(apiStorageModel)).get();
       for (var apiTask in apiTasks) {
+        if (apiTask.apiType <= updateApi.apiType) {
+          log("updateApiTask, ignoring: prev type=${updateApi.apiType}, check type=${apiTask.apiType}");
+          continue;
+        }
         var updatedApiTask = apiTask.copyWith(
           webApiParams: apiTask.webApiParams.replaceAll(
               "\"${Utils.generateUpdateIdString(oldId)}\"",
@@ -92,7 +98,7 @@ class ApiStorageDao extends DatabaseAccessor<AppDatabase>
     for (var apiTask in apiTasks) {
       log("all tasks: ${apiTask.apiName}, ${apiTask.webApiParams}");
     }
-    log("updateApiTask FIN: $oldId => $newId; ${_.apiType}");
+    log("updateApiTask FIN: $oldId => $newId; ${updateApi.apiType}");
   }
 
   Future<List<ApiStorageModelData>> getTasks() async {

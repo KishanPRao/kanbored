@@ -74,16 +74,16 @@ class ProjectDao extends DatabaseAccessor<AppDatabase> with _$ProjectDaoMixin {
         .getSingleOrNull();
   }
 
-  void updateId(int oldId, int newId) async {
-    (update(projectModel)..where((tbl) => tbl.id.equals(oldId)))
-        .write(ProjectModelCompanion(id: Value(newId)));
-  }
-
   void updateProject(ProjectModelData data) async {
     await into(projectModel).insertOnConflictUpdate(data);
   }
 
   void removeProject(int projectId) async {
     await (delete(projectModel)..where((tbl) => tbl.id.equals(projectId))).go();
+  }
+
+  void updateId(int oldId, int newId) async {
+    (update(projectModel)..where((tbl) => tbl.id.equals(oldId)))
+        .write(ProjectModelCompanion(id: Value(newId)));
   }
 }

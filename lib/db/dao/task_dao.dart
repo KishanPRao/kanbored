@@ -108,4 +108,14 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
     (update(taskModel)..where((tbl) => tbl.id.equals(oldId)))
         .write(TaskModelCompanion(id: Value(newId)));
   }
+
+  void updateColumnId(int oldId, int newId) async {
+    (update(taskModel)..where((tbl) => tbl.columnId.equals(oldId)))
+        .write(TaskModelCompanion(columnId: Value(newId)));
+  }
+
+  void updateProjectId(int oldId, int newId) async {
+    (update(taskModel)..where((tbl) => tbl.projectId.equals(oldId)))
+        .write(TaskModelCompanion(projectId: Value(newId)));
+  }
 }
