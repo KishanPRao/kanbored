@@ -13,15 +13,27 @@ dependencies:
   cupertino_icons: ^1.0.6
   shared_preferences: ^2.2.2
   http:
-  flutter_secure_storage:
+  flutter_secure_storage: ^9.2.4
   flutter_markdown:
   markdown:
-#  flutter_markdown_editor:
+  drift: ^2.17.0
+  sqlite3_flutter_libs: ^0.5.0
+  path_provider: ^2.0.0
+  path: ^1.9.0
+  sqlite3:
+  json_annotation:
+  flutter_riverpod: ^2.3.0
+  drift_db_viewer:
+  collection:
+  connectivity_plus:
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^5.0.0
+  drift_dev: ^2.17.0
+  build_runner: ^2.4.9
+  json_serializable:
 
 flutter:
   uses-material-design: true
