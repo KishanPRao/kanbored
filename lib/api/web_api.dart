@@ -258,13 +258,34 @@ class WebApi {
         as List<dynamic>;
   }
 
-  static Future<List<SubtaskModel>> getAllSubtasks(int taskId) async =>
-      listApi("getAllSubtasks", 2087700490, SubtaskModel.fromJson,
-          params: {"task_id": taskId});
+  static Future<List<dynamic>> getAllSubtasks(int taskId) async {
+    if (taskId < 0) {
+      return Future.error("getAllSubtasks: Invalid task id: $taskId");
+    }
+    return await baseApi("getAllSubtasks", 2087700490,
+        params: {"task_id": taskId}) as List<dynamic>;
+  }
 
-  static Future<List<CommentModel>> getAllComments(int taskId) async =>
-      listApi("getAllComments", 148484683, CommentModel.fromJson,
-          params: {"task_id": taskId});
+  static Future<List<dynamic>> getAllComments(int taskId) async {
+    if (taskId < 0) {
+      return Future.error("getAllComments: Invalid task id: $taskId");
+    }
+    return await baseApi("getAllComments", 148484683,
+        params: {"task_id": taskId}) as List<dynamic>;
+  }
+
+  // TODO: Use for mutliple checklist, shopping list
+  static Future<dynamic> getTaskMetadata(int taskId) async {
+    if (taskId < 0) {
+      return Future.error("getTaskMetadata: Invalid task id: $taskId");
+    }
+    return baseApi("getTaskMetadata", 133280317, params: {"task_id": taskId});
+  }
+
+  static Future<ProjectMetadataModel> getProjectMetadata(int projectId) async {
+    return singleApi("getProjectMetadata", 1797076613, ProjectMetadataModel.fromJson,
+        params: {"project_id": projectId});
+  }
 
   static Future<Map<String, dynamic>> getTask(int taskId, int projectId) async {
     dynamic values = await Future.wait([
@@ -306,14 +327,6 @@ class WebApi {
 
   static Future<dynamic> _searchTasks({dynamic params = const {}}) async =>
       baseApi("searchTasks", 1468511716, params: params);
-
-  // TODO: Use for mutliple checklist, shopping list
-  static Future<dynamic> getTaskMetadata(int taskId) async =>
-      baseApi("getTaskMetadata", 133280317, params: {"task_id": taskId});
-
-  static Future<ProjectMetadataModel> getProjectMetadata(int projectId) async =>
-      singleApi("getProjectMetadata", 1797076613, ProjectMetadataModel.fromJson,
-          params: {"project_id": projectId});
 
   //////////////////////////////////// API //////////////////////////////////
 
@@ -390,7 +403,7 @@ class WebApi {
       "id": id,
       "params": params
     };
-    log("Base api, params: $parameters");
+    // log("Base api, params: $parameters");
     final credentials = "${AppData.username}:${AppData.password}";
     Codec<String, String> stringToBase64 = utf8.fuse(base64);
     String encoded = stringToBase64.encode(credentials);
@@ -418,6 +431,7 @@ class WebApi {
 
     final decodedData = json.decode(utf8.decode(resp.bodyBytes));
     // log("decodedData: ${utf8.decode(resp.bodyBytes)}");
+    // log("baseapi: $params, decodedData: $decodedData");
     if (resp.statusCode != 200) {
       log("baseapi: $params, decodedData: $decodedData");
     }

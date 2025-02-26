@@ -227,6 +227,21 @@ class ColumnModelData extends DataClass implements Insertable<ColumnModelData> {
         hideInDashboard: hideInDashboard ?? this.hideInDashboard,
         projectId: projectId ?? this.projectId,
       );
+  ColumnModelData copyWithCompanion(ColumnModelCompanion data) {
+    return ColumnModelData(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      position: data.position.present ? data.position.value : this.position,
+      taskLimit: data.taskLimit.present ? data.taskLimit.value : this.taskLimit,
+      description:
+          data.description.present ? data.description.value : this.description,
+      hideInDashboard: data.hideInDashboard.present
+          ? data.hideInDashboard.value
+          : this.hideInDashboard,
+      projectId: data.projectId.present ? data.projectId.value : this.projectId,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('ColumnModelData(')
@@ -686,6 +701,26 @@ class CommentModelData extends DataClass
         email: email.present ? email.value : this.email,
         avatarPath: avatarPath.present ? avatarPath.value : this.avatarPath,
       );
+  CommentModelData copyWithCompanion(CommentModelCompanion data) {
+    return CommentModelData(
+      id: data.id.present ? data.id.value : this.id,
+      dateCreation: data.dateCreation.present
+          ? data.dateCreation.value
+          : this.dateCreation,
+      dateModification: data.dateModification.present
+          ? data.dateModification.value
+          : this.dateModification,
+      taskId: data.taskId.present ? data.taskId.value : this.taskId,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      comment: data.comment.present ? data.comment.value : this.comment,
+      username: data.username.present ? data.username.value : this.username,
+      name: data.name.present ? data.name.value : this.name,
+      email: data.email.present ? data.email.value : this.email,
+      avatarPath:
+          data.avatarPath.present ? data.avatarPath.value : this.avatarPath,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('CommentModelData(')
@@ -1484,6 +1519,50 @@ class ProjectModelData extends DataClass
             : this.isTrelloImported,
         url: url ?? this.url,
       );
+  ProjectModelData copyWithCompanion(ProjectModelCompanion data) {
+    return ProjectModelData(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+      token: data.token.present ? data.token.value : this.token,
+      lastModified: data.lastModified.present
+          ? data.lastModified.value
+          : this.lastModified,
+      isPublic: data.isPublic.present ? data.isPublic.value : this.isPublic,
+      isPrivate: data.isPrivate.present ? data.isPrivate.value : this.isPrivate,
+      description:
+          data.description.present ? data.description.value : this.description,
+      identifier:
+          data.identifier.present ? data.identifier.value : this.identifier,
+      startDate: data.startDate.present ? data.startDate.value : this.startDate,
+      endDate: data.endDate.present ? data.endDate.value : this.endDate,
+      ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
+      priorityDefault: data.priorityDefault.present
+          ? data.priorityDefault.value
+          : this.priorityDefault,
+      priorityStart: data.priorityStart.present
+          ? data.priorityStart.value
+          : this.priorityStart,
+      priorityEnd:
+          data.priorityEnd.present ? data.priorityEnd.value : this.priorityEnd,
+      email: data.email.present ? data.email.value : this.email,
+      predefinedEmailSubjects: data.predefinedEmailSubjects.present
+          ? data.predefinedEmailSubjects.value
+          : this.predefinedEmailSubjects,
+      perSwimlaneTaskLimits: data.perSwimlaneTaskLimits.present
+          ? data.perSwimlaneTaskLimits.value
+          : this.perSwimlaneTaskLimits,
+      taskLimit: data.taskLimit.present ? data.taskLimit.value : this.taskLimit,
+      enableGlobalTags: data.enableGlobalTags.present
+          ? data.enableGlobalTags.value
+          : this.enableGlobalTags,
+      isTrelloImported: data.isTrelloImported.present
+          ? data.isTrelloImported.value
+          : this.isTrelloImported,
+      url: data.url.present ? data.url.value : this.url,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('ProjectModelData(')
@@ -2235,6 +2314,31 @@ class SubtaskModelData extends DataClass
         statusName: statusName.present ? statusName.value : this.statusName,
         isTimerStarted: isTimerStarted ?? this.isTimerStarted,
       );
+  SubtaskModelData copyWithCompanion(SubtaskModelCompanion data) {
+    return SubtaskModelData(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      status: data.status.present ? data.status.value : this.status,
+      timeEstimated: data.timeEstimated.present
+          ? data.timeEstimated.value
+          : this.timeEstimated,
+      timeSpent: data.timeSpent.present ? data.timeSpent.value : this.timeSpent,
+      taskId: data.taskId.present ? data.taskId.value : this.taskId,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      position: data.position.present ? data.position.value : this.position,
+      username: data.username.present ? data.username.value : this.username,
+      name: data.name.present ? data.name.value : this.name,
+      timerStartDate: data.timerStartDate.present
+          ? data.timerStartDate.value
+          : this.timerStartDate,
+      statusName:
+          data.statusName.present ? data.statusName.value : this.statusName,
+      isTimerStarted: data.isTimerStarted.present
+          ? data.isTimerStarted.value
+          : this.isTimerStarted,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('SubtaskModelData(')
@@ -3301,6 +3405,67 @@ class TaskModelData extends DataClass implements Insertable<TaskModelData> {
             : this.recurrenceChild,
         priority: priority ?? this.priority,
       );
+  TaskModelData copyWithCompanion(TaskModelCompanion data) {
+    return TaskModelData(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      description:
+          data.description.present ? data.description.value : this.description,
+      dateCreation: data.dateCreation.present
+          ? data.dateCreation.value
+          : this.dateCreation,
+      colorId: data.colorId.present ? data.colorId.value : this.colorId,
+      projectId: data.projectId.present ? data.projectId.value : this.projectId,
+      columnId: data.columnId.present ? data.columnId.value : this.columnId,
+      ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
+      position: data.position.present ? data.position.value : this.position,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+      dateCompleted: data.dateCompleted.present
+          ? data.dateCompleted.value
+          : this.dateCompleted,
+      score: data.score.present ? data.score.value : this.score,
+      dateDue: data.dateDue.present ? data.dateDue.value : this.dateDue,
+      categoryId:
+          data.categoryId.present ? data.categoryId.value : this.categoryId,
+      creatorId: data.creatorId.present ? data.creatorId.value : this.creatorId,
+      dateModification: data.dateModification.present
+          ? data.dateModification.value
+          : this.dateModification,
+      reference: data.reference.present ? data.reference.value : this.reference,
+      dateStarted:
+          data.dateStarted.present ? data.dateStarted.value : this.dateStarted,
+      timeSpent: data.timeSpent.present ? data.timeSpent.value : this.timeSpent,
+      timeEstimated: data.timeEstimated.present
+          ? data.timeEstimated.value
+          : this.timeEstimated,
+      swimlaneId:
+          data.swimlaneId.present ? data.swimlaneId.value : this.swimlaneId,
+      dateMoved: data.dateMoved.present ? data.dateMoved.value : this.dateMoved,
+      recurrenceStatus: data.recurrenceStatus.present
+          ? data.recurrenceStatus.value
+          : this.recurrenceStatus,
+      recurrenceTrigger: data.recurrenceTrigger.present
+          ? data.recurrenceTrigger.value
+          : this.recurrenceTrigger,
+      recurrenceFactor: data.recurrenceFactor.present
+          ? data.recurrenceFactor.value
+          : this.recurrenceFactor,
+      recurrenceTimeframe: data.recurrenceTimeframe.present
+          ? data.recurrenceTimeframe.value
+          : this.recurrenceTimeframe,
+      recurrenceBasedate: data.recurrenceBasedate.present
+          ? data.recurrenceBasedate.value
+          : this.recurrenceBasedate,
+      recurrenceParent: data.recurrenceParent.present
+          ? data.recurrenceParent.value
+          : this.recurrenceParent,
+      recurrenceChild: data.recurrenceChild.present
+          ? data.recurrenceChild.value
+          : this.recurrenceChild,
+      priority: data.priority.present ? data.priority.value : this.priority,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('TaskModelData(')
@@ -3910,6 +4075,13 @@ class TaskMetadataModelData extends DataClass
         taskId: taskId ?? this.taskId,
         metadata: metadata ?? this.metadata,
       );
+  TaskMetadataModelData copyWithCompanion(TaskMetadataModelCompanion data) {
+    return TaskMetadataModelData(
+      taskId: data.taskId.present ? data.taskId.value : this.taskId,
+      metadata: data.metadata.present ? data.metadata.value : this.metadata,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('TaskMetadataModelData(')
@@ -4205,6 +4377,20 @@ class ApiStorageModelData extends DataClass
         updateId: updateId ?? this.updateId,
         timestamp: timestamp ?? this.timestamp,
       );
+  ApiStorageModelData copyWithCompanion(ApiStorageModelCompanion data) {
+    return ApiStorageModelData(
+      id: data.id.present ? data.id.value : this.id,
+      apiId: data.apiId.present ? data.apiId.value : this.apiId,
+      apiName: data.apiName.present ? data.apiName.value : this.apiName,
+      apiType: data.apiType.present ? data.apiType.value : this.apiType,
+      webApiParams: data.webApiParams.present
+          ? data.webApiParams.value
+          : this.webApiParams,
+      updateId: data.updateId.present ? data.updateId.value : this.updateId,
+      timestamp: data.timestamp.present ? data.timestamp.value : this.timestamp,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('ApiStorageModelData(')
@@ -4349,6 +4535,7 @@ class ApiStorageModelCompanion extends UpdateCompanion<ApiStorageModelData> {
 
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
+  $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $ColumnModelTable columnModel = $ColumnModelTable(this);
   late final $CommentModelTable commentModel = $CommentModelTable(this);
   late final $ProjectModelTable projectModel = $ProjectModelTable(this);
@@ -4361,6 +4548,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final ProjectDao projectDao = ProjectDao(this as AppDatabase);
   late final ColumnDao columnDao = ColumnDao(this as AppDatabase);
   late final TaskDao taskDao = TaskDao(this as AppDatabase);
+  late final SubtaskDao subtaskDao = SubtaskDao(this as AppDatabase);
+  late final CommentDao commentDao = CommentDao(this as AppDatabase);
+  late final TaskMetadataDao taskMetadataDao =
+      TaskMetadataDao(this as AppDatabase);
   late final ApiStorageDao apiStorageDao = ApiStorageDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -4375,4 +4566,2722 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         taskMetadataModel,
         apiStorageModel
       ];
+}
+
+typedef $$ColumnModelTableCreateCompanionBuilder = ColumnModelCompanion
+    Function({
+  required int id,
+  required String title,
+  required int position,
+  required int taskLimit,
+  required String description,
+  required int hideInDashboard,
+  required int projectId,
+  Value<int> rowid,
+});
+typedef $$ColumnModelTableUpdateCompanionBuilder = ColumnModelCompanion
+    Function({
+  Value<int> id,
+  Value<String> title,
+  Value<int> position,
+  Value<int> taskLimit,
+  Value<String> description,
+  Value<int> hideInDashboard,
+  Value<int> projectId,
+  Value<int> rowid,
+});
+
+final class $$ColumnModelTableReferences
+    extends BaseReferences<_$AppDatabase, $ColumnModelTable, ColumnModelData> {
+  $$ColumnModelTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ColumnModelTable _projectIdTable(_$AppDatabase db) =>
+      db.columnModel.createAlias(
+          $_aliasNameGenerator(db.columnModel.projectId, db.columnModel.id));
+
+  $$ColumnModelTableProcessedTableManager get projectId {
+    final $_column = $_itemColumn<int>('project_id')!;
+
+    final manager = $$ColumnModelTableTableManager($_db, $_db.columnModel)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_projectIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+
+  static MultiTypedResultKey<$TaskModelTable, List<TaskModelData>>
+      _taskModelRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+          db.taskModel,
+          aliasName:
+              $_aliasNameGenerator(db.columnModel.id, db.taskModel.columnId));
+
+  $$TaskModelTableProcessedTableManager get taskModelRefs {
+    final manager = $$TaskModelTableTableManager($_db, $_db.taskModel)
+        .filter((f) => f.columnId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_taskModelRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+}
+
+class $$ColumnModelTableFilterComposer
+    extends Composer<_$AppDatabase, $ColumnModelTable> {
+  $$ColumnModelTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get position => $composableBuilder(
+      column: $table.position, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get taskLimit => $composableBuilder(
+      column: $table.taskLimit, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get hideInDashboard => $composableBuilder(
+      column: $table.hideInDashboard,
+      builder: (column) => ColumnFilters(column));
+
+  $$ColumnModelTableFilterComposer get projectId {
+    final $$ColumnModelTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.projectId,
+        referencedTable: $db.columnModel,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ColumnModelTableFilterComposer(
+              $db: $db,
+              $table: $db.columnModel,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  Expression<bool> taskModelRefs(
+      Expression<bool> Function($$TaskModelTableFilterComposer f) f) {
+    final $$TaskModelTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.taskModel,
+        getReferencedColumn: (t) => t.columnId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$TaskModelTableFilterComposer(
+              $db: $db,
+              $table: $db.taskModel,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+}
+
+class $$ColumnModelTableOrderingComposer
+    extends Composer<_$AppDatabase, $ColumnModelTable> {
+  $$ColumnModelTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get position => $composableBuilder(
+      column: $table.position, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get taskLimit => $composableBuilder(
+      column: $table.taskLimit, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get hideInDashboard => $composableBuilder(
+      column: $table.hideInDashboard,
+      builder: (column) => ColumnOrderings(column));
+
+  $$ColumnModelTableOrderingComposer get projectId {
+    final $$ColumnModelTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.projectId,
+        referencedTable: $db.columnModel,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ColumnModelTableOrderingComposer(
+              $db: $db,
+              $table: $db.columnModel,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$ColumnModelTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ColumnModelTable> {
+  $$ColumnModelTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+
+  GeneratedColumn<int> get taskLimit =>
+      $composableBuilder(column: $table.taskLimit, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => column);
+
+  GeneratedColumn<int> get hideInDashboard => $composableBuilder(
+      column: $table.hideInDashboard, builder: (column) => column);
+
+  $$ColumnModelTableAnnotationComposer get projectId {
+    final $$ColumnModelTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.projectId,
+        referencedTable: $db.columnModel,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ColumnModelTableAnnotationComposer(
+              $db: $db,
+              $table: $db.columnModel,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  Expression<T> taskModelRefs<T extends Object>(
+      Expression<T> Function($$TaskModelTableAnnotationComposer a) f) {
+    final $$TaskModelTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.taskModel,
+        getReferencedColumn: (t) => t.columnId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$TaskModelTableAnnotationComposer(
+              $db: $db,
+              $table: $db.taskModel,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+}
+
+class $$ColumnModelTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $ColumnModelTable,
+    ColumnModelData,
+    $$ColumnModelTableFilterComposer,
+    $$ColumnModelTableOrderingComposer,
+    $$ColumnModelTableAnnotationComposer,
+    $$ColumnModelTableCreateCompanionBuilder,
+    $$ColumnModelTableUpdateCompanionBuilder,
+    (ColumnModelData, $$ColumnModelTableReferences),
+    ColumnModelData,
+    PrefetchHooks Function({bool projectId, bool taskModelRefs})> {
+  $$ColumnModelTableTableManager(_$AppDatabase db, $ColumnModelTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ColumnModelTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ColumnModelTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ColumnModelTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> title = const Value.absent(),
+            Value<int> position = const Value.absent(),
+            Value<int> taskLimit = const Value.absent(),
+            Value<String> description = const Value.absent(),
+            Value<int> hideInDashboard = const Value.absent(),
+            Value<int> projectId = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ColumnModelCompanion(
+            id: id,
+            title: title,
+            position: position,
+            taskLimit: taskLimit,
+            description: description,
+            hideInDashboard: hideInDashboard,
+            projectId: projectId,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required int id,
+            required String title,
+            required int position,
+            required int taskLimit,
+            required String description,
+            required int hideInDashboard,
+            required int projectId,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ColumnModelCompanion.insert(
+            id: id,
+            title: title,
+            position: position,
+            taskLimit: taskLimit,
+            description: description,
+            hideInDashboard: hideInDashboard,
+            projectId: projectId,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$ColumnModelTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: ({projectId = false, taskModelRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (taskModelRefs) db.taskModel],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (projectId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.projectId,
+                    referencedTable:
+                        $$ColumnModelTableReferences._projectIdTable(db),
+                    referencedColumn:
+                        $$ColumnModelTableReferences._projectIdTable(db).id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (taskModelRefs)
+                    await $_getPrefetchedData<ColumnModelData,
+                            $ColumnModelTable, TaskModelData>(
+                        currentTable: table,
+                        referencedTable: $$ColumnModelTableReferences
+                            ._taskModelRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$ColumnModelTableReferences(db, table, p0)
+                                .taskModelRefs,
+                        referencedItemsForCurrentItem: (item,
+                                referencedItems) =>
+                            referencedItems.where((e) => e.columnId == item.id),
+                        typedResults: items)
+                ];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$ColumnModelTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $ColumnModelTable,
+    ColumnModelData,
+    $$ColumnModelTableFilterComposer,
+    $$ColumnModelTableOrderingComposer,
+    $$ColumnModelTableAnnotationComposer,
+    $$ColumnModelTableCreateCompanionBuilder,
+    $$ColumnModelTableUpdateCompanionBuilder,
+    (ColumnModelData, $$ColumnModelTableReferences),
+    ColumnModelData,
+    PrefetchHooks Function({bool projectId, bool taskModelRefs})>;
+typedef $$CommentModelTableCreateCompanionBuilder = CommentModelCompanion
+    Function({
+  required int id,
+  Value<int?> dateCreation,
+  required int dateModification,
+  required int taskId,
+  required int userId,
+  required String comment,
+  Value<String?> username,
+  Value<String?> name,
+  Value<String?> email,
+  Value<String?> avatarPath,
+  Value<int> rowid,
+});
+typedef $$CommentModelTableUpdateCompanionBuilder = CommentModelCompanion
+    Function({
+  Value<int> id,
+  Value<int?> dateCreation,
+  Value<int> dateModification,
+  Value<int> taskId,
+  Value<int> userId,
+  Value<String> comment,
+  Value<String?> username,
+  Value<String?> name,
+  Value<String?> email,
+  Value<String?> avatarPath,
+  Value<int> rowid,
+});
+
+class $$CommentModelTableFilterComposer
+    extends Composer<_$AppDatabase, $CommentModelTable> {
+  $$CommentModelTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get dateCreation => $composableBuilder(
+      column: $table.dateCreation, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get dateModification => $composableBuilder(
+      column: $table.dateModification,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get taskId => $composableBuilder(
+      column: $table.taskId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get comment => $composableBuilder(
+      column: $table.comment, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get username => $composableBuilder(
+      column: $table.username, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get email => $composableBuilder(
+      column: $table.email, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get avatarPath => $composableBuilder(
+      column: $table.avatarPath, builder: (column) => ColumnFilters(column));
+}
+
+class $$CommentModelTableOrderingComposer
+    extends Composer<_$AppDatabase, $CommentModelTable> {
+  $$CommentModelTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get dateCreation => $composableBuilder(
+      column: $table.dateCreation,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get dateModification => $composableBuilder(
+      column: $table.dateModification,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get taskId => $composableBuilder(
+      column: $table.taskId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get comment => $composableBuilder(
+      column: $table.comment, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get username => $composableBuilder(
+      column: $table.username, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get email => $composableBuilder(
+      column: $table.email, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get avatarPath => $composableBuilder(
+      column: $table.avatarPath, builder: (column) => ColumnOrderings(column));
+}
+
+class $$CommentModelTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CommentModelTable> {
+  $$CommentModelTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get dateCreation => $composableBuilder(
+      column: $table.dateCreation, builder: (column) => column);
+
+  GeneratedColumn<int> get dateModification => $composableBuilder(
+      column: $table.dateModification, builder: (column) => column);
+
+  GeneratedColumn<int> get taskId =>
+      $composableBuilder(column: $table.taskId, builder: (column) => column);
+
+  GeneratedColumn<int> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<String> get comment =>
+      $composableBuilder(column: $table.comment, builder: (column) => column);
+
+  GeneratedColumn<String> get username =>
+      $composableBuilder(column: $table.username, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get email =>
+      $composableBuilder(column: $table.email, builder: (column) => column);
+
+  GeneratedColumn<String> get avatarPath => $composableBuilder(
+      column: $table.avatarPath, builder: (column) => column);
+}
+
+class $$CommentModelTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $CommentModelTable,
+    CommentModelData,
+    $$CommentModelTableFilterComposer,
+    $$CommentModelTableOrderingComposer,
+    $$CommentModelTableAnnotationComposer,
+    $$CommentModelTableCreateCompanionBuilder,
+    $$CommentModelTableUpdateCompanionBuilder,
+    (
+      CommentModelData,
+      BaseReferences<_$AppDatabase, $CommentModelTable, CommentModelData>
+    ),
+    CommentModelData,
+    PrefetchHooks Function()> {
+  $$CommentModelTableTableManager(_$AppDatabase db, $CommentModelTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CommentModelTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CommentModelTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CommentModelTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<int?> dateCreation = const Value.absent(),
+            Value<int> dateModification = const Value.absent(),
+            Value<int> taskId = const Value.absent(),
+            Value<int> userId = const Value.absent(),
+            Value<String> comment = const Value.absent(),
+            Value<String?> username = const Value.absent(),
+            Value<String?> name = const Value.absent(),
+            Value<String?> email = const Value.absent(),
+            Value<String?> avatarPath = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              CommentModelCompanion(
+            id: id,
+            dateCreation: dateCreation,
+            dateModification: dateModification,
+            taskId: taskId,
+            userId: userId,
+            comment: comment,
+            username: username,
+            name: name,
+            email: email,
+            avatarPath: avatarPath,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required int id,
+            Value<int?> dateCreation = const Value.absent(),
+            required int dateModification,
+            required int taskId,
+            required int userId,
+            required String comment,
+            Value<String?> username = const Value.absent(),
+            Value<String?> name = const Value.absent(),
+            Value<String?> email = const Value.absent(),
+            Value<String?> avatarPath = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              CommentModelCompanion.insert(
+            id: id,
+            dateCreation: dateCreation,
+            dateModification: dateModification,
+            taskId: taskId,
+            userId: userId,
+            comment: comment,
+            username: username,
+            name: name,
+            email: email,
+            avatarPath: avatarPath,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$CommentModelTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $CommentModelTable,
+    CommentModelData,
+    $$CommentModelTableFilterComposer,
+    $$CommentModelTableOrderingComposer,
+    $$CommentModelTableAnnotationComposer,
+    $$CommentModelTableCreateCompanionBuilder,
+    $$CommentModelTableUpdateCompanionBuilder,
+    (
+      CommentModelData,
+      BaseReferences<_$AppDatabase, $CommentModelTable, CommentModelData>
+    ),
+    CommentModelData,
+    PrefetchHooks Function()>;
+typedef $$ProjectModelTableCreateCompanionBuilder = ProjectModelCompanion
+    Function({
+  Value<int> id,
+  required String name,
+  required int isActive,
+  required String token,
+  required int lastModified,
+  required int isPublic,
+  required int isPrivate,
+  Value<String?> description,
+  required String identifier,
+  required String startDate,
+  required String endDate,
+  required int ownerId,
+  required int priorityDefault,
+  required int priorityStart,
+  required int priorityEnd,
+  Value<String?> email,
+  Value<String?> predefinedEmailSubjects,
+  required int perSwimlaneTaskLimits,
+  required int taskLimit,
+  required int enableGlobalTags,
+  Value<int?> isTrelloImported,
+  required Url url,
+});
+typedef $$ProjectModelTableUpdateCompanionBuilder = ProjectModelCompanion
+    Function({
+  Value<int> id,
+  Value<String> name,
+  Value<int> isActive,
+  Value<String> token,
+  Value<int> lastModified,
+  Value<int> isPublic,
+  Value<int> isPrivate,
+  Value<String?> description,
+  Value<String> identifier,
+  Value<String> startDate,
+  Value<String> endDate,
+  Value<int> ownerId,
+  Value<int> priorityDefault,
+  Value<int> priorityStart,
+  Value<int> priorityEnd,
+  Value<String?> email,
+  Value<String?> predefinedEmailSubjects,
+  Value<int> perSwimlaneTaskLimits,
+  Value<int> taskLimit,
+  Value<int> enableGlobalTags,
+  Value<int?> isTrelloImported,
+  Value<Url> url,
+});
+
+final class $$ProjectModelTableReferences extends BaseReferences<_$AppDatabase,
+    $ProjectModelTable, ProjectModelData> {
+  $$ProjectModelTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$TaskModelTable, List<TaskModelData>>
+      _taskModelRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+          db.taskModel,
+          aliasName:
+              $_aliasNameGenerator(db.projectModel.id, db.taskModel.projectId));
+
+  $$TaskModelTableProcessedTableManager get taskModelRefs {
+    final manager = $$TaskModelTableTableManager($_db, $_db.taskModel)
+        .filter((f) => f.projectId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_taskModelRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+}
+
+class $$ProjectModelTableFilterComposer
+    extends Composer<_$AppDatabase, $ProjectModelTable> {
+  $$ProjectModelTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get isActive => $composableBuilder(
+      column: $table.isActive, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get token => $composableBuilder(
+      column: $table.token, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get lastModified => $composableBuilder(
+      column: $table.lastModified, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get isPublic => $composableBuilder(
+      column: $table.isPublic, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get isPrivate => $composableBuilder(
+      column: $table.isPrivate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get identifier => $composableBuilder(
+      column: $table.identifier, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get startDate => $composableBuilder(
+      column: $table.startDate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get endDate => $composableBuilder(
+      column: $table.endDate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get ownerId => $composableBuilder(
+      column: $table.ownerId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get priorityDefault => $composableBuilder(
+      column: $table.priorityDefault,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get priorityStart => $composableBuilder(
+      column: $table.priorityStart, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get priorityEnd => $composableBuilder(
+      column: $table.priorityEnd, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get email => $composableBuilder(
+      column: $table.email, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get predefinedEmailSubjects => $composableBuilder(
+      column: $table.predefinedEmailSubjects,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get perSwimlaneTaskLimits => $composableBuilder(
+      column: $table.perSwimlaneTaskLimits,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get taskLimit => $composableBuilder(
+      column: $table.taskLimit, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get enableGlobalTags => $composableBuilder(
+      column: $table.enableGlobalTags,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get isTrelloImported => $composableBuilder(
+      column: $table.isTrelloImported,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<Url, Url, String> get url =>
+      $composableBuilder(
+          column: $table.url,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  Expression<bool> taskModelRefs(
+      Expression<bool> Function($$TaskModelTableFilterComposer f) f) {
+    final $$TaskModelTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.taskModel,
+        getReferencedColumn: (t) => t.projectId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$TaskModelTableFilterComposer(
+              $db: $db,
+              $table: $db.taskModel,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+}
+
+class $$ProjectModelTableOrderingComposer
+    extends Composer<_$AppDatabase, $ProjectModelTable> {
+  $$ProjectModelTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get isActive => $composableBuilder(
+      column: $table.isActive, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get token => $composableBuilder(
+      column: $table.token, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get lastModified => $composableBuilder(
+      column: $table.lastModified,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get isPublic => $composableBuilder(
+      column: $table.isPublic, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get isPrivate => $composableBuilder(
+      column: $table.isPrivate, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get identifier => $composableBuilder(
+      column: $table.identifier, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get startDate => $composableBuilder(
+      column: $table.startDate, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get endDate => $composableBuilder(
+      column: $table.endDate, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get ownerId => $composableBuilder(
+      column: $table.ownerId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get priorityDefault => $composableBuilder(
+      column: $table.priorityDefault,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get priorityStart => $composableBuilder(
+      column: $table.priorityStart,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get priorityEnd => $composableBuilder(
+      column: $table.priorityEnd, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get email => $composableBuilder(
+      column: $table.email, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get predefinedEmailSubjects => $composableBuilder(
+      column: $table.predefinedEmailSubjects,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get perSwimlaneTaskLimits => $composableBuilder(
+      column: $table.perSwimlaneTaskLimits,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get taskLimit => $composableBuilder(
+      column: $table.taskLimit, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get enableGlobalTags => $composableBuilder(
+      column: $table.enableGlobalTags,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get isTrelloImported => $composableBuilder(
+      column: $table.isTrelloImported,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get url => $composableBuilder(
+      column: $table.url, builder: (column) => ColumnOrderings(column));
+}
+
+class $$ProjectModelTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ProjectModelTable> {
+  $$ProjectModelTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  GeneratedColumn<String> get token =>
+      $composableBuilder(column: $table.token, builder: (column) => column);
+
+  GeneratedColumn<int> get lastModified => $composableBuilder(
+      column: $table.lastModified, builder: (column) => column);
+
+  GeneratedColumn<int> get isPublic =>
+      $composableBuilder(column: $table.isPublic, builder: (column) => column);
+
+  GeneratedColumn<int> get isPrivate =>
+      $composableBuilder(column: $table.isPrivate, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => column);
+
+  GeneratedColumn<String> get identifier => $composableBuilder(
+      column: $table.identifier, builder: (column) => column);
+
+  GeneratedColumn<String> get startDate =>
+      $composableBuilder(column: $table.startDate, builder: (column) => column);
+
+  GeneratedColumn<String> get endDate =>
+      $composableBuilder(column: $table.endDate, builder: (column) => column);
+
+  GeneratedColumn<int> get ownerId =>
+      $composableBuilder(column: $table.ownerId, builder: (column) => column);
+
+  GeneratedColumn<int> get priorityDefault => $composableBuilder(
+      column: $table.priorityDefault, builder: (column) => column);
+
+  GeneratedColumn<int> get priorityStart => $composableBuilder(
+      column: $table.priorityStart, builder: (column) => column);
+
+  GeneratedColumn<int> get priorityEnd => $composableBuilder(
+      column: $table.priorityEnd, builder: (column) => column);
+
+  GeneratedColumn<String> get email =>
+      $composableBuilder(column: $table.email, builder: (column) => column);
+
+  GeneratedColumn<String> get predefinedEmailSubjects => $composableBuilder(
+      column: $table.predefinedEmailSubjects, builder: (column) => column);
+
+  GeneratedColumn<int> get perSwimlaneTaskLimits => $composableBuilder(
+      column: $table.perSwimlaneTaskLimits, builder: (column) => column);
+
+  GeneratedColumn<int> get taskLimit =>
+      $composableBuilder(column: $table.taskLimit, builder: (column) => column);
+
+  GeneratedColumn<int> get enableGlobalTags => $composableBuilder(
+      column: $table.enableGlobalTags, builder: (column) => column);
+
+  GeneratedColumn<int> get isTrelloImported => $composableBuilder(
+      column: $table.isTrelloImported, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Url, String> get url =>
+      $composableBuilder(column: $table.url, builder: (column) => column);
+
+  Expression<T> taskModelRefs<T extends Object>(
+      Expression<T> Function($$TaskModelTableAnnotationComposer a) f) {
+    final $$TaskModelTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.taskModel,
+        getReferencedColumn: (t) => t.projectId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$TaskModelTableAnnotationComposer(
+              $db: $db,
+              $table: $db.taskModel,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+}
+
+class $$ProjectModelTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $ProjectModelTable,
+    ProjectModelData,
+    $$ProjectModelTableFilterComposer,
+    $$ProjectModelTableOrderingComposer,
+    $$ProjectModelTableAnnotationComposer,
+    $$ProjectModelTableCreateCompanionBuilder,
+    $$ProjectModelTableUpdateCompanionBuilder,
+    (ProjectModelData, $$ProjectModelTableReferences),
+    ProjectModelData,
+    PrefetchHooks Function({bool taskModelRefs})> {
+  $$ProjectModelTableTableManager(_$AppDatabase db, $ProjectModelTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ProjectModelTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ProjectModelTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ProjectModelTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<int> isActive = const Value.absent(),
+            Value<String> token = const Value.absent(),
+            Value<int> lastModified = const Value.absent(),
+            Value<int> isPublic = const Value.absent(),
+            Value<int> isPrivate = const Value.absent(),
+            Value<String?> description = const Value.absent(),
+            Value<String> identifier = const Value.absent(),
+            Value<String> startDate = const Value.absent(),
+            Value<String> endDate = const Value.absent(),
+            Value<int> ownerId = const Value.absent(),
+            Value<int> priorityDefault = const Value.absent(),
+            Value<int> priorityStart = const Value.absent(),
+            Value<int> priorityEnd = const Value.absent(),
+            Value<String?> email = const Value.absent(),
+            Value<String?> predefinedEmailSubjects = const Value.absent(),
+            Value<int> perSwimlaneTaskLimits = const Value.absent(),
+            Value<int> taskLimit = const Value.absent(),
+            Value<int> enableGlobalTags = const Value.absent(),
+            Value<int?> isTrelloImported = const Value.absent(),
+            Value<Url> url = const Value.absent(),
+          }) =>
+              ProjectModelCompanion(
+            id: id,
+            name: name,
+            isActive: isActive,
+            token: token,
+            lastModified: lastModified,
+            isPublic: isPublic,
+            isPrivate: isPrivate,
+            description: description,
+            identifier: identifier,
+            startDate: startDate,
+            endDate: endDate,
+            ownerId: ownerId,
+            priorityDefault: priorityDefault,
+            priorityStart: priorityStart,
+            priorityEnd: priorityEnd,
+            email: email,
+            predefinedEmailSubjects: predefinedEmailSubjects,
+            perSwimlaneTaskLimits: perSwimlaneTaskLimits,
+            taskLimit: taskLimit,
+            enableGlobalTags: enableGlobalTags,
+            isTrelloImported: isTrelloImported,
+            url: url,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String name,
+            required int isActive,
+            required String token,
+            required int lastModified,
+            required int isPublic,
+            required int isPrivate,
+            Value<String?> description = const Value.absent(),
+            required String identifier,
+            required String startDate,
+            required String endDate,
+            required int ownerId,
+            required int priorityDefault,
+            required int priorityStart,
+            required int priorityEnd,
+            Value<String?> email = const Value.absent(),
+            Value<String?> predefinedEmailSubjects = const Value.absent(),
+            required int perSwimlaneTaskLimits,
+            required int taskLimit,
+            required int enableGlobalTags,
+            Value<int?> isTrelloImported = const Value.absent(),
+            required Url url,
+          }) =>
+              ProjectModelCompanion.insert(
+            id: id,
+            name: name,
+            isActive: isActive,
+            token: token,
+            lastModified: lastModified,
+            isPublic: isPublic,
+            isPrivate: isPrivate,
+            description: description,
+            identifier: identifier,
+            startDate: startDate,
+            endDate: endDate,
+            ownerId: ownerId,
+            priorityDefault: priorityDefault,
+            priorityStart: priorityStart,
+            priorityEnd: priorityEnd,
+            email: email,
+            predefinedEmailSubjects: predefinedEmailSubjects,
+            perSwimlaneTaskLimits: perSwimlaneTaskLimits,
+            taskLimit: taskLimit,
+            enableGlobalTags: enableGlobalTags,
+            isTrelloImported: isTrelloImported,
+            url: url,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$ProjectModelTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: ({taskModelRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (taskModelRefs) db.taskModel],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (taskModelRefs)
+                    await $_getPrefetchedData<ProjectModelData,
+                            $ProjectModelTable, TaskModelData>(
+                        currentTable: table,
+                        referencedTable: $$ProjectModelTableReferences
+                            ._taskModelRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$ProjectModelTableReferences(db, table, p0)
+                                .taskModelRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.projectId == item.id),
+                        typedResults: items)
+                ];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$ProjectModelTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $ProjectModelTable,
+    ProjectModelData,
+    $$ProjectModelTableFilterComposer,
+    $$ProjectModelTableOrderingComposer,
+    $$ProjectModelTableAnnotationComposer,
+    $$ProjectModelTableCreateCompanionBuilder,
+    $$ProjectModelTableUpdateCompanionBuilder,
+    (ProjectModelData, $$ProjectModelTableReferences),
+    ProjectModelData,
+    PrefetchHooks Function({bool taskModelRefs})>;
+typedef $$SubtaskModelTableCreateCompanionBuilder = SubtaskModelCompanion
+    Function({
+  required int id,
+  required String title,
+  required int status,
+  required int timeEstimated,
+  required int timeSpent,
+  required int taskId,
+  required int userId,
+  required int position,
+  Value<String?> username,
+  Value<String?> name,
+  required int timerStartDate,
+  Value<String?> statusName,
+  required bool isTimerStarted,
+  Value<int> rowid,
+});
+typedef $$SubtaskModelTableUpdateCompanionBuilder = SubtaskModelCompanion
+    Function({
+  Value<int> id,
+  Value<String> title,
+  Value<int> status,
+  Value<int> timeEstimated,
+  Value<int> timeSpent,
+  Value<int> taskId,
+  Value<int> userId,
+  Value<int> position,
+  Value<String?> username,
+  Value<String?> name,
+  Value<int> timerStartDate,
+  Value<String?> statusName,
+  Value<bool> isTimerStarted,
+  Value<int> rowid,
+});
+
+class $$SubtaskModelTableFilterComposer
+    extends Composer<_$AppDatabase, $SubtaskModelTable> {
+  $$SubtaskModelTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get status => $composableBuilder(
+      column: $table.status, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get timeEstimated => $composableBuilder(
+      column: $table.timeEstimated, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get timeSpent => $composableBuilder(
+      column: $table.timeSpent, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get taskId => $composableBuilder(
+      column: $table.taskId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get position => $composableBuilder(
+      column: $table.position, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get username => $composableBuilder(
+      column: $table.username, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get timerStartDate => $composableBuilder(
+      column: $table.timerStartDate,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get statusName => $composableBuilder(
+      column: $table.statusName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isTimerStarted => $composableBuilder(
+      column: $table.isTimerStarted,
+      builder: (column) => ColumnFilters(column));
+}
+
+class $$SubtaskModelTableOrderingComposer
+    extends Composer<_$AppDatabase, $SubtaskModelTable> {
+  $$SubtaskModelTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get status => $composableBuilder(
+      column: $table.status, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get timeEstimated => $composableBuilder(
+      column: $table.timeEstimated,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get timeSpent => $composableBuilder(
+      column: $table.timeSpent, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get taskId => $composableBuilder(
+      column: $table.taskId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get position => $composableBuilder(
+      column: $table.position, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get username => $composableBuilder(
+      column: $table.username, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get timerStartDate => $composableBuilder(
+      column: $table.timerStartDate,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get statusName => $composableBuilder(
+      column: $table.statusName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isTimerStarted => $composableBuilder(
+      column: $table.isTimerStarted,
+      builder: (column) => ColumnOrderings(column));
+}
+
+class $$SubtaskModelTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SubtaskModelTable> {
+  $$SubtaskModelTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<int> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<int> get timeEstimated => $composableBuilder(
+      column: $table.timeEstimated, builder: (column) => column);
+
+  GeneratedColumn<int> get timeSpent =>
+      $composableBuilder(column: $table.timeSpent, builder: (column) => column);
+
+  GeneratedColumn<int> get taskId =>
+      $composableBuilder(column: $table.taskId, builder: (column) => column);
+
+  GeneratedColumn<int> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+
+  GeneratedColumn<String> get username =>
+      $composableBuilder(column: $table.username, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get timerStartDate => $composableBuilder(
+      column: $table.timerStartDate, builder: (column) => column);
+
+  GeneratedColumn<String> get statusName => $composableBuilder(
+      column: $table.statusName, builder: (column) => column);
+
+  GeneratedColumn<bool> get isTimerStarted => $composableBuilder(
+      column: $table.isTimerStarted, builder: (column) => column);
+}
+
+class $$SubtaskModelTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $SubtaskModelTable,
+    SubtaskModelData,
+    $$SubtaskModelTableFilterComposer,
+    $$SubtaskModelTableOrderingComposer,
+    $$SubtaskModelTableAnnotationComposer,
+    $$SubtaskModelTableCreateCompanionBuilder,
+    $$SubtaskModelTableUpdateCompanionBuilder,
+    (
+      SubtaskModelData,
+      BaseReferences<_$AppDatabase, $SubtaskModelTable, SubtaskModelData>
+    ),
+    SubtaskModelData,
+    PrefetchHooks Function()> {
+  $$SubtaskModelTableTableManager(_$AppDatabase db, $SubtaskModelTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SubtaskModelTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SubtaskModelTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SubtaskModelTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> title = const Value.absent(),
+            Value<int> status = const Value.absent(),
+            Value<int> timeEstimated = const Value.absent(),
+            Value<int> timeSpent = const Value.absent(),
+            Value<int> taskId = const Value.absent(),
+            Value<int> userId = const Value.absent(),
+            Value<int> position = const Value.absent(),
+            Value<String?> username = const Value.absent(),
+            Value<String?> name = const Value.absent(),
+            Value<int> timerStartDate = const Value.absent(),
+            Value<String?> statusName = const Value.absent(),
+            Value<bool> isTimerStarted = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              SubtaskModelCompanion(
+            id: id,
+            title: title,
+            status: status,
+            timeEstimated: timeEstimated,
+            timeSpent: timeSpent,
+            taskId: taskId,
+            userId: userId,
+            position: position,
+            username: username,
+            name: name,
+            timerStartDate: timerStartDate,
+            statusName: statusName,
+            isTimerStarted: isTimerStarted,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required int id,
+            required String title,
+            required int status,
+            required int timeEstimated,
+            required int timeSpent,
+            required int taskId,
+            required int userId,
+            required int position,
+            Value<String?> username = const Value.absent(),
+            Value<String?> name = const Value.absent(),
+            required int timerStartDate,
+            Value<String?> statusName = const Value.absent(),
+            required bool isTimerStarted,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              SubtaskModelCompanion.insert(
+            id: id,
+            title: title,
+            status: status,
+            timeEstimated: timeEstimated,
+            timeSpent: timeSpent,
+            taskId: taskId,
+            userId: userId,
+            position: position,
+            username: username,
+            name: name,
+            timerStartDate: timerStartDate,
+            statusName: statusName,
+            isTimerStarted: isTimerStarted,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$SubtaskModelTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $SubtaskModelTable,
+    SubtaskModelData,
+    $$SubtaskModelTableFilterComposer,
+    $$SubtaskModelTableOrderingComposer,
+    $$SubtaskModelTableAnnotationComposer,
+    $$SubtaskModelTableCreateCompanionBuilder,
+    $$SubtaskModelTableUpdateCompanionBuilder,
+    (
+      SubtaskModelData,
+      BaseReferences<_$AppDatabase, $SubtaskModelTable, SubtaskModelData>
+    ),
+    SubtaskModelData,
+    PrefetchHooks Function()>;
+typedef $$TaskModelTableCreateCompanionBuilder = TaskModelCompanion Function({
+  required int id,
+  required String title,
+  required String description,
+  Value<int?> dateCreation,
+  required String colorId,
+  required int projectId,
+  required int columnId,
+  required int ownerId,
+  required int position,
+  required int isActive,
+  Value<int?> dateCompleted,
+  Value<int?> score,
+  Value<int?> dateDue,
+  required int categoryId,
+  required int creatorId,
+  Value<int?> dateModification,
+  Value<String?> reference,
+  Value<int?> dateStarted,
+  Value<int?> timeSpent,
+  Value<int?> timeEstimated,
+  required int swimlaneId,
+  required int dateMoved,
+  required int recurrenceStatus,
+  required int recurrenceTrigger,
+  required int recurrenceFactor,
+  required int recurrenceTimeframe,
+  required int recurrenceBasedate,
+  Value<int?> recurrenceParent,
+  Value<int?> recurrenceChild,
+  required int priority,
+  Value<int> rowid,
+});
+typedef $$TaskModelTableUpdateCompanionBuilder = TaskModelCompanion Function({
+  Value<int> id,
+  Value<String> title,
+  Value<String> description,
+  Value<int?> dateCreation,
+  Value<String> colorId,
+  Value<int> projectId,
+  Value<int> columnId,
+  Value<int> ownerId,
+  Value<int> position,
+  Value<int> isActive,
+  Value<int?> dateCompleted,
+  Value<int?> score,
+  Value<int?> dateDue,
+  Value<int> categoryId,
+  Value<int> creatorId,
+  Value<int?> dateModification,
+  Value<String?> reference,
+  Value<int?> dateStarted,
+  Value<int?> timeSpent,
+  Value<int?> timeEstimated,
+  Value<int> swimlaneId,
+  Value<int> dateMoved,
+  Value<int> recurrenceStatus,
+  Value<int> recurrenceTrigger,
+  Value<int> recurrenceFactor,
+  Value<int> recurrenceTimeframe,
+  Value<int> recurrenceBasedate,
+  Value<int?> recurrenceParent,
+  Value<int?> recurrenceChild,
+  Value<int> priority,
+  Value<int> rowid,
+});
+
+final class $$TaskModelTableReferences
+    extends BaseReferences<_$AppDatabase, $TaskModelTable, TaskModelData> {
+  $$TaskModelTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ProjectModelTable _projectIdTable(_$AppDatabase db) =>
+      db.projectModel.createAlias(
+          $_aliasNameGenerator(db.taskModel.projectId, db.projectModel.id));
+
+  $$ProjectModelTableProcessedTableManager get projectId {
+    final $_column = $_itemColumn<int>('project_id')!;
+
+    final manager = $$ProjectModelTableTableManager($_db, $_db.projectModel)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_projectIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+
+  static $ColumnModelTable _columnIdTable(_$AppDatabase db) =>
+      db.columnModel.createAlias(
+          $_aliasNameGenerator(db.taskModel.columnId, db.columnModel.id));
+
+  $$ColumnModelTableProcessedTableManager get columnId {
+    final $_column = $_itemColumn<int>('column_id')!;
+
+    final manager = $$ColumnModelTableTableManager($_db, $_db.columnModel)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_columnIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+
+  static MultiTypedResultKey<$TaskMetadataModelTable,
+      List<TaskMetadataModelData>> _taskMetadataModelRefsTable(
+          _$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(db.taskMetadataModel,
+          aliasName: $_aliasNameGenerator(
+              db.taskModel.id, db.taskMetadataModel.taskId));
+
+  $$TaskMetadataModelTableProcessedTableManager get taskMetadataModelRefs {
+    final manager =
+        $$TaskMetadataModelTableTableManager($_db, $_db.taskMetadataModel)
+            .filter((f) => f.taskId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache =
+        $_typedResult.readTableOrNull(_taskMetadataModelRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+}
+
+class $$TaskModelTableFilterComposer
+    extends Composer<_$AppDatabase, $TaskModelTable> {
+  $$TaskModelTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get dateCreation => $composableBuilder(
+      column: $table.dateCreation, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get colorId => $composableBuilder(
+      column: $table.colorId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get ownerId => $composableBuilder(
+      column: $table.ownerId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get position => $composableBuilder(
+      column: $table.position, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get isActive => $composableBuilder(
+      column: $table.isActive, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get dateCompleted => $composableBuilder(
+      column: $table.dateCompleted, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get score => $composableBuilder(
+      column: $table.score, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get dateDue => $composableBuilder(
+      column: $table.dateDue, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get categoryId => $composableBuilder(
+      column: $table.categoryId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get creatorId => $composableBuilder(
+      column: $table.creatorId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get dateModification => $composableBuilder(
+      column: $table.dateModification,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get reference => $composableBuilder(
+      column: $table.reference, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get dateStarted => $composableBuilder(
+      column: $table.dateStarted, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get timeSpent => $composableBuilder(
+      column: $table.timeSpent, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get timeEstimated => $composableBuilder(
+      column: $table.timeEstimated, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get swimlaneId => $composableBuilder(
+      column: $table.swimlaneId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get dateMoved => $composableBuilder(
+      column: $table.dateMoved, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get recurrenceStatus => $composableBuilder(
+      column: $table.recurrenceStatus,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get recurrenceTrigger => $composableBuilder(
+      column: $table.recurrenceTrigger,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get recurrenceFactor => $composableBuilder(
+      column: $table.recurrenceFactor,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get recurrenceTimeframe => $composableBuilder(
+      column: $table.recurrenceTimeframe,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get recurrenceBasedate => $composableBuilder(
+      column: $table.recurrenceBasedate,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get recurrenceParent => $composableBuilder(
+      column: $table.recurrenceParent,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get recurrenceChild => $composableBuilder(
+      column: $table.recurrenceChild,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get priority => $composableBuilder(
+      column: $table.priority, builder: (column) => ColumnFilters(column));
+
+  $$ProjectModelTableFilterComposer get projectId {
+    final $$ProjectModelTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.projectId,
+        referencedTable: $db.projectModel,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ProjectModelTableFilterComposer(
+              $db: $db,
+              $table: $db.projectModel,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  $$ColumnModelTableFilterComposer get columnId {
+    final $$ColumnModelTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.columnId,
+        referencedTable: $db.columnModel,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ColumnModelTableFilterComposer(
+              $db: $db,
+              $table: $db.columnModel,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  Expression<bool> taskMetadataModelRefs(
+      Expression<bool> Function($$TaskMetadataModelTableFilterComposer f) f) {
+    final $$TaskMetadataModelTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.taskMetadataModel,
+        getReferencedColumn: (t) => t.taskId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$TaskMetadataModelTableFilterComposer(
+              $db: $db,
+              $table: $db.taskMetadataModel,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+}
+
+class $$TaskModelTableOrderingComposer
+    extends Composer<_$AppDatabase, $TaskModelTable> {
+  $$TaskModelTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get dateCreation => $composableBuilder(
+      column: $table.dateCreation,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get colorId => $composableBuilder(
+      column: $table.colorId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get ownerId => $composableBuilder(
+      column: $table.ownerId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get position => $composableBuilder(
+      column: $table.position, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get isActive => $composableBuilder(
+      column: $table.isActive, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get dateCompleted => $composableBuilder(
+      column: $table.dateCompleted,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get score => $composableBuilder(
+      column: $table.score, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get dateDue => $composableBuilder(
+      column: $table.dateDue, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get categoryId => $composableBuilder(
+      column: $table.categoryId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get creatorId => $composableBuilder(
+      column: $table.creatorId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get dateModification => $composableBuilder(
+      column: $table.dateModification,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get reference => $composableBuilder(
+      column: $table.reference, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get dateStarted => $composableBuilder(
+      column: $table.dateStarted, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get timeSpent => $composableBuilder(
+      column: $table.timeSpent, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get timeEstimated => $composableBuilder(
+      column: $table.timeEstimated,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get swimlaneId => $composableBuilder(
+      column: $table.swimlaneId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get dateMoved => $composableBuilder(
+      column: $table.dateMoved, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get recurrenceStatus => $composableBuilder(
+      column: $table.recurrenceStatus,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get recurrenceTrigger => $composableBuilder(
+      column: $table.recurrenceTrigger,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get recurrenceFactor => $composableBuilder(
+      column: $table.recurrenceFactor,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get recurrenceTimeframe => $composableBuilder(
+      column: $table.recurrenceTimeframe,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get recurrenceBasedate => $composableBuilder(
+      column: $table.recurrenceBasedate,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get recurrenceParent => $composableBuilder(
+      column: $table.recurrenceParent,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get recurrenceChild => $composableBuilder(
+      column: $table.recurrenceChild,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get priority => $composableBuilder(
+      column: $table.priority, builder: (column) => ColumnOrderings(column));
+
+  $$ProjectModelTableOrderingComposer get projectId {
+    final $$ProjectModelTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.projectId,
+        referencedTable: $db.projectModel,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ProjectModelTableOrderingComposer(
+              $db: $db,
+              $table: $db.projectModel,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  $$ColumnModelTableOrderingComposer get columnId {
+    final $$ColumnModelTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.columnId,
+        referencedTable: $db.columnModel,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ColumnModelTableOrderingComposer(
+              $db: $db,
+              $table: $db.columnModel,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$TaskModelTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TaskModelTable> {
+  $$TaskModelTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => column);
+
+  GeneratedColumn<int> get dateCreation => $composableBuilder(
+      column: $table.dateCreation, builder: (column) => column);
+
+  GeneratedColumn<String> get colorId =>
+      $composableBuilder(column: $table.colorId, builder: (column) => column);
+
+  GeneratedColumn<int> get ownerId =>
+      $composableBuilder(column: $table.ownerId, builder: (column) => column);
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+
+  GeneratedColumn<int> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  GeneratedColumn<int> get dateCompleted => $composableBuilder(
+      column: $table.dateCompleted, builder: (column) => column);
+
+  GeneratedColumn<int> get score =>
+      $composableBuilder(column: $table.score, builder: (column) => column);
+
+  GeneratedColumn<int> get dateDue =>
+      $composableBuilder(column: $table.dateDue, builder: (column) => column);
+
+  GeneratedColumn<int> get categoryId => $composableBuilder(
+      column: $table.categoryId, builder: (column) => column);
+
+  GeneratedColumn<int> get creatorId =>
+      $composableBuilder(column: $table.creatorId, builder: (column) => column);
+
+  GeneratedColumn<int> get dateModification => $composableBuilder(
+      column: $table.dateModification, builder: (column) => column);
+
+  GeneratedColumn<String> get reference =>
+      $composableBuilder(column: $table.reference, builder: (column) => column);
+
+  GeneratedColumn<int> get dateStarted => $composableBuilder(
+      column: $table.dateStarted, builder: (column) => column);
+
+  GeneratedColumn<int> get timeSpent =>
+      $composableBuilder(column: $table.timeSpent, builder: (column) => column);
+
+  GeneratedColumn<int> get timeEstimated => $composableBuilder(
+      column: $table.timeEstimated, builder: (column) => column);
+
+  GeneratedColumn<int> get swimlaneId => $composableBuilder(
+      column: $table.swimlaneId, builder: (column) => column);
+
+  GeneratedColumn<int> get dateMoved =>
+      $composableBuilder(column: $table.dateMoved, builder: (column) => column);
+
+  GeneratedColumn<int> get recurrenceStatus => $composableBuilder(
+      column: $table.recurrenceStatus, builder: (column) => column);
+
+  GeneratedColumn<int> get recurrenceTrigger => $composableBuilder(
+      column: $table.recurrenceTrigger, builder: (column) => column);
+
+  GeneratedColumn<int> get recurrenceFactor => $composableBuilder(
+      column: $table.recurrenceFactor, builder: (column) => column);
+
+  GeneratedColumn<int> get recurrenceTimeframe => $composableBuilder(
+      column: $table.recurrenceTimeframe, builder: (column) => column);
+
+  GeneratedColumn<int> get recurrenceBasedate => $composableBuilder(
+      column: $table.recurrenceBasedate, builder: (column) => column);
+
+  GeneratedColumn<int> get recurrenceParent => $composableBuilder(
+      column: $table.recurrenceParent, builder: (column) => column);
+
+  GeneratedColumn<int> get recurrenceChild => $composableBuilder(
+      column: $table.recurrenceChild, builder: (column) => column);
+
+  GeneratedColumn<int> get priority =>
+      $composableBuilder(column: $table.priority, builder: (column) => column);
+
+  $$ProjectModelTableAnnotationComposer get projectId {
+    final $$ProjectModelTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.projectId,
+        referencedTable: $db.projectModel,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ProjectModelTableAnnotationComposer(
+              $db: $db,
+              $table: $db.projectModel,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  $$ColumnModelTableAnnotationComposer get columnId {
+    final $$ColumnModelTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.columnId,
+        referencedTable: $db.columnModel,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ColumnModelTableAnnotationComposer(
+              $db: $db,
+              $table: $db.columnModel,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  Expression<T> taskMetadataModelRefs<T extends Object>(
+      Expression<T> Function($$TaskMetadataModelTableAnnotationComposer a) f) {
+    final $$TaskMetadataModelTableAnnotationComposer composer =
+        $composerBuilder(
+            composer: this,
+            getCurrentColumn: (t) => t.id,
+            referencedTable: $db.taskMetadataModel,
+            getReferencedColumn: (t) => t.taskId,
+            builder: (joinBuilder,
+                    {$addJoinBuilderToRootComposer,
+                    $removeJoinBuilderFromRootComposer}) =>
+                $$TaskMetadataModelTableAnnotationComposer(
+                  $db: $db,
+                  $table: $db.taskMetadataModel,
+                  $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                  joinBuilder: joinBuilder,
+                  $removeJoinBuilderFromRootComposer:
+                      $removeJoinBuilderFromRootComposer,
+                ));
+    return f(composer);
+  }
+}
+
+class $$TaskModelTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $TaskModelTable,
+    TaskModelData,
+    $$TaskModelTableFilterComposer,
+    $$TaskModelTableOrderingComposer,
+    $$TaskModelTableAnnotationComposer,
+    $$TaskModelTableCreateCompanionBuilder,
+    $$TaskModelTableUpdateCompanionBuilder,
+    (TaskModelData, $$TaskModelTableReferences),
+    TaskModelData,
+    PrefetchHooks Function(
+        {bool projectId, bool columnId, bool taskMetadataModelRefs})> {
+  $$TaskModelTableTableManager(_$AppDatabase db, $TaskModelTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TaskModelTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TaskModelTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TaskModelTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> title = const Value.absent(),
+            Value<String> description = const Value.absent(),
+            Value<int?> dateCreation = const Value.absent(),
+            Value<String> colorId = const Value.absent(),
+            Value<int> projectId = const Value.absent(),
+            Value<int> columnId = const Value.absent(),
+            Value<int> ownerId = const Value.absent(),
+            Value<int> position = const Value.absent(),
+            Value<int> isActive = const Value.absent(),
+            Value<int?> dateCompleted = const Value.absent(),
+            Value<int?> score = const Value.absent(),
+            Value<int?> dateDue = const Value.absent(),
+            Value<int> categoryId = const Value.absent(),
+            Value<int> creatorId = const Value.absent(),
+            Value<int?> dateModification = const Value.absent(),
+            Value<String?> reference = const Value.absent(),
+            Value<int?> dateStarted = const Value.absent(),
+            Value<int?> timeSpent = const Value.absent(),
+            Value<int?> timeEstimated = const Value.absent(),
+            Value<int> swimlaneId = const Value.absent(),
+            Value<int> dateMoved = const Value.absent(),
+            Value<int> recurrenceStatus = const Value.absent(),
+            Value<int> recurrenceTrigger = const Value.absent(),
+            Value<int> recurrenceFactor = const Value.absent(),
+            Value<int> recurrenceTimeframe = const Value.absent(),
+            Value<int> recurrenceBasedate = const Value.absent(),
+            Value<int?> recurrenceParent = const Value.absent(),
+            Value<int?> recurrenceChild = const Value.absent(),
+            Value<int> priority = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              TaskModelCompanion(
+            id: id,
+            title: title,
+            description: description,
+            dateCreation: dateCreation,
+            colorId: colorId,
+            projectId: projectId,
+            columnId: columnId,
+            ownerId: ownerId,
+            position: position,
+            isActive: isActive,
+            dateCompleted: dateCompleted,
+            score: score,
+            dateDue: dateDue,
+            categoryId: categoryId,
+            creatorId: creatorId,
+            dateModification: dateModification,
+            reference: reference,
+            dateStarted: dateStarted,
+            timeSpent: timeSpent,
+            timeEstimated: timeEstimated,
+            swimlaneId: swimlaneId,
+            dateMoved: dateMoved,
+            recurrenceStatus: recurrenceStatus,
+            recurrenceTrigger: recurrenceTrigger,
+            recurrenceFactor: recurrenceFactor,
+            recurrenceTimeframe: recurrenceTimeframe,
+            recurrenceBasedate: recurrenceBasedate,
+            recurrenceParent: recurrenceParent,
+            recurrenceChild: recurrenceChild,
+            priority: priority,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required int id,
+            required String title,
+            required String description,
+            Value<int?> dateCreation = const Value.absent(),
+            required String colorId,
+            required int projectId,
+            required int columnId,
+            required int ownerId,
+            required int position,
+            required int isActive,
+            Value<int?> dateCompleted = const Value.absent(),
+            Value<int?> score = const Value.absent(),
+            Value<int?> dateDue = const Value.absent(),
+            required int categoryId,
+            required int creatorId,
+            Value<int?> dateModification = const Value.absent(),
+            Value<String?> reference = const Value.absent(),
+            Value<int?> dateStarted = const Value.absent(),
+            Value<int?> timeSpent = const Value.absent(),
+            Value<int?> timeEstimated = const Value.absent(),
+            required int swimlaneId,
+            required int dateMoved,
+            required int recurrenceStatus,
+            required int recurrenceTrigger,
+            required int recurrenceFactor,
+            required int recurrenceTimeframe,
+            required int recurrenceBasedate,
+            Value<int?> recurrenceParent = const Value.absent(),
+            Value<int?> recurrenceChild = const Value.absent(),
+            required int priority,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              TaskModelCompanion.insert(
+            id: id,
+            title: title,
+            description: description,
+            dateCreation: dateCreation,
+            colorId: colorId,
+            projectId: projectId,
+            columnId: columnId,
+            ownerId: ownerId,
+            position: position,
+            isActive: isActive,
+            dateCompleted: dateCompleted,
+            score: score,
+            dateDue: dateDue,
+            categoryId: categoryId,
+            creatorId: creatorId,
+            dateModification: dateModification,
+            reference: reference,
+            dateStarted: dateStarted,
+            timeSpent: timeSpent,
+            timeEstimated: timeEstimated,
+            swimlaneId: swimlaneId,
+            dateMoved: dateMoved,
+            recurrenceStatus: recurrenceStatus,
+            recurrenceTrigger: recurrenceTrigger,
+            recurrenceFactor: recurrenceFactor,
+            recurrenceTimeframe: recurrenceTimeframe,
+            recurrenceBasedate: recurrenceBasedate,
+            recurrenceParent: recurrenceParent,
+            recurrenceChild: recurrenceChild,
+            priority: priority,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$TaskModelTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: (
+              {projectId = false,
+              columnId = false,
+              taskMetadataModelRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (taskMetadataModelRefs) db.taskMetadataModel
+              ],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (projectId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.projectId,
+                    referencedTable:
+                        $$TaskModelTableReferences._projectIdTable(db),
+                    referencedColumn:
+                        $$TaskModelTableReferences._projectIdTable(db).id,
+                  ) as T;
+                }
+                if (columnId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.columnId,
+                    referencedTable:
+                        $$TaskModelTableReferences._columnIdTable(db),
+                    referencedColumn:
+                        $$TaskModelTableReferences._columnIdTable(db).id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (taskMetadataModelRefs)
+                    await $_getPrefetchedData<TaskModelData, $TaskModelTable,
+                            TaskMetadataModelData>(
+                        currentTable: table,
+                        referencedTable: $$TaskModelTableReferences
+                            ._taskMetadataModelRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$TaskModelTableReferences(db, table, p0)
+                                .taskMetadataModelRefs,
+                        referencedItemsForCurrentItem: (item,
+                                referencedItems) =>
+                            referencedItems.where((e) => e.taskId == item.id),
+                        typedResults: items)
+                ];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$TaskModelTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $TaskModelTable,
+    TaskModelData,
+    $$TaskModelTableFilterComposer,
+    $$TaskModelTableOrderingComposer,
+    $$TaskModelTableAnnotationComposer,
+    $$TaskModelTableCreateCompanionBuilder,
+    $$TaskModelTableUpdateCompanionBuilder,
+    (TaskModelData, $$TaskModelTableReferences),
+    TaskModelData,
+    PrefetchHooks Function(
+        {bool projectId, bool columnId, bool taskMetadataModelRefs})>;
+typedef $$TaskMetadataModelTableCreateCompanionBuilder
+    = TaskMetadataModelCompanion Function({
+  Value<int> taskId,
+  required TaskMetadata metadata,
+});
+typedef $$TaskMetadataModelTableUpdateCompanionBuilder
+    = TaskMetadataModelCompanion Function({
+  Value<int> taskId,
+  Value<TaskMetadata> metadata,
+});
+
+final class $$TaskMetadataModelTableReferences extends BaseReferences<
+    _$AppDatabase, $TaskMetadataModelTable, TaskMetadataModelData> {
+  $$TaskMetadataModelTableReferences(
+      super.$_db, super.$_table, super.$_typedResult);
+
+  static $TaskModelTable _taskIdTable(_$AppDatabase db) =>
+      db.taskModel.createAlias(
+          $_aliasNameGenerator(db.taskMetadataModel.taskId, db.taskModel.id));
+
+  $$TaskModelTableProcessedTableManager get taskId {
+    final $_column = $_itemColumn<int>('task_id')!;
+
+    final manager = $$TaskModelTableTableManager($_db, $_db.taskModel)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_taskIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$TaskMetadataModelTableFilterComposer
+    extends Composer<_$AppDatabase, $TaskMetadataModelTable> {
+  $$TaskMetadataModelTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnWithTypeConverterFilters<TaskMetadata, TaskMetadata, String>
+      get metadata => $composableBuilder(
+          column: $table.metadata,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  $$TaskModelTableFilterComposer get taskId {
+    final $$TaskModelTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.taskId,
+        referencedTable: $db.taskModel,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$TaskModelTableFilterComposer(
+              $db: $db,
+              $table: $db.taskModel,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$TaskMetadataModelTableOrderingComposer
+    extends Composer<_$AppDatabase, $TaskMetadataModelTable> {
+  $$TaskMetadataModelTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get metadata => $composableBuilder(
+      column: $table.metadata, builder: (column) => ColumnOrderings(column));
+
+  $$TaskModelTableOrderingComposer get taskId {
+    final $$TaskModelTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.taskId,
+        referencedTable: $db.taskModel,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$TaskModelTableOrderingComposer(
+              $db: $db,
+              $table: $db.taskModel,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$TaskMetadataModelTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TaskMetadataModelTable> {
+  $$TaskMetadataModelTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumnWithTypeConverter<TaskMetadata, String> get metadata =>
+      $composableBuilder(column: $table.metadata, builder: (column) => column);
+
+  $$TaskModelTableAnnotationComposer get taskId {
+    final $$TaskModelTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.taskId,
+        referencedTable: $db.taskModel,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$TaskModelTableAnnotationComposer(
+              $db: $db,
+              $table: $db.taskModel,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$TaskMetadataModelTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $TaskMetadataModelTable,
+    TaskMetadataModelData,
+    $$TaskMetadataModelTableFilterComposer,
+    $$TaskMetadataModelTableOrderingComposer,
+    $$TaskMetadataModelTableAnnotationComposer,
+    $$TaskMetadataModelTableCreateCompanionBuilder,
+    $$TaskMetadataModelTableUpdateCompanionBuilder,
+    (TaskMetadataModelData, $$TaskMetadataModelTableReferences),
+    TaskMetadataModelData,
+    PrefetchHooks Function({bool taskId})> {
+  $$TaskMetadataModelTableTableManager(
+      _$AppDatabase db, $TaskMetadataModelTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TaskMetadataModelTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TaskMetadataModelTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TaskMetadataModelTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> taskId = const Value.absent(),
+            Value<TaskMetadata> metadata = const Value.absent(),
+          }) =>
+              TaskMetadataModelCompanion(
+            taskId: taskId,
+            metadata: metadata,
+          ),
+          createCompanionCallback: ({
+            Value<int> taskId = const Value.absent(),
+            required TaskMetadata metadata,
+          }) =>
+              TaskMetadataModelCompanion.insert(
+            taskId: taskId,
+            metadata: metadata,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$TaskMetadataModelTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: ({taskId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (taskId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.taskId,
+                    referencedTable:
+                        $$TaskMetadataModelTableReferences._taskIdTable(db),
+                    referencedColumn:
+                        $$TaskMetadataModelTableReferences._taskIdTable(db).id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$TaskMetadataModelTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $TaskMetadataModelTable,
+    TaskMetadataModelData,
+    $$TaskMetadataModelTableFilterComposer,
+    $$TaskMetadataModelTableOrderingComposer,
+    $$TaskMetadataModelTableAnnotationComposer,
+    $$TaskMetadataModelTableCreateCompanionBuilder,
+    $$TaskMetadataModelTableUpdateCompanionBuilder,
+    (TaskMetadataModelData, $$TaskMetadataModelTableReferences),
+    TaskMetadataModelData,
+    PrefetchHooks Function({bool taskId})>;
+typedef $$ApiStorageModelTableCreateCompanionBuilder = ApiStorageModelCompanion
+    Function({
+  Value<int> id,
+  required int apiId,
+  required String apiName,
+  required int apiType,
+  required String webApiParams,
+  required int updateId,
+  required int timestamp,
+});
+typedef $$ApiStorageModelTableUpdateCompanionBuilder = ApiStorageModelCompanion
+    Function({
+  Value<int> id,
+  Value<int> apiId,
+  Value<String> apiName,
+  Value<int> apiType,
+  Value<String> webApiParams,
+  Value<int> updateId,
+  Value<int> timestamp,
+});
+
+class $$ApiStorageModelTableFilterComposer
+    extends Composer<_$AppDatabase, $ApiStorageModelTable> {
+  $$ApiStorageModelTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get apiId => $composableBuilder(
+      column: $table.apiId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get apiName => $composableBuilder(
+      column: $table.apiName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get apiType => $composableBuilder(
+      column: $table.apiType, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get webApiParams => $composableBuilder(
+      column: $table.webApiParams, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get updateId => $composableBuilder(
+      column: $table.updateId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get timestamp => $composableBuilder(
+      column: $table.timestamp, builder: (column) => ColumnFilters(column));
+}
+
+class $$ApiStorageModelTableOrderingComposer
+    extends Composer<_$AppDatabase, $ApiStorageModelTable> {
+  $$ApiStorageModelTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get apiId => $composableBuilder(
+      column: $table.apiId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get apiName => $composableBuilder(
+      column: $table.apiName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get apiType => $composableBuilder(
+      column: $table.apiType, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get webApiParams => $composableBuilder(
+      column: $table.webApiParams,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get updateId => $composableBuilder(
+      column: $table.updateId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get timestamp => $composableBuilder(
+      column: $table.timestamp, builder: (column) => ColumnOrderings(column));
+}
+
+class $$ApiStorageModelTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ApiStorageModelTable> {
+  $$ApiStorageModelTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get apiId =>
+      $composableBuilder(column: $table.apiId, builder: (column) => column);
+
+  GeneratedColumn<String> get apiName =>
+      $composableBuilder(column: $table.apiName, builder: (column) => column);
+
+  GeneratedColumn<int> get apiType =>
+      $composableBuilder(column: $table.apiType, builder: (column) => column);
+
+  GeneratedColumn<String> get webApiParams => $composableBuilder(
+      column: $table.webApiParams, builder: (column) => column);
+
+  GeneratedColumn<int> get updateId =>
+      $composableBuilder(column: $table.updateId, builder: (column) => column);
+
+  GeneratedColumn<int> get timestamp =>
+      $composableBuilder(column: $table.timestamp, builder: (column) => column);
+}
+
+class $$ApiStorageModelTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $ApiStorageModelTable,
+    ApiStorageModelData,
+    $$ApiStorageModelTableFilterComposer,
+    $$ApiStorageModelTableOrderingComposer,
+    $$ApiStorageModelTableAnnotationComposer,
+    $$ApiStorageModelTableCreateCompanionBuilder,
+    $$ApiStorageModelTableUpdateCompanionBuilder,
+    (
+      ApiStorageModelData,
+      BaseReferences<_$AppDatabase, $ApiStorageModelTable, ApiStorageModelData>
+    ),
+    ApiStorageModelData,
+    PrefetchHooks Function()> {
+  $$ApiStorageModelTableTableManager(
+      _$AppDatabase db, $ApiStorageModelTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ApiStorageModelTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ApiStorageModelTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ApiStorageModelTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<int> apiId = const Value.absent(),
+            Value<String> apiName = const Value.absent(),
+            Value<int> apiType = const Value.absent(),
+            Value<String> webApiParams = const Value.absent(),
+            Value<int> updateId = const Value.absent(),
+            Value<int> timestamp = const Value.absent(),
+          }) =>
+              ApiStorageModelCompanion(
+            id: id,
+            apiId: apiId,
+            apiName: apiName,
+            apiType: apiType,
+            webApiParams: webApiParams,
+            updateId: updateId,
+            timestamp: timestamp,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required int apiId,
+            required String apiName,
+            required int apiType,
+            required String webApiParams,
+            required int updateId,
+            required int timestamp,
+          }) =>
+              ApiStorageModelCompanion.insert(
+            id: id,
+            apiId: apiId,
+            apiName: apiName,
+            apiType: apiType,
+            webApiParams: webApiParams,
+            updateId: updateId,
+            timestamp: timestamp,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$ApiStorageModelTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $ApiStorageModelTable,
+    ApiStorageModelData,
+    $$ApiStorageModelTableFilterComposer,
+    $$ApiStorageModelTableOrderingComposer,
+    $$ApiStorageModelTableAnnotationComposer,
+    $$ApiStorageModelTableCreateCompanionBuilder,
+    $$ApiStorageModelTableUpdateCompanionBuilder,
+    (
+      ApiStorageModelData,
+      BaseReferences<_$AppDatabase, $ApiStorageModelTable, ApiStorageModelData>
+    ),
+    ApiStorageModelData,
+    PrefetchHooks Function()>;
+
+class $AppDatabaseManager {
+  final _$AppDatabase _db;
+  $AppDatabaseManager(this._db);
+  $$ColumnModelTableTableManager get columnModel =>
+      $$ColumnModelTableTableManager(_db, _db.columnModel);
+  $$CommentModelTableTableManager get commentModel =>
+      $$CommentModelTableTableManager(_db, _db.commentModel);
+  $$ProjectModelTableTableManager get projectModel =>
+      $$ProjectModelTableTableManager(_db, _db.projectModel);
+  $$SubtaskModelTableTableManager get subtaskModel =>
+      $$SubtaskModelTableTableManager(_db, _db.subtaskModel);
+  $$TaskModelTableTableManager get taskModel =>
+      $$TaskModelTableTableManager(_db, _db.taskModel);
+  $$TaskMetadataModelTableTableManager get taskMetadataModel =>
+      $$TaskMetadataModelTableTableManager(_db, _db.taskMetadataModel);
+  $$ApiStorageModelTableTableManager get apiStorageModel =>
+      $$ApiStorageModelTableTableManager(_db, _db.apiStorageModel);
 }

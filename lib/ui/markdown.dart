@@ -85,8 +85,8 @@ class _MarkdownState extends EditableState<Markdown> {
   @override
   void startEdit() {
     log("widget.key: ${widget.key}");
-    ref.read(UiState.boardActiveState.notifier).state =
-    widget.key as GlobalKey<EditableState>;
+    // ref.read(UiState.boardActiveState.notifier).state =
+    // widget.key as GlobalKey<EditableState>;
     ref.read(UiState.boardActiveText.notifier).state = controller.text;
     ref.read(UiState.boardActions.notifier).state = [
       AppBarAction.kDiscard,
@@ -167,7 +167,7 @@ class _MarkdownState extends EditableState<Markdown> {
   Widget build(BuildContext context) {
     TextSelection currentSelection =
         const TextSelection(baseOffset: 0, extentOffset: 0);
-    final editing = ref.read(UiState.boardEditing);
+    final editing = ref.watch(UiState.boardEditing);
     return Container(
       margin: const EdgeInsets.all(5),
       color: (editing ? "descEditBg" : "descBg").themed(context),

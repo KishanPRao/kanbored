@@ -52,7 +52,7 @@ class BoardTasksState extends ConsumerState<BoardTasks> {
                       : tasks.where((t) => t.isActive == 0))
                   : tasks.where((t) => t.isActive == 1))
               .toList();
-          log("new tasks: ${tasks.length}");
+          // log("new tasks: ${tasks.length}");
           return Expanded(
             child: Column(children: [
               Expanded(
@@ -61,7 +61,7 @@ class BoardTasksState extends ConsumerState<BoardTasks> {
                 itemCount: tasks.length,
                 itemBuilder: (_, index) {
                   final task = tasks[index];
-                  log("task: ${task.title}, ${task.id}");
+                  // log("task: ${task.title}, ${task.id}");
                   return buildBoardTask(tasks.elementAt(index), context);
                 },
               )),

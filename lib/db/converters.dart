@@ -39,8 +39,8 @@ class TaskMetadata {
 
 @j.JsonSerializable()
 class ChecklistMetadata {
-  String name;
-  int position;
+  String name;  // TODO: use title instead?
+  int position; /* position of checklist */
   List<CheckListItemMetadata> items;
 
   ChecklistMetadata(this.name, this.position, this.items);
@@ -53,7 +53,7 @@ class ChecklistMetadata {
 
 @j.JsonSerializable()
 class CheckListItemMetadata {
-  int id;
+  int id; /* subtask id */
 
   CheckListItemMetadata(this.id);
 

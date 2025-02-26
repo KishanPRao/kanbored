@@ -15,4 +15,10 @@ class UiState {
   static final boardActiveIdx = StateProvider<int>((ref) => 0);
   static final boardActiveState = StateProvider<GlobalKey<EditableState>?>((ref) => null);
   static final boardActions = StateProvider<Iterable<int>>((ref) => []);
+  // TODO: task actions?
+  // static final taskEditing = StateProvider<bool>((ref) => false);
+  // static final taskActiveText = StateProvider<String>((ref) => "");
+  // static final taskActiveIdx = StateProvider<int>((ref) => 0);
+  // static final taskActiveState = StateProvider<GlobalKey<EditableState>?>((ref) => null);
+  // static final taskActions = StateProvider<Iterable<int>>((ref) => []);
 }

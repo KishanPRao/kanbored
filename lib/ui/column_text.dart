@@ -59,6 +59,7 @@ class ColumnTextState extends EditableState<ColumnText> {
   }
 
   void removeColumn() {
+    // TODO: Api, never direct WebApi
     WebApi.removeColumn(columnModel.id).then((value) {
       if (!value) {
         Utils.showErrorSnackbar(context, "Could not remove column");

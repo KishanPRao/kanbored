@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:kanbored/db/database.dart';
 
 class CommentModel extends Table {
   @override
@@ -28,4 +29,27 @@ class CommentModel extends Table {
 
   @JsonKey('avatar_path')
   TextColumn get avatarPath => text().nullable()();
+}
+
+extension CommentModelCompanionExt on CommentModelCompanion {
+  static CommentModelCompanion create(
+      int id, int taskId, int userId, String comment,
+      {int? dateCreation,
+      int dateModification = 0,
+      String? username,
+      String? name,
+      String? email,
+      String? avatarPath}) {
+    return CommentModelCompanion(
+        id: Value(id),
+        dateCreation: Value(dateCreation),
+        dateModification: Value(dateModification),
+        taskId: Value(taskId),
+        userId: Value(userId),
+        comment: Value(comment),
+        username: Value(username),
+        name: Value(name),
+        email: Value(email),
+        avatarPath: Value(avatarPath));
+  }
 }

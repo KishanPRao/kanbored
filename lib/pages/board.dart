@@ -32,8 +32,8 @@ class _BoardState extends ConsumerState<Board> {
   // late ProjectMetadataModel projectMetadataModel;
   // List<BoardModel> boards = [];
   // var showArchived = false;
-  var activeColumnPos = -1;
-  var activeTaskId = -1;
+  // var activeColumnPos = -1;
+  // var activeTaskId = -1;
   late double columnWidth;
 
   // var activeEditIndex = 0;

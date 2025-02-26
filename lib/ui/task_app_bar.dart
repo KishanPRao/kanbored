@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/api/state.dart';
+import 'package:kanbored/db/database.dart';
 import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/ui_state.dart';
@@ -18,6 +19,8 @@ class TaskAppBarActions extends AppBarActions {
 }
 
 class TaskAppBarActionsState extends AppBarActionsState<TaskAppBarActions> {
+  late TaskModelData taskModel;
+
   @override
   Iterable<String> getPopupNames() => {
         ref.read(activeTask)!.isActive == 1
@@ -42,7 +45,7 @@ class TaskAppBarActionsState extends AppBarActionsState<TaskAppBarActions> {
   // TODO: find out why re-build invoked
   @override
   Future<void> handlePopupAction(String action) async {
-    final taskModel = ref.read(activeTask)!;
+    // final taskModel = ref.read(activeTask)!;
     if (action == "archive".resc() || action == "unarchive".resc()) {
       log("Archive/Unarchive");
       final updatedTask = taskModel.copyWith(isActive: 1 - taskModel.isActive);
@@ -98,5 +101,14 @@ class TaskAppBarActionsState extends AppBarActionsState<TaskAppBarActions> {
       default:
         return super.getButton(action);
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var taskModel = ref.watch(activeTask);
+    if (taskModel != null) {
+      this.taskModel = taskModel;
+    }
+    return super.build(context);
   }
 }

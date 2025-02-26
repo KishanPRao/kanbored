@@ -140,7 +140,7 @@ extension ApiColumn on Api {
         // if (ref.context.mounted) {
         //   updateDbColumns(ref, items);
         // }
-        ref.read(AppDatabase.provider).columnDao.updateColumns(items);
+        ref.readIfMounted(AppDatabase.provider)?.columnDao.updateColumns(items);
       });
     }
 
@@ -161,8 +161,7 @@ extension ApiTask on Api {
         tasks.addAll(values[1]);
         // log("tasks: $tasks");
         log("update tasks: ${tasks.length}");
-        // TODO: ref.readIfMounted()
-        ref.read(AppDatabase.provider).taskDao.updateTasks(tasks);
+        ref.readIfMounted(AppDatabase.provider)?.taskDao.updateTasks(tasks);
       });
     }
 
@@ -210,30 +209,30 @@ extension ApiTask on Api {
         .createTask(localId, projectId, columnId, title);
     log("[api] createTask: $localId");
     ref.read(AppDatabase.provider).apiStorageDao.addApiTask(
-      WebApiModel.createTask,
-      {
-        "owner_id": AppData.userId,
-        "creator_id": AppData.userId,
-        "date_started": null,
-        "date_due": null,
-        "description": "",
-        "category_id": 0,
-        "score": null,
-        "title": title,
-        "project_id": Utils.generateUpdateIdString(projectId),
-        "color_id": "yellow",
-        "column_id": Utils.generateUpdateIdString(columnId),
-        "recurrence_status": 0,
-        "recurrence_trigger": 0,
-        "recurrence_factor": 0,
-        "recurrence_timeframe": 0,
-        "recurrence_basedate": 0,
-        "time_estimated": 0,
-        "time_spent": 0,
-        "nb_comments": 0,
-      },
-      localId,
-    );
+          WebApiModel.createTask,
+          {
+            "owner_id": AppData.userId,
+            "creator_id": AppData.userId,
+            "date_started": null,
+            "date_due": null,
+            "description": "",
+            "category_id": 0,
+            "score": null,
+            "title": title,
+            "project_id": Utils.generateUpdateIdString(projectId),
+            "color_id": "yellow",
+            "column_id": Utils.generateUpdateIdString(columnId),
+            "recurrence_status": 0,
+            "recurrence_trigger": 0,
+            "recurrence_factor": 0,
+            "recurrence_timeframe": 0,
+            "recurrence_basedate": 0,
+            "time_estimated": 0,
+            "time_spent": 0,
+            "nb_comments": 0,
+          },
+          localId,
+        );
     return localId;
   }
 
@@ -247,31 +246,140 @@ extension ApiTask on Api {
 }
 
 extension ApiTaskMetadata on Api {
-//
-// Future<TaskMetadataModelData?> retrieveTaskMetadata(
-//     WidgetRef ref, int taskId,
-//     {webUpdate = true}) async {
-//   var data = await WebApi.getTaskMetadata(taskId);
-//   if (data["task_id"] == null) {
-//     return null;
-//   }
-//   data["task_id"] = int.parse(data["task_id"]);
-//   return updateDbTaskMetadata(ref, data);
-// }
-//
-// Future<TaskMetadataModelData?> retrieveActiveTaskMetadata(
-//     WidgetRef ref,
-//     {webUpdate = true}) async {
-//   var task = ref.read(activeTask)!;
-//   var metadata = retrieveTaskMetadata(ref, task.id);
-//   ref.read(activeTaskMetadata.notifier).state = await metadata;
-//   return metadata;
-// }
+  // Future<TaskMetadataModelData?> retrieveTaskMetadata(WidgetRef ref, int taskId,
+  //     {webUpdate = true}) async {
+  //   var data = await WebApi.getTaskMetadata(taskId);
+  //   if (data["task_id"] == null) {
+  //     return null;
+  //   }
+  //   data["task_id"] = int.parse(data["task_id"]);
+  //   return updateDbTaskMetadata(ref, data);
+  // }
+  //
+  // Future<TaskMetadataModelData?> retrieveActiveTaskMetadata(WidgetRef ref,
+  //     {webUpdate = true}) async {
+  //   var task = ref.read(activeTask)!;
+  //   var metadata = retrieveTaskMetadata(ref, task.id);
+  //   ref.read(activeTaskMetadata.notifier).state = await metadata;
+  //   return metadata;
+  // }
+  // TODO: create
+  // void updateSubtask(WidgetRef ref, SubtaskModelData data) async {
+  //   ref.read(AppDatabase.provider).subtaskDao.updateSubtask(data);
+  //   log("[api] updateSubtask");
+  //   ref.read(AppDatabase.provider).apiStorageDao.addApiTask(
+  //     WebApiModel.updateSubtask,
+  //     {
+  //       "id": Utils.generateUpdateIdString(data.id),
+  //       "task_id": Utils.generateUpdateIdString(data.taskId),
+  //       "title": data.title,
+  //       "user_id": data.userId,
+  //       "time_estimated": data.timeEstimated,
+  //       "time_spent": data.timeSpent,
+  //       "status": data.status,
+  //     },
+  //     data.id,
+  //   );
+  //   // TODO: call enable/disable project
+  // }
+
+  Timer? retrieveTaskMetadata(WidgetRef ref, int taskId, {recurring = false}) {
+    function() {
+      WebApi.getTaskMetadata(taskId).then((items) async {
+        // TODO: alt approach?
+        // if (ref.context.mounted) {
+        //   updateDbColumns(ref, items);
+        // }
+        // log("updateSubtasks: $items");
+        ref
+            .readIfMounted(AppDatabase.provider)
+            ?.taskMetadataDao
+            .updateTaskMetadata(taskId, items);
+      });
+    }
+
+    function();
+    if (recurring) return Api.recurringApi(function);
+    return null;
+  }
 }
 
-extension ApiSubtask on Api {}
+extension ApiSubtask on Api {
+  // TODO: create
+  void updateSubtask(WidgetRef ref, SubtaskModelData data) async {
+    ref.read(AppDatabase.provider).subtaskDao.updateSubtask(data);
+    log("[api] updateSubtask");
+    ref.read(AppDatabase.provider).apiStorageDao.addApiTask(
+          WebApiModel.updateSubtask,
+          {
+            "id": Utils.generateUpdateIdString(data.id),
+            "task_id": Utils.generateUpdateIdString(data.taskId),
+            "title": data.title,
+            "user_id": data.userId,
+            "time_estimated": data.timeEstimated,
+            "time_spent": data.timeSpent,
+            "status": data.status,
+          },
+          data.id,
+        );
+    // TODO: call enable/disable project
+  }
 
-extension ApiComment on Api {}
+  Timer? updateSubtasks(WidgetRef ref, int taskId, {recurring = false}) {
+    function() {
+      WebApi.getAllSubtasks(taskId).then((items) async {
+        // TODO: alt approach?
+        // if (ref.context.mounted) {
+        //   updateDbColumns(ref, items);
+        // }
+        // log("updateSubtasks: $items");
+        ref
+            .readIfMounted(AppDatabase.provider)
+            ?.subtaskDao
+            .updateSubtasks(items);
+      });
+    }
+
+    function();
+    if (recurring) return Api.recurringApi(function);
+    return null;
+  }
+}
+
+extension ApiComment on Api {
+  // TODO: create
+  void updateComment(WidgetRef ref, CommentModelData data) async {
+    ref.read(AppDatabase.provider).commentDao.updateComment(data);
+    log("[api] updateComment");
+    ref.read(AppDatabase.provider).apiStorageDao.addApiTask(
+          WebApiModel.updateComment,
+          {
+            "id": Utils.generateUpdateIdString(data.id),
+            "content": data.comment
+          },
+          data.id,
+        );
+  }
+
+  Timer? updateComments(WidgetRef ref, int taskId, {recurring = false}) {
+    function() {
+      WebApi.getAllComments(taskId).then((items) async {
+        // TODO: alt approach?
+        // if (ref.context.mounted) {
+        //   updateDbColumns(ref, items);
+        // }
+        ref
+            .readIfMounted(AppDatabase.provider)
+            ?.commentDao
+            .updateComments(items);
+      });
+    }
+
+    function();
+    if (recurring) return Api.recurringApi(function);
+    return null;
+  }
+}
 
 // TODO: remove if unneeded
 extension WidgetRefExt on WidgetRef {
