@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/api/state.dart';
+import 'package:kanbored/db/dao/task_metadata_dao.dart';
 import 'package:kanbored/db/database.dart';
 import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
@@ -19,7 +20,15 @@ class TaskAppBarActions extends AppBarActions {
 }
 
 class TaskAppBarActionsState extends AppBarActionsState<TaskAppBarActions> {
-  late TaskModelData taskModel;
+  late TaskModelData task;
+  // late TaskMetadataDao taskMetadataDao;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // taskMetadataDao = ref.read(AppDatabase.provider).taskMetadataDao;
+  }
 
   @override
   Iterable<String> getPopupNames() => {
@@ -39,7 +48,18 @@ class TaskAppBarActionsState extends AppBarActionsState<TaskAppBarActions> {
 
   @override
   void mainAction() {
-    log("task main");
+    log("task main, add checklist");
+    // var taskMetadata = taskMetadataDao.getTaskMetadataForTask(task.id);
+    // taskMetadataDao.addChecklist()
+    Utils.showInputAlertDialog(context, "alert_new_checklist".resc(),
+        "alert_new_checklist_content".resc(), "", (title) {
+          log("task, add checklist: $title");
+          // taskMetadataDao.addChecklist(title);
+          // final updatedTask = task.copyWith(title: title);
+          Api.instance.addChecklist(ref, task.id, title);
+          // ref.read(activeTask.notifier).state = updatedTask;
+          // abActionListener.refreshUi();
+        });
   }
 
   // TODO: find out why re-build invoked
@@ -48,43 +68,33 @@ class TaskAppBarActionsState extends AppBarActionsState<TaskAppBarActions> {
     // final taskModel = ref.read(activeTask)!;
     if (action == "archive".resc() || action == "unarchive".resc()) {
       log("Archive/Unarchive");
-      final updatedTask = taskModel.copyWith(isActive: 1 - taskModel.isActive);
+      final updatedTask = task.copyWith(isActive: 1 - task.isActive);
       (updatedTask.isActive == 1
-              ? Api.instance.openTask(ref, taskModel.id)
-              : Api.instance.closeTask(ref, taskModel.id))
-          .then((value) {
-        if (!value) {
-          Utils.showErrorSnackbar(context, "Could not update task");
-        } else {
-          ref.read(activeTask.notifier).state = updatedTask;
-          // TODO: bug: Does not refresh archived list
-          // abActionListener.refreshUi();
-          log("arch/unarch updated task??");
-        }
-      }).catchError((e) => Utils.showErrorSnackbar(context, e));
+          ? Api.instance.openTask(ref, task.id)
+          : Api.instance.closeTask(ref, task.id));
+
+      ref.read(activeTask.notifier).state = updatedTask;
+      // TODO: bug: Does not refresh archived list
+      // abActionListener.refreshUi();
+      log("arch/unarch updated task??");
     } else if (action == "delete".resc()) {
-      Utils.showAlertDialog(context, "${'delete'.resc()} `${taskModel.title}`?",
+      Utils.showAlertDialog(context, "${'delete'.resc()} `${task.title}`?",
           "alert_del_content".resc(), () {
         log("Delete task");
-        Api.instance.removeTask(ref, taskModel.id);
+        Api.instance.removeTask(ref, task.id);
         ref.read(activeTask.notifier).state = null;
         Navigator.pop(context);
       });
     } else if (action == "rename".resc()) {
       log("Rename task");
       Utils.showInputAlertDialog(context, "rename_task".resc(),
-          "alert_rename_task_content".resc(), taskModel.title, (title) {
+          "alert_rename_task_content".resc(), task.title, (title) {
         log("project, rename task: $title");
-        final updatedTask = taskModel.copyWith(title: title);
-        Api.instance.updateTask(ref, updatedTask).then((result) {
-          if (result) {
-            ref.read(activeTask.notifier).state = updatedTask;
-            // abActionListener.refreshUi();
-            log("rename task??");
-          } else {
-            Utils.showErrorSnackbar(context, "Could not rename task");
-          }
-        }).onError((e, st) => Utils.showErrorSnackbar(context, e));
+        final updatedTask = task.copyWith(title: title);
+        Api.instance.updateTask(ref, updatedTask);
+        ref.read(activeTask.notifier).state = updatedTask;
+        // abActionListener.refreshUi();
+        log("rename task??");
       });
     }
   }
@@ -105,9 +115,9 @@ class TaskAppBarActionsState extends AppBarActionsState<TaskAppBarActions> {
 
   @override
   Widget build(BuildContext context) {
-    var taskModel = ref.watch(activeTask);
-    if (taskModel != null) {
-      this.taskModel = taskModel;
+    var task = ref.watch(activeTask);
+    if (task != null) {
+      this.task = task;
     }
     return super.build(context);
   }

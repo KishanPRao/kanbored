@@ -333,15 +333,17 @@ class _BoardState extends ConsumerState<Board> {
           return StreamBuilder(
             stream: ref.watch(UiState.boardShowArchived.notifier).stream,
             builder: (context, snapshot2) {
+              // TODO: show archived not triggering full update
               final showArchived = snapshot2.data ?? false;
-              log("col, showArchived: $showArchived, proj: $projectId");
+              // log("col, showArchived: $showArchived, proj: $projectId");
               var columns = snapshot.data ?? [];
+              // TODO: any task which is hidden
               columns = columns
                   .where((c) =>
                       (showArchived && c.hideInDashboard == 1) ||
                       (!showArchived && c.hideInDashboard == 0))
                   .toList();
-              log("new columns: ${columns.length}");
+              // log("new columns: ${columns.length}");
               return Expanded(
                   child: ListView.builder(
                 shrinkWrap: true,
@@ -349,7 +351,7 @@ class _BoardState extends ConsumerState<Board> {
                 itemCount: columns.length,
                 itemBuilder: (_, index) {
                   final column = columns[index];
-                  log("column: ${column.title}, ${column.id}");
+                  // log("column: ${column.title}, ${column.id}");
                   // return Text(column.title);
                   return SizedBox(
                       key: ObjectKey(column.id),

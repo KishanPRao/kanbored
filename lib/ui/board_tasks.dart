@@ -32,7 +32,7 @@ class BoardTasksState extends ConsumerState<BoardTasks> {
     super.initState();
     column = widget.column;
     tasksStream = buildTasksStream();
-    log("init board tasks");
+    // log("init board tasks");
   }
 
   StreamBuilder<List<TaskModelData>> buildTasksStream() {
@@ -44,7 +44,7 @@ class BoardTasksState extends ConsumerState<BoardTasks> {
           // NOTE: assume rebuilt by column on change of archive, just read
           final showArchived = ref.read(UiState.boardShowArchived);
           var tasks = snapshot.data ?? [];
-          log("tasks, showArchived: $showArchived; ${tasks.length}");
+          // log("tasks, showArchived: $showArchived; ${tasks.length}");
           tasks = tasks.where((t) => t.columnId == column.id).toList();
           tasks = (showArchived
                   ? (column.hideInDashboard == 1

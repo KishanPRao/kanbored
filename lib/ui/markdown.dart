@@ -18,6 +18,7 @@ import 'package:markdown/markdown.dart' as md;
 class Markdown extends ConsumerStatefulWidget {
   final String content;
   final Function(String) onSaveCb;
+
   // final Model model;
   // final AppBarActionListener abActionListener;
 
@@ -42,6 +43,7 @@ class _MarkdownState extends EditableState<Markdown> {
   // final int maxLines = 8;
   // late Model model;
   late TextEditingController controller;
+
   // late AppBarActionListener abActionListener;
   // bool editing = false;
   final FocusNode focusNode = FocusNode();
@@ -85,8 +87,8 @@ class _MarkdownState extends EditableState<Markdown> {
   @override
   void startEdit() {
     log("widget.key: ${widget.key}");
-    // ref.read(UiState.boardActiveState.notifier).state =
-    // widget.key as GlobalKey<EditableState>;
+    ref.read(UiState.boardActiveState.notifier).state =
+        widget.key as GlobalKey<EditableState>;
     ref.read(UiState.boardActiveText.notifier).state = controller.text;
     ref.read(UiState.boardActions.notifier).state = [
       AppBarAction.kDiscard,
@@ -102,7 +104,7 @@ class _MarkdownState extends EditableState<Markdown> {
 
   @override
   void endEdit(bool saveChanges) {
-    FocusManager.instance.primaryFocus?.unfocus();
+    // FocusManager.instance.primaryFocus?.unfocus();
     if (saveChanges) {
       // TODO
       content = controller.text;
@@ -132,8 +134,9 @@ class _MarkdownState extends EditableState<Markdown> {
     // } else {
     //   controller.text = "";
     // }
-    // FocusManager.instance.primaryFocus?.unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
   }
+
   //
   // void deleteComment(CommentModel model) {
   //   abActionListener.onEditEnd(false);
@@ -167,7 +170,10 @@ class _MarkdownState extends EditableState<Markdown> {
   Widget build(BuildContext context) {
     TextSelection currentSelection =
         const TextSelection(baseOffset: 0, extentOffset: 0);
-    final editing = ref.watch(UiState.boardEditing);
+    final editing = ref.watch(UiState.boardEditing) &&
+        ref.read(UiState.boardActiveState.notifier).state ==
+            widget.key as GlobalKey<EditableState>;
+    // TODO: check key?
     return Container(
       margin: const EdgeInsets.all(5),
       color: (editing ? "descEditBg" : "descBg").themed(context),
@@ -186,7 +192,8 @@ class _MarkdownState extends EditableState<Markdown> {
                   // abActionListener.onChange(controller.text);
                   // abActionListener.onEditStart(null, []);
                 },
-                onChanged: (value) => ref.read(UiState.boardActiveText.notifier).state = value,
+                onChanged: (value) =>
+                    ref.read(UiState.boardActiveText.notifier).state = value,
                 onEditingComplete: () {
                   endEdit(true);
                   // abActionListener.onEditEnd(true);

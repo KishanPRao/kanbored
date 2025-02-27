@@ -1,5 +1,4 @@
-import 'dart:developer';
-
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/state.dart';
@@ -16,6 +15,7 @@ import 'package:kanbored/ui/add_task.dart';
 import 'package:kanbored/ui/editing_state.dart';
 import 'package:kanbored/ui/sizes.dart';
 import 'package:kanbored/ui/ui_state.dart';
+import 'package:kanbored/utils/utils.dart';
 
 class BoardSubtasks extends ConsumerStatefulWidget {
   final TaskModelData task;
@@ -43,7 +43,7 @@ class BoardSubtasksState extends ConsumerState<BoardSubtasks> {
     subtaskDao = ref.read(AppDatabase.provider).subtaskDao;
     taskMetadataDao = ref.read(AppDatabase.provider).taskMetadataDao;
     stream = buildSubtasksStream();
-    log("init board tasks");
+    // log("init board subtasks");
   }
 
   // StreamBuilder<List<Subtask>> buildSubtasksStream() {
@@ -67,31 +67,41 @@ class BoardSubtasksState extends ConsumerState<BoardSubtasks> {
                     TaskMetadataModelData(
                         taskId: task.id, metadata: TaskMetadata([]));
                 var subtasks = snapshot.data ?? [];
-                log("subtasks: ${subtasks.length}");
+                // log("subtasks: ${subtasks.length}");
                 // subtasks = subtasks.where((t) => t.taskId == task.id).toList();
                 var checklistSubtaskCount =
                     (taskMetadata.metadata.checklists.length * 2) +
                         subtasks.length;
-                log("Checklist + subtask count: $checklistSubtaskCount");
-                log("Checklist len: ${taskMetadata.metadata.checklists.length} subtask len: ${subtasks.length}");
+                // log("Checklist + subtask count: $checklistSubtaskCount");
+                // log("Checklist len: ${taskMetadata.metadata.checklists.length} subtask len: ${subtasks.length}");
                 return Column(
                     children: taskMetadata.metadata.checklists.map((checklist) {
-                  log("checklist: $checklist");
+                  // log("checklist: $checklist");
                   return Column(
                       children: <Widget>[
                             ChecklistHeader(
+                              key: EditableState.createKey(),
+                              taskMetadata: taskMetadata,
                               checklist: checklist,
                             )
                           ] +
                           checklist.items.map(
                             (item) {
-                              var subtask = subtasks.singleWhere(
+                              var subtask = subtasks.singleWhereOrNull(
                                   (element) => element.id == item.id);
-                              return BoardSubtask(subtask: subtask);
+                              if (subtask == null) {
+                                // TODO: Bad state: No element, when adding a new subtask;
+                                //  caused by localId & taskMetadata update
+                                return Utils.emptyUi();
+                              }
+                              return BoardSubtask(
+                                  key: EditableState.createKey(),
+                                  subtask: subtask);
                             },
                           ).toList() +
                           [
                             BoardAddSubtask(
+                              key: EditableState.createKey(),
                               task: task,
                               taskMetadata: taskMetadata,
                               checklist: checklist,

@@ -11,27 +11,26 @@ part 'subtask_dao.g.dart';
 class SubtaskDao extends DatabaseAccessor<AppDatabase> with _$SubtaskDaoMixin {
   SubtaskDao(super.db);
 
-  Future<int> addSubtask(int localId, String title, int taskId) async {
+  void createSubtask(int id, String title, int taskId) async {
     return transaction(() async {
-      // var lowestIdItem = await (select(subtaskModel)
-      //       ..orderBy(
-      //           [(t) => OrderingTerm(expression: t.id, mode: OrderingMode.asc)])
-      //       ..limit(1))
-      //     .getSingleOrNull();
       var highestPositionItem = await (select(subtaskModel)
-            ..orderBy([
+        ..where((tbl) => tbl.taskId.equals(taskId))
+        ..orderBy([
               (t) =>
-                  OrderingTerm(expression: t.position, mode: OrderingMode.desc)
-            ])
-            ..limit(1))
+              OrderingTerm(expression: t.position, mode: OrderingMode.desc)
+        ])
+        ..limit(1))
           .getSingleOrNull();
       // log("lowestIdItem: ${lowestIdItem?.id}, ${lowestIdItem?.title}");
-      // final lowestId = lowestIdItem?.id ?? 0;
       final highestPosition = highestPositionItem?.position ?? 0;
       var data = SubtaskModelCompanionExt.create(
-          localId, title, taskId, AppData.userId, highestPosition);
-      log("dao, addSubtask");
-      return await into(subtaskModel).insertOnConflictUpdate(data);
+        id,
+        title,
+        taskId,
+        highestPosition,
+      );
+      log("dao, createSubtask");
+      await into(subtaskModel).insertOnConflictUpdate(data);
     });
   }
 
@@ -48,6 +47,14 @@ class SubtaskDao extends DatabaseAccessor<AppDatabase> with _$SubtaskDaoMixin {
     return query.watch();
   }
 
+  Future<SubtaskModelData?> getSubtask(int subtaskId) {
+    final query = select(subtaskModel)
+      ..where((tbl) {
+        return tbl.id.equals(subtaskId);
+      })..limit(1);
+    return query.getSingleOrNull();
+  }
+
   void updateSubtasks(List<dynamic> items) {
     // log("[dao] updateSubtasks");
     db.transaction(() async {
@@ -55,13 +62,13 @@ class SubtaskDao extends DatabaseAccessor<AppDatabase> with _$SubtaskDaoMixin {
       for (var item in items) {
         // log("project: $project");
         var data = SubtaskModelData.fromJson(item);
-        // log("project data: ${data.name}");
+        // log("subtask data: ${data.title}, ${data.status}");
         await into(subtaskModel).insertOnConflictUpdate(data);
       }
     });
   }
 
-  void updateId(int oldId, int newId) async {
+  Future<void> updateId(int oldId, int newId) async {
     (update(subtaskModel)..where((tbl) => tbl.id.equals(oldId)))
         .write(SubtaskModelCompanion(id: Value(newId)));
   }

@@ -283,7 +283,8 @@ class WebApi {
   }
 
   static Future<ProjectMetadataModel> getProjectMetadata(int projectId) async {
-    return singleApi("getProjectMetadata", 1797076613, ProjectMetadataModel.fromJson,
+    return singleApi(
+        "getProjectMetadata", 1797076613, ProjectMetadataModel.fromJson,
         params: {"project_id": projectId});
   }
 
@@ -526,9 +527,49 @@ class WebApi {
             .updateId(apiData.updateId, result);
         log("handleApiRequest: update task id ${apiData.updateId} => $result");
         apiDao.removeApiTask(apiData.id);
+      } else if (apiData.apiId == WebApiModel.createSubtask.apiId) {
+        log("handleApiRequest: createSubtask: ${apiData.updateId}, ${apiData.webApiParams}");
+        await ref
+            .read(AppDatabase.provider)
+            .subtaskDao
+            .updateId(apiData.updateId, result);
+        var subtask =
+            await ref.read(AppDatabase.provider).subtaskDao.getSubtask(result);
+        var taskMetadata = await ref
+            .read(AppDatabase.provider)
+            .taskMetadataDao
+            .getTaskMetadataForTask(subtask!.taskId);
+        outerLoop:
+        for (var checklist in taskMetadata!.metadata.checklists) {
+          for (var item in checklist.items) {
+            if (item.id == apiData.updateId) {
+              log("handleApiRequest: updating checklist item, ${item.id} => $result");
+              item.id = result;
+              break outerLoop;
+            }
+          }
+        }
+        log("handleApiRequest: task metadata: ${taskMetadata.toJson()}");
+        ref
+            .read(AppDatabase.provider)
+            .taskMetadataDao
+            .writeTaskMetadata(taskMetadata);
+        // .updateSubtaskId(subtask.taskId, taskMetadata, apiData.updateId, result);
+        log("handleApiRequest: update subtask id ${apiData.updateId} => $result");
+        apiDao.removeApiTask(apiData.id);
       }
+      /*else if (apiData.apiId == WebApiModel.saveTaskMetadata.apiId) {
+        log("handleApiRequest: saveTaskMetadata: ${apiData.updateId}, ${apiData.webApiParams}");
+        ref
+            .read(AppDatabase.provider)
+            .taskMetadataDao
+            .updateSubtaskId(apiData.updateId, result);
+        log("handleApiRequest: update task id ${apiData.updateId} => $result");
+        apiDao.removeApiTask(apiData.id);
+      }*/
       // NOTE: Only creation needs updating, internal `updateId`
       apiDao.updateApiTask(apiData.updateId, result, apiData);
+      return true;
     } else if (result is bool) {
       if (result) {
         apiDao.removeApiTask(apiData.id);
@@ -536,7 +577,9 @@ class WebApi {
         log("Failed to finish task: ${apiData.apiName}, ${apiData.webApiParams}");
         return false;
       }
+      return true;
     }
+    log("Unknown result! $result");
     return false;
   }
 }

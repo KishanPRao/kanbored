@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:kanbored/db/database.dart';
+import 'package:kanbored/utils/app_data.dart';
 
 class SubtaskModel extends Table {
   @override
@@ -41,7 +42,7 @@ class SubtaskModel extends Table {
 
 extension SubtaskModelCompanionExt on SubtaskModelCompanion {
   static SubtaskModelCompanion create(
-      int id, String title, int taskId, int userId, int position,
+      int id, String title, int taskId, int position,
       {int status = 0,
       int timeSpent = 0,
       int timeEstimated = 0,
@@ -57,7 +58,7 @@ extension SubtaskModelCompanionExt on SubtaskModelCompanion {
         timeEstimated: Value(timeEstimated),
         timeSpent: Value(timeSpent),
         taskId: Value(taskId),
-        userId: Value(userId),
+        userId: Value(AppData.userId),
         position: Value(position),
         username: Value(username),
         name: Value(name),

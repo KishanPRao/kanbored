@@ -31,7 +31,8 @@ class ApiStorageDao extends DatabaseAccessor<AppDatabase>
     await into(apiStorageModel).insert(data);
   }
 
-  void updateApiTask(int oldId, int newId, ApiStorageModelData updateApi) async {
+  void updateApiTask(
+      int oldId, int newId, ApiStorageModelData updateApi) async {
     // (delete(apiStorageModel)..where((tbl) => tbl.id.equals(oldId))).go();
     log("updateApiTask: $oldId => $newId; type=${updateApi.apiType}");
     // final apiTasks = await (select(apiStorageModel)
@@ -80,10 +81,10 @@ class ApiStorageDao extends DatabaseAccessor<AppDatabase>
           continue;
         }
         var updatedApiTask = apiTask.copyWith(
-          webApiParams: apiTask.webApiParams.replaceAll(
-              "\"${Utils.generateUpdateIdString(oldId)}\"",
-              "$newId"
-          ),
+          webApiParams: apiTask.webApiParams
+              .replaceAll(
+                  "\"${Utils.generateUpdateIdString(oldId)}\"", "$newId")
+              .replaceAll(Utils.generateUpdateIdString(oldId), "$newId"),
         );
         // log("update api: \"${Utils.generateUpdateIdString(oldId)}\" => \"${Utils.generateUpdateIdString(newId)}\"");
         log("update api: ${apiTask.webApiParams} => ${updatedApiTask.webApiParams}");
@@ -125,8 +126,9 @@ class ApiStorageDao extends DatabaseAccessor<AppDatabase>
   // Get next lowest update id
   Future<int> nextId() async {
     var lowestIdItem = await (select(apiStorageModel)
-          ..orderBy(
-              [(t) => OrderingTerm(expression: t.updateId, mode: OrderingMode.asc)])
+          ..orderBy([
+            (t) => OrderingTerm(expression: t.updateId, mode: OrderingMode.asc)
+          ])
           ..limit(1))
         .getSingleOrNull();
     // TODO: directly use `id` instead?

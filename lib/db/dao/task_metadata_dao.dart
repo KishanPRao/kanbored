@@ -24,6 +24,12 @@ class TaskMetadataDao extends DatabaseAccessor<AppDatabase>
     await into(taskMetadataModel).insertOnConflictUpdate(data);
   }
 
+  void updateSubtaskId(int taskId, TaskMetadataModelData taskMetadata, int oldId, int newId) async {
+    (update(taskMetadataModel)
+      ..where((tbl) => tbl.taskId.equals(taskId)))
+        .write(TaskMetadataModelCompanion(metadata: Value(taskMetadata.metadata)));
+  }
+
   void updateTaskMetadata(int taskId, Map<String, dynamic> item) {
     // log("[dao] updateTaskMetadata");
     // TODO: null data?
@@ -35,7 +41,7 @@ class TaskMetadataDao extends DatabaseAccessor<AppDatabase>
     db.transaction(() async {
       // log("# projects ${projects.length}");
       // for (var item in items) {
-      log("task metadata: $item");
+      // log("task metadata: $item");
       //{metadata: {"checklists":[{"name":"Checklist1","position":1,"items":[{"id":16},{"id":17},{"id":18}]},{"name":"Checklist","position":2,"items":[{"id":19},{"id":20}]}]}}
       //{task_id: 77}
       var data = TaskMetadataModelData.fromJson(item);
@@ -75,7 +81,26 @@ class TaskMetadataDao extends DatabaseAccessor<AppDatabase>
     return query.watchSingleOrNull();
   }
 
-  void addChecklist() {}
+  Future<TaskMetadataModelData?> getTaskMetadataForTask(int taskId) {
+    final query = select(taskMetadataModel)
+      ..where((tbl) {
+        return tbl.taskId.equals(taskId);
+      })
+      ..limit(1);
+    return query.getSingleOrNull();
+  }
+
+  // Future<int> getNextChecklistId(TaskMetadataModelData taskMetadata) async {
+  //   var maxChecklist = taskMetadata.metadata.checklists.reduce((a, b) => a.id > b.id ? a : b);
+  //   // log("lowestIdItem: ${lowestIdItem?.id}, ${lowestIdItem?.title}");
+  //   // final lowestId = lowestIdItem?.id ?? 0;
+  //   log("max checklist: $maxChecklist");
+  //   var nextId = maxChecklist.id + 1;
+  //   return nextId;
+  // }
+
+  // TODO
+  void addChecklist(String title) {}
 
   void updateTaskId(int oldId, int newId) async {
     (update(taskMetadataModel)..where((tbl) => tbl.taskId.equals(oldId)))

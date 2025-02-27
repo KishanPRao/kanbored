@@ -59,7 +59,7 @@ class BoardColumnState extends ConsumerState<BoardColumn> {
     //     },
     //     error: (e, s) {},
     //     loading: () {});
-    log("load task in col: ${column.id}");
+    // log("load task in col: ${column.id}");
     // var tasks = ref.watch(tasksInColumn(column.id));
     // log("Board column, build: ${column.title}, ${column.isActive}; archived: ${abActionListener.isArchived()}, $baseIdx");
     // return Text(column.title);

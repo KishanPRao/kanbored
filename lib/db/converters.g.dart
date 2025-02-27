@@ -19,7 +19,8 @@ Map<String, dynamic> _$TaskMetadataToJson(TaskMetadata instance) =>
 
 ChecklistMetadata _$ChecklistMetadataFromJson(Map<String, dynamic> json) =>
     ChecklistMetadata(
-      json['name'] as String,
+      (json['id'] as num).toInt(),
+      json['title'] as String,
       (json['position'] as num).toInt(),
       (json['items'] as List<dynamic>)
           .map((e) => CheckListItemMetadata.fromJson(e as Map<String, dynamic>))
@@ -28,7 +29,8 @@ ChecklistMetadata _$ChecklistMetadataFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$ChecklistMetadataToJson(ChecklistMetadata instance) =>
     <String, dynamic>{
-      'name': instance.name,
+      'id': instance.id,
+      'title': instance.title,
       'position': instance.position,
       'items': instance.items,
     };

@@ -39,11 +39,12 @@ class TaskMetadata {
 
 @j.JsonSerializable()
 class ChecklistMetadata {
-  String name;  // TODO: use title instead?
+  int id; /* id is the next max id of current checklist */
+  String title;  // TODO: use title instead?
   int position; /* position of checklist */
   List<CheckListItemMetadata> items;
 
-  ChecklistMetadata(this.name, this.position, this.items);
+  ChecklistMetadata(this.id, this.title, this.position, this.items);
 
   factory ChecklistMetadata.fromJson(Map<String, dynamic> json) =>
       _$ChecklistMetadataFromJson(json);

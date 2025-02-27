@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/state.dart';
@@ -43,7 +44,7 @@ class BoardCommentsState extends ConsumerState<BoardComments> {
     task = ref.read(activeTask.notifier).state!;
     commentDao = ref.read(AppDatabase.provider).commentDao;
     stream = buildSubtasksStream();
-    log("init board tasks");
+    // log("init board comments");
   }
 
   // StreamBuilder<List<Subtask>> buildSubtasksStream() {
@@ -61,17 +62,22 @@ class BoardCommentsState extends ConsumerState<BoardComments> {
         builder: (context, AsyncSnapshot<List<CommentModelData>> snapshot) {
           // TODO: scenarios! Create new metadata etc
           var comments = snapshot.data ?? [];
-          log("comments: ${comments.length}");
           // comments = comments.where((t) => t.taskId == task.id).toList();
-          log("comments len: ${comments.length}");
+          // log("comments len: ${comments.length}");
           return Column(
-              children: comments.map((comment) {
+              children: comments.sorted((a, b) {
+            if (a.dateCreation! > b.dateCreation!) {
+              return -1;
+            } else {
+              return 1;
+            }
+          }).map((comment) {
             log("comment: $comment");
             return Markdown(
                 content: comment.comment,
                 onSaveCb: (text) {
-              log("save mkdown desc");
-            });
+                  log("save mkdown desc");
+                });
           }).toList());
         });
   }

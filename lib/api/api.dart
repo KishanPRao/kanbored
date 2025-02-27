@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/web_api.dart';
+import 'package:kanbored/db/converters.dart';
 import 'package:kanbored/db/database.dart';
 import 'package:kanbored/db/web_api_model.dart';
 import 'package:kanbored/utils/app_data.dart';
@@ -160,7 +161,7 @@ extension ApiTask on Api {
         var tasks = values[0];
         tasks.addAll(values[1]);
         // log("tasks: $tasks");
-        log("update tasks: ${tasks.length}");
+        // log("update tasks: ${tasks.length}");
         ref.readIfMounted(AppDatabase.provider)?.taskDao.updateTasks(tasks);
       });
     }
@@ -170,36 +171,54 @@ extension ApiTask on Api {
     return null;
   }
 
-  Future<bool> openTask(WidgetRef ref, int taskId) async {
-    final result = await WebApi.openTask(taskId);
-    if (result is int) {
-      ref.read(AppDatabase.provider).taskDao.openTask(taskId);
-    } else {
-      Utils.showErrorSnackbar(ref.context, "Could not update task");
-    }
-    return result;
+  void openTask(WidgetRef ref, int taskId) async {
+    ref.read(AppDatabase.provider).taskDao.openTask(taskId);
+    log("[api] openTask: $taskId");
+    ref.read(AppDatabase.provider).apiStorageDao.addApiTask(
+        WebApiModel.openTask,
+        {"task_id": Utils.generateUpdateIdString(taskId)},
+        taskId);
+    //
+    // final result = await WebApi.openTask(taskId);
+    // if (result is int) {
+    //   ref.read(AppDatabase.provider).taskDao.openTask(taskId);
+    // } else {
+    //   Utils.showErrorSnackbar(ref.context, "Could not update task");
+    // }
+    // return result;
   }
 
-  Future<bool> closeTask(WidgetRef ref, int taskId) async {
-    final result = await WebApi.closeTask(taskId);
-    if (result is int) {
-      ref.read(AppDatabase.provider).taskDao.closeTask(taskId);
-    } else {
-      Utils.showErrorSnackbar(ref.context, "Could not update task");
-    }
-    return result;
+  void closeTask(WidgetRef ref, int taskId) async {
+    ref.read(AppDatabase.provider).taskDao.openTask(taskId);
+    log("[api] closeTask: $taskId");
+    ref.read(AppDatabase.provider).apiStorageDao.addApiTask(
+        WebApiModel.closeTask,
+        {"task_id": Utils.generateUpdateIdString(taskId)},
+        taskId);
   }
 
-  Future<bool> updateTask(WidgetRef ref, TaskModelData data) async {
-    final result = await WebApi.updateTask(data);
-    if (result) {
-      ref.read(AppDatabase.provider).taskDao.updateTask(data);
-    } else {
-      Utils.showErrorSnackbar(ref.context, "Could not update task");
+  void updateTask(WidgetRef ref, TaskModelData data) async {
+    ref.read(AppDatabase.provider).taskDao.updateTask(data);
+    log("[api] updateTask: ${data.title}");
+    var params = {
+      "id": Utils.generateUpdateIdString(data.id),
+      "title": data.title,
+      "color_id": data.colorId,
+      "owner_id": data.ownerId,
+      "description": data.description,
+      "score": data.score,
+    };
+
+    if (!(data.dateDue == null || data.dateDue == 0)) {
+      params["date_due"] = data.dateDue;
     }
-    return result;
+    ref
+        .read(AppDatabase.provider)
+        .apiStorageDao
+        .addApiTask(WebApiModel.updateTask, params, data.id);
   }
 
+  // TODO: no need to return
   Future<int> createTask(
       WidgetRef ref, int projectId, int columnId, String title) async {
     final localId = await ref.read(AppDatabase.provider).apiStorageDao.nextId();
@@ -238,10 +257,13 @@ extension ApiTask on Api {
 
   // Remove:
 
-  Future<bool> removeTask(WidgetRef ref, int taskId) async {
-    var result = await WebApi.removeTask(taskId);
-    if (result) ref.read(AppDatabase.provider).taskDao.removeTask(taskId);
-    return result;
+  void removeTask(WidgetRef ref, int taskId) async {
+    ref.read(AppDatabase.provider).taskDao.removeTask(taskId);
+    log("[api] removeTask: $taskId");
+    ref.read(AppDatabase.provider).apiStorageDao.addApiTask(
+        WebApiModel.removeTask,
+        {"task_id": Utils.generateUpdateIdString(taskId)},
+        taskId);
   }
 }
 
@@ -302,10 +324,103 @@ extension ApiTaskMetadata on Api {
     if (recurring) return Api.recurringApi(function);
     return null;
   }
+
+  void addChecklist(WidgetRef ref, int taskId, String title) async {
+    var taskMetadata = await ref
+        .read(AppDatabase.provider)
+        .taskMetadataDao
+        .getTaskMetadataForTask(taskId);
+    if (taskMetadata == null) {
+      log("[api] null task metadata");
+    } else {
+      var nextId = 1;
+      if (taskMetadata.metadata.checklists.isNotEmpty) {
+        var maxChecklist = taskMetadata.metadata.checklists
+            .reduce((a, b) => a.id > b.id ? a : b);
+        log("max checklist: $maxChecklist");
+        nextId = maxChecklist.id + 1;
+      }
+      log("next id: $nextId");
+      var checklist = ChecklistMetadata(
+          nextId, title, taskMetadata.metadata.checklists.length + 1, []);
+      taskMetadata.metadata.checklists.add(checklist);
+      log("new task metadata: ${taskMetadata.toJson()}");
+      ref
+          .read(AppDatabase.provider)
+          .taskMetadataDao
+          .writeTaskMetadata(taskMetadata);
+      ref.read(AppDatabase.provider).apiStorageDao.addApiTask(
+            WebApiModel.saveTaskMetadata,
+            [Utils.generateUpdateIdString(taskId), taskMetadata.toJson()],
+            taskId,
+          );
+    }
+  }
+
+  void updateChecklist(
+      WidgetRef ref, TaskMetadataModelData taskMetadata) async {
+    log("new task metadata: ${taskMetadata.toJson()}");
+    ref
+        .read(AppDatabase.provider)
+        .taskMetadataDao
+        .writeTaskMetadata(taskMetadata);
+    ref.read(AppDatabase.provider).apiStorageDao.addApiTask(
+          WebApiModel.saveTaskMetadata,
+          [
+            Utils.generateUpdateIdString(taskMetadata.taskId),
+            taskMetadata.toJson()
+          ],
+          taskMetadata.taskId,
+        );
+  }
+
+  void updateChecklistWithSubtask(
+      WidgetRef ref, TaskMetadataModelData taskMetadata, int subtaskId) async {
+    log("new task metadata: ${taskMetadata.toJson()}");
+
+    var data = taskMetadata.toJson();
+    data.update(
+      "metadata",
+      (value) => (value as String).replaceAll(
+          subtaskId.toString(), Utils.generateUpdateIdString(subtaskId)),
+    );
+    log("task metadata aft: $data");
+    ref
+        .read(AppDatabase.provider)
+        .taskMetadataDao
+        .writeTaskMetadata(taskMetadata);
+    ref.read(AppDatabase.provider).apiStorageDao.addApiTask(
+          WebApiModel.saveTaskMetadata,
+          [Utils.generateUpdateIdString(taskMetadata.taskId), data],
+          taskMetadata.taskId,
+        );
+  }
 }
 
 extension ApiSubtask on Api {
-  // TODO: create
+  Future<int> createSubtask(WidgetRef ref, String title, int taskId) async {
+    final localId = await ref.read(AppDatabase.provider).apiStorageDao.nextId();
+    ref
+        .read(AppDatabase.provider)
+        .subtaskDao
+        .createSubtask(localId, title, taskId);
+    log("[api] createSubtask");
+    ref.read(AppDatabase.provider).apiStorageDao.addApiTask(
+          WebApiModel.createSubtask,
+          {
+            "task_id": Utils.generateUpdateIdString(taskId),
+            "title": title,
+            "user_id": AppData.userId,
+            "time_estimated": 0,
+            "time_spent": 0,
+            "status": 0,
+          },
+          localId,
+        );
+    // TODO: call enable/disable project
+    return localId;
+  }
+
   void updateSubtask(WidgetRef ref, SubtaskModelData data) async {
     ref.read(AppDatabase.provider).subtaskDao.updateSubtask(data);
     log("[api] updateSubtask");

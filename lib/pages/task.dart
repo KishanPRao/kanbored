@@ -62,6 +62,7 @@ class _TaskState extends ConsumerState<Task> {
   Future<List<Timer?>?> updateData({bool recurring = false}) async {
     var taskModel = ref.read(activeTask)!;
     // taskId = taskModel.id;
+    // TODO: if task is closed and re-opened, data isn't updated in db after being loaded
     return [
       Api.instance.updateSubtasks(ref, taskModel.id, recurring: recurring),
       Api.instance.updateComments(ref, taskModel.id, recurring: recurring),
@@ -253,6 +254,10 @@ class _TaskState extends ConsumerState<Task> {
   Widget build(BuildContext context) {
     final task = ref.watch(activeTask);
     if (task == null) return Utils.emptyUi();
+    // Reset task metadata
+    // taskMetadataDao.updateTaskMetadata(task.id, {
+    //   "metadata": {"checklists": []}
+    // });
     // Do not load until some data is retrieved
     // if (!isLoaded) {
     //   return Utils.emptyUi();
@@ -300,6 +305,7 @@ class _TaskState extends ConsumerState<Task> {
                 controller: scrollController,
                 children: <Widget>[
                       Markdown(
+                        key: EditableState.createKey(),
                         content: task.description,
                         onSaveCb: (text) {
                           log("save mkdown desc");
@@ -322,7 +328,11 @@ class _TaskState extends ConsumerState<Task> {
                     ] +
                     // [buildSubtasksStream(taskModel.id)]
                     // [Column(crossAxisAlignment: CrossAxisAlignment.start, children: [BoardSubtasks(task: task)])]
-                    [BoardSubtasks(task: task), BoardAddComment(task: task), BoardComments(task: task)]
+                    [
+                      BoardSubtasks(task: task),
+                      BoardAddComment(task: task),
+                      BoardComments(task: task)
+                    ]
                 // buildSubtasks(
                 //     context,
                 //     taskModel,
@@ -416,10 +426,12 @@ class _TaskState extends ConsumerState<Task> {
                       subtasks.length;
               log("Checklist + subtask count: $checklistSubtaskCount");
               log("Checklist len: ${taskMetadata.metadata.checklists.length} subtask len: ${subtasks.length}");
-              return Column(children: [
-                // TODO
-              ],);
-                  // Expanded(child:
+              return Column(
+                children: [
+                  // TODO
+                ],
+              );
+              // Expanded(child:
               //     ListView.builder(
               //   shrinkWrap: true,
               //   scrollDirection: Axis.vertical,

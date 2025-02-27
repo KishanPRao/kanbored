@@ -16,8 +16,9 @@ import 'package:kanbored/utils/utils.dart';
 
 class ChecklistHeader extends ConsumerStatefulWidget {
   final ChecklistMetadata checklist;
+  final TaskMetadataModelData taskMetadata;
 
-  const ChecklistHeader({super.key, required this.checklist});
+  const ChecklistHeader({super.key, required this.taskMetadata, required this.checklist});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => ChecklistHeaderState();
@@ -26,6 +27,7 @@ class ChecklistHeader extends ConsumerStatefulWidget {
 class ChecklistHeaderState extends EditableState<ChecklistHeader> {
   var focusNode = FocusNode();
   late ChecklistMetadata checklist;
+  late TaskMetadataModelData taskMetadata;
 
   // late AppBarActionListener abActionListener;
   late TextEditingController controller;
@@ -34,9 +36,10 @@ class ChecklistHeaderState extends EditableState<ChecklistHeader> {
   void initState() {
     super.initState();
     checklist = widget.checklist;
+    taskMetadata = widget.taskMetadata;
     // columnModel = widget.columnModel;
     // abActionListener = widget.abActionListener;
-    controller = TextEditingController(text: widget.checklist.name);
+    controller = TextEditingController(text: widget.checklist.title);
   }
 
   @override
@@ -140,6 +143,8 @@ class ChecklistHeaderState extends EditableState<ChecklistHeader> {
     log("checklist, endEdit: $saveChanges");
     if (saveChanges) {
       log("checklist update: ${controller.text}");
+      checklist.title = controller.text;
+      Api.instance.updateChecklist(ref, taskMetadata);
       // final tasksDao = ref.read(AppDatabase.provider).taskDao;
       // tasksDao.ChecklistHeader(taskJson);
       //   Api.instance
@@ -162,7 +167,7 @@ class ChecklistHeaderState extends EditableState<ChecklistHeader> {
       // } else {
       //   controller.text = "";
       // }
-      FocusManager.instance.primaryFocus?.unfocus();
     }
+    FocusManager.instance.primaryFocus?.unfocus();
   }
 }

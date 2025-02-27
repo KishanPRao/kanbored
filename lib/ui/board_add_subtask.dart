@@ -20,7 +20,10 @@ class BoardAddSubtask extends ConsumerStatefulWidget {
   final ChecklistMetadata checklist;
 
   const BoardAddSubtask(
-      {super.key, required this.task, required this.taskMetadata, required this.checklist});
+      {super.key,
+      required this.task,
+      required this.taskMetadata,
+      required this.checklist});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => BoardAddSubtaskState();
@@ -49,24 +52,17 @@ class BoardAddSubtaskState extends EditableState<BoardAddSubtask> {
     super.dispose();
   }
 
-  void startEditing() {
+  @override
+  void startEdit() {
     log("add subtask: startEditing");
-    ref
-        .read(UiState.boardActiveState.notifier)
-        .state =
-    widget.key as GlobalKey<EditableState>;
-    ref
-        .read(UiState.boardActiveText.notifier)
-        .state = controller.text;
-    ref
-        .read(UiState.boardActions.notifier)
-        .state = [
+    ref.read(UiState.boardActiveState.notifier).state =
+        widget.key as GlobalKey<EditableState>;
+    ref.read(UiState.boardActiveText.notifier).state = controller.text;
+    ref.read(UiState.boardActions.notifier).state = [
       AppBarAction.kDiscard,
       AppBarAction.kDone
     ];
-    ref
-        .read(UiState.boardEditing.notifier)
-        .state = true;
+    ref.read(UiState.boardEditing.notifier).state = true;
   }
 
   @override
@@ -77,9 +73,11 @@ class BoardAddSubtaskState extends EditableState<BoardAddSubtask> {
             controller: controller,
             onTap: () {
               log("ontap");
+              startEdit();
             },
             onSubmitted: (value) {
               log("onsubmitted");
+              endEdit(true);
             },
             onChanged: (value) {
               log("onchanged");
@@ -91,12 +89,24 @@ class BoardAddSubtaskState extends EditableState<BoardAddSubtask> {
   }
 
   @override
-  void endEdit(bool saveChanges) {
+  void endEdit(bool saveChanges) async {
     log("add subtask, endEdit: $saveChanges");
+    ref.read(UiState.boardEditing.notifier).state = false;
     if (saveChanges) {
-      log("Add a new subtask: ${controller.text}, into checklist: ${checklist
-          .name}");
-      FocusManager.instance.primaryFocus?.unfocus();
+      log("Add a new subtask: ${controller.text}, into checklist: ${checklist.title}");
+      var id = await Api.instance
+          .createSubtask(
+        ref,
+        controller.text,
+        task.id,
+      );
+      // TODO: position within checklist item metadata? Or simply array order?
+      checklist.items.add(CheckListItemMetadata(id));
+      Api.instance.updateChecklistWithSubtask(ref, taskMetadata, id);
+      // TODO: error handling needed?
     }
+    controller.text = "";
+    log("add subtask, unfocus");
+    FocusManager.instance.primaryFocus?.unfocus();
   }
 }

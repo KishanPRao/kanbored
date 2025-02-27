@@ -119,7 +119,7 @@ abstract class AppBarActionsState<T extends AppBarActions>
       stream: ref.watch(UiState.boardEditing.notifier).stream.distinct(),
       builder: (context, snapshot) {
         final editing = snapshot.data ?? false;
-        log("edit stream: $editing");
+        // log("edit stream: $editing");
         return Row(
             children:
                 (editing ? ref.read(UiState.boardActions) : defaultActions)

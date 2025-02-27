@@ -33,6 +33,15 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
     return query.get();
   }
 
+  Future<List<TaskModelData>> getTasksInColumn(int columnId) async {
+    final query = select(taskModel)
+      ..where((tbl) {
+        return tbl.columnId.equals(columnId);
+      })
+      ..orderBy([(t) => OrderingTerm(expression: t.position)]);
+    return await query.get();
+  }
+
   Future<TaskModelData> getTask(int taskId) {
     final query = select(taskModel)
       ..where((tbl) {

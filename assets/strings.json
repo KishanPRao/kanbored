@@ -39,5 +39,7 @@
   "alert_rename_task_content": "Enter the name of the task",
   "column_empty_warn": "Column name cannot be empty",
   "clear_local": "Clear local data",
-  "add_task": "Add a task"
+  "add_task": "Add a task",
+  "alert_new_checklist": "New checklist",
+  "alert_new_checklist_content": "Enter the name of a new checklist"
 }
