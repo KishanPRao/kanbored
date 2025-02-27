@@ -79,9 +79,7 @@ class BoardAddSubtaskState extends EditableState<BoardAddSubtask> {
               log("onsubmitted");
               endEdit(true);
             },
-            onChanged: (value) {
-              log("onchanged");
-            },
+            onChanged: (value) => ref.read(UiState.boardActiveText.notifier).state = value,
             decoration: InputDecoration(
                 hintText: "add_subtask".resc(),
                 border: InputBorder.none,

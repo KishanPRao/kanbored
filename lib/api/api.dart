@@ -462,11 +462,29 @@ extension ApiSubtask on Api {
 }
 
 extension ApiComment on Api {
-  // TODO: create
-  void updateComment(WidgetRef ref, CommentModelData data) async {
-    ref.read(AppDatabase.provider).commentDao.updateComment(data);
-    log("[api] updateComment");
+  Future<int> createComment(WidgetRef ref, String comment, int taskId) async {
+    final localId = await ref.read(AppDatabase.provider).apiStorageDao.nextId();
+    await ref
+        .read(AppDatabase.provider)
+        .commentDao
+        .createComment(localId, comment, taskId);
+    log("[api] createComment: $localId");
     ref.read(AppDatabase.provider).apiStorageDao.addApiTask(
+          WebApiModel.createComment,
+          {
+            "task_id": taskId,
+            "user_id": AppData.userId,
+            "content": comment,
+          },
+          localId,
+        );
+    return localId;
+  }
+
+  Future<void> updateComment(WidgetRef ref, CommentModelData data) async {
+    await ref.read(AppDatabase.provider).commentDao.updateComment(data);
+    log("[api] updateComment");
+    await ref.read(AppDatabase.provider).apiStorageDao.addApiTask(
           WebApiModel.updateComment,
           {
             "id": Utils.generateUpdateIdString(data.id),

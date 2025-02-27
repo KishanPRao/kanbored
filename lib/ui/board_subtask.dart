@@ -20,6 +20,7 @@ class BoardSubtask extends ConsumerStatefulWidget {
   static const kStatusFinished = 2;
 
   final SubtaskModelData subtask;
+
   const BoardSubtask({super.key, required this.subtask});
 
   @override
@@ -36,7 +37,8 @@ class BoardSubtaskState extends EditableState<BoardSubtask> {
     super.initState();
     subtask = widget.subtask;
     controller = TextEditingController(text: subtask.title);
-    log("subtask name: ${subtask.title}");
+    // TODO: stop reloading subtasks non-stop
+    // log("subtask name: ${subtask.title}");
   }
 
   @override
@@ -48,7 +50,7 @@ class BoardSubtaskState extends EditableState<BoardSubtask> {
   void startEditing() {
     log("add task: startEditing");
     ref.read(UiState.boardActiveState.notifier).state =
-    widget.key as GlobalKey<EditableState>;
+        widget.key as GlobalKey<EditableState>;
     ref.read(UiState.boardActiveText.notifier).state = controller.text;
     ref.read(UiState.boardActions.notifier).state = [
       AppBarAction.kDiscard,
@@ -71,8 +73,11 @@ class BoardSubtaskState extends EditableState<BoardSubtask> {
         value: subtask.status == BoardSubtask.kStatusFinished,
         onChanged: (value) {
           // log("Changed value: $value");
-          subtask.copyWith(status: value! ? BoardSubtask.kStatusFinished : BoardSubtask.kStatusTodo);
-          // updateSubtask();
+          var updated = subtask.copyWith(
+              status: value!
+                  ? BoardSubtask.kStatusFinished
+                  : BoardSubtask.kStatusTodo);
+          Api.instance.updateSubtask(ref, updated);
           setState(() {});
         },
       ),
@@ -80,20 +85,23 @@ class BoardSubtaskState extends EditableState<BoardSubtask> {
           child: TextField(
               controller: controller,
               maxLines: null,
-              textInputAction: TextInputAction.go,
+              textInputAction: TextInputAction.done,
               onTap: () {
                 log("onTap");
+                startEditing();
               },
               style: subtask.status == BoardSubtask.kStatusFinished
                   ? const TextStyle(
-                  decoration: TextDecoration.lineThrough,
-                  fontStyle: FontStyle.italic)
+                      decoration: TextDecoration.lineThrough,
+                      fontStyle: FontStyle.italic)
                   : null,
               onSubmitted: (value) {
                 log("submitted");
+                endEdit(true);
               },
               onChanged: (value) {
                 log("onchange");
+                ref.read(UiState.boardActiveText.notifier).state = value;
               },
               decoration: const InputDecoration(border: InputBorder.none)))
     ]);
@@ -101,10 +109,14 @@ class BoardSubtaskState extends EditableState<BoardSubtask> {
 
   @override
   void endEdit(bool saveChanges) {
-    log("checklist, endEdit: $saveChanges");
+    log("[subtask], endEdit: $saveChanges");
     if (saveChanges) {
-      log("checklist update: ${controller.text}");
-      FocusManager.instance.primaryFocus?.unfocus();
+      log("[subtask] update: ${controller.text}");
+      var updated = subtask.copyWith(title: controller.text);
+      Api.instance.updateSubtask(ref, updated);
+    } else {
+      controller.text = subtask.title;
     }
+    FocusManager.instance.primaryFocus?.unfocus();
   }
 }

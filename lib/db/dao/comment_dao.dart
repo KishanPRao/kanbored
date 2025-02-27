@@ -11,7 +11,7 @@ part 'comment_dao.g.dart';
 class CommentDao extends DatabaseAccessor<AppDatabase> with _$CommentDaoMixin {
   CommentDao(super.db);
 
-  Future<int> addComment(int localId, String comment, int taskId) async {
+  Future<int> createComment(int localId, String comment, int taskId) async {
     return transaction(() async {
       var data = CommentModelCompanionExt.create(
           localId, taskId, AppData.userId, comment);
@@ -20,7 +20,7 @@ class CommentDao extends DatabaseAccessor<AppDatabase> with _$CommentDaoMixin {
     });
   }
 
-  void updateComment(CommentModelData data) async {
+  Future<void> updateComment(CommentModelData data) async {
     await into(commentModel).insertOnConflictUpdate(data);
   }
 

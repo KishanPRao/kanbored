@@ -16,7 +16,7 @@ class ApiStorageDao extends DatabaseAccessor<AppDatabase>
     with _$ApiStorageDaoMixin {
   ApiStorageDao(super.db);
 
-  void addApiTask(
+  Future<void> addApiTask(
       WebApiModel webApiModel, dynamic apiParams, int updateId) async {
     final timestamp = Utils.currentTimestampInMsec();
     log("add api task: $timestamp");

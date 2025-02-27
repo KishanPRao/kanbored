@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanbored/api/api.dart';
 import 'package:kanbored/api/state.dart';
 import 'package:kanbored/db/converters.dart';
 import 'package:kanbored/db/dao/comment_dao.dart';
@@ -34,6 +35,7 @@ class BoardCommentsState extends ConsumerState<BoardComments> {
   final keyAddTask = EditableState.createKey(); //TODO
   late StreamBuilder<List<CommentModelData>> stream;
   late CommentDao commentDao;
+  static const int intMaxValue = -1 >>> 1;
 
   // late int baseIdx;
 
@@ -66,54 +68,30 @@ class BoardCommentsState extends ConsumerState<BoardComments> {
           // log("comments len: ${comments.length}");
           return Column(
               children: comments.sorted((a, b) {
-            if (a.dateCreation! > b.dateCreation!) {
+            // initially, dateCreation is null locally, put into top
+            // TODO: alternative is to define own dateCreation, but changes on remote sync
+            if ((a.dateCreation ?? intMaxValue) >
+                (b.dateCreation ?? intMaxValue)) {
               return -1;
             } else {
               return 1;
             }
           }).map((comment) {
-            log("comment: $comment");
+            // log("comment: $comment");
             return Markdown(
+                key: EditableState.createKey(),
                 content: comment.comment,
-                onSaveCb: (text) {
-                  log("save mkdown desc");
+                onSaveCb: (text) async {
+                  log("[comment] save text");
+                  Api.instance.updateComment(
+                    ref,
+                    comment.copyWith(comment: text),
+                  );
                 });
           }).toList());
         });
   }
 
-  Widget buildBoardSubtask(SubtaskModelData subtask, BuildContext context) {
-    // log("Board task: ${task.title} at ${task.position}");
-    return Text(subtask.title);
-    // return Card(
-    //     key: ObjectKey(subtask.id),
-    //     margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 0.0),
-    //     clipBehavior: Clip.hardEdge,
-    //     color: "taskBg".themed(context),
-    //     child: InkWell(
-    //         splashColor: "cardHighlight".themed(context),
-    //         highlightColor: "cardHighlight".themed(context),
-    //         onTap: () {
-    //           // ref.read(activeTask.notifier).state = subtask;
-    //           // Navigator.pushNamed(context, routeTask);
-    //         },
-    //         child: Padding(
-    //           padding: const EdgeInsets.all(10.0),
-    //           child: SizedBox(
-    //               height: Sizes.kTaskHeight,
-    //               child: Center(
-    //                   child: Text(
-    //                 subtask.title,
-    //                 textAlign: TextAlign.center, // horizontal
-    //               ))),
-    //         )));
-  }
-
   @override
-  // Widget build(BuildContext context) => Column(children: [Expanded(child: stream)],);
-  // Widget build(BuildContext context) => Column(
-  //       children: [Flexible(fit: FlexFit.loose, child: stream)],
-  //     );
   Widget build(BuildContext context) => stream;
-// Widget build(BuildContext context) => Text("test");
 }

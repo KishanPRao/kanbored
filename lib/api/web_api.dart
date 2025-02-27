@@ -557,6 +557,14 @@ class WebApi {
         // .updateSubtaskId(subtask.taskId, taskMetadata, apiData.updateId, result);
         log("handleApiRequest: update subtask id ${apiData.updateId} => $result");
         apiDao.removeApiTask(apiData.id);
+      } else if (apiData.apiId == WebApiModel.createComment.apiId) {
+        log("handleApiRequest: createComment: ${apiData.updateId}, ${apiData.webApiParams}");
+        ref
+            .read(AppDatabase.provider)
+            .commentDao
+            .updateId(apiData.updateId, result);
+        log("handleApiRequest: update comment id ${apiData.updateId} => $result");
+        apiDao.removeApiTask(apiData.id);
       }
       /*else if (apiData.apiId == WebApiModel.saveTaskMetadata.apiId) {
         log("handleApiRequest: saveTaskMetadata: ${apiData.updateId}, ${apiData.webApiParams}");

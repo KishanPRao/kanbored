@@ -58,6 +58,8 @@ class _TaskState extends ConsumerState<Task> {
   late TaskMetadataDao taskMetadataDao;
   late double columnWidth;
   ScrollController scrollController = ScrollController();
+  late GlobalKey<EditableState> keyDescription;
+  late GlobalKey<EditableState> keyAddComment;
 
   Future<List<Timer?>?> updateData({bool recurring = false}) async {
     var taskModel = ref.read(activeTask)!;
@@ -87,6 +89,8 @@ class _TaskState extends ConsumerState<Task> {
     subtaskDao = ref.read(AppDatabase.provider).subtaskDao;
     commentDao = ref.read(AppDatabase.provider).commentDao;
     taskMetadataDao = ref.read(AppDatabase.provider).taskMetadataDao;
+    keyAddComment = EditableState.createKey();
+    keyDescription = EditableState.createKey();
     // columns = ref.watch(columnsInProject);
     // columnsStream = buildColumns(context, projectModel.id);
     // final showArchived = ref.watch(UiState.boardShowArchived.notifier).stream.distinct();
@@ -304,35 +308,40 @@ class _TaskState extends ConsumerState<Task> {
                 scrollDirection: Axis.vertical,
                 controller: scrollController,
                 children: <Widget>[
-                      Markdown(
-                        key: EditableState.createKey(),
-                        content: task.description,
-                        onSaveCb: (text) {
-                          log("save mkdown desc");
-                        },
-                        // key: keysEditableText[0],
-                        // model: taskModel,
-                        // abActionListener: AppBarActionListener(
-                        //   onChange: onChange,
-                        //   onEditStart: (_, __) => onEditStart(
-                        //       0, [AppBarAction.kDiscard, AppBarAction.kDone]),
-                        //   onEditEnd: (saveChanges) {
-                        //     // TODO: allow empty desc, default hint text
-                        //     // updateDescription()
-                        //     return onEditEnd(saveChanges);
-                        //   },
-                        //   onDelete: onDelete,
-                        //   refreshUi: refreshUi,
-                        // )
-                      )
-                    ] +
-                    // [buildSubtasksStream(taskModel.id)]
-                    // [Column(crossAxisAlignment: CrossAxisAlignment.start, children: [BoardSubtasks(task: task)])]
-                    [
-                      BoardSubtasks(task: task),
-                      BoardAddComment(task: task),
-                      BoardComments(task: task)
-                    ]
+              Markdown(
+                key: keyDescription,
+                content: task.description,
+                onSaveCb: (text) {
+                  log("[task] update desc");
+                  Api.instance.updateTask(
+                    ref,
+                    task.copyWith(description: text),
+                  );
+                },
+                // key: keysEditableText[0],
+                // model: taskModel,
+                // abActionListener: AppBarActionListener(
+                //   onChange: onChange,
+                //   onEditStart: (_, __) => onEditStart(
+                //       0, [AppBarAction.kDiscard, AppBarAction.kDone]),
+                //   onEditEnd: (saveChanges) {
+                //     // TODO: allow empty desc, default hint text
+                //     // updateDescription()
+                //     return onEditEnd(saveChanges);
+                //   },
+                //   onDelete: onDelete,
+                //   refreshUi: refreshUi,
+                // )
+              ),
+              BoardSubtasks(task: task),
+
+              // TODO: new key creation causes kb to keep closing on open
+              // BoardAddComment(key: EditableState.createKey(), task: task),
+              BoardAddComment(key: keyAddComment, task: task),
+              BoardComments(task: task)
+            ]
+                // [buildSubtasksStream(taskModel.id)]
+                // [Column(crossAxisAlignment: CrossAxisAlignment.start, children: [BoardSubtasks(task: task)])]
                 // buildSubtasks(
                 //     context,
                 //     taskModel,

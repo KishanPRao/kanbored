@@ -47,6 +47,7 @@ abstract class AppBarActionsState<T extends AppBarActions>
     }
     ref.read(UiState.boardEditing.notifier).state = false;
     ref.read(UiState.boardActions.notifier).state = defaultActions;
+    log("end edit, ${ref.read(UiState.boardActiveState.notifier).state?.currentState}");
     ref.read(UiState.boardActiveState.notifier).state?.currentState?.endEdit(saveChanges);
     // if (_editing) {
     //   setState(() {

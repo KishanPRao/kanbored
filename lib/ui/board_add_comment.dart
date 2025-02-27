@@ -51,6 +51,7 @@ class BoardAddCommentState extends EditableState<BoardAddComment> {
       AppBarAction.kDone
     ];
     ref.read(UiState.boardEditing.notifier).state = true;
+    // focusNode.requestFocus();
   }
 
   @override
@@ -58,16 +59,15 @@ class BoardAddCommentState extends EditableState<BoardAddComment> {
     return Padding(
         padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 10.0),
         child: TextField(
+            // focusNode: focusNode,
+            textInputAction: TextInputAction.newline,
             controller: controller,
+            maxLines: null,
             onTap: () {
               log("ontap");
+              startEditing();
             },
-            onSubmitted: (value) {
-              log("onsubmitted");
-            },
-            onChanged: (value) {
-              log("onchanged");
-            },
+            onChanged: (value) => ref.read(UiState.boardActiveText.notifier).state = value,
             decoration: InputDecoration(
                 hintText: "add_comment".resc(),
                 border: InputBorder.none,
@@ -75,11 +75,18 @@ class BoardAddCommentState extends EditableState<BoardAddComment> {
   }
 
   @override
-  void endEdit(bool saveChanges) {
-    log("add subtask, endEdit: $saveChanges");
+  Future<void> endEdit(bool saveChanges) async {
+    ref.read(UiState.boardEditing.notifier).state = false;
+    log("add comment, endEdit: $saveChanges");
     if (saveChanges) {
       log("Add a new comment: ${controller.text}, into task: ${task.title}");
-      FocusManager.instance.primaryFocus?.unfocus();
+      await Api.instance.createComment(
+        ref,
+        controller.text,
+        task.id,
+      );
     }
+    controller.text = "";
+    FocusManager.instance.primaryFocus?.unfocus();
   }
 }

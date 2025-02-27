@@ -167,6 +167,8 @@ class ChecklistHeaderState extends EditableState<ChecklistHeader> {
       // } else {
       //   controller.text = "";
       // }
+    } else {
+      controller.text = checklist.title;
     }
     FocusManager.instance.primaryFocus?.unfocus();
   }
