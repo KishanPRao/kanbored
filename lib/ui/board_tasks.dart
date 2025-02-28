@@ -62,7 +62,7 @@ class BoardTasksState extends ConsumerState<BoardTasks> {
                 itemBuilder: (_, index) {
                   final task = tasks[index];
                   // log("task: ${task.title}, ${task.id}");
-                  return buildBoardTask(tasks.elementAt(index), context);
+                  return buildBoardTask(task, context);
                 },
               )),
               if (!showArchived) AddTask(key: keyAddTask, columnModel: column)

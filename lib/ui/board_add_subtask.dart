@@ -91,13 +91,13 @@ class BoardAddSubtaskState extends EditableState<BoardAddSubtask> {
     log("add subtask, endEdit: $saveChanges");
     ref.read(UiState.boardEditing.notifier).state = false;
     if (saveChanges) {
-      log("Add a new subtask: ${controller.text}, into checklist: ${checklist.title}");
       var id = await Api.instance
           .createSubtask(
         ref,
         controller.text,
         task.id,
       );
+      log("Add a new subtask: ${controller.text}, into checklist: ${checklist.title}; local id: $id");
       // TODO: position within checklist item metadata? Or simply array order?
       checklist.items.add(CheckListItemMetadata(id));
       Api.instance.updateChecklistWithSubtask(ref, taskMetadata, id);

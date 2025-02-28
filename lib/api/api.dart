@@ -404,7 +404,7 @@ extension ApiSubtask on Api {
         .read(AppDatabase.provider)
         .subtaskDao
         .createSubtask(localId, title, taskId);
-    log("[api] createSubtask");
+    log("[api] createSubtask: $localId");
     ref.read(AppDatabase.provider).apiStorageDao.addApiTask(
           WebApiModel.createSubtask,
           {

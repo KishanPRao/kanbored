@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/api/api.dart';
 import 'package:kanbored/api/web_api.dart';
 import 'package:kanbored/db/database.dart';
+import 'package:kanbored/ui/ui_state.dart';
 import 'package:kanbored/utils/strings.dart';
 import 'package:kanbored/ui/abstract_app_bar.dart';
 import 'package:kanbored/ui/app_bar_action_listener.dart';
@@ -37,6 +38,19 @@ class ColumnTextState extends EditableState<ColumnText> {
     columnModel = widget.columnModel;
     // abActionListener = widget.abActionListener;
     controller = TextEditingController(text: columnModel.title);
+  }
+
+  @override
+  void startEdit() {
+    log("[column header]: startEditing");
+    ref.read(UiState.boardActiveState.notifier).state =
+    widget.key as GlobalKey<EditableState>;
+    ref.read(UiState.boardActiveText.notifier).state = controller.text;
+    ref.read(UiState.boardActions.notifier).state = [
+      AppBarAction.kDiscard,
+      AppBarAction.kDone
+    ];
+    ref.read(UiState.boardEditing.notifier).state = true;
   }
 
   @override
@@ -161,6 +175,7 @@ class ColumnTextState extends EditableState<ColumnText> {
     return TextField(
       controller: controller,
       onTap: () {
+        startEdit();
         // abActionListener.onChange(controller.text);
         // abActionListener.onEditStart(0, [
         //   AppBarAction.kDelete,
