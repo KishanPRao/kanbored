@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:isolate';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -37,12 +38,8 @@ class _HomeState extends ConsumerState<Home> {
     "params": {"name": "New project", "owner_id": 1}
   };
 
-  void runApiTask(ApiStorageModelData event) async {
-    apiDao.getTasks();
-    bool status = await WebApi.handleApiRequest(ref, event);
-    log("runApiTask: $status");
-  }
-
+  // TODO: Move into bg service; all api requests!
+  // TODO: Multi-api requests for non-creation requests that don't need result directly; eg, open task, etc
   void updateData({bool recurring = false}) async {
     var timer = Api.instance.updateProjects(ref, recurring: recurring);
     if (recurring) {
@@ -52,11 +49,33 @@ class _HomeState extends ConsumerState<Home> {
     final event = await apiDao.getApiLatest();
     if (event != null && (ref.read(onlineStatus.notifier).state ?? false)) {
       log("run latest api task: ${event.timestamp}, ${event.updateId}, ${event.apiName}, ${event.apiType}");
-      runApiTask(event);
+      Api.instance.runApiTask(ref, event);
     } else {
       log("no latest api / offline");
     }
     // });
+  }
+
+  static void updateAllData(WidgetRef ref) {
+    log("update all data, start");
+    Api.instance.updateProjects(ref, cb: () async {
+      var projects = await ref.read(AppDatabase.provider).projectDao.getProjects();
+      for (var project in projects) {
+        Api.instance.updateTasks(ref, project.id, cb: () async {
+          var tasks = await ref.read(AppDatabase.provider).taskDao.getAllTasks();
+          for (var task in tasks) {
+            Api.instance.retrieveTaskMetadata(ref, task.id, cb: () {
+              Api.instance.updateSubtasks(ref, task.id, cb: () {
+                Api.instance.updateComments(ref, task.id, cb: () {
+                  log("comments done");
+                });
+              },);
+            },);
+          }
+        },);
+      }
+    },);
+    log("update all data, done");
   }
 
   @override
@@ -65,12 +84,14 @@ class _HomeState extends ConsumerState<Home> {
     taskDao = ref.read(AppDatabase.provider).taskDao;
     apiDao = ref.read(AppDatabase.provider).apiStorageDao;
     connection = AppConnection(ref.read(onlineStatus.notifier));
-    ref.read(onlineStatus.notifier).stream.listen((online) {
+    ref.read(onlineStatus.notifier).stream.listen((online) async {
       online = online ?? false;
       if (online) {
         updateData();
+        updateAllData(ref);
       }
     });
+
     // TODO: Check works on offline
     updateData(recurring: true);
 
@@ -92,7 +113,7 @@ class _HomeState extends ConsumerState<Home> {
       }
       log("run watched api task: ${event.timestamp}, ${event.updateId}, ${event.apiName}, ${event.apiType}; ${event.webApiParams}");
       // apiDao.transaction(() async {
-      runApiTask(event);
+      Api.instance.runApiTask(ref, event);
       // });
       // log("==> running task: ${event.timestamp}");
       // int next(int min, int max) => min + random.nextInt(max - min);
@@ -211,18 +232,20 @@ class _HomeState extends ConsumerState<Home> {
                   StreamBuilder(
                       stream: ref.watch(onlineStatus.notifier).stream,
                       builder: (context, snapshot2) {
-                        final isOnline = snapshot2.data ?? true;  // If not loaded yet, don't show offline
+                        final isOnline = snapshot2.data ??
+                            (ref.read(onlineStatus.notifier).state ?? true);
+                        // If not loaded yet, don't show offline
                         if (!isOnline) {
                           log("offline! ${snapshot2.data}");
                         }
                         return isOnline
                             ? Utils.emptyUi()
                             : Card(
-                                clipBehavior: Clip.hardEdge,
-                                color: "offlineBg".themed(context),
-                                child: SizedBox(
-                                  child: Center(child: Text("offline".resc())),
-                                ));
+                            clipBehavior: Clip.hardEdge,
+                            color: "offlineBg".themed(context),
+                            child: SizedBox(
+                              child: Center(child: Text("offline".resc())),
+                            ));
                       }),
                   StreamBuilder(
                       stream: ref

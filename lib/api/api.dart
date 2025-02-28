@@ -88,12 +88,13 @@ extension ApiProject on Api {
     return result;
   }
 
-  Timer? updateProjects(WidgetRef ref, {recurring = false}) {
+  Timer? updateProjects(WidgetRef ref, {recurring = false, Function()? cb}) {
     function() {
       // TODO: try catch, SocketException
       WebApi.getAllProjects().then((items) async {
         ref.read(AppDatabase.provider).projectDao.updateProjects(items);
         // updateDbProjects(ref, items);
+        cb?.call();
       });
     }
 
@@ -152,7 +153,7 @@ extension ApiColumn on Api {
 }
 
 extension ApiTask on Api {
-  Timer? updateTasks(WidgetRef ref, int projectId, {recurring = false}) {
+  Timer? updateTasks(WidgetRef ref, int projectId, {recurring = false, Function()? cb}) {
     function() {
       Future.wait([
         WebApi.getAllTasks(projectId, 1), // active
@@ -163,6 +164,7 @@ extension ApiTask on Api {
         // log("tasks: $tasks");
         // log("update tasks: ${tasks.length}");
         ref.readIfMounted(AppDatabase.provider)?.taskDao.updateTasks(tasks);
+        cb?.call();
       });
     }
 
@@ -189,7 +191,7 @@ extension ApiTask on Api {
   }
 
   void closeTask(WidgetRef ref, int taskId) async {
-    ref.read(AppDatabase.provider).taskDao.openTask(taskId);
+    ref.read(AppDatabase.provider).taskDao.closeTask(taskId);
     log("[api] closeTask: $taskId");
     ref.read(AppDatabase.provider).apiStorageDao.addApiTask(
         WebApiModel.closeTask,
@@ -305,7 +307,7 @@ extension ApiTaskMetadata on Api {
   //   // TODO: call enable/disable project
   // }
 
-  Timer? retrieveTaskMetadata(WidgetRef ref, int taskId, {recurring = false}) {
+  Timer? retrieveTaskMetadata(WidgetRef ref, int taskId, {recurring = false, Function()? cb}) {
     function() {
       WebApi.getTaskMetadata(taskId).then((items) async {
         // TODO: alt approach?
@@ -317,6 +319,7 @@ extension ApiTaskMetadata on Api {
             .readIfMounted(AppDatabase.provider)
             ?.taskMetadataDao
             .updateTaskMetadata(taskId, items);
+        cb?.call();
       });
     }
 
@@ -440,7 +443,7 @@ extension ApiSubtask on Api {
     // TODO: call enable/disable project
   }
 
-  Timer? updateSubtasks(WidgetRef ref, int taskId, {recurring = false}) {
+  Timer? updateSubtasks(WidgetRef ref, int taskId, {recurring = false, Function()? cb}) {
     function() {
       WebApi.getAllSubtasks(taskId).then((items) async {
         // TODO: alt approach?
@@ -452,6 +455,7 @@ extension ApiSubtask on Api {
             .readIfMounted(AppDatabase.provider)
             ?.subtaskDao
             .updateSubtasks(items);
+        cb?.call();
       });
     }
 
@@ -494,7 +498,7 @@ extension ApiComment on Api {
         );
   }
 
-  Timer? updateComments(WidgetRef ref, int taskId, {recurring = false}) {
+  Timer? updateComments(WidgetRef ref, int taskId, {recurring = false, Function()? cb}) {
     function() {
       WebApi.getAllComments(taskId).then((items) async {
         // TODO: alt approach?
@@ -505,12 +509,22 @@ extension ApiComment on Api {
             .readIfMounted(AppDatabase.provider)
             ?.commentDao
             .updateComments(items);
+        cb?.call();
       });
     }
 
     function();
     if (recurring) return Api.recurringApi(function);
     return null;
+  }
+}
+
+extension ApiInnerTask on Api {
+
+  void runApiTask(WidgetRef ref, ApiStorageModelData event) async {
+    await ref.read(AppDatabase.provider).apiStorageDao.getTasks();
+    bool status = await WebApi.handleApiRequest(ref, event);
+    log("runApiTask: $status");
   }
 }
 

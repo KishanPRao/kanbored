@@ -258,6 +258,7 @@ class _TaskState extends ConsumerState<Task> {
   Widget build(BuildContext context) {
     final task = ref.watch(activeTask);
     if (task == null) return Utils.emptyUi();
+    log("[task] build, task: ${task.title}, ${task.id}, active: ${task.isActive}");
     // Reset task metadata
     // taskMetadataDao.updateTaskMetadata(task.id, {
     //   "metadata": {"checklists": []}
@@ -293,6 +294,24 @@ class _TaskState extends ConsumerState<Task> {
                 )
           ]),
       body: Column(children: [
+        StreamBuilder(
+            stream: ref.watch(onlineStatus.notifier).stream,
+            builder: (context, snapshot2) {
+              final isOnline = snapshot2.data ??
+                  (ref.read(onlineStatus.notifier).state ?? true);
+              // If not loaded yet, don't show offline
+              if (!isOnline) {
+                log("offline! ${snapshot2.data}");
+              }
+              return isOnline
+                  ? Utils.emptyUi()
+                  : Card(
+                  clipBehavior: Clip.hardEdge,
+                  color: "offlineBg".themed(context),
+                  child: SizedBox(
+                    child: Center(child: Text("offline".resc())),
+                  ));
+            }),
         task.isActive == 1
             ? Utils.emptyUi()
             : Card(

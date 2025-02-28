@@ -15,6 +15,12 @@ class ProjectDao extends DatabaseAccessor<AppDatabase> with _$ProjectDaoMixin {
       ..orderBy([(t) => OrderingTerm(expression: t.name)]);
     return query.watch();
   }
+
+  Future<List<ProjectModelData>> getProjects() {
+    final query = select(projectModel)
+      ..orderBy([(t) => OrderingTerm(expression: t.name)]);
+    return query.get();
+  }
   //
   // void createProject(Map<String, dynamic> json) {
   //   transaction(() async {

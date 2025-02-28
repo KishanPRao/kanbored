@@ -313,6 +313,24 @@ class _BoardState extends ConsumerState<Board> {
                   return Utils.emptyFuture();
                 },
                 child: Column(children: [
+                  StreamBuilder(
+                      stream: ref.watch(onlineStatus.notifier).stream,
+                      builder: (context, snapshot2) {
+                        final isOnline = snapshot2.data ??
+                            (ref.read(onlineStatus.notifier).state ?? true);
+                        // If not loaded yet, don't show offline
+                        if (!isOnline) {
+                          log("offline! ${snapshot2.data}");
+                        }
+                        return isOnline
+                            ? Utils.emptyUi()
+                            : Card(
+                                clipBehavior: Clip.hardEdge,
+                                color: "offlineBg".themed(context),
+                                child: SizedBox(
+                                  child: Center(child: Text("offline".resc())),
+                                ));
+                      }),
                   showArchived
                       ? Card(
                           clipBehavior: Clip.hardEdge,

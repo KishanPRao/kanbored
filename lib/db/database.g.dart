@@ -4553,6 +4553,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final TaskMetadataDao taskMetadataDao =
       TaskMetadataDao(this as AppDatabase);
   late final ApiStorageDao apiStorageDao = ApiStorageDao(this as AppDatabase);
+  late final SearchDao searchDao = SearchDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();

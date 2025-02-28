@@ -6,6 +6,7 @@ import 'package:drift/native.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanbored/db/dao/comment_dao.dart';
+import 'package:kanbored/db/dao/search_dao.dart';
 import 'package:kanbored/db/dao/subtask_dao.dart';
 import 'package:kanbored/db/dao/task_metadata_dao.dart';
 import 'package:kanbored/db/web_api_model.dart';
@@ -43,6 +44,7 @@ part 'database.g.dart';
   CommentDao,
   TaskMetadataDao,
   ApiStorageDao,
+  SearchDao,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());

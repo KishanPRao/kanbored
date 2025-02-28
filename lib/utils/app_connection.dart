@@ -27,6 +27,7 @@ class AppConnection {
         retryCount++;
         // log("update connection: retry: $retryCount");
       } else {
+        log("update connection: retry offline: $retryCount");
         retryCount = 0;
         onlineStatus.state = false;
       }
