@@ -11,6 +11,7 @@ dependencies:
     sdk: flutter
   provider: ^6.0.0
   cupertino_icons: ^1.0.6
+  flutter_launcher_icons:
   shared_preferences: ^2.2.2
   http:
   flutter_secure_storage: ^9.2.4
@@ -42,3 +43,9 @@ flutter:
     - assets/dark_theme.json
     - assets/light_theme.json
     - assets/strings.json
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/icons/launcher.png"

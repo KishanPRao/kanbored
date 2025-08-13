@@ -396,7 +396,7 @@ class WebApi {
         .toList();
   }
 
-  static dynamic baseApi<T extends Model>(String method, int id,
+  static dynamic baseApi(String method, int id,
       {bool saveCache = false, dynamic params = const {}}) async {
     final Map<String, dynamic> parameters = {
       "jsonrpc": "2.0",
