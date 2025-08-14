@@ -1,6 +1,6 @@
 # kanbored
 
-A WIP Flutter kanban board with front-end inspired by Trello, with experimental support for offline cache, and intention to work alongside a self-hosted Kanboard server.
+A WIP Flutter kanban board with front-end inspired by Trello, with experimental support for offline cache, and intended to work alongside a self-hosted Kanboard server.
 
 Trello data can be converted to Kanboard data using [this fork](https://github.com/KishanPRao/TrelloJSON2Kanboard/tree/feature/additional-trello-features) to include checklist information.
 
