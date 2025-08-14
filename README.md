@@ -1,115 +1,23 @@
 # kanbored
-Kanbored
 
-```
-TODO: Remove!
-Container(child: Text("TMP"), color: Colors.white,)
-SizedBox(width: _columnWidth, child: TextField(decoration: InputDecoration(hintText: "add_task".resc())))
-```
+A WIP Flutter kanban board with front-end inspired by Trello, with experimental support for offline cache, and intention to work alongside a self-hosted Kanboard server.
 
-Behaviour:
-- Archived task & column: viewing archived columns, show all tasks within archived column & show column w/ inactive tasks.
-- New Checklist: if no existing checklist (from trello), all existing tasks to new checklist, create a new one.
+Trello data can be convert to Kanboard data using [this fork](https://github.com/KishanPRao/TrelloJSON2Kanboard/tree/feature/additional-trello-features) to include checklist information.
 
-NOTE: bridge supported features might not look right while using `kanboard`.
-Also, `kanboard` features might be missing. eg, swimlane. 
-Bridge support:
-- Multiple checklist (adds task metadata into kanboard, even if not try checklist)
-- Archived task (card), column (list)
+The intention of this project is to support Trello's named checklists better, making of metadata to store this additional information, and to be able to host your data privately.
 
-Basic features:
-- Checklist-bridge complete
-- Bridge, linked task
-- Add, remove, update items (project, task, subtask, comment)
-- Cached data
-- Archive-unarchive
-- Amolded theme
-- Attachments if simple
-- Pin task to homescreen (android only?)
-- Search: task, subtask & comments (local cache info or rely on `kanboard`?)
-- Test if only sqlite or other `kanboard` DBs work (JSON type issues?)
-- Replace newline for markdown with double newline
-- Due date, task and subtask
-- Date note added, all activity list (separate dialog/screen?)
-- A common state listener for changes from different routes/screens, decide if task change matters to Board/Column screen etc, trigger rebuild, maybe mention scope of change
+For a rough idea about the features that are yet to be supported, please take a look at the [TODO file](TODO.md).
 
-TODO:
-- Link tasks
-- (re-order) Drag & drop, header/checklist & items between checklists (`flutter_sticky_header`, `SliverReorderableList`)
-- Test w/ and w/o bridge features/metadata
-- Queue write tasks (offline support), bg service
-- Load all projects, pull down refresh to force update, bg service
-- Use multi-paragraph markdown: `flutter_markdown_selectionarea`
-- Move/copy task
-- Task bg or color
-- Due date
-- Task activity
-- Attachments
-- Favorite/starred tasks
-- Optimize!
-- Store updated accurate position info when deleting middle position items
-- Show metadata of task (num comments, num of subtasks)
-- Show progress of subtasks
-- Enforce loading atleast once after clearing local data
+## Screenshots
 
-Limitations:
-These features are unlikely to be worked on either due to complexity, or due to limited understanding of its expected workflow.
+| Login                                                                                                    | Add Project                                                                                                 | Task Information                                                                                             |
+|----------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| <div style="text-align: center;"><img src="screenshots/login.jpg" alt="Description" width="400" /></div> | <div style="text-align: center;"><img src="screenshots/add_proj.jpg" alt="Description" width="400" /></div> | <div style="text-align: center;"><img src="screenshots/task_data.jpg" alt="Description" width="400" /></div> |
 
-- Swimlane support
-- Multi user support / user show
-- Subtask ordering will be different (uses metadata info to organize & decide position). If re-ordered in kanboard after in-app use, it will not be reflected.
+| Project Information                                                                                        | New Column                                                                                                    | Archived task                                                                                                    |
+|------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
+| <div style="text-align: center;"><img src="screenshots/project.jpg" alt="Description" width="400" /></div> | <div style="text-align: center;"><img src="screenshots/new_column.jpg" alt="Description" width="400" /></div> | <div style="text-align: center;"><img src="screenshots/archived_task.jpg" alt="Description" width="400" /></div> |
 
-Bugs:
-- Archive/unarchive task, does not refresh the main screen (fix after cache)
-- Views reload (while adding task, etc); optimization
-- Default columns in new project
-- Archive/unarchive incorrect reloading, better `key` usage 
-- Close task would complete incomplete subtasks (use metadata for archive instead)
-- perf: Re-use same pages/screens; search -> col -> search, etc
-
-Test:
-- Archive, unarchive cols, tasks
-
-Possible Kanboard bugs:
-- Inaccurate position info when deleting middle position items
-- `removeColumn` not working
-
-Offline limitations:
-- new `id` related:
-    - creating new project/task/
-    - **possible workaround**
-        - use proj/task/col id -1, -2 etc, use only for subsequent tasks; use some pattern: {%column{%-1%}%} as the id, run tasks once online; refresh after all api tasks finished.
-
-Actions:
-- Home
-    - Create proj - x
-    - Show arch (proj) - x
-    - Settings -
-- Board
-    - Actions
-        - Add column -
-        - Rename proj - x
-        - Show arch (col/task) -
-        - Archive proj - x
-        - Delete proj - x
-    - Add task
-        - back button, deselect before exit -
-    - Rename col - x
-    - Archive col - x
-    - Delete col -
-    - Search proj -
-- Task
-    - Actions
-        - Add clist -
-        - Archive task -
-        - Rename task -
-        - Delete task -
-    - Edit / discard changes Desc -
-    - Edit / discard changes clist -
-    - Delete clist -
-    - Add subtask -
-    - Edit / discard changes subtask -
-    - Delete subtask -
-    - Add comment -
-    - Edit / discard changes comment -
-    - Delete comment - 
+| Kanboard server                                     |
+|-----------------------------------------------------|
+| ![Kanboard server](screenshots/kanboard_server.jpg) |
