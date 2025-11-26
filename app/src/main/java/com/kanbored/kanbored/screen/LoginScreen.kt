@@ -147,7 +147,10 @@ private fun FormField(
 fun LoginPreviewDark() {
     AppTheme(darkTheme = false) {
         // TODO: avoid plugging actual repo/db into preview
-        val kanbanRepository = KanbanRepository(context = LocalContext.current)
+        val kanbanRepository = KanbanRepository(
+            context = LocalContext.current,
+            viewModelScope = viewModelScope
+        )
         val kanbanVM =
             viewModel<KanbanViewModel> { KanbanViewModel(repository = kanbanRepository) }
         LoginScreen(kanbanVM)

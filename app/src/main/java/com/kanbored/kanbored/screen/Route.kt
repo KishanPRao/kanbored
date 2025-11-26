@@ -7,4 +7,6 @@ sealed class Route {
     object Login: Route()
     @Serializable
     object Home: Route()
+    @Serializable
+    object Empty: Route()
 }

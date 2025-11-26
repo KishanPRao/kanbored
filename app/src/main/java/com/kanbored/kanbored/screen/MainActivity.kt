@@ -32,7 +32,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.kanbored.kanbored.repository.KanbanRepository
 import com.kanbored.kanbored.ui.theme.AppTheme
 import com.kanbored.kanbored.utils.UiEvent
 import com.kanbored.kanbored.viewmodel.KanbanViewModel
@@ -44,12 +43,13 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AppTheme {
-                val kanbanRepository = KanbanRepository(context = LocalContext.current)
+                val context = LocalContext.current
                 val kanbanVM =
-                    viewModel<KanbanViewModel> { KanbanViewModel(repository = kanbanRepository) }
+                    viewModel<KanbanViewModel> { KanbanViewModel(context = context) }
                 val navController = rememberNavController()
                 val userSession = kanbanVM.authenticatedSession.collectAsState().value
-                val isAuthenticated = userSession?.authenticated ?: false
+                println("user session: $userSession")
+                val isAuthenticated = userSession?.authenticated
 
                 val hostState = remember { SnackbarHostState() }
                 var showLoading by remember { mutableStateOf(false) }
@@ -90,9 +90,16 @@ class MainActivity : ComponentActivity() {
                     }
                     NavHost(
                         navController = navController,
-                        startDestination = if (isAuthenticated) Route.Home else Route.Login,
+                        startDestination = when {
+                            isAuthenticated == null -> Route.Empty  // Not loaded yet
+                            isAuthenticated -> Route.Home
+                            else -> Route.Login
+                        },
                         modifier = Modifier.padding(innerPadding)
                     ) {
+                        composable<Route.Empty> {
+                            Box(modifier = Modifier.fillMaxSize())
+                        }
                         composable<Route.Home> {
                             HomeScreen(
                                 kanbanVM = kanbanVM,

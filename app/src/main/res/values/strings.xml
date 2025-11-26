@@ -9,5 +9,4 @@
     <string name="login_button">LOGIN</string>
     <string name="login_err_unknown">Unknown error</string>
     <string name="login_err_invalid_input">Please enter correct input data!</string>
-    <string name="login_err_unauthorized">Unauthorized user. Please check your credentials!</string>
 </resources>

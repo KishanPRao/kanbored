@@ -40,7 +40,7 @@ interface UserDao {
     suspend fun delete(userSessionEntity: KanbanUserSessionEntity)
 
     @Query("select * from $userSessionTableName where authenticated == 1")  // TODO: limit 1?
-    suspend fun getAuthenticatedUserSessionSync(): KanbanUserSessionEntity
+    suspend fun getAuthenticatedUserSessionSync(): KanbanUserSessionEntity?
 }
 
 @Database(entities = [KanbanUserSessionEntity::class], version = 1)
