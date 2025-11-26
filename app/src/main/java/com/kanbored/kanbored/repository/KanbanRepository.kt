@@ -2,16 +2,18 @@ package com.kanbored.kanbored.repository
 
 import android.content.Context
 import com.kanbored.kanbored.R
+import com.kanbored.kanbored.model.KanbanProject
 import com.kanbored.kanbored.model.KanbanUserSession
 import com.kanbored.kanbored.network.KanbanApi
-import com.kanbored.kanbored.network.KanbanLoginRequest
 import com.kanbored.kanbored.network.KanbanMethod
+import com.kanbored.kanbored.network.KanbanRequest
 import com.kanbored.kanbored.network.Result
 import com.kanbored.kanbored.network.RetrofitClient
 import com.kanbored.kanbored.persistent.KanbanDatabase
 import com.kanbored.kanbored.utils.PresentableText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class KanbanRepository(context: Context, scope: CoroutineScope) {
@@ -28,6 +30,30 @@ class KanbanRepository(context: Context, scope: CoroutineScope) {
                     hostUrl = userSession.hostUrl,
                 )
             }
+        }
+    }
+
+    fun getAllProjects(): Flow<List<KanbanProject>> = database.projectDao().getAllProjects()
+
+    suspend fun refreshProjects(): Result<Unit> {
+        try {
+            val response = kanbanApi.getAllProjects()
+            if (response.result != null) {
+                val projects = response.result
+                println("all projects: $projects")
+                database.projectDao().insertAll(projects)
+                return Result.Success(Unit)
+            } else if (response.error != null) {
+                return Result.Error(PresentableText.DynamicString(response.error.message))
+            } else {
+                return Result.Error(PresentableText.StringResource(R.string.login_err_unknown))
+            }
+        } catch (e: Exception) {
+            println("refreshProjects error: ${e.message}")
+            return Result.Error(
+                e.message?.let { PresentableText.DynamicString(it) }
+                    ?: PresentableText.StringResource(R.string.login_err_unknown)
+            )
         }
     }
 
@@ -51,10 +77,9 @@ class KanbanRepository(context: Context, scope: CoroutineScope) {
                     hostUrl = hostUrl,
                 )
                 kanbanApi.login(
-                    KanbanLoginRequest(
+                    KanbanRequest(
                         method = KanbanMethod.GetMe.name,
                         id = KanbanMethod.GetMe.id,
-                        jsonrpc = "2.0",
                     )
                 )
             }

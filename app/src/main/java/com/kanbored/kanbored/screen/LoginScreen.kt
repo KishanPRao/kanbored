@@ -54,9 +54,9 @@ fun LoginScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         val spacing = 30.dp
-        var url by rememberSaveable { mutableStateOf("") }
-        var userName by rememberSaveable { mutableStateOf("") }
-        var password by rememberSaveable { mutableStateOf("") }
+        var url by rememberSaveable { mutableStateOf("http://192.168.0.50:6080") }
+        var userName by rememberSaveable { mutableStateOf("admin") }
+        var password by rememberSaveable { mutableStateOf("admin") }
         var isValidUrl by rememberSaveable { mutableStateOf(true) }
         var isValidUserName by rememberSaveable { mutableStateOf(true) }
         var isValidPassword by rememberSaveable { mutableStateOf(true) }

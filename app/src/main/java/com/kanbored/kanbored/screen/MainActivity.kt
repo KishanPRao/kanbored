@@ -56,6 +56,7 @@ import androidx.navigation.compose.rememberNavController
 import com.kanbored.kanbored.R
 import com.kanbored.kanbored.ui.theme.AppTheme
 import com.kanbored.kanbored.utils.KanbanIconButton
+import com.kanbored.kanbored.utils.TextInputDialog
 import com.kanbored.kanbored.utils.UiEvent
 import com.kanbored.kanbored.viewmodel.KanbanViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -107,8 +108,9 @@ class MainActivity : ComponentActivity() {
                                     )
                                 }
 
-                                UiEvent.HideLoading -> showLoading = false
-                                UiEvent.ShowLoading -> showLoading = true
+                                UiEvent.HideGlobalLoading -> showLoading = false
+                                UiEvent.ShowGlobalLoading -> showLoading = true
+                                else -> {}
                             }
                         }
                     }
@@ -155,111 +157,126 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
 
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun AppTopBar(
-        navController: NavHostController,
-        modifier: Modifier = Modifier,
-        kanbanVM: KanbanViewModel,
-    ) {
-        val backStackEntry by navController.currentBackStackEntryAsState()
-        val destination = backStackEntry?.destination
-        TopAppBar(
-            title = { TopbarTitle(destination) },
-            modifier = modifier,
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            ),
-            navigationIcon = { TopbarNavigationIcon(navController, destination) },
-            actions = { TopbarIcons(destination) }
-        )
-    }
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AppTopBar(
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
+    kanbanVM: KanbanViewModel,
+) {
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val destination = backStackEntry?.destination
+    TopAppBar(
+        title = { TopbarTitle(destination) },
+        modifier = modifier,
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        ),
+        navigationIcon = { TopbarNavigationIcon(navController, destination) },
+        actions = { TopbarIcons(destination) }
+    )
+}
 
-    @Composable
-    private fun TopbarTitle(destination: NavDestination?) {
-        Text(
-            text = when {
-                destination?.hasRoute<Route.Home>() == true -> {
-                    stringResource(R.string.projects)
-                }
-
-                destination?.hasRoute<Route.Login>() == true -> {
-                    stringResource(R.string.login)
-                }
-
-                else -> {
-                    ""
-                }
-            }
-        )
-    }
-
-    @Composable
-    private fun TopbarIcons(destination: NavDestination?) {
-        when {
+@Composable
+private fun TopbarTitle(destination: NavDestination?) {
+    Text(
+        text = when {
             destination?.hasRoute<Route.Home>() == true -> {
-                var expandedMenu by remember { mutableStateOf(false) }
-                Row {
-                    KanbanIconButton(Icons.Filled.Add, R.string.topbar_add_project) {
-                        println("Add project")
+                stringResource(R.string.projects)
+            }
+
+            destination?.hasRoute<Route.Login>() == true -> {
+                stringResource(R.string.login)
+            }
+
+            else -> {
+                ""
+            }
+        }
+    )
+}
+
+@Composable
+private fun TopbarIcons(destination: NavDestination?) {
+    when {
+        destination?.hasRoute<Route.Home>() == true -> {
+            var expandedMenu by remember { mutableStateOf(false) }
+            var showDialog by remember { mutableStateOf(false) }
+            Row {
+                KanbanIconButton(Icons.Filled.Add, R.string.topbar_add_project) {
+                    println("Add project")
+                    showDialog = true
+                }
+                KanbanIconButton(Icons.Filled.MoreVert, R.string.topbar_more_options) {
+                    expandedMenu = true
+                }
+                DropdownMenu(
+                    expanded = expandedMenu,
+                    onDismissRequest = { expandedMenu = false }
+                ) {
+                    TopbarDropdownMenuItem(R.string.topbar_show_archived) {
+                        expandedMenu = false
                     }
-                    KanbanIconButton(Icons.Filled.MoreVert, R.string.topbar_more_options) {
-                        expandedMenu = true
-                    }
-                    DropdownMenu(
-                        expanded = expandedMenu,
-                        onDismissRequest = { expandedMenu = false }
-                    ) {
-                        TopbarDropdownMenuItem(R.string.topbar_show_archived) {
-                            expandedMenu = false
-                        }
-                        TopbarDropdownMenuItem(R.string.topbar_settings) {
-                            expandedMenu = false
-                        }
+                    TopbarDropdownMenuItem(R.string.topbar_settings) {
+                        expandedMenu = false
                     }
                 }
-            }
-
-            else -> {}
-        }
-    }
-
-    @Composable
-    private fun TopbarDropdownMenuItem(@StringRes textRes: Int, onClick: () -> Unit) {
-        DropdownMenuItem(
-            text = { Text(stringResource(textRes)) },
-            onClick = onClick
-        )
-    }
-
-    @Composable
-    private fun TopbarNavigationIcon(
-        navController: NavHostController,
-        destination: NavDestination?
-    ) {
-        if (showNavigationIcon(destination)) {
-            IconButton(onClick = {
-                navController.popBackStack()
-            }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.navigate_back)
-                )
+                if (showDialog) {
+                    TextInputDialog(
+                        title = stringResource(R.string.add_new_project),
+                        hint = stringResource(R.string.enter_name_new_project),
+                        onClickOk = { text ->
+                            showDialog = false
+                            println("Add new project: $text")
+                        },
+                        onClickCancel = {
+                            showDialog = false
+                        }
+                    )
+                }
             }
         }
-    }
 
-    private fun showNavigationIcon(destination: NavDestination?): Boolean {
-        return when {
+        else -> {}
+    }
+}
+
+@Composable
+private fun TopbarDropdownMenuItem(@StringRes textRes: Int, onClick: () -> Unit) {
+    DropdownMenuItem(
+        text = { Text(stringResource(textRes)) },
+        onClick = onClick
+    )
+}
+
+@Composable
+private fun TopbarNavigationIcon(
+    navController: NavHostController,
+    destination: NavDestination?
+) {
+    if (showNavigationIcon(destination)) {
+        IconButton(onClick = {
+            navController.popBackStack()
+        }) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = stringResource(R.string.navigate_back)
+            )
+        }
+    }
+}
+
+private fun showNavigationIcon(destination: NavDestination?): Boolean {
+    return when {
 //            destination?.hasRoute<Route.Home>() == true -> {
 //                true
 //            }
 
-            else -> {
-                false
-            }
+        else -> {
+            false
         }
     }
 }

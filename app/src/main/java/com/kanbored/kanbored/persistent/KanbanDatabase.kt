@@ -12,6 +12,7 @@ import androidx.room.RoomDatabase
 import androidx.room.Update
 import com.kanbored.kanbored.model.KanbanProject
 import com.kanbored.kanbored.model.KanbanUserSession
+import kotlinx.coroutines.flow.Flow
 
 const val kanbanProjectTableName = "kanban_project"
 const val kanbanUserSessionTableName = "kanban_user_session"
@@ -22,6 +23,9 @@ interface KanbanProjectDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdate(project: KanbanProject)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(projects: List<KanbanProject>)
+
     @Update
     suspend fun update(project: KanbanProject)
 
@@ -29,7 +33,10 @@ interface KanbanProjectDao {
     suspend fun delete(project: KanbanProject)
 
     @Query("select * from $kanbanProjectTableName")
-    suspend fun getAllProjects(): List<KanbanProject>
+    fun getAllProjects(): Flow<List<KanbanProject>>
+
+    @Query("select * from $kanbanProjectTableName")
+    suspend fun getAllProjectsSync(): List<KanbanProject>
 }
 
 @Dao
