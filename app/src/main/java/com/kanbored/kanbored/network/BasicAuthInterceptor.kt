@@ -5,8 +5,8 @@ import okhttp3.Interceptor
 import okhttp3.Response
 
 class BasicAuthInterceptor(
-    private val username: String,
-    private val password: String
+    username: String,
+    password: String
 ) : Interceptor {
     private val credentials: String = Credentials.basic(username, password)
 
