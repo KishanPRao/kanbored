@@ -10,8 +10,13 @@ activityCompose = "1.12.0"
 composeBom = "2025.11.01"
 navigationCompose = "2.9.6"
 materialIconsExtended = "1.7.8"
+kotlinxSerialization = "1.9.0"
+retrofit = "3.0.0"
+okhttp = "5.3.2"
 #composeHotReload = "v1.0.0-beta08"
 #viewmodelCompose = "2.10.0"
+room = "2.8.4"
+ksp = "2.2.21-2.0.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -29,7 +34,15 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIconsExtended"  }
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room"  }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room"  }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room"  }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+squareup-retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+squareup-kotlinx-serialization = { group = "com.squareup.retrofit2", name = "converter-kotlinx-serialization", version.ref = "retrofit" }
+squareup-okhttp3 = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+squareup-okhttp3-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 #androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "viewmodelCompose" }
 
 [plugins]
@@ -37,4 +50,5 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kps = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 #composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload"}

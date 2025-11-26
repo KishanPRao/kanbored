@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Kanbored</string>
+    <string name="login_url">Kanboard URL</string>
+    <string name="login_username">Username</string>
+    <string name="login_password">Password</string>
+    <string name="login_url_hint">https://kanboard_url.com</string>
+    <string name="login_username_hint">admin</string>
+    <string name="login_password_hint">hunter2</string>
+    <string name="login_button">LOGIN</string>
+    <string name="login_err_unknown">Unknown error</string>
+    <string name="login_err_invalid_input">Please enter correct input data!</string>
+    <string name="login_err_unauthorized">Unauthorized user. Please check your credentials!</string>
 </resources>

@@ -5,9 +5,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.kanbored.kanbored.viewmodel.KanbanViewModel
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(kanbanVM: KanbanViewModel) {
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
