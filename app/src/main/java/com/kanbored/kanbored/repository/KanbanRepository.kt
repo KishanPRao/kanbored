@@ -9,7 +9,6 @@ import com.kanbored.kanbored.network.KanbanMethod
 import com.kanbored.kanbored.network.Result
 import com.kanbored.kanbored.network.RetrofitClient
 import com.kanbored.kanbored.persistent.KanbanDatabase
-import com.kanbored.kanbored.persistent.KanbanUserSessionEntity
 import com.kanbored.kanbored.utils.PresentableText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +33,7 @@ class KanbanRepository(context: Context, scope: CoroutineScope) {
 
     suspend fun getAuthenticatedUserSessionSync(): KanbanUserSession? {
         return with(Dispatchers.IO) {
-            database.userDao().getAuthenticatedUserSessionSync()?.toModel()
+            database.userSessionDao().getAuthenticatedUserSessionSync()
         }
     }
 
@@ -61,7 +60,7 @@ class KanbanRepository(context: Context, scope: CoroutineScope) {
             }
             if (response.result != null) {
                 this.kanbanApi = kanbanApi
-                val entity = KanbanUserSessionEntity(
+                val entity = KanbanUserSession(
                     userId = response.result.id,
                     userName = userName,
                     password = password,
@@ -70,8 +69,8 @@ class KanbanRepository(context: Context, scope: CoroutineScope) {
                     authenticated = true,
                 )
                 println("login: $response, $entity")
-                database.userDao().insertOrUpdate(entity)
-                return Result.Success(entity.toModel())
+                database.userSessionDao().insertOrUpdate(entity)
+                return Result.Success(entity)
             } else if (response.error != null) {
                 return Result.Error(PresentableText.DynamicString(response.error.message))
             } else {

@@ -4,9 +4,11 @@ import kotlinx.serialization.Serializable
 
 sealed class Route {
     @Serializable
-    object Login: Route()
+    object Login : Route()
+
     @Serializable
-    object Home: Route()
+    object Home : Route()
+
     @Serializable
-    object Empty: Route()
+    object Empty : Route()
 }

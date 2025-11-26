@@ -1,52 +1,57 @@
 package com.kanbored.kanbored.persistent
 
 import android.content.Context
-import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Delete
-import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
-import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.Update
+import com.kanbored.kanbored.model.KanbanProject
+import com.kanbored.kanbored.model.KanbanUserSession
 
-const val userSessionTableName = "kanban_user_session"
+const val kanbanProjectTableName = "kanban_project"
+const val kanbanUserSessionTableName = "kanban_user_session"
 const val databaseName = "kanban_database"
 
-@Entity(tableName = userSessionTableName)
-data class KanbanUserSessionEntity(
-    @PrimaryKey
-    @ColumnInfo(name = "user_id") val userId: Int,
-    @ColumnInfo(name = "user_name") val userName: String,
-    val password: String,
-    @ColumnInfo(name = "host_url") val hostUrl: String,
-    @ColumnInfo(name = "app_role") val appRole: String,
-    val authenticated: Boolean,
-)
-
 @Dao
-interface UserDao {
+interface KanbanProjectDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrUpdate(userSessionEntity: KanbanUserSessionEntity)
+    suspend fun insertOrUpdate(project: KanbanProject)
 
     @Update
-    suspend fun update(userSessionEntity: KanbanUserSessionEntity)
+    suspend fun update(project: KanbanProject)
 
     @Delete
-    suspend fun delete(userSessionEntity: KanbanUserSessionEntity)
+    suspend fun delete(project: KanbanProject)
 
-    @Query("select * from $userSessionTableName where authenticated == 1")  // TODO: limit 1?
-    suspend fun getAuthenticatedUserSessionSync(): KanbanUserSessionEntity?
+    @Query("select * from $kanbanProjectTableName")
+    suspend fun getAllProjects(): List<KanbanProject>
 }
 
-@Database(entities = [KanbanUserSessionEntity::class], version = 1)
+@Dao
+interface KanbanUserSessionDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrUpdate(userSession: KanbanUserSession)
+
+    @Update
+    suspend fun update(userSession: KanbanUserSession)
+
+    @Delete
+    suspend fun delete(userSession: KanbanUserSession)
+
+    @Query("select * from $kanbanUserSessionTableName where authenticated == 1")  // TODO: limit 1?
+    suspend fun getAuthenticatedUserSessionSync(): KanbanUserSession?
+}
+
+@Database(entities = [KanbanUserSession::class, KanbanProject::class], version = 1)
 abstract class KanbanDatabase : RoomDatabase() {
 
-    abstract fun userDao(): UserDao
+    abstract fun projectDao(): KanbanProjectDao
+    abstract fun userSessionDao(): KanbanUserSessionDao
 
     companion object {
         private var instance: KanbanDatabase? = null
