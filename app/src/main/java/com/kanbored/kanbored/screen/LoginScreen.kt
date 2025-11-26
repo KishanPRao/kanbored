@@ -32,7 +32,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kanbored.kanbored.R
-import com.kanbored.kanbored.repository.KanbanRepository
 import com.kanbored.kanbored.ui.theme.AppTheme
 import com.kanbored.kanbored.utils.PresentableText
 import com.kanbored.kanbored.viewmodel.KanbanViewModel
@@ -145,14 +144,10 @@ private fun FormField(
 @Preview()
 @Composable
 fun LoginPreviewDark() {
+    val context = LocalContext.current
     AppTheme(darkTheme = false) {
         // TODO: avoid plugging actual repo/db into preview
-        val kanbanRepository = KanbanRepository(
-            context = LocalContext.current,
-            viewModelScope = viewModelScope
-        )
-        val kanbanVM =
-            viewModel<KanbanViewModel> { KanbanViewModel(repository = kanbanRepository) }
+        val kanbanVM = viewModel<KanbanViewModel> { KanbanViewModel(context) }
         LoginScreen(kanbanVM)
     }
 }
