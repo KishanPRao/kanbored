@@ -5,4 +5,6 @@ plugins {
     alias(libs.plugins.ksp) apply false  // Add this
 //    alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.compose) apply false
+    alias(libs.plugins.compose.hot.reload) apply false
+    alias(libs.plugins.compose.multiplatform) apply false
 }
