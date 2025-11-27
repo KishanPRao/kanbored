@@ -1,11 +1,42 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.multiplatform)
+//    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.kps)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.room)
 //    alias(libs.plugins.composeHotReload) apply false
+}
+
+kotlin {
+//    androidTarget()
+    linuxX64 {
+        binaries {
+            executable()
+        }
+    }
+    androidTarget {
+        compilations.all {
+//            kotlinOptions {
+//                jvmTarget = "1.8"  // or "11" depending on your setup
+//            }
+        }
+    }
+
+    sourceSets {
+        val androidMain by getting {
+            dependencies {
+                // Android-specific dependencies
+            }
+        }
+        val commonMain by getting {
+            dependencies {
+                // Shared dependencies
+            }
+        }
+    }
+
 }
 
 android {
@@ -35,9 +66,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
+//    kotlinOptions {
+//        jvmTarget = "11"
+//    }
     buildFeatures {
         compose = true
     }
@@ -59,7 +90,11 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
+//    ksp(libs.androidx.room.compiler)
+//    kspJvm(libs.androidx.room.compiler)
+//    kspAndroid(libs.androidx.room.compiler)
+    add("kspAndroid", libs.androidx.room.compiler)
+
     implementation(libs.androidx.navigation.compose)
 
     implementation(libs.squareup.retrofit)
