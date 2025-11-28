@@ -4,32 +4,25 @@ android-minSdk = "24"
 android-targetSdk = "36"
 agp = "8.13.1"
 kotlin = "2.2.21"
-#activityCompose = "1.12.0"
-activityCompose = "1.8.2"
-navigationCompose = "2.9.1"
-materialIconsExtended = "1.7.8"
-kotlinxSerialization = "1.9.0"
+androidx-navigation = "2.9.1"
+material-icons-extended = "1.7.3"
+kotlinx-serialization = "1.9.0"
 retrofit = "3.0.0"
 okhttp = "5.3.2"
 room = "2.8.4"
 ksp = "2.2.21-2.0.4"
 androidx-lifecycle = "2.9.6"
-#androidx-lifecycle = "2.9.1"
-composeHotReload = "1.0.0-rc04"
-#composeMultiplatform = "1.9.3"
-# TODO: fixes java.lang.NoSuchMethodError: 'long androidx.compose.ui.unit.IntOffset$Companion.getMax-nOcc-ac()' [1.9.0+]
-composeMultiplatform = "1.8.2"
-#composeMultiplatform = "1.9.0"
+compose-hot-reload = "1.0.0-rc04"
+compose-multiplatform = "1.9.3"
 kotlinx-coroutines = "1.10.2"
 sqlite = "2.6.2"
 
 [libraries]
-androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
-androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIconsExtended"  }
+androidx-material-icons-extended = { group = "org.jetbrains.compose.material", name = "material-icons-extended", version.ref = "material-icons-extended" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room"  }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room"  }
-kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
-androidx-navigation-compose = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+androidx-navigation-compose = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version.ref = "androidx-navigation" }
 squareup-retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 squareup-kotlinx-serialization = { group = "com.squareup.retrofit2", name = "converter-kotlinx-serialization", version.ref = "retrofit" }
 squareup-okhttp3 = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
@@ -46,5 +39,5 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-compose-hot-reload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
-compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
+compose-hot-reload = { id = "org.jetbrains.compose.hot-reload", version.ref = "compose-hot-reload" }
+compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
