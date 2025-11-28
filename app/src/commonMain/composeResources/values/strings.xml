@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">Kanbored</string>
+    <string name="login_url">Kanboard URL</string>
+    <string name="login_username">Username</string>
+    <string name="login_password">Password</string>
+    <string name="login_url_hint">https://kanboard_url.com</string>
+    <string name="login_username_hint">admin</string>
+    <string name="login_password_hint">hunter2</string>
+    <string name="login_button">LOGIN</string>
+    <string name="login_err_unknown">Unknown error</string>
+    <string name="login_err_invalid_input">Please enter correct input data!</string>
+
+    <string name="projects">Projects</string>
+    <string name="login">Login</string>
+    <string name="navigate_back">Back</string>
+    <string name="topbar_add_project">Add Project</string>
+    <string name="topbar_more_options">More Options</string>
+    <string name="topbar_show_archived">Show Archived</string>
+    <string name="topbar_settings">Settings</string>
+    <string name="topbar_rename">Rename</string>
+    <string name="topbar_archive">Archive</string>
+    <string name="topbar_delete">Delete</string>
+    <string name="settings">Settings</string>
+    <string name="hide_password">Hide password</string>
+    <string name="show_password">Show password</string>
+
+    <string name="add_new_project">Add a new project</string>
+    <string name="enter_name_new_project">Enter the new project name</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+</resources>
