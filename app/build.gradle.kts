@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.room)
     alias(libs.plugins.compose.hot.reload)
     alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.hilt.android)
 }
 
 kotlin {
@@ -18,16 +19,20 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    jvm {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
-
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
-        mainRun {
-            mainClass.set("com.kanbored.kanbored.MainKt")
-        }
-    }
+    /***
+    TODO: Enable JVM again
+    Currently, follows a half-baked KMP design, with hilt/dagger (and other) android libraries being used with commonMain, to be replaced with Koin or kotlin-inject
+    ***/
+//    jvm {
+//        compilerOptions {
+//            jvmTarget.set(JvmTarget.JVM_11)
+//        }
+//
+//        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+//        mainRun {
+//            mainClass.set("com.kanbored.kanbored.MainKt")
+//        }
+//    }
 
     sourceSets {
         all {
@@ -48,6 +53,9 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel.compose)
             implementation(libs.androidx.lifecycle.runtime.compose)
+
+            implementation(libs.androidx.hilt.navigation.compose)
+            implementation(libs.hilt.android)
 
             implementation(libs.androidx.navigation.compose)
 
@@ -111,5 +119,6 @@ room {
 
 dependencies {
     add("kspAndroid", libs.androidx.room.compiler)
-    add("kspJvm", libs.androidx.room.compiler)
+    add("kspAndroid", libs.hilt.android.compiler)
+//    add("kspJvm", libs.androidx.room.compiler)
 }
