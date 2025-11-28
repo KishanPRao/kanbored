@@ -33,6 +33,12 @@ kotlin {
     }
 
     sourceSets {
+        all {
+            languageSettings {
+                optIn("androidx.compose.material3.ExperimentalMaterial3Api")
+                optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
+            }
+        }
 //        val androidMain by getting {
 //            dependencies {
 //                // Android-specific dependencies
@@ -107,8 +113,8 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodelCompose)
-            implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.androidx.lifecycle.viewmodel.compose)
+            implementation(libs.androidx.lifecycle.runtime.compose)
 //    ksp(libs.androidx.room.compiler)
 //    kspJvm(libs.androidx.room.compiler)
 //    kspAndroid(libs.androidx.room.compiler)
@@ -133,6 +139,7 @@ kotlin {
 
         androidMain.dependencies {
             implementation(compose.preview)
+            // TODO: needed?
             implementation(libs.androidx.activity.compose)
         }
         jvmMain.dependencies {
@@ -144,6 +151,26 @@ kotlin {
 
 }
 
+//configurations.all {
+//    // TODO: fixes java.lang.NoSuchMethodError: 'long androidx.compose.ui.unit.IntOffset$Companion.getMax-nOcc-ac()'
+//    resolutionStrategy {
+//        force("org.jetbrains.compose.ui:ui:1.9.3")
+//        force("org.jetbrains.compose.runtime:runtime:1.9.3")
+//        force("org.jetbrains.compose.foundation:foundation:1.9.3")
+//    }
+//}
+
+configurations.all {
+    // TODO: fixes java.lang.NoSuchMethodError: 'long androidx.compose.ui.unit.IntOffset$Companion.getMax-nOcc-ac()'
+    // and java.lang.NoSuchMethodError: 'float androidx.compose.ui.util.MathHelpersKt.fastCbrt(float)'
+    resolutionStrategy {
+        eachDependency {
+            if (requested.group.startsWith("org.jetbrains.compose")) {
+                useVersion(libs.versions.composeMultiplatform.get())
+            }
+        }
+    }
+}
 android {
     namespace = "com.kanbored.kanbored"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -177,15 +204,18 @@ android {
     buildFeatures {
         compose = true
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.composeMultiplatform.get()
+    }
 }
 
 room {
     schemaDirectory("$projectDir/schemas")
 }
 
-dependencies {
-    debugImplementation(compose.uiTooling)
-}
+//dependencies {
+//    debugImplementation(compose.uiTooling)
+//}
 //
 //compose.desktop {
 //    application {

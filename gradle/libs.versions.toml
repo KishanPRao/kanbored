@@ -4,75 +4,43 @@ android-minSdk = "24"
 android-targetSdk = "36"
 agp = "8.13.1"
 kotlin = "2.2.21"
-coreKtx = "1.17.0"
-junit = "4.13.2"
-junitVersion = "1.3.0"
-espressoCore = "3.7.0"
-lifecycleRuntimeKtx = "2.10.0"
-activityCompose = "1.12.0"
-composeBom = "2025.11.01"
-navigationCompose = "2.9.6"
+#activityCompose = "1.12.0"
+activityCompose = "1.8.2"
+navigationCompose = "2.9.1"
 materialIconsExtended = "1.7.8"
 kotlinxSerialization = "1.9.0"
 retrofit = "3.0.0"
 okhttp = "5.3.2"
-#composeHotReload = "v1.0.0-beta08"
-#viewmodelCompose = "2.10.0"
 room = "2.8.4"
 ksp = "2.2.21-2.0.4"
-androidx-activity = "1.11.0"
-androidx-appcompat = "1.7.1"
-androidx-core = "1.17.0"
-androidx-espresso = "3.7.0"
-androidx-lifecycle = "2.9.5"
-androidx-testExt = "1.3.0"
-composeHotReload = "1.0.0-rc02"
-composeMultiplatform = "1.9.1"
+androidx-lifecycle = "2.9.6"
+#androidx-lifecycle = "2.9.1"
+composeHotReload = "1.0.0-rc04"
+#composeMultiplatform = "1.9.3"
+# TODO: fixes java.lang.NoSuchMethodError: 'long androidx.compose.ui.unit.IntOffset$Companion.getMax-nOcc-ac()' [1.9.0+]
+composeMultiplatform = "1.8.2"
+#composeMultiplatform = "1.9.0"
 kotlinx-coroutines = "1.10.2"
 sqlite = "2.6.2"
 
 [libraries]
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
-androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
-androidx-ui = { group = "androidx.compose.ui", name = "ui" }
-androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
-androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
-androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
-androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
-androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
-androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIconsExtended"  }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room"  }
-androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room"  }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room"  }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
-androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+androidx-navigation-compose = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 squareup-retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 squareup-kotlinx-serialization = { group = "com.squareup.retrofit2", name = "converter-kotlinx-serialization", version.ref = "retrofit" }
 squareup-okhttp3 = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 squareup-okhttp3-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
-#androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "viewmodelCompose" }
-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
-kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
-#junit = { module = "junit:junit", version.ref = "junit" }
-#androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
-#androidx-testExt-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-testExt" }
-#androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-espresso" }
-androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
-#androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
-androidx-lifecycle-viewmodelCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
-androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-#kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
@@ -80,4 +48,3 @@ room = { id = "androidx.room", version.ref = "room" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 compose-hot-reload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
-#composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload"}
