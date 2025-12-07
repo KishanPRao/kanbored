@@ -28,4 +28,7 @@
     <string name="enter_name_new_project">Enter the new project name</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+
+    <string name="server_unreachable">The server is unreachable</string>
+    <string name="online">Online</string>
 </resources>

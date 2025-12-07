@@ -3,8 +3,6 @@ package com.kanbored.kanbored.repository
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.kanbored.kanbored.model.AuthConfig
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -111,7 +111,7 @@ fun MainScreen() {
                             hostState.showSnackbar(
                                 message = event.message.asStringSuspend(),
                                 withDismissAction = true,
-                                duration = SnackbarDuration.Long,
+                                duration = SnackbarDuration.Indefinite,
                             )
                         }
 

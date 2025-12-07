@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.kanbored.kanbored.model.KanbanProject
 import com.kanbored.kanbored.network.Result
 import com.kanbored.kanbored.repository.KanbanRepository
+import com.kanbored.kanbored.utils.AppEventBus
+import com.kanbored.kanbored.utils.AppUiEvent
 import com.kanbored.kanbored.utils.PresentableText
 import com.kanbored.kanbored.utils.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,9 +23,13 @@ import javax.inject.Inject
 const val refreshStateDelay = 30_000L
 
 @HiltViewModel
-class KanbanViewModel @Inject constructor(private val repository: KanbanRepository) : ViewModel() {
+class KanbanViewModel @Inject constructor(
+    private val repository: KanbanRepository,
+    private val appEventBus: AppEventBus,
+) : ViewModel() {
     private val _uiEventFlow = MutableSharedFlow<UiEvent>()
     val uiEventFlow = _uiEventFlow.asSharedFlow()
+    val isApiReachable = repository.pollApiReachability()
     val projects: StateFlow<List<KanbanProject>> = repository.getAllProjects()
         .stateIn(
             scope = viewModelScope,
@@ -48,14 +54,13 @@ class KanbanViewModel @Inject constructor(private val repository: KanbanReposito
         _uiEventFlow.emit(UiEvent.ShowLoading)
         val result = repository.refreshProjects()
         println("finish refresh project")
+        _uiEventFlow.emit(UiEvent.HideLoading)
         when (result) {
             is Result.Error<*> -> {
-                _uiEventFlow.emit(UiEvent.ShowMessage(result.message!!))
+                appEventBus.emit(AppUiEvent.ShowError(result.message!!))
             }
 
-            is Result.Success<*> -> {
-                _uiEventFlow.emit(UiEvent.HideLoading)
-            }
+            is Result.Success<*> -> {}
         }
     }
 
