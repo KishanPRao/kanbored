@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,14 +42,35 @@ fun KanbanIconButton(
     contentDescription: StringResource,
     onClick: () -> Unit
 ) {
+    KanbanIconButton(
+        imageVector = imageVector,
+        contentDescription = stringResource(contentDescription),
+        onClick = onClick
+    )
+}
+
+@Composable
+fun KanbanIconButton(
+    imageVector: ImageVector,
+    contentDescription: String,
+    onClick: () -> Unit
+) {
     IconButton(onClick = onClick) {
         Icon(
             imageVector = imageVector,
-            contentDescription = stringResource(contentDescription)
+            contentDescription = contentDescription
         )
     }
 }
 
+
+@Composable
+fun TopbarDropdownMenuItem(text: String, onClick: () -> Unit) {
+    DropdownMenuItem(
+        text = { Text(text) },
+        onClick = onClick
+    )
+}
 
 @Composable
 fun TextInputDialog(

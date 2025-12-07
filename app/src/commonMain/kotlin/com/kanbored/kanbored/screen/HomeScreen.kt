@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -40,22 +42,70 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
-import com.kanbored.kanbored.ui.theme.AppTheme
+import com.kanbored.kanbored.utils.PresentableText
+import com.kanbored.kanbored.utils.TextInputDialog
 import com.kanbored.kanbored.utils.UiEvent
 import com.kanbored.kanbored.viewmodel.KanbanViewModel
+import com.kanbored.kanbored.viewmodel.TopBarAction
+import com.kanbored.kanbored.viewmodel.TopBarDropdownItem
+import com.kanbored.kanbored.viewmodel.TopBarViewModel
 import kanbored.app.generated.resources.Res
+import kanbored.app.generated.resources.add_new_project
+import kanbored.app.generated.resources.enter_name_new_project
 import kanbored.app.generated.resources.online
+import kanbored.app.generated.resources.projects
 import kanbored.app.generated.resources.server_unreachable
+import kanbored.app.generated.resources.topbar_add_project
+import kanbored.app.generated.resources.topbar_settings
+import kanbored.app.generated.resources.topbar_show_archived
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun HomeScreen(
-    kanbanVM: KanbanViewModel = hiltViewModel()
+    topBarVM: TopBarViewModel
 ) {
+    var showDialog by remember { mutableStateOf(false) }
+    val title = stringResource(Res.string.projects)
+    LaunchedEffect(Unit) {
+        topBarVM.updateTitle(title)
+        topBarVM.showBackButton(false)
+        topBarVM.setActions(
+            listOf(
+                TopBarAction(
+                    icon = Icons.Filled.Add,
+                    contentDescription = PresentableText.DynamicResource(Res.string.topbar_add_project),
+                    onClick = {
+                        println("Add project")
+                        showDialog = true
+                    }
+                ),
+            ))
+        topBarVM.setDropdownItems(
+            listOf(
+                TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_show_archived)) {
+                },
+                TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_settings)) {
+                },
+            )
+        )
+    }
+    if (showDialog) {
+        TextInputDialog(
+            title = stringResource(Res.string.add_new_project),
+            hint = stringResource(Res.string.enter_name_new_project),
+            onClickOk = { text ->
+                showDialog = false
+                println("Add new project: $text")
+            },
+            onClickCancel = {
+                showDialog = false
+            }
+        )
+    }
+    val kanbanVM: KanbanViewModel = hiltViewModel()
     var isRefreshing by remember { mutableStateOf(false) }
     val isApiReachable by kanbanVM.isApiReachable.collectAsState()
     LaunchedEffect(Unit) {
@@ -170,10 +220,10 @@ fun ConnectionStatusStrip(
     }
 }
 
-@Preview
-@Composable
-fun HomeScreenPreview() {
-    AppTheme(darkTheme = false) {
-        HomeScreen()
-    }
-}
+//@Preview
+//@Composable
+//fun HomeScreenPreview() {
+//    AppTheme(darkTheme = false) {
+//        HomeScreen()
+//    }
+//}

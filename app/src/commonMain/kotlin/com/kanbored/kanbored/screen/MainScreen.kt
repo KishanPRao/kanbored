@@ -3,19 +3,15 @@ package com.kanbored.kanbored.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -39,38 +35,35 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.navigation.NavDestination
-import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.kanbored.kanbored.ui.theme.AppTheme
 import com.kanbored.kanbored.utils.AppUiEvent
 import com.kanbored.kanbored.utils.KanbanIconButton
-import com.kanbored.kanbored.utils.TextInputDialog
+import com.kanbored.kanbored.utils.TopbarDropdownMenuItem
 import com.kanbored.kanbored.viewmodel.MainViewModel
+import com.kanbored.kanbored.viewmodel.TopBarState
+import com.kanbored.kanbored.viewmodel.TopBarViewModel
 import kanbored.app.generated.resources.Res
-import kanbored.app.generated.resources.add_new_project
-import kanbored.app.generated.resources.enter_name_new_project
-import kanbored.app.generated.resources.login
 import kanbored.app.generated.resources.navigate_back
-import kanbored.app.generated.resources.projects
-import kanbored.app.generated.resources.topbar_add_project
 import kanbored.app.generated.resources.topbar_more_options
-import kanbored.app.generated.resources.topbar_settings
-import kanbored.app.generated.resources.topbar_show_archived
 import kotlinx.coroutines.flow.collectLatest
-import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun MainScreen() {
     AppTheme {
         val navController = rememberNavController()
         val mainVM: MainViewModel = hiltViewModel()
+        val topBarVM: TopBarViewModel = hiltViewModel(
+            // TODO: top bar vm?
+//            navController.getBackStackEntry("app_graph")
+        )
+        val topBarState = topBarVM.state.collectAsState()
         val authConfig = mainVM.authConfig.collectAsState().value
         val isAuthenticated = authConfig.authenticated
 
@@ -94,7 +87,7 @@ fun MainScreen() {
                     )
                 })
             },
-            topBar = { AppTopBar(navController = navController) },
+            topBar = { AppTopBar(navController = navController, topBarState.value) },
             modifier = Modifier.fillMaxSize(),
         ) { innerPadding ->
             LaunchedEffect(Unit) {
@@ -129,10 +122,10 @@ fun MainScreen() {
                 modifier = Modifier.padding(innerPadding)
             ) {
                 composable<Route.Home> {
-                    HomeScreen()
+                    HomeScreen(topBarVM)
                 }
                 composable<Route.Login> {
-                    LoginScreen()
+                    LoginScreen(topBarVM)
                 }
             }
 
@@ -159,119 +152,54 @@ fun MainScreen() {
 @Composable
 private fun AppTopBar(
     navController: NavHostController,
-    modifier: Modifier = Modifier,
+    topBarState: TopBarState,
 ) {
-    val backStackEntry by navController.currentBackStackEntryAsState()
-    val destination = backStackEntry?.destination
+    var expandedMenu by remember { mutableStateOf(false) }
     TopAppBar(
-        title = { TopbarTitle(destination) },
-        modifier = modifier,
+        title = { Text(topBarState.title) },
+        navigationIcon = {
+            if (topBarState.showBackButton) {
+                KanbanIconButton(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    Res.string.navigate_back,
+                ) { navController.popBackStack() }
+            }
+        },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
         ),
-        navigationIcon = { TopbarNavigationIcon(navController, destination) },
-        actions = { TopbarIcons(destination) }
-    )
-}
-
-@Composable
-private fun TopbarTitle(destination: NavDestination?) {
-    Text(
-        text = when {
-            destination?.hasRoute<Route.Home>() == true -> {
-                stringResource(Res.string.projects)
+        actions = {
+            topBarState.actions.forEach { action ->
+                KanbanIconButton(
+                    action.icon,
+                    action.contentDescription.asString(),
+                    onClick = action.onClick,
+                )
             }
-
-            destination?.hasRoute<Route.Login>() == true -> {
-                stringResource(Res.string.login)
-            }
-
-            else -> {
-                ""
+            if (topBarState.dropdownItems.isNotEmpty()) {
+                KanbanIconButton(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = Res.string.topbar_more_options,
+                    onClick = { expandedMenu = true },
+                )
             }
         }
     )
-}
-
-@Composable
-private fun TopbarIcons(destination: NavDestination?) {
-    when {
-        destination?.hasRoute<Route.Home>() == true -> {
-            var expandedMenu by remember { mutableStateOf(false) }
-            var showDialog by remember { mutableStateOf(false) }
-            Row {
-                KanbanIconButton(Icons.Filled.Add, Res.string.topbar_add_project) {
-                    println("Add project")
-                    showDialog = true
-                }
-                KanbanIconButton(Icons.Filled.MoreVert, Res.string.topbar_more_options) {
-                    expandedMenu = true
-                }
-                DropdownMenu(
-                    expanded = expandedMenu,
-                    onDismissRequest = { expandedMenu = false }
-                ) {
-                    TopbarDropdownMenuItem(Res.string.topbar_show_archived) {
+    if (topBarState.dropdownItems.isNotEmpty()) {
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
+            DropdownMenu(
+                offset = DpOffset(x = (-4).dp, y = 0.dp),
+                expanded = expandedMenu,
+                onDismissRequest = { expandedMenu = false }
+            ) {
+                topBarState.dropdownItems.forEach { action ->
+                    TopbarDropdownMenuItem(action.contentDescription.asString()) {
                         expandedMenu = false
-                    }
-                    TopbarDropdownMenuItem(Res.string.topbar_settings) {
-                        expandedMenu = false
+                        action.onClick()
                     }
                 }
-                if (showDialog) {
-                    TextInputDialog(
-                        title = stringResource(Res.string.add_new_project),
-                        hint = stringResource(Res.string.enter_name_new_project),
-                        onClickOk = { text ->
-                            showDialog = false
-                            println("Add new project: $text")
-                        },
-                        onClickCancel = {
-                            showDialog = false
-                        }
-                    )
-                }
             }
-        }
-
-        else -> {}
-    }
-}
-
-@Composable
-private fun TopbarDropdownMenuItem(textRes: StringResource, onClick: () -> Unit) {
-    DropdownMenuItem(
-        text = { Text(stringResource(textRes)) },
-        onClick = onClick
-    )
-}
-
-@Composable
-private fun TopbarNavigationIcon(
-    navController: NavHostController,
-    destination: NavDestination?
-) {
-    if (showNavigationIcon(destination)) {
-        IconButton(onClick = {
-            navController.popBackStack()
-        }) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = stringResource(Res.string.navigate_back)
-            )
-        }
-    }
-}
-
-private fun showNavigationIcon(destination: NavDestination?): Boolean {
-    return when {
-//            destination?.hasRoute<Route.Home>() == true -> {
-//                true
-//            }
-
-        else -> {
-            false
         }
     }
 }

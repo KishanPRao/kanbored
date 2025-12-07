@@ -24,7 +24,7 @@ kotlin {
     /***
     TODO: Enable JVM again
     Currently, follows a half-baked KMP design, with hilt/dagger (and other) android libraries being used with commonMain, to be replaced with Koin or kotlin-inject
-    ***/
+     ***/
 //    jvm {
 //        compilerOptions {
 //            jvmTarget.set(JvmTarget.JVM_11)

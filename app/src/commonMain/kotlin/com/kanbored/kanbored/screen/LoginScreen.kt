@@ -23,6 +23,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -35,11 +36,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.kanbored.kanbored.ui.theme.AppTheme
 import com.kanbored.kanbored.utils.PresentableText
 import com.kanbored.kanbored.viewmodel.LoginViewModel
+import com.kanbored.kanbored.viewmodel.TopBarViewModel
 import kanbored.app.generated.resources.Res
 import kanbored.app.generated.resources.hide_password
+import kanbored.app.generated.resources.login
 import kanbored.app.generated.resources.login_button
 import kanbored.app.generated.resources.login_err_invalid_input
 import kanbored.app.generated.resources.login_password
@@ -50,12 +52,19 @@ import kanbored.app.generated.resources.login_username
 import kanbored.app.generated.resources.login_username_hint
 import kanbored.app.generated.resources.show_password
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun LoginScreen(
-    loginVM: LoginViewModel = hiltViewModel()
+    topBarVM: TopBarViewModel
 ) {
+    val title = stringResource(Res.string.login)
+    LaunchedEffect(Unit) {
+        topBarVM.updateTitle(title)
+        topBarVM.showBackButton(false)
+        topBarVM.setActions(emptyList())
+        topBarVM.setDropdownItems(emptyList())
+    }
+    val loginVM: LoginViewModel = hiltViewModel()
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -195,11 +204,11 @@ private fun FormField(
     )
 }
 
-@Preview()
-@Composable
-fun LoginPreviewDark() {
-    AppTheme(darkTheme = false) {
-        // TODO: avoid plugging actual repo/db into preview
-        LoginScreen()
-    }
-}
+//@Preview()
+//@Composable
+//fun LoginPreviewDark() {
+//    AppTheme(darkTheme = false) {
+//        // TODO: avoid plugging actual repo/db into preview
+//        LoginScreen()
+//    }
+//}

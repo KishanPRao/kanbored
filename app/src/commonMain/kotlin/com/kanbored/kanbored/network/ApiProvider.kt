@@ -43,7 +43,7 @@ class ApiProvider @Inject constructor(
 
                 val response = okHttpClient.newCall(request).execute()
                 response.isSuccessful
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 false
             }
         }
