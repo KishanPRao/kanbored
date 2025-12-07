@@ -19,6 +19,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SwipeToDismissBox
@@ -38,7 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
@@ -47,11 +48,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.kanbored.kanbored.ui.theme.AppTheme
+import com.kanbored.kanbored.utils.AppUiEvent
 import com.kanbored.kanbored.utils.KanbanIconButton
 import com.kanbored.kanbored.utils.TextInputDialog
-import com.kanbored.kanbored.utils.UiEvent
-import com.kanbored.kanbored.utils.getContext
-import com.kanbored.kanbored.viewmodel.KanbanViewModel
+import com.kanbored.kanbored.viewmodel.MainViewModel
 import kanbored.app.generated.resources.Res
 import kanbored.app.generated.resources.add_new_project
 import kanbored.app.generated.resources.enter_name_new_project
@@ -69,14 +69,10 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun MainScreen() {
     AppTheme {
-        val context = getContext()
-        val kanbanVM =
-            viewModel<KanbanViewModel> { KanbanViewModel(context = context) }
-        // TODO: nav controller is unimplemented in CMP "Implemented only in JetBrains fork"
         val navController = rememberNavController()
-        val userSession = kanbanVM.authenticatedSession.collectAsState().value
-        println("user session: $userSession")
-        val isAuthenticated = userSession?.authenticated
+        val mainVM: MainViewModel = hiltViewModel()
+        val authConfig = mainVM.authConfig.collectAsState().value
+        val isAuthenticated = authConfig.authenticated
 
         val hostState = remember { SnackbarHostState() }
         var showLoading by remember { mutableStateOf(false) }
@@ -98,45 +94,45 @@ fun MainScreen() {
                     )
                 })
             },
-            topBar = { AppTopBar(navController = navController, kanbanVM = kanbanVM) },
+            topBar = { AppTopBar(navController = navController) },
             modifier = Modifier.fillMaxSize(),
         ) { innerPadding ->
             LaunchedEffect(Unit) {
-                kanbanVM.uiEventFlow.collectLatest { event ->
+                mainVM.appEventBus.events.collectLatest { event ->
                     when (event) {
-                        is UiEvent.ShowMessage -> {
+                        is AppUiEvent.ShowMessage -> {
                             hostState.showSnackbar(
                                 message = event.message.asStringSuspend(),
+                                duration = SnackbarDuration.Short,
                             )
                         }
 
-                        UiEvent.HideGlobalLoading -> showLoading = false
-                        UiEvent.ShowGlobalLoading -> showLoading = true
-                        else -> {}
+                        is AppUiEvent.ShowError -> {
+                            hostState.showSnackbar(
+                                message = event.message.asStringSuspend(),
+                                withDismissAction = true,
+                                duration = SnackbarDuration.Long,
+                            )
+                        }
+
+                        AppUiEvent.HideGlobalLoading -> showLoading = false
+                        AppUiEvent.ShowGlobalLoading -> showLoading = true
                     }
                 }
             }
             NavHost(
                 navController = navController,
                 startDestination = when {
-                    isAuthenticated == null -> Route.Empty  // Not loaded yet
                     isAuthenticated -> Route.Home
                     else -> Route.Login
                 },
                 modifier = Modifier.padding(innerPadding)
             ) {
-                composable<Route.Empty> {
-                    Box(modifier = Modifier.fillMaxSize())
-                }
                 composable<Route.Home> {
-                    HomeScreen(
-                        kanbanVM = kanbanVM,
-                    )
+                    HomeScreen()
                 }
                 composable<Route.Login> {
-                    LoginScreen(
-                        kanbanVM = kanbanVM,
-                    )
+                    LoginScreen()
                 }
             }
 
@@ -164,7 +160,6 @@ fun MainScreen() {
 private fun AppTopBar(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    kanbanVM: KanbanViewModel,
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val destination = backStackEntry?.destination

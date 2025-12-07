@@ -34,11 +34,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kanbored.kanbored.ui.theme.AppTheme
 import com.kanbored.kanbored.utils.PresentableText
-import com.kanbored.kanbored.utils.getContext
-import com.kanbored.kanbored.viewmodel.KanbanViewModel
+import com.kanbored.kanbored.viewmodel.LoginViewModel
 import kanbored.app.generated.resources.Res
 import kanbored.app.generated.resources.hide_password
 import kanbored.app.generated.resources.login_button
@@ -55,7 +54,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun LoginScreen(
-    kanbanVM: KanbanViewModel,
+    loginVM: LoginViewModel = hiltViewModel()
 ) {
     Column(
         verticalArrangement = Arrangement.Center,
@@ -106,13 +105,13 @@ fun LoginScreen(
                 isValidUserName = validateUsername(userName)
                 isValidPassword = validatePassword(password)
                 if (isValidUrl && isValidUserName && isValidPassword) {
-                    kanbanVM.login(
-                        hostUrl = url,
+                    loginVM.login(
+                        baseUrl = url,
                         userName = userName,
                         password = password,
                     )
                 } else {
-                    kanbanVM.showUiMessage(
+                    loginVM.showUiMessage(
                         PresentableText.DynamicResource(Res.string.login_err_invalid_input)
                     )
                 }
@@ -199,10 +198,8 @@ private fun FormField(
 @Preview()
 @Composable
 fun LoginPreviewDark() {
-    val context = getContext()
     AppTheme(darkTheme = false) {
         // TODO: avoid plugging actual repo/db into preview
-        val kanbanVM = viewModel<KanbanViewModel> { KanbanViewModel(context) }
-        LoginScreen(kanbanVM)
+        LoginScreen()
     }
 }

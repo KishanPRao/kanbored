@@ -3,42 +3,26 @@ package com.kanbored.kanbored.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kanbored.kanbored.model.KanbanProject
-import com.kanbored.kanbored.model.KanbanUserSession
 import com.kanbored.kanbored.network.Result
 import com.kanbored.kanbored.repository.KanbanRepository
-import com.kanbored.kanbored.utils.PlatformContext
 import com.kanbored.kanbored.utils.PresentableText
 import com.kanbored.kanbored.utils.UiEvent
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 // 30 seconds
 const val refreshStateDelay = 30_000L
 
-class KanbanViewModel(context: PlatformContext) : ViewModel() {
-    private val unauthenticatedSession = KanbanUserSession(
-        userId = -1,
-        "",
-        "",
-        "",
-        "",
-        false,
-    )
-    private val _authenticatedSession: MutableStateFlow<KanbanUserSession?> =
-        MutableStateFlow(value = null)
+@HiltViewModel
+class KanbanViewModel @Inject constructor(private val repository: KanbanRepository) : ViewModel() {
     private val _uiEventFlow = MutableSharedFlow<UiEvent>()
-
-    private val repository: KanbanRepository =
-        KanbanRepository(context = context, scope = viewModelScope)
-
-    val authenticatedSession = _authenticatedSession.asStateFlow()
     val uiEventFlow = _uiEventFlow.asSharedFlow()
     val projects: StateFlow<List<KanbanProject>> = repository.getAllProjects()
         .stateIn(
@@ -49,64 +33,33 @@ class KanbanViewModel(context: PlatformContext) : ViewModel() {
 
     init {
         viewModelScope.launch {
-            _authenticatedSession.value =
-                repository.getAuthenticatedUserSessionSync() ?: unauthenticatedSession
-            if (authenticatedSession.value?.authenticated ?: false) {
-                startAutoRefresh()
-            }
+            startAutoRefresh()
         }
     }
 
     private suspend fun startAutoRefresh() {
         while (true) {
-            refreshProjects()
+            refreshProjectsSync()
             delay(refreshStateDelay)
         }
     }
 
-    fun refreshProjects() {
-        viewModelScope.launch {
-            _uiEventFlow.emit(UiEvent.ShowLocalLoading)
-            val result = repository.refreshProjects()
-            println("finish refresh project")
-            when (result) {
-                is Result.Error<*> -> {
-                    _uiEventFlow.emit(UiEvent.ShowMessage(result.message!!))
-                }
+    private suspend fun refreshProjectsSync() {
+        _uiEventFlow.emit(UiEvent.ShowLoading)
+        val result = repository.refreshProjects()
+        println("finish refresh project")
+        when (result) {
+            is Result.Error<*> -> {
+                _uiEventFlow.emit(UiEvent.ShowMessage(result.message!!))
+            }
 
-                is Result.Success<*> -> {
-                    _uiEventFlow.emit(UiEvent.HideLocalLoading)
-                }
+            is Result.Success<*> -> {
+                _uiEventFlow.emit(UiEvent.HideLoading)
             }
         }
     }
 
-    fun login(
-        hostUrl: String,
-        userName: String,
-        password: String
-    ) {
-        viewModelScope.launch {
-            _uiEventFlow.emit(UiEvent.ShowGlobalLoading)
-            println("login view model")
-            val result = repository.login(
-                hostUrl = hostUrl,
-                userName = userName,
-                password = password,
-            )
-            _uiEventFlow.emit(UiEvent.HideGlobalLoading)
-            when (result) {
-                is Result.Error<*> -> {
-                    _uiEventFlow.emit(UiEvent.ShowMessage(result.message!!))
-                }
-
-                is Result.Success<*> -> {
-                    _authenticatedSession.value = result.data!!
-                    startAutoRefresh()
-                }
-            }
-        }
-    }
+    fun refreshProjects() = viewModelScope.launch { refreshProjectsSync() }
 
     fun showUiMessage(presentableText: PresentableText) {
         viewModelScope.launch {

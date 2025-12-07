@@ -2,56 +2,8 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "e554aef42c27a4b1af2db6bf6f0d04f8",
+    "identityHash": "508de00f4a5312ecf918ef7c7a10a41c",
     "entities": [
-      {
-        "tableName": "kanban_user_session",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`user_id` INTEGER NOT NULL, `user_name` TEXT NOT NULL, `password` TEXT NOT NULL, `host_url` TEXT NOT NULL, `app_role` TEXT NOT NULL, `authenticated` INTEGER NOT NULL, PRIMARY KEY(`user_id`))",
-        "fields": [
-          {
-            "fieldPath": "userId",
-            "columnName": "user_id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "userName",
-            "columnName": "user_name",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "password",
-            "columnName": "password",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "hostUrl",
-            "columnName": "host_url",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "appRole",
-            "columnName": "app_role",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "authenticated",
-            "columnName": "authenticated",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "user_id"
-          ]
-        }
-      },
       {
         "tableName": "kanban_project",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `isActive` INTEGER NOT NULL, `token` TEXT NOT NULL, `lastModified` INTEGER NOT NULL, `isPublic` INTEGER NOT NULL, `isPrivate` INTEGER NOT NULL, `description` TEXT, `identifier` TEXT NOT NULL, `startDate` TEXT NOT NULL, `endDate` TEXT NOT NULL, `ownerId` INTEGER NOT NULL, `priorityDefault` INTEGER NOT NULL, `priorityStart` INTEGER NOT NULL, `priorityEnd` INTEGER NOT NULL, `email` TEXT, `predefinedEmailSubjects` TEXT, `perSwimlaneTaskLimits` INTEGER NOT NULL, `taskLimit` INTEGER NOT NULL, `enableGlobalTags` INTEGER NOT NULL, `isTrelloImported` INTEGER NOT NULL, `url_board` TEXT NOT NULL, `url_list` TEXT NOT NULL, PRIMARY KEY(`id`))",
@@ -202,7 +154,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e554aef42c27a4b1af2db6bf6f0d04f8')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '508de00f4a5312ecf918ef7c7a10a41c')"
     ]
   }
 }

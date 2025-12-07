@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -14,6 +13,9 @@ plugins {
 }
 
 kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
@@ -54,9 +56,6 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel.compose)
             implementation(libs.androidx.lifecycle.runtime.compose)
 
-            implementation(libs.androidx.hilt.navigation.compose)
-            implementation(libs.hilt.android)
-
             implementation(libs.androidx.navigation.compose)
 
             implementation(libs.squareup.retrofit)
@@ -68,12 +67,17 @@ kotlin {
 
         androidMain.dependencies {
             implementation(compose.preview)
+
+            // Replace DI w/ KMP variant later
+            implementation(libs.androidx.hilt.navigation.compose)
+            implementation(libs.hilt.android)
+            implementation(libs.security.crypto)
         }
-        jvmMain.dependencies {
-            implementation(compose.desktop.currentOs)
-            implementation(libs.kotlinx.coroutinesSwing)
-            implementation(libs.androidx.sqlite.bundled)
-        }
+//        jvmMain.dependencies {
+//            implementation(compose.desktop.currentOs)
+//            implementation(libs.kotlinx.coroutinesSwing)
+//            implementation(libs.androidx.sqlite.bundled)
+//        }
     }
 
 }
@@ -107,6 +111,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.compose.multiplatform.get()

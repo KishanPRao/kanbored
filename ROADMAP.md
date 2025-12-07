@@ -45,6 +45,7 @@
   - [ ] dark
   - [ ] light
   - [ ] amolded
+- [ ] Change auth encryption approach
 
 ### Functionalities
 

@@ -9,13 +9,9 @@ import androidx.room.Query
 import androidx.room.RoomDatabase
 import androidx.room.Update
 import com.kanbored.kanbored.model.KanbanProject
-import com.kanbored.kanbored.model.KanbanUserSession
-import com.kanbored.kanbored.utils.PlatformContext
 import kotlinx.coroutines.flow.Flow
 
 const val kanbanProjectTableName = "kanban_project"
-const val kanbanUserSessionTableName = "kanban_user_session"
-const val databaseName = "kanban_database"
 
 @Dao
 interface KanbanProjectDao {
@@ -38,39 +34,15 @@ interface KanbanProjectDao {
     suspend fun getAllProjectsSync(): List<KanbanProject>
 }
 
-@Dao
-interface KanbanUserSessionDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrUpdate(userSession: KanbanUserSession)
-
-    @Update
-    suspend fun update(userSession: KanbanUserSession)
-
-    @Delete
-    suspend fun delete(userSession: KanbanUserSession)
-
-    @Query("select * from $kanbanUserSessionTableName where authenticated == 1")  // TODO: limit 1?
-    suspend fun getAuthenticatedUserSessionSync(): KanbanUserSession?
-}
-
-@Database(entities = [KanbanUserSession::class, KanbanProject::class], version = 1)
+@Database(entities = [KanbanProject::class], version = 1)
 abstract class KanbanDatabase : RoomDatabase() {
 
     abstract fun projectDao(): KanbanProjectDao
-    abstract fun userSessionDao(): KanbanUserSessionDao
 
     companion object {
-        private var instance: KanbanDatabase? = null
-
-        fun getDatabase(context: PlatformContext): KanbanDatabase {
-            return instance ?: synchronized(this) {
-                createKanbanDatabase(context, databaseName)
-                    .also {
-                        instance = it
-                    }
-            }
-        }
+        const val DATABASE_NAME = "kanban_database"
     }
 }
 
-expect fun createKanbanDatabase(context: PlatformContext, databaseName: String): KanbanDatabase
+// TODO: re-enable code when jvm for KMP
+//expect fun createKanbanDatabase(context: PlatformContext, databaseName: String): KanbanDatabase

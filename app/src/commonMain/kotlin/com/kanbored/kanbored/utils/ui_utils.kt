@@ -113,9 +113,9 @@ fun TextInputDialog(
     }
 }
 
-expect abstract class PlatformContext : Any {
-//    expect fun getString(resId: StringResource, vararg args: Any): String
-}
-
-@Composable
-expect fun getContext(): PlatformContext
+//expect abstract class PlatformContext : Any {
+////    expect fun getString(resId: StringResource, vararg args: Any): String
+//}
+//
+//@Composable
+//expect fun getContext(): PlatformContext

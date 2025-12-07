@@ -8,7 +8,4 @@ sealed class Route {
 
     @Serializable
     object Home : Route()
-
-    @Serializable
-    object Empty : Route()
 }

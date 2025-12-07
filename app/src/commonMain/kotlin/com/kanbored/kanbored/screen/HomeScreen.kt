@@ -24,25 +24,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kanbored.kanbored.ui.theme.AppTheme
 import com.kanbored.kanbored.utils.UiEvent
-import com.kanbored.kanbored.utils.getContext
 import com.kanbored.kanbored.viewmodel.KanbanViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun HomeScreen(kanbanVM: KanbanViewModel) {
+fun HomeScreen(
+    kanbanVM: KanbanViewModel = hiltViewModel()
+) {
     var isRefreshing by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         kanbanVM.uiEventFlow.collectLatest { event ->
             when (event) {
-                UiEvent.HideLocalLoading -> isRefreshing = false
-                UiEvent.ShowLocalLoading -> isRefreshing = true
+                UiEvent.HideLoading -> isRefreshing = false
+                UiEvent.ShowLoading -> isRefreshing = true
                 else -> {}
             }
         }
@@ -89,10 +90,7 @@ fun ProjectGrid(kanbanVM: KanbanViewModel) {
 @Preview
 @Composable
 fun HomeScreenPreview() {
-    val context = getContext()
     AppTheme(darkTheme = false) {
-        // TODO: avoid plugging actual repo/db into preview
-        val kanbanVM = viewModel<KanbanViewModel> { KanbanViewModel(context) }
-        HomeScreen(kanbanVM)
+        HomeScreen()
     }
 }
