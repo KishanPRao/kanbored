@@ -2,7 +2,7 @@
 android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
-agp = "8.13.1"
+agp = "8.13.2"
 kotlin = "2.2.21"
 androidx-navigation = "2.9.1"
 material-icons-extended = "1.7.3"
