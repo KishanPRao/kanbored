@@ -42,9 +42,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
+import com.kanbored.kanbored.event.UiEvent
 import com.kanbored.kanbored.utils.PresentableText
 import com.kanbored.kanbored.utils.TextInputDialog
-import com.kanbored.kanbored.utils.UiEvent
 import com.kanbored.kanbored.viewmodel.KanbanViewModel
 import com.kanbored.kanbored.viewmodel.TopBarAction
 import com.kanbored.kanbored.viewmodel.TopBarDropdownItem
@@ -67,6 +67,7 @@ import org.jetbrains.compose.resources.stringResource
 fun HomeScreen(
     topBarVM: TopBarViewModel
 ) {
+    val kanbanVM: KanbanViewModel = hiltViewModel()
     var showDialog by remember { mutableStateOf(false) }
     val title = stringResource(Res.string.projects)
     LaunchedEffect(Unit) {
@@ -99,13 +100,13 @@ fun HomeScreen(
             onClickOk = { text ->
                 showDialog = false
                 println("Add new project: $text")
+                kanbanVM.createProject(text)
             },
             onClickCancel = {
                 showDialog = false
             }
         )
     }
-    val kanbanVM: KanbanViewModel = hiltViewModel()
     var isRefreshing by remember { mutableStateOf(false) }
     val isApiReachable by kanbanVM.isApiReachable.collectAsState()
     LaunchedEffect(Unit) {

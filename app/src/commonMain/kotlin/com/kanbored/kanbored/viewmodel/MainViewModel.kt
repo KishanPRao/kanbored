@@ -2,9 +2,9 @@ package com.kanbored.kanbored.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kanbored.kanbored.event.AppEventBus
+import com.kanbored.kanbored.event.AppUiEvent
 import com.kanbored.kanbored.repository.ConfigRepository
-import com.kanbored.kanbored.utils.AppEventBus
-import com.kanbored.kanbored.utils.AppUiEvent
 import com.kanbored.kanbored.utils.PresentableText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

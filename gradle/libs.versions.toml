@@ -19,6 +19,7 @@ sqlite = "2.6.2"
 
 dagger-hilt = "2.57.2"
 hilt-navigation-compose = "1.3.0"
+kotest = "6.0.7"
 
 # Deprecated:
 security-crypto = "1.1.0"
@@ -28,6 +29,8 @@ androidx-material-icons-extended = { group = "org.jetbrains.compose.material", n
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room"  }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room"  }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
+kotest-assertions-json = { group = "io.kotest", name = "kotest-assertions-json", version.ref = "kotest" }
 androidx-navigation-compose = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version.ref = "androidx-navigation" }
 squareup-retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 squareup-kotlinx-serialization = { group = "com.squareup.retrofit2", name = "converter-kotlinx-serialization", version.ref = "retrofit" }

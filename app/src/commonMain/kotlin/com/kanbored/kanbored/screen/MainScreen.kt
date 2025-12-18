@@ -42,8 +42,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.kanbored.kanbored.event.AppUiEvent
 import com.kanbored.kanbored.ui.theme.AppTheme
-import com.kanbored.kanbored.utils.AppUiEvent
 import com.kanbored.kanbored.utils.KanbanIconButton
 import com.kanbored.kanbored.utils.TopbarDropdownMenuItem
 import com.kanbored.kanbored.viewmodel.MainViewModel

@@ -65,6 +65,11 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
         }
 
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotest.assertions.json)
+        }
+
         androidMain.dependencies {
             implementation(compose.preview)
 
@@ -72,6 +77,11 @@ kotlin {
             implementation(libs.androidx.hilt.navigation.compose)
             implementation(libs.hilt.android)
             implementation(libs.security.crypto)
+//
+//            testImplementation(libs.junit)
+//            androidTestImplementation(libs.androidx.junit)
+//            androidTestImplementation(libs.androidx.espresso.core)
+//            androidTestImplementation(libs.androidx.ui.test.junit4)
         }
 //        jvmMain.dependencies {
 //            implementation(compose.desktop.currentOs)

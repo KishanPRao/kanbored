@@ -1,5 +1,6 @@
-package com.kanbored.kanbored.utils
+package com.kanbored.kanbored.event
 
+import com.kanbored.kanbored.utils.PresentableText
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import javax.inject.Inject

@@ -6,7 +6,7 @@ import com.kanbored.kanbored.network.Result
 import com.kanbored.kanbored.persistent.KanbanDatabase
 import com.kanbored.kanbored.utils.PresentableText
 import kanbored.app.generated.resources.Res
-import kanbored.app.generated.resources.login_err_unknown
+import kanbored.app.generated.resources.error_unknown
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
@@ -55,7 +55,7 @@ class KanbanRepository @Inject constructor(
 
     suspend fun refreshProjects(): Result<Unit> {
         try {
-            val response = apiProvider.getKanbanApi().getAllProjects()
+            val response = apiProvider.kanbanApi.getAllProjects()
             if (response.result != null) {
                 val projects = response.result
                 println("all projects: $projects")
@@ -64,13 +64,34 @@ class KanbanRepository @Inject constructor(
             } else if (response.error != null) {
                 return Result.Error(PresentableText.DynamicString(response.error.message))
             } else {
-                return Result.Error(PresentableText.DynamicResource(Res.string.login_err_unknown))
+                return Result.Error(PresentableText.DynamicResource(Res.string.error_unknown))
             }
         } catch (e: Exception) {
             println("refreshProjects error: ${e.message}")
             return Result.Error(
                 e.message?.let { PresentableText.DynamicString(it) }
-                    ?: PresentableText.DynamicResource(Res.string.login_err_unknown)
+                    ?: PresentableText.DynamicResource(Res.string.error_unknown)
+            )
+        }
+    }
+
+    suspend fun createProject(name: String): Result<Unit> {
+        try {
+            val response = apiProvider.kanbanApi.createProject(name)
+            if (response.result != null) {
+                val projectId = response.result
+                println("createProject: $projectId")
+                return Result.Success(Unit)
+            } else if (response.error != null) {
+                return Result.Error(PresentableText.DynamicString(response.error.message))
+            } else {
+                return Result.Error(PresentableText.DynamicResource(Res.string.error_unknown))
+            }
+        } catch (e: Exception) {
+            println("createProject error: ${e.message}")
+            return Result.Error(
+                e.message?.let { PresentableText.DynamicString(it) }
+                    ?: PresentableText.DynamicResource(Res.string.error_unknown)
             )
         }
     }

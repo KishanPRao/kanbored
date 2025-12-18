@@ -3,13 +3,29 @@ package com.kanbored.kanbored.network
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class KanbanRequest(val method: String, val id: Int, val jsonrpc: String = "2.0")
+sealed class KanbanRequest
+
+@Serializable
+data class KanbanArrayRequest(
+    val method: String,
+    val id: Int,
+    val jsonrpc: String = "2.0",
+    val params: List<String>
+) : KanbanRequest()
+
+@Serializable
+data class KanbanParamsRequest(
+    val method: String,
+    val id: Int,
+    val jsonrpc: String = "2.0",
+    val params: KanbanParams?
+) : KanbanRequest()
 
 @Serializable
 data class KanbanLoginResponse(
     val jsonrpc: String,
     val result: KanbanLoginUserInfo? = null,
-    val error: KanbanLoginError? = null,
+    val error: KanbanError? = null,
     val id: Int? = null,
 )
 
@@ -25,4 +41,4 @@ data class KanbanResponse<Result, Error>(
 data class KanbanLoginUserInfo(val id: Int, val role: String)
 
 @Serializable
-data class KanbanLoginError(val code: Int, val message: String)
+data class KanbanError(val code: Int, val message: String)

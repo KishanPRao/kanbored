@@ -19,17 +19,17 @@ class ApiProvider @Inject constructor(
     @param:Named("auth_config") private val configFlow: StateFlow<AuthConfig?>
 ) {
     @Volatile
-    private var kanbanApi: KanbanApi? = null
-
-    fun getKanbanApi(): KanbanApi {
-        return kanbanApi ?: synchronized(this) {
-            val api = retrofitBuilder
-                .build()
-                .create(KanbanApi::class.java)
-            kanbanApi = api
-            api
+    private var _kanbanApi: KanbanApi? = null
+    val kanbanApi: KanbanApi
+        get() {
+            return _kanbanApi ?: synchronized(this) {
+                val api = retrofitBuilder
+                    .build()
+                    .create(KanbanApi::class.java)
+                _kanbanApi = api
+                api
+            }
         }
-    }
 
 
     suspend fun isApiReachable(): Boolean {

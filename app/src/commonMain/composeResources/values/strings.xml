@@ -7,7 +7,6 @@
     <string name="login_username_hint">admin</string>
     <string name="login_password_hint">hunter2</string>
     <string name="login_button">LOGIN</string>
-    <string name="login_err_unknown">Unknown error</string>
     <string name="login_err_invalid_input">Please enter correct input data!</string>
 
     <string name="projects">Projects</string>
@@ -31,4 +30,5 @@
 
     <string name="server_unreachable">The server is unreachable</string>
     <string name="online">Online</string>
+    <string name="error_unknown">Unknown error</string>
 </resources>

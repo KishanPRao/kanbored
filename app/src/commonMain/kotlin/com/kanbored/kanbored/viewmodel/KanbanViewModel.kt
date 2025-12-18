@@ -2,13 +2,13 @@ package com.kanbored.kanbored.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kanbored.kanbored.event.AppEventBus
+import com.kanbored.kanbored.event.AppUiEvent
+import com.kanbored.kanbored.event.UiEvent
 import com.kanbored.kanbored.model.KanbanProject
 import com.kanbored.kanbored.network.Result
 import com.kanbored.kanbored.repository.KanbanRepository
-import com.kanbored.kanbored.utils.AppEventBus
-import com.kanbored.kanbored.utils.AppUiEvent
 import com.kanbored.kanbored.utils.PresentableText
-import com.kanbored.kanbored.utils.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -65,6 +65,20 @@ class KanbanViewModel @Inject constructor(
     }
 
     fun refreshProjects() = viewModelScope.launch { refreshProjectsSync() }
+
+    fun createProject(name: String) = viewModelScope.launch {
+        val result = repository.createProject(name)
+        when (result) {
+            is Result.Error<*> -> {
+                appEventBus.emit(AppUiEvent.ShowError(result.message!!))
+            }
+
+            is Result.Success<*> -> {
+                println("created")
+                refreshProjectsSync()
+            }
+        }
+    }
 
     fun showUiMessage(presentableText: PresentableText) {
         viewModelScope.launch {

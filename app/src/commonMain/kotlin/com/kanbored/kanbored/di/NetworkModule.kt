@@ -2,6 +2,7 @@ package com.kanbored.kanbored.di
 
 import com.kanbored.kanbored.model.AuthConfig
 import com.kanbored.kanbored.network.AuthInterceptorFactory
+import com.kanbored.kanbored.network.createJson
 import com.kanbored.kanbored.repository.ConfigRepository
 import com.kanbored.kanbored.utils.BuildConfiguration
 import dagger.Module
@@ -9,7 +10,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -34,10 +34,7 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideRetrofitBuilder(okHttpClient: OkHttpClient): Retrofit.Builder {
-        val json = Json {
-            ignoreUnknownKeys = true
-            encodeDefaults = true
-        }
+        val json = createJson()
         return Retrofit.Builder()
             .baseUrl("https://example.com")    // NOTE: This will be replaced by the interceptor
             .client(okHttpClient)
