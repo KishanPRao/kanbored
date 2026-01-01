@@ -55,7 +55,8 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun LoginScreen(
-    topBarVM: TopBarViewModel
+    topBarVM: TopBarViewModel,
+    modifier: Modifier = Modifier
 ) {
     val title = stringResource(Res.string.login)
     LaunchedEffect(Unit) {
@@ -68,7 +69,7 @@ fun LoginScreen(
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
         val spacing = 30.dp
         var url by rememberSaveable { mutableStateOf("http://192.168.0.50:6080") }

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "508de00f4a5312ecf918ef7c7a10a41c",
+    "identityHash": "d08d38c4b8c947e9dbade608f737c259",
     "entities": [
       {
         "tableName": "kanban_project",
@@ -150,11 +150,250 @@
             "id"
           ]
         }
+      },
+      {
+        "tableName": "kanban_column",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `position` INTEGER NOT NULL, `taskLimit` INTEGER NOT NULL, `description` TEXT NOT NULL, `hideInDashboard` INTEGER NOT NULL, `projectId` INTEGER NOT NULL, PRIMARY KEY(`id`, `projectId`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "taskLimit",
+            "columnName": "taskLimit",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hideInDashboard",
+            "columnName": "hideInDashboard",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "projectId",
+            "columnName": "projectId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id",
+            "projectId"
+          ]
+        }
+      },
+      {
+        "tableName": "kanban_task",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `dateCreation` INTEGER NOT NULL, `colorId` TEXT NOT NULL, `projectId` INTEGER NOT NULL, `columnId` INTEGER NOT NULL, `ownerId` INTEGER NOT NULL, `position` INTEGER NOT NULL, `isActive` INTEGER NOT NULL, `dateCompleted` INTEGER, `score` INTEGER, `dateDue` INTEGER, `categoryId` INTEGER NOT NULL, `creatorId` INTEGER NOT NULL, `dateModification` INTEGER, `reference` TEXT, `dateStarted` INTEGER, `timeSpent` INTEGER, `timeEstimated` INTEGER, `swimlaneId` INTEGER NOT NULL, `dateMoved` INTEGER NOT NULL, `recurrenceStatus` INTEGER NOT NULL, `recurrenceTrigger` INTEGER NOT NULL, `recurrenceFactor` INTEGER NOT NULL, `recurrenceTimeframe` INTEGER NOT NULL, `recurrenceBasedate` INTEGER NOT NULL, `recurrenceParent` INTEGER, `recurrenceChild` INTEGER, `priority` INTEGER NOT NULL, PRIMARY KEY(`id`, `columnId`, `projectId`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateCreation",
+            "columnName": "dateCreation",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "colorId",
+            "columnName": "colorId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "projectId",
+            "columnName": "projectId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "columnId",
+            "columnName": "columnId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ownerId",
+            "columnName": "ownerId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isActive",
+            "columnName": "isActive",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateCompleted",
+            "columnName": "dateCompleted",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "score",
+            "columnName": "score",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "dateDue",
+            "columnName": "dateDue",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "categoryId",
+            "columnName": "categoryId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "creatorId",
+            "columnName": "creatorId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateModification",
+            "columnName": "dateModification",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "reference",
+            "columnName": "reference",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "dateStarted",
+            "columnName": "dateStarted",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "timeSpent",
+            "columnName": "timeSpent",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "timeEstimated",
+            "columnName": "timeEstimated",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "swimlaneId",
+            "columnName": "swimlaneId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateMoved",
+            "columnName": "dateMoved",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recurrenceStatus",
+            "columnName": "recurrenceStatus",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recurrenceTrigger",
+            "columnName": "recurrenceTrigger",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recurrenceFactor",
+            "columnName": "recurrenceFactor",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recurrenceTimeframe",
+            "columnName": "recurrenceTimeframe",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recurrenceBasedate",
+            "columnName": "recurrenceBasedate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recurrenceParent",
+            "columnName": "recurrenceParent",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "recurrenceChild",
+            "columnName": "recurrenceChild",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "priority",
+            "columnName": "priority",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id",
+            "columnId",
+            "projectId"
+          ]
+        }
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '508de00f4a5312ecf918ef7c7a10a41c')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd08d38c4b8c947e9dbade608f737c259')"
     ]
   }
 }

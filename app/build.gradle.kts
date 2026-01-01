@@ -77,6 +77,7 @@ kotlin {
             implementation(libs.androidx.hilt.navigation.compose)
             implementation(libs.hilt.android)
             implementation(libs.security.crypto)
+            implementation(libs.androidx.ui.tooling)
 //
 //            testImplementation(libs.junit)
 //            androidTestImplementation(libs.androidx.junit)

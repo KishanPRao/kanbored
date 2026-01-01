@@ -13,6 +13,8 @@
     <string name="login">Login</string>
     <string name="navigate_back">Back</string>
     <string name="topbar_add_project">Add Project</string>
+    <string name="topbar_add_column">Add Column</string>
+    <string name="topbar_change_view">Change View</string>
     <string name="topbar_more_options">More Options</string>
     <string name="topbar_show_archived">Show Archived</string>
     <string name="topbar_settings">Settings</string>
@@ -23,8 +25,10 @@
     <string name="hide_password">Hide password</string>
     <string name="show_password">Show password</string>
 
+    <string name="add_new_column">Add a column</string>
     <string name="add_new_project">Add a new project</string>
     <string name="enter_name_new_project">Enter the new project name</string>
+    <string name="enter_name_new_column">Enter the new column name</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
 

@@ -13,6 +13,8 @@ import javax.inject.Inject
 @HiltViewModel
 class TopBarViewModel @Inject constructor() : ViewModel() {
     private val _state = MutableStateFlow(TopBarState())
+    private var _backupState: TopBarState? = null
+
     val state: StateFlow<TopBarState> = _state.asStateFlow()
 
     fun updateTitle(title: String) {
@@ -29,6 +31,17 @@ class TopBarViewModel @Inject constructor() : ViewModel() {
 
     fun setDropdownItems(items: List<TopBarDropdownItem>) {
         _state.update { it.copy(dropdownItems = items) }
+    }
+
+    fun saveState() {
+        _backupState = _state.value
+    }
+
+    fun revertState() {
+        _backupState?.let { state ->
+            _state.update { state }
+            _backupState = null
+        }
     }
 }
 

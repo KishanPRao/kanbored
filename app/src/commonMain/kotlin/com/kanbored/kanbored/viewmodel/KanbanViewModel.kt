@@ -5,12 +5,17 @@ import androidx.lifecycle.viewModelScope
 import com.kanbored.kanbored.event.AppEventBus
 import com.kanbored.kanbored.event.AppUiEvent
 import com.kanbored.kanbored.event.UiEvent
+import com.kanbored.kanbored.model.KanbanColumn
 import com.kanbored.kanbored.model.KanbanProject
+import com.kanbored.kanbored.model.KanbanTask
 import com.kanbored.kanbored.network.Result
 import com.kanbored.kanbored.repository.KanbanRepository
 import com.kanbored.kanbored.utils.PresentableText
+import com.kanbored.kanbored.utils.emptyProject
+import com.kanbored.kanbored.utils.refreshStateDelay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -18,9 +23,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-// 30 seconds
-const val refreshStateDelay = 30_000L
 
 @HiltViewModel
 class KanbanViewModel @Inject constructor(
@@ -46,15 +48,17 @@ class KanbanViewModel @Inject constructor(
     private suspend fun startAutoRefresh() {
         while (true) {
             refreshProjectsSync()
+            for (project in projects.value) {
+                refreshColumnsAndTasks(project.id, false)
+                refreshColumnsAndTasks(project.id, true)
+            }
             delay(refreshStateDelay)
         }
     }
 
     private suspend fun refreshProjectsSync() {
-        _uiEventFlow.emit(UiEvent.ShowLoading)
         val result = repository.refreshProjects()
         println("finish refresh project")
-        _uiEventFlow.emit(UiEvent.HideLoading)
         when (result) {
             is Result.Error<*> -> {
                 appEventBus.emit(AppUiEvent.ShowError(result.message!!))
@@ -64,7 +68,63 @@ class KanbanViewModel @Inject constructor(
         }
     }
 
-    fun refreshProjects() = viewModelScope.launch { refreshProjectsSync() }
+    private suspend fun refreshColumnsSync(projectId: Int) {
+        val result = repository.refreshColumns(projectId)
+        println("finish refresh columns")
+        when (result) {
+            is Result.Error<*> -> {
+                appEventBus.emit(AppUiEvent.ShowError(result.message!!))
+            }
+
+            is Result.Success<*> -> {}
+        }
+    }
+
+    private suspend fun refreshColumnsAndTasksSync(projectId: Int, isArchived: Boolean) {
+        val result = repository.refreshColumns(projectId)
+        when (result) {
+            is Result.Error<*> -> {
+                appEventBus.emit(AppUiEvent.ShowError(result.message!!))
+            }
+
+            is Result.Success<*> -> {}
+        }
+        val resultTasks = repository.refreshTasks(projectId, isArchived)
+        when (resultTasks) {
+            is Result.Error<*> -> {
+                appEventBus.emit(AppUiEvent.ShowError(result.message!!))
+            }
+
+            is Result.Success<*> -> {}
+        }
+        println("finish refresh columns and tasks")
+    }
+
+    fun refreshProjects() = viewModelScope.launch {
+        _uiEventFlow.emit(UiEvent.ShowLoading)
+        refreshProjectsSync()
+        _uiEventFlow.emit(UiEvent.HideLoading)
+    }
+
+    fun refreshAllColumns() = viewModelScope.launch {
+        _uiEventFlow.emit(UiEvent.ShowLoading)
+        for (project in projects.value) {
+            refreshColumnsSync(project.id)
+        }
+        _uiEventFlow.emit(UiEvent.HideLoading)
+    }
+
+    fun refreshColumns(projectId: Int) = viewModelScope.launch {
+        _uiEventFlow.emit(UiEvent.ShowLoading)
+        refreshColumnsSync(projectId)
+        _uiEventFlow.emit(UiEvent.HideLoading)
+    }
+
+    fun refreshColumnsAndTasks(projectId: Int, isArchived: Boolean) = viewModelScope.launch {
+        _uiEventFlow.emit(UiEvent.ShowLoading)
+        refreshColumnsAndTasksSync(projectId, isArchived)
+        _uiEventFlow.emit(UiEvent.HideLoading)
+    }
 
     fun createProject(name: String) = viewModelScope.launch {
         val result = repository.createProject(name)
@@ -78,6 +138,32 @@ class KanbanViewModel @Inject constructor(
                 refreshProjectsSync()
             }
         }
+    }
+
+    fun createColumn(projectId: Int, name: String) = viewModelScope.launch {
+//        val result = repository.createProject(name)
+//        when (result) {
+//            is Result.Error<*> -> {
+//                appEventBus.emit(AppUiEvent.ShowError(result.message!!))
+//            }
+//
+//            is Result.Success<*> -> {
+//                println("created")
+//                refreshProjectsSync()
+//            }
+//        }
+    }
+
+    fun getColumns(projectId: Int): Flow<List<KanbanColumn>> {
+        return repository.getColumns(projectId)
+    }
+
+    fun getTasks(projectId: Int, columnId: Int): Flow<List<KanbanTask>> {
+        return repository.getTasks(projectId, columnId)
+    }
+
+    fun getProject(projectId: Int): KanbanProject {
+        return projects.value.find { project -> project.id == projectId } ?: emptyProject
     }
 
     fun showUiMessage(presentableText: PresentableText) {

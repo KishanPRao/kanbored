@@ -8,10 +8,14 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RoomDatabase
 import androidx.room.Update
+import com.kanbored.kanbored.model.KanbanColumn
 import com.kanbored.kanbored.model.KanbanProject
+import com.kanbored.kanbored.model.KanbanTask
 import kotlinx.coroutines.flow.Flow
 
 const val kanbanProjectTableName = "kanban_project"
+const val kanbanColumnTableName = "kanban_column"
+const val kanbanTaskTableName = "kanban_task"
 
 @Dao
 interface KanbanProjectDao {
@@ -34,10 +38,56 @@ interface KanbanProjectDao {
     suspend fun getAllProjectsSync(): List<KanbanProject>
 }
 
-@Database(entities = [KanbanProject::class], version = 1)
+@Dao
+interface KanbanColumnDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrUpdate(column: KanbanColumn)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(columns: List<KanbanColumn>)
+
+    @Update
+    suspend fun update(column: KanbanColumn)
+
+    @Delete
+    suspend fun delete(column: KanbanColumn)
+
+    @Query("select * from $kanbanColumnTableName where projectId == :projectId")
+    fun getColumns(projectId: Int): Flow<List<KanbanColumn>>
+
+    @Query("select * from $kanbanColumnTableName")
+    fun getAllColumns(): Flow<List<KanbanColumn>>
+
+    @Query("select * from $kanbanColumnTableName")
+    suspend fun getAllColumnsSync(): List<KanbanColumn>
+}
+
+@Dao
+interface KanbanTaskDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrUpdate(task: KanbanTask)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(tasks: List<KanbanTask>)
+
+    @Update
+    suspend fun update(task: KanbanTask)
+
+    @Delete
+    suspend fun delete(task: KanbanTask)
+
+    @Query("select * from $kanbanTaskTableName where columnId == :columnId and projectId == :projectId")
+    fun getTasks(projectId: Int, columnId: Int): Flow<List<KanbanTask>>
+}
+
+@Database(entities = [KanbanProject::class, KanbanColumn::class, KanbanTask::class], version = 1)
 abstract class KanbanDatabase : RoomDatabase() {
 
     abstract fun projectDao(): KanbanProjectDao
+
+    abstract fun columnDao(): KanbanColumnDao
+
+    abstract fun taskDao(): KanbanTaskDao
 
     companion object {
         const val DATABASE_NAME = "kanban_database"

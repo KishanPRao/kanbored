@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -39,10 +40,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.kanbored.kanbored.event.UiEvent
+import com.kanbored.kanbored.model.KanbanProject
 import com.kanbored.kanbored.utils.PresentableText
 import com.kanbored.kanbored.utils.TextInputDialog
 import com.kanbored.kanbored.viewmodel.KanbanViewModel
@@ -65,9 +66,11 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun HomeScreen(
-    topBarVM: TopBarViewModel
+    topBarVM: TopBarViewModel,
+    kanbanVM: KanbanViewModel,
+    onProjectOpened: (KanbanProject) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val kanbanVM: KanbanViewModel = hiltViewModel()
     var showDialog by remember { mutableStateOf(false) }
     val title = stringResource(Res.string.projects)
     LaunchedEffect(Unit) {
@@ -83,11 +86,17 @@ fun HomeScreen(
                         showDialog = true
                     }
                 ),
+                // TODO: Or find a different, more useful operation
+                TopBarAction(
+                    icon = Icons.Filled.Archive,
+                    contentDescription = PresentableText.DynamicResource(Res.string.topbar_show_archived),
+                    onClick = {
+                        println("Show archived")
+                    }
+                ),
             ))
         topBarVM.setDropdownItems(
             listOf(
-                TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_show_archived)) {
-                },
                 TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_settings)) {
                 },
             )
@@ -119,7 +128,7 @@ fun HomeScreen(
         }
     }
     println("isApiReachable: $isApiReachable")
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = modifier.fillMaxSize()) {
         ConnectionStatusStrip(
             stringResource(Res.string.server_unreachable),
             !isApiReachable,
@@ -132,12 +141,12 @@ fun HomeScreen(
                 }
             },
             modifier = Modifier.fillMaxSize(),
-        ) { ProjectGrid(kanbanVM) }
+        ) { ProjectGrid(kanbanVM, onProjectOpened) }
     }
 }
 
 @Composable
-fun ProjectGrid(kanbanVM: KanbanViewModel) {
+fun ProjectGrid(kanbanVM: KanbanViewModel, onProjectOpened: (KanbanProject) -> Unit) {
     val projects by kanbanVM.projects.collectAsStateWithLifecycle()
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -151,7 +160,10 @@ fun ProjectGrid(kanbanVM: KanbanViewModel) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
-                    .clickable {},
+                    .clickable {
+                        println("open project: ${project.name}")
+                        onProjectOpened(project)
+                    },
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                 )

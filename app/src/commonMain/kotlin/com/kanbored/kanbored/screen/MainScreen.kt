@@ -42,12 +42,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.kanbored.kanbored.event.AppUiEvent
 import com.kanbored.kanbored.ui.theme.AppTheme
 import com.kanbored.kanbored.utils.KanbanIconButton
 import com.kanbored.kanbored.utils.TopbarDropdownMenuItem
+import com.kanbored.kanbored.viewmodel.KanbanViewModel
 import com.kanbored.kanbored.viewmodel.MainViewModel
-import com.kanbored.kanbored.viewmodel.TopBarState
 import com.kanbored.kanbored.viewmodel.TopBarViewModel
 import kanbored.app.generated.resources.Res
 import kanbored.app.generated.resources.navigate_back
@@ -63,7 +64,6 @@ fun MainScreen() {
             // TODO: top bar vm?
 //            navController.getBackStackEntry("app_graph")
         )
-        val topBarState = topBarVM.state.collectAsState()
         val authConfig = mainVM.authConfig.collectAsState().value
         val isAuthenticated = authConfig.authenticated
 
@@ -87,7 +87,9 @@ fun MainScreen() {
                     )
                 })
             },
-            topBar = { AppTopBar(navController = navController, topBarState.value) },
+            topBar = {
+                AppTopBar(navController = navController, topBarVM = topBarVM)
+            },
             modifier = Modifier.fillMaxSize(),
         ) { innerPadding ->
             LaunchedEffect(Unit) {
@@ -121,11 +123,25 @@ fun MainScreen() {
                 },
                 modifier = Modifier.padding(innerPadding)
             ) {
-                composable<Route.Home> {
-                    HomeScreen(topBarVM)
-                }
                 composable<Route.Login> {
                     LoginScreen(topBarVM)
+                }
+                composable<Route.Home> { entry ->
+                    val kanbanGraphEntry = remember(entry) {
+                        navController.getBackStackEntry(Route.Home)
+                    }
+                    val kanbanVM: KanbanViewModel = hiltViewModel(kanbanGraphEntry)
+                    HomeScreen(topBarVM, kanbanVM, onProjectOpened = { project ->
+                        navController.navigate(Route.Project(projectId = project.id))
+                    })
+                }
+                composable<Route.Project> { entry ->
+                    val kanbanGraphEntry = remember(entry) {
+                        navController.getBackStackEntry(Route.Home)
+                    }
+                    val kanbanVM: KanbanViewModel = hiltViewModel(kanbanGraphEntry)
+                    val args = entry.toRoute<Route.Project>()
+                    ProjectScreen(topBarVM, kanbanVM, args.projectId)
                 }
             }
 
@@ -152,9 +168,11 @@ fun MainScreen() {
 @Composable
 private fun AppTopBar(
     navController: NavHostController,
-    topBarState: TopBarState,
+    topBarVM: TopBarViewModel,
 ) {
+    val topBarVMState = topBarVM.state.collectAsState()
     var expandedMenu by remember { mutableStateOf(false) }
+    val topBarState = topBarVMState.value
     TopAppBar(
         title = { Text(topBarState.title) },
         navigationIcon = {
@@ -162,7 +180,10 @@ private fun AppTopBar(
                 KanbanIconButton(
                     Icons.AutoMirrored.Filled.ArrowBack,
                     Res.string.navigate_back,
-                ) { navController.popBackStack() }
+                ) {
+                    topBarVM.revertState()
+                    navController.popBackStack()
+                }
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
