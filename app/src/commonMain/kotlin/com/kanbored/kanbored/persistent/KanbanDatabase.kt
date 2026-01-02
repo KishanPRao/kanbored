@@ -78,6 +78,9 @@ interface KanbanTaskDao {
 
     @Query("select * from $kanbanTaskTableName where columnId == :columnId and projectId == :projectId")
     fun getTasks(projectId: Int, columnId: Int): Flow<List<KanbanTask>>
+
+    @Query("select * from $kanbanTaskTableName where columnId == :columnId and projectId == :projectId and id == :taskId")
+    fun getTaskSync(projectId: Int, columnId: Int, taskId: Int): Flow<KanbanTask?>
 }
 
 @Database(entities = [KanbanProject::class, KanbanColumn::class, KanbanTask::class], version = 1)

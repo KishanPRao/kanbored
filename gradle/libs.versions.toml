@@ -13,10 +13,12 @@ room = "2.8.4"
 ksp = "2.2.21-2.0.4"
 androidx-lifecycle = "2.9.6"
 compose-hot-reload = "1.0.0-rc04"
-compose-multiplatform = "1.9.3"
+compose-multiplatform = "1.10.0-rc02"   # multiplatform-markdown-renderer needs >= CMP 1.10
 kotlinx-coroutines = "1.10.2"
 sqlite = "2.6.2"
 kotest = "6.0.7"
+#richeditor-compose = "1.0.0-rc13"
+multiplatform-markdown-renderer = "0.39.0"
 
 # android specific:
 dagger-hilt = "2.57.2"
@@ -43,13 +45,16 @@ androidx-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecy
 androidx-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 #kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 #androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
-androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
+#richeditor-compose = { module = "com.mohamedrejeb.richeditor:richeditor-compose", version.ref = "richeditor-compose" }
+multiplatform-markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "multiplatform-markdown-renderer" }
+multiplatform-markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "multiplatform-markdown-renderer" }
 
 ## non-KMP
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "dagger-hilt" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "dagger-hilt" }
 security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "security-crypto" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
+androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
 
 
 [plugins]

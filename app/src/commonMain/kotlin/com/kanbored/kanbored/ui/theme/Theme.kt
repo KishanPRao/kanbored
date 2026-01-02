@@ -68,9 +68,9 @@ fun AppTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-        dynamicColor && canEnableDynamicColor() -> {
-            dynamicColorTheme(darkTheme)
-        }
+//        dynamicColor && canEnableDynamicColor() -> {
+//            dynamicColorTheme(darkTheme)
+//        }
 
         darkTheme -> darkColorScheme
         else -> lightColorScheme

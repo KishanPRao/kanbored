@@ -10,6 +10,7 @@ data class Dimensions(
     val columnTaskPadding: Dp = 15.dp,
     val columnPadding: Dp = 12.dp,
     val columnItemsPadding: Dp = 8.dp,
+    val minTaskDescHeight: Dp = 100.dp,
 )
 
 val LocalDimensions = compositionLocalOf { Dimensions() }

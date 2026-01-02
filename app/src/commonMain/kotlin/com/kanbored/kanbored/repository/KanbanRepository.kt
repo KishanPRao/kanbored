@@ -61,6 +61,9 @@ class KanbanRepository @Inject constructor(
     fun getTasks(projectId: Int, columnId: Int): Flow<List<KanbanTask>> =
         database.taskDao().getTasks(projectId, columnId)
 
+    fun getTask(projectId: Int, columnId: Int, taskId: Int): Flow<KanbanTask?> =
+        database.taskDao().getTaskSync(projectId, columnId, taskId)
+
     suspend fun refreshProjects(): Result<Unit> {
         try {
             val response = apiProvider.kanbanApi.getAllProjects()

@@ -166,6 +166,10 @@ class KanbanViewModel @Inject constructor(
         return projects.value.find { project -> project.id == projectId } ?: emptyProject
     }
 
+    fun getTask(projectId: Int, columnId: Int, taskId: Int): Flow<KanbanTask?> {
+        return repository.getTask(projectId, columnId, taskId)
+    }
+
     fun showUiMessage(presentableText: PresentableText) {
         viewModelScope.launch {
             _uiEventFlow.emit(UiEvent.ShowMessage(presentableText))

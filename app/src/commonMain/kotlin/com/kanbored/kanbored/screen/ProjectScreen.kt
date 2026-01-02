@@ -43,6 +43,7 @@ import com.kanbored.kanbored.ui.theme.AppTheme
 import com.kanbored.kanbored.ui.theme.LocalDimensions
 import com.kanbored.kanbored.utils.PresentableText
 import com.kanbored.kanbored.utils.TextInputDialog
+import com.kanbored.kanbored.utils.emptyTask
 import com.kanbored.kanbored.viewmodel.KanbanViewModel
 import com.kanbored.kanbored.viewmodel.TopBarAction
 import com.kanbored.kanbored.viewmodel.TopBarDropdownItem
@@ -63,6 +64,7 @@ fun ProjectScreen(
     topBarVM: TopBarViewModel,
     kanbanVM: KanbanViewModel,
     projectId: Int,
+    onTaskOpened: (KanbanTask) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showDialog by remember { mutableStateOf(false) }
@@ -140,23 +142,28 @@ fun ProjectScreen(
                 }
             },
             modifier = Modifier.fillMaxSize(),
-        ) { ColumnList(projectId, kanbanVM) }
+        ) { ColumnList(projectId, kanbanVM, onTaskOpened) }
     }
 }
 
 @Composable
-fun ColumnList(projectId: Int, kanbanVM: KanbanViewModel) {
+fun ColumnList(projectId: Int, kanbanVM: KanbanViewModel, onTaskOpened: (KanbanTask) -> Unit) {
     val columns by kanbanVM.getColumns(projectId).collectAsStateWithLifecycle(emptyList())
     println("columns: $columns")
     LazyRow {
         items(items = columns, key = { it.id }) { column ->
-            ColumnView(projectId, column, kanbanVM)
+            ColumnView(projectId, column, kanbanVM, onTaskOpened)
         }
     }
 }
 
 @Composable
-fun ColumnView(projectId: Int, column: KanbanColumn, kanbanVM: KanbanViewModel) {
+fun ColumnView(
+    projectId: Int,
+    column: KanbanColumn,
+    kanbanVM: KanbanViewModel,
+    onTaskOpened: (KanbanTask) -> Unit
+) {
     val dimensions = LocalDimensions.current
     val tasks by kanbanVM.getTasks(projectId, column.id).collectAsStateWithLifecycle(emptyList())
     println("tasks: $tasks")
@@ -178,14 +185,14 @@ fun ColumnView(projectId: Int, column: KanbanColumn, kanbanVM: KanbanViewModel) 
         }
         LazyColumn(verticalArrangement = Arrangement.spacedBy(dimensions.columnItemsPadding)) {
             items(items = tasks, key = { it.id }) { task ->
-                TaskView(task)
+                TaskView(task, onTaskOpened)
             }
         }
     }
 }
 
 @Composable
-fun TaskView(task: KanbanTask) {
+fun TaskView(task: KanbanTask, onTaskOpened: (KanbanTask) -> Unit) {
     val dimensions = LocalDimensions.current
     Card(
         modifier = Modifier
@@ -194,7 +201,7 @@ fun TaskView(task: KanbanTask) {
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
         ), onClick = {
-
+            onTaskOpened(task)
         }
     ) {
         Box(
@@ -216,37 +223,8 @@ fun TaskView(task: KanbanTask) {
 fun TaskViewPreview() {
     AppTheme(darkTheme = false) {
         TaskView(
-            KanbanTask(
-                id = 0,
-                title = "Alien Isolation",
-                description = "",
-                dateCreation = 0,
-                colorId = "",
-                projectId = 0,
-                columnId = 0,
-                ownerId = 0,
-                position = 0,
-                isActive = 0,
-                dateCompleted = 0,
-                score = 0,
-                dateDue = 0,
-                categoryId = 0,
-                creatorId = 0,
-                dateModification = 0,
-                reference = "",
-                dateStarted = 0,
-                timeSpent = 0,
-                timeEstimated = 0,
-                dateMoved = 0,
-                recurrenceStatus = 0,
-                recurrenceTrigger = 0,
-                recurrenceFactor = 0,
-                recurrenceTimeframe = 0,
-                recurrenceBasedate = 0,
-                recurrenceParent = 0,
-                recurrenceChild = 0,
-                priority = 0
-            )
+            emptyTask.copy(title = "Elden Ring"),
+            { }
         )
     }
 }

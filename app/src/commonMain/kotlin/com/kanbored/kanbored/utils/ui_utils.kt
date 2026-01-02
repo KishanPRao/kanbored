@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -26,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -40,11 +42,15 @@ import org.jetbrains.compose.resources.stringResource
 fun KanbanIconButton(
     imageVector: ImageVector,
     contentDescription: StringResource,
+    modifier: Modifier = Modifier,
+    tint: Color = LocalContentColor.current,
     onClick: () -> Unit
 ) {
     KanbanIconButton(
         imageVector = imageVector,
         contentDescription = stringResource(contentDescription),
+        tint = tint,
+        modifier = modifier,
         onClick = onClick
     )
 }
@@ -53,12 +59,15 @@ fun KanbanIconButton(
 fun KanbanIconButton(
     imageVector: ImageVector,
     contentDescription: String,
+    tint: Color = LocalContentColor.current,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    IconButton(onClick = onClick) {
+    IconButton(modifier = modifier, onClick = onClick) {
         Icon(
             imageVector = imageVector,
-            contentDescription = contentDescription
+            contentDescription = contentDescription,
+            tint = tint,
         )
     }
 }

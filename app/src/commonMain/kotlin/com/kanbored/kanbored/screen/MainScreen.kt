@@ -141,7 +141,29 @@ fun MainScreen() {
                     }
                     val kanbanVM: KanbanViewModel = hiltViewModel(kanbanGraphEntry)
                     val args = entry.toRoute<Route.Project>()
-                    ProjectScreen(topBarVM, kanbanVM, args.projectId)
+                    ProjectScreen(topBarVM, kanbanVM, args.projectId, onTaskOpened = { task ->
+                        navController.navigate(
+                            Route.Task(
+                                projectId = task.projectId,
+                                columnId = task.columnId,
+                                taskId = task.id,
+                            )
+                        )
+                    })
+                }
+                composable<Route.Task> { entry ->
+                    val kanbanGraphEntry = remember(entry) {
+                        navController.getBackStackEntry(Route.Home)
+                    }
+                    val kanbanVM: KanbanViewModel = hiltViewModel(kanbanGraphEntry)
+                    val args = entry.toRoute<Route.Task>()
+                    TaskScreen(
+                        topBarVM,
+                        kanbanVM,
+                        projectId = args.projectId,
+                        columnId = args.columnId,
+                        taskId = args.taskId,
+                    )
                 }
             }
 
