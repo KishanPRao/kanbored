@@ -53,8 +53,11 @@ import kanbored.app.generated.resources.add_new_column
 import kanbored.app.generated.resources.enter_name_new_column
 import kanbored.app.generated.resources.server_unreachable
 import kanbored.app.generated.resources.topbar_add_column
+import kanbored.app.generated.resources.topbar_archive
 import kanbored.app.generated.resources.topbar_change_view
-import kanbored.app.generated.resources.topbar_settings
+import kanbored.app.generated.resources.topbar_delete
+import kanbored.app.generated.resources.topbar_rename
+import kanbored.app.generated.resources.topbar_show_archived
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -77,7 +80,17 @@ fun ProjectScreen(
         topBarVM.showBackButton(true)
         topBarVM.setDropdownItems(
             listOf(
-                TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_settings)) {
+                TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_rename)) {
+                    println("Rename")
+                },
+                TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_show_archived)) {
+                    println("Show archived")
+                },
+                TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_archive)) {
+                    println("Archive")
+                },
+                TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_delete)) {
+                    println("Delete")
                 },
             )
         )
@@ -149,7 +162,7 @@ fun ProjectScreen(
 @Composable
 fun ColumnList(projectId: Int, kanbanVM: KanbanViewModel, onTaskOpened: (KanbanTask) -> Unit) {
     val columns by kanbanVM.getColumns(projectId).collectAsStateWithLifecycle(emptyList())
-    println("columns: $columns")
+//    println("columns: $columns")
     LazyRow {
         items(items = columns, key = { it.id }) { column ->
             ColumnView(projectId, column, kanbanVM, onTaskOpened)
@@ -166,7 +179,7 @@ fun ColumnView(
 ) {
     val dimensions = LocalDimensions.current
     val tasks by kanbanVM.getTasks(projectId, column.id).collectAsStateWithLifecycle(emptyList())
-    println("tasks: $tasks")
+//    println("tasks: $tasks")
     Card(
         modifier = Modifier
             .fillMaxHeight()
@@ -183,7 +196,10 @@ fun ColumnView(
                 }) {
             Text(column.title)
         }
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(dimensions.columnItemsPadding)) {
+        LazyColumn(
+            modifier = Modifier.padding(10.dp),
+            verticalArrangement = Arrangement.spacedBy(dimensions.columnItemsPadding)
+        ) {
             items(items = tasks, key = { it.id }) { task ->
                 TaskView(task, onTaskOpened)
             }

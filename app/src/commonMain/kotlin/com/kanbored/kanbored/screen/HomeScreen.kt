@@ -98,6 +98,7 @@ fun HomeScreen(
         topBarVM.setDropdownItems(
             listOf(
                 TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_settings)) {
+                    println("Settings")
                 },
             )
         )
@@ -155,7 +156,7 @@ fun ProjectGrid(kanbanVM: KanbanViewModel, onProjectOpened: (KanbanProject) -> U
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         items(projects) { project ->
-            println("project: ${project.name}")
+//            println("project: ${project.name}")
             Card(
                 modifier = Modifier
                     .fillMaxWidth()

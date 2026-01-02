@@ -20,9 +20,9 @@ class AuthInterceptor(
     private val configFlow: StateFlow<AuthConfig?>
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        println("auth interceptor")
+//        println("auth interceptor")
         val config = configFlow.value ?: return chain.proceed(chain.request())
-        println("auth interceptor: $config")
+//        println("auth interceptor: $config")
         val credentials: String = Credentials.basic(config.username, config.password)
         val url = config.baseUrl + chain.request().url.encodedPath
         val request = chain.request()

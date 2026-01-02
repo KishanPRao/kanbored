@@ -1,7 +1,9 @@
 package com.kanbored.kanbored.network
 
 import com.kanbored.kanbored.model.KanbanColumn
+import com.kanbored.kanbored.model.KanbanComment
 import com.kanbored.kanbored.model.KanbanProject
+import com.kanbored.kanbored.model.KanbanSubtask
 import com.kanbored.kanbored.model.KanbanTask
 import com.kanbored.kanbored.utils.endPoint
 import kotlinx.serialization.SerialName
@@ -11,10 +13,14 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface KanbanApi {
+    /***************************** AUTH ***************************/
+
     @POST(endPoint)
     suspend fun login(
         @Body kanbanRequest: KanbanRequest = createKanbanRequest(KanbanMethod.GetMe)
     ): KanbanLoginResponse
+
+    /***************************** GET ***************************/
 
     @POST(endPoint)
     suspend fun getAllProjects(
@@ -41,6 +47,26 @@ interface KanbanApi {
     ): KanbanResponse<List<KanbanTask>, KanbanError>
 
     @POST(endPoint)
+    suspend fun getAllSubtasks(
+        @Query("taskId") taskId: Int,
+        @Body kanbanRequest: KanbanRequest = createKanbanRequest(
+            KanbanMethod.GetAllSubtasks,
+            KanbanParams(taskId = taskId)
+        )
+    ): KanbanResponse<List<KanbanSubtask>, KanbanError>
+
+    @POST(endPoint)
+    suspend fun getAllComments(
+        @Query("taskId") taskId: Int,
+        @Body kanbanRequest: KanbanRequest = createKanbanRequest(
+            KanbanMethod.GetAllComments,
+            KanbanParams(taskId = taskId)
+        )
+    ): KanbanResponse<List<KanbanComment>, KanbanError>
+
+    /***************************** CREATE ***************************/
+
+    @POST(endPoint)
     suspend fun createProject(
         @Query("name") name: String,
         @Body kanbanRequest: KanbanRequest = createKanbanRequest(
@@ -48,12 +74,16 @@ interface KanbanApi {
             KanbanParams(name = name)
         )
     ): KanbanResponse<Int, KanbanError>
+
+    /***************************** UPDATE ***************************/
 }
 
 @Serializable
 data class KanbanParams(
     @SerialName("project_id")
     val projectId: Int? = null,
+    @SerialName("task_id")
+    val taskId: Int? = null,
     val name: String? = null,
     val identifier: String? = null,
     val email: String? = null,

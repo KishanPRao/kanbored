@@ -19,6 +19,7 @@ sqlite = "2.6.2"
 kotest = "6.0.7"
 #richeditor-compose = "1.0.0-rc13"
 multiplatform-markdown-renderer = "0.39.0"
+reorderable = "3.0.0"
 
 # android specific:
 dagger-hilt = "2.57.2"
@@ -48,6 +49,7 @@ androidx-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycl
 #richeditor-compose = { module = "com.mohamedrejeb.richeditor:richeditor-compose", version.ref = "richeditor-compose" }
 multiplatform-markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "multiplatform-markdown-renderer" }
 multiplatform-markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "multiplatform-markdown-renderer" }
+reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 
 ## non-KMP
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "dagger-hilt" }

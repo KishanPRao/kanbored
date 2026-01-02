@@ -6,7 +6,9 @@ import com.kanbored.kanbored.event.AppEventBus
 import com.kanbored.kanbored.event.AppUiEvent
 import com.kanbored.kanbored.event.UiEvent
 import com.kanbored.kanbored.model.KanbanColumn
+import com.kanbored.kanbored.model.KanbanComment
 import com.kanbored.kanbored.model.KanbanProject
+import com.kanbored.kanbored.model.KanbanSubtask
 import com.kanbored.kanbored.model.KanbanTask
 import com.kanbored.kanbored.network.Result
 import com.kanbored.kanbored.repository.KanbanRepository
@@ -97,7 +99,27 @@ class KanbanViewModel @Inject constructor(
 
             is Result.Success<*> -> {}
         }
-        println("finish refresh columns and tasks")
+//        println("finish refresh columns and tasks")
+    }
+
+    private suspend fun refreshSubtasksAndCommentsSync(taskId: Int) {
+        val result = repository.refreshSubtasks(taskId)
+        when (result) {
+            is Result.Error<*> -> {
+                appEventBus.emit(AppUiEvent.ShowError(result.message!!))
+            }
+
+            is Result.Success<*> -> {}
+        }
+        val resultTasks = repository.refreshComments(taskId)
+        when (resultTasks) {
+            is Result.Error<*> -> {
+                appEventBus.emit(AppUiEvent.ShowError(result.message!!))
+            }
+
+            is Result.Success<*> -> {}
+        }
+        println("finish refresh subtasks and comments")
     }
 
     fun refreshProjects() = viewModelScope.launch {
@@ -124,6 +146,10 @@ class KanbanViewModel @Inject constructor(
         _uiEventFlow.emit(UiEvent.ShowLoading)
         refreshColumnsAndTasksSync(projectId, isArchived)
         _uiEventFlow.emit(UiEvent.HideLoading)
+    }
+
+    fun refreshSubtasksAndComments(taskId: Int) = viewModelScope.launch {
+        refreshSubtasksAndCommentsSync(taskId)
     }
 
     fun createProject(name: String) = viewModelScope.launch {
@@ -160,6 +186,14 @@ class KanbanViewModel @Inject constructor(
 
     fun getTasks(projectId: Int, columnId: Int): Flow<List<KanbanTask>> {
         return repository.getTasks(projectId, columnId)
+    }
+
+    fun getSubtasks(taskId: Int): Flow<List<KanbanSubtask>> {
+        return repository.getSubtasks(taskId)
+    }
+
+    fun getComments(taskId: Int): Flow<List<KanbanComment>> {
+        return repository.getComments(taskId)
     }
 
     fun getProject(projectId: Int): KanbanProject {

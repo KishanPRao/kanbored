@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "d08d38c4b8c947e9dbade608f737c259",
+    "identityHash": "6c98483278ea2e0f8ff9a34559fa11e1",
     "entities": [
       {
         "tableName": "kanban_project",
@@ -389,11 +389,169 @@
             "projectId"
           ]
         }
+      },
+      {
+        "tableName": "kanban_subtask",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `status` INTEGER NOT NULL, `timeEstimated` INTEGER NOT NULL, `timeSpent` INTEGER NOT NULL, `taskId` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `position` INTEGER NOT NULL, `username` TEXT, `name` TEXT, `timerStartDate` INTEGER NOT NULL, `statusName` TEXT NOT NULL, `isTimerStarted` INTEGER NOT NULL, PRIMARY KEY(`id`, `taskId`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timeEstimated",
+            "columnName": "timeEstimated",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timeSpent",
+            "columnName": "timeSpent",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "taskId",
+            "columnName": "taskId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userId",
+            "columnName": "userId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "username",
+            "columnName": "username",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "timerStartDate",
+            "columnName": "timerStartDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "statusName",
+            "columnName": "statusName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isTimerStarted",
+            "columnName": "isTimerStarted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id",
+            "taskId"
+          ]
+        }
+      },
+      {
+        "tableName": "kanban_comment",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `dateCreation` INTEGER NOT NULL, `dateModification` INTEGER NOT NULL, `taskId` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `comment` TEXT NOT NULL, `username` TEXT, `name` TEXT, `email` TEXT, `avatarPath` TEXT, PRIMARY KEY(`id`, `taskId`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateCreation",
+            "columnName": "dateCreation",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateModification",
+            "columnName": "dateModification",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "taskId",
+            "columnName": "taskId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userId",
+            "columnName": "userId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "comment",
+            "columnName": "comment",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "username",
+            "columnName": "username",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "email",
+            "columnName": "email",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "avatarPath",
+            "columnName": "avatarPath",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id",
+            "taskId"
+          ]
+        }
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd08d38c4b8c947e9dbade608f737c259')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6c98483278ea2e0f8ff9a34559fa11e1')"
     ]
   }
 }

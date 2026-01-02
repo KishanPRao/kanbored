@@ -44,6 +44,7 @@ object NetworkModule {
     @Provides
     @Singleton
     fun providesHttpLoggingInterceptor(): HttpLoggingInterceptor? {
+        return null
         return if (BuildConfiguration.isDebug) {
             HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BODY
