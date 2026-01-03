@@ -1,5 +1,8 @@
 package com.kanbored.kanbored.network
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 sealed class KanbanMethod(val id: Int, val name: String, val type: Type) {
     data object GetMe : KanbanMethod(1718627783, "getMe", Type.Authentication)
     data object GetAllProjects : KanbanMethod(2134420212, "getAllProjects", Type.Project)

@@ -2,9 +2,9 @@ package com.kanbored.kanbored.di
 
 import com.kanbored.kanbored.model.AuthConfig
 import com.kanbored.kanbored.network.AuthInterceptorFactory
-import com.kanbored.kanbored.network.createJson
 import com.kanbored.kanbored.repository.ConfigRepository
 import com.kanbored.kanbored.utils.BuildConfiguration
+import com.kanbored.kanbored.utils.createJson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

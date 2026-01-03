@@ -153,17 +153,8 @@ class KanbanViewModel @Inject constructor(
     }
 
     fun createProject(name: String) = viewModelScope.launch {
-        val result = repository.createProject(name)
-        when (result) {
-            is Result.Error<*> -> {
-                appEventBus.emit(AppUiEvent.ShowError(result.message!!))
-            }
-
-            is Result.Success<*> -> {
-                println("created")
-                refreshProjectsSync()
-            }
-        }
+        repository.createProject(name)
+        refreshProjectsSync()
     }
 
     fun createColumn(projectId: Int, name: String) = viewModelScope.launch {

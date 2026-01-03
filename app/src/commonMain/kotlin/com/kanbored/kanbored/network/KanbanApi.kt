@@ -67,13 +67,9 @@ interface KanbanApi {
     /***************************** CREATE ***************************/
 
     @POST(endPoint)
-    suspend fun createProject(
-        @Query("name") name: String,
-        @Body kanbanRequest: KanbanRequest = createKanbanRequest(
-            KanbanMethod.CreateProject,
-            KanbanParams(name = name)
-        )
-    ): KanbanResponse<Int, KanbanError>
+    suspend fun genericApi(
+        @Body kanbanRequest: KanbanRequest
+    ): KanbanResponse<*, KanbanError>
 
     /***************************** UPDATE ***************************/
 }

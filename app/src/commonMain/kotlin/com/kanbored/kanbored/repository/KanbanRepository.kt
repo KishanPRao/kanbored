@@ -6,6 +6,7 @@ import com.kanbored.kanbored.model.KanbanProject
 import com.kanbored.kanbored.model.KanbanSubtask
 import com.kanbored.kanbored.model.KanbanTask
 import com.kanbored.kanbored.network.ApiProvider
+import com.kanbored.kanbored.network.ApiWorkManager
 import com.kanbored.kanbored.network.KanbanError
 import com.kanbored.kanbored.network.KanbanResponse
 import com.kanbored.kanbored.network.Result
@@ -32,6 +33,7 @@ class KanbanRepository @Inject constructor(
     // TODO: db or all DAOs?
     private val database: KanbanDatabase,
     private val apiProvider: ApiProvider,
+    private val apiWorkManager: ApiWorkManager,
 ) {
     companion object {
         const val API_POLL_INTERVAL_MS = 5_000L
@@ -141,24 +143,8 @@ class KanbanRepository @Inject constructor(
         })
     }
 
-    suspend fun createProject(name: String): Result<Unit> {
-        try {
-            val response = apiProvider.kanbanApi.createProject(name)
-            if (response.result != null) {
-                val projectId = response.result
-                println("createProject: $projectId")
-                return Result.Success(Unit)
-            } else if (response.error != null) {
-                return Result.Error(PresentableText.DynamicString(response.error.message))
-            } else {
-                return Result.Error(PresentableText.DynamicResource(Res.string.error_unknown))
-            }
-        } catch (e: Exception) {
-            println("createProject error: ${e.message}")
-            return Result.Error(
-                e.message?.let { PresentableText.DynamicString(it) }
-                    ?: PresentableText.DynamicResource(Res.string.error_unknown)
-            )
-        }
+    suspend fun createProject(name: String) {
+        val localProject = apiWorkManager.createProject(name)
+        database.projectDao().insertOrUpdate(localProject)
     }
 }

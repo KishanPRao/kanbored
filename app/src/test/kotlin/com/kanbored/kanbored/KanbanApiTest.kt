@@ -2,18 +2,18 @@ package com.kanbored.kanbored
 
 import com.kanbored.kanbored.network.KanbanMethod
 import com.kanbored.kanbored.network.KanbanParams
-import com.kanbored.kanbored.network.createJson
 import com.kanbored.kanbored.network.createKanbanRequest
+import com.kanbored.kanbored.utils.createJson
 import io.kotest.assertions.json.shouldEqualJson
 import kotlinx.serialization.json.Json
-import org.junit.Before
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class KanbanApiTest {
 
     private lateinit var json: Json
 
-    @Before
+    @BeforeTest
     fun setup() {
         json = createJson()
     }

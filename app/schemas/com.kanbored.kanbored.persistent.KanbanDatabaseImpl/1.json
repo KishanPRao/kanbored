@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "6c98483278ea2e0f8ff9a34559fa11e1",
+    "identityHash": "466494ac2046c1a44e3b3f843e940b2c",
     "entities": [
       {
         "tableName": "kanban_project",
@@ -547,11 +547,53 @@
             "taskId"
           ]
         }
+      },
+      {
+        "tableName": "api_storage",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`kanbanMethod` TEXT NOT NULL, `kanbanParams` TEXT NOT NULL, `updateId` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "kanbanMethod",
+            "columnName": "kanbanMethod",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kanbanParams",
+            "columnName": "kanbanParams",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updateId",
+            "columnName": "updateId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6c98483278ea2e0f8ff9a34559fa11e1')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '466494ac2046c1a44e3b3f843e940b2c')"
     ]
   }
 }

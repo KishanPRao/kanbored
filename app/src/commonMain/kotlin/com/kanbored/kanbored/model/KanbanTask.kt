@@ -2,6 +2,7 @@ package com.kanbored.kanbored.model
 
 import androidx.room.Entity
 import com.kanbored.kanbored.persistent.kanbanTaskTableName
+import com.kanbored.kanbored.utils.BooleanAsIntSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -17,7 +18,8 @@ data class KanbanTask(
     @SerialName("column_id") val columnId: Int,
     @SerialName("owner_id") val ownerId: Int,
     val position: Int,
-    @SerialName("is_active") val isActive: Int,
+    @Serializable(with = BooleanAsIntSerializer::class)
+    @SerialName("is_active") val isActive: Boolean,
     @SerialName("date_completed") val dateCompleted: Int?,
     val score: Int?,
     @SerialName("date_due") val dateDue: Int?,

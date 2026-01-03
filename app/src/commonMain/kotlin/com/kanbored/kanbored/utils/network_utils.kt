@@ -1,5 +1,8 @@
-package com.kanbored.kanbored.network
+package com.kanbored.kanbored.utils
 
+import com.kanbored.kanbored.network.KanbanArrayRequest
+import com.kanbored.kanbored.network.KanbanParamsRequest
+import com.kanbored.kanbored.network.KanbanRequest
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.ClassDiscriminatorMode
 import kotlinx.serialization.json.Json

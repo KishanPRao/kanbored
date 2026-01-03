@@ -1,13 +1,12 @@
 package com.kanbored.kanbored.persistent
 
 import androidx.room.Dao
-import androidx.room.Database
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.RoomDatabase
 import androidx.room.Update
+import com.kanbored.kanbored.model.ApiStorage
 import com.kanbored.kanbored.model.KanbanColumn
 import com.kanbored.kanbored.model.KanbanComment
 import com.kanbored.kanbored.model.KanbanProject
@@ -20,6 +19,7 @@ const val kanbanColumnTableName = "kanban_column"
 const val kanbanTaskTableName = "kanban_task"
 const val kanbanSubtaskTableName = "kanban_subtask"
 const val kanbanCommentTableName = "kanban_comment"
+const val apiStorageTableName = "api_storage"
 
 @Dao
 interface BaseDao<T> {
@@ -80,27 +80,34 @@ interface KanbanCommentDao : BaseDao<KanbanComment> {
     fun get(taskId: Int): Flow<List<KanbanComment>>
 }
 
-@Database(
-    entities = [
-        KanbanProject::class,
-        KanbanColumn::class,
-        KanbanTask::class,
-        KanbanSubtask::class,
-        KanbanComment::class
-    ],
-    version = 1
-)
-abstract class KanbanDatabase : RoomDatabase() {
+@Dao
+interface ApiStorageDao : BaseDao<ApiStorage> {
+    @Query("select * from $apiStorageTableName")
+    fun getAll(): Flow<List<ApiStorage>>
 
-    abstract fun projectDao(): KanbanProjectDao
+    @Query("select * from $apiStorageTableName")
+    suspend fun getAllSync(): List<ApiStorage>
 
-    abstract fun columnDao(): KanbanColumnDao
+    @Query("select min(updateId) from $apiStorageTableName")
+    fun getNextId(): Int
 
-    abstract fun taskDao(): KanbanTaskDao
+    @Query("select * from $apiStorageTableName order by timestamp asc limit 1")
+    fun getNextApi(): ApiStorage?
+}
 
-    abstract fun subtaskDao(): KanbanSubtaskDao
+interface KanbanDatabase {
 
-    abstract fun commentDao(): KanbanCommentDao
+    fun projectDao(): KanbanProjectDao
+
+    fun columnDao(): KanbanColumnDao
+
+    fun taskDao(): KanbanTaskDao
+
+    fun subtaskDao(): KanbanSubtaskDao
+
+    fun commentDao(): KanbanCommentDao
+
+    fun apiStorageDao(): ApiStorageDao
 
     companion object {
         const val DATABASE_NAME = "kanban_database"

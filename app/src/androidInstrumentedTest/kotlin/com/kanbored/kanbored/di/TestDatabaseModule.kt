@@ -1,25 +1,26 @@
 package com.kanbored.kanbored.di
 
 import android.content.Context
-import androidx.room.Room
+import com.kanbored.kanbored.persistent.MockDatabase
 import com.kanbored.kanbored.persistent.KanbanDatabase
-import com.kanbored.kanbored.persistent.KanbanDatabaseImpl
 import com.kanbored.kanbored.persistent.KanbanProjectDao
 import dagger.Module
 import dagger.Provides
-import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import dagger.hilt.testing.TestInstallIn
 import javax.inject.Singleton
 
 @Module
-@InstallIn(SingletonComponent::class)
-object DatabaseModule {
+@TestInstallIn(
+    components = [SingletonComponent::class],
+    replaces = [DatabaseModule::class]
+)
+object TestDatabaseModule {
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): KanbanDatabase =
-        Room.databaseBuilder(context, KanbanDatabaseImpl::class.java, KanbanDatabase.DATABASE_NAME)
-            .build()
+        MockDatabase()
 
     @Provides
     @Singleton

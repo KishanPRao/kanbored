@@ -309,7 +309,7 @@ fun TaskDescEmptyPreview(modifier: Modifier = Modifier) {
     }
 }
 
-@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
+//@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun TaskDescPreview(modifier: Modifier = Modifier) {
     // https://gist.github.com/ww9/44f08d44327a40d2ab309a349bebec57

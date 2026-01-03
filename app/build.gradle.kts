@@ -1,4 +1,6 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 
 plugins {
     alias(libs.plugins.android.application)
@@ -17,6 +19,11 @@ kotlin {
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
     androidTarget {
+        // Includes commonTest dependencies into androidInstrumentedTest
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        instrumentedTestVariant {
+            sourceSetTree.set(KotlinSourceSetTree.test)
+        }
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
@@ -70,7 +77,9 @@ kotlin {
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
             implementation(libs.kotest.assertions.json)
+            implementation(libs.mockk)
         }
 
         androidMain.dependencies {
@@ -81,12 +90,32 @@ kotlin {
             implementation(libs.hilt.android)
             implementation(libs.security.crypto)
             implementation(libs.androidx.ui.tooling)
+            implementation(libs.androidx.work.runtime.ktx)
+            implementation(libs.androidx.hilt.common)
+            implementation(libs.androidx.hilt.work)
+
 //
 //            testImplementation(libs.junit)
 //            androidTestImplementation(libs.androidx.junit)
 //            androidTestImplementation(libs.androidx.espresso.core)
 //            androidTestImplementation(libs.androidx.ui.test.junit4)
         }
+
+        androidUnitTest.dependencies {
+            implementation(libs.junit)
+            implementation(libs.androidx.core.ktx)
+        }
+        androidInstrumentedTest.dependencies {
+            implementation(libs.androidx.junit)
+            implementation(libs.androidx.espresso.core)
+            implementation(libs.androidx.ui.test.junit4)
+            implementation(libs.mockk.android)
+            implementation(libs.androidx.work.testing)
+            implementation(libs.hilt.android.testing)
+        }
+//        androidMainTest.dependencies {
+//            implementation(libs.androidx.work.testing)
+//        }
 //        jvmMain.dependencies {
 //            implementation(compose.desktop.currentOs)
 //            implementation(libs.kotlinx.coroutinesSwing)
@@ -107,7 +136,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.kanbored.kanbored.HiltTestRunner"
     }
 
     buildTypes {
@@ -128,7 +157,7 @@ android {
         buildConfig = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.compose.multiplatform.get()
+        kotlinCompilerExtensionVersion = libs.versions.composeMultiplatform.get()
     }
 }
 
@@ -139,5 +168,7 @@ room {
 dependencies {
     add("kspAndroid", libs.androidx.room.compiler)
     add("kspAndroid", libs.hilt.android.compiler)
-//    add("kspJvm", libs.androidx.room.compiler)
+    add("kspAndroid", libs.androidx.hilt.compiler)
+    add("kspAndroidAndroidTest", libs.hilt.android.compiler)
+    add("kspAndroidAndroidTest", libs.androidx.hilt.compiler)
 }

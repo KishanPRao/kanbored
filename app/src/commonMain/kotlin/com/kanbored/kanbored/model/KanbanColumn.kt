@@ -2,6 +2,7 @@ package com.kanbored.kanbored.model
 
 import androidx.room.Entity
 import com.kanbored.kanbored.persistent.kanbanColumnTableName
+import com.kanbored.kanbored.utils.BooleanAsIntSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -13,7 +14,8 @@ data class KanbanColumn(
     val position: Int,
     @SerialName("task_limit") val taskLimit: Int,
     val description: String,
-    @SerialName("hide_in_dashboard") val hideInDashboard: Int,
+    @Serializable(with = BooleanAsIntSerializer::class)
+    @SerialName("hide_in_dashboard") val hideInDashboard: Boolean,
     @SerialName("project_id") val projectId: Int,
 //    val nbOpenTasks: Int,
 //    val nbClosedTasks: Int,
