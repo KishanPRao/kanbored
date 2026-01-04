@@ -12,4 +12,13 @@ class MockDatabase : KanbanDatabase {
     override fun commentDao(): KanbanCommentDao = MockKanbanCommentDao
 
     override fun apiStorageDao(): ApiStorageDao = MockApiStorageDao
+
+    fun clear() {
+        MockKanbanProjectDao.clear()
+        MockKanbanColumnDao.clear()
+        MockKanbanTaskDao.clear()
+        MockKanbanSubtaskDao.clear()
+        MockKanbanCommentDao.clear()
+        MockApiStorageDao.clear()
+    }
 }

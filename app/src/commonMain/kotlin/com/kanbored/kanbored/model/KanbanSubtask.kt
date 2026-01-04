@@ -1,14 +1,25 @@
 package com.kanbored.kanbored.model
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.PrimaryKey
 import com.kanbored.kanbored.persistent.kanbanSubtaskTableName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Entity(tableName = kanbanSubtaskTableName, primaryKeys = ["id", "taskId"])
+@Entity(
+    tableName = kanbanSubtaskTableName,
+    foreignKeys = [ForeignKey(
+        entity = KanbanTask::class,
+        parentColumns = ["id"],
+        childColumns = ["taskId"],
+        onUpdate = ForeignKey.CASCADE,
+        onDelete = ForeignKey.CASCADE,  // TODO: confirm
+    )],
+)
 @Serializable
 data class KanbanSubtask(
-    val id: Int,
+    @PrimaryKey val id: Int,
     val title: String,
     val status: Int,
     @SerialName("time_estimated") val timeEstimated: Int,

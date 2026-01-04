@@ -45,6 +45,9 @@ interface KanbanProjectDao : BaseDao<KanbanProject> {
 
     @Query("select * from $kanbanProjectTableName")
     suspend fun getAllSync(): List<KanbanProject>
+
+    @Query("update $kanbanProjectTableName set id = :newId where id == :oldId")
+    suspend fun updateId(oldId: Int, newId: Int)
 }
 
 @Dao
@@ -57,6 +60,9 @@ interface KanbanColumnDao : BaseDao<KanbanColumn> {
 
     @Query("select * from $kanbanColumnTableName")
     suspend fun getAllSync(): List<KanbanColumn>
+
+    @Query("update $kanbanColumnTableName set id = :newId where id == :oldId")
+    suspend fun updateId(oldId: Int, newId: Int)
 }
 
 @Dao
@@ -66,18 +72,36 @@ interface KanbanTaskDao : BaseDao<KanbanTask> {
 
     @Query("select * from $kanbanTaskTableName where columnId == :columnId and projectId == :projectId and id == :taskId")
     fun getSingle(projectId: Int, columnId: Int, taskId: Int): Flow<KanbanTask?>
+
+    @Query("select * from $kanbanTaskTableName")
+    suspend fun getAllSync(): List<KanbanTask>
+
+    @Query("update $kanbanTaskTableName set id = :newId where id == :oldId")
+    suspend fun updateId(oldId: Int, newId: Int)
 }
 
 @Dao
 interface KanbanSubtaskDao : BaseDao<KanbanSubtask> {
     @Query("select * from $kanbanSubtaskTableName where taskId == :taskId")
     fun get(taskId: Int): Flow<List<KanbanSubtask>>
+
+    @Query("select * from $kanbanSubtaskTableName")
+    suspend fun getAllSync(): List<KanbanSubtask>
+
+    @Query("update $kanbanSubtaskTableName set id = :newId where id == :oldId")
+    suspend fun updateId(oldId: Int, newId: Int)
 }
 
 @Dao
 interface KanbanCommentDao : BaseDao<KanbanComment> {
     @Query("select * from $kanbanCommentTableName where taskId == :taskId")
     fun get(taskId: Int): Flow<List<KanbanComment>>
+
+    @Query("select * from $kanbanCommentTableName")
+    suspend fun getAllSync(): List<KanbanComment>
+
+    @Query("update $kanbanSubtaskTableName set id = :newId where id == :oldId")
+    suspend fun updateId(oldId: Int, newId: Int)
 }
 
 @Dao
@@ -93,6 +117,15 @@ interface ApiStorageDao : BaseDao<ApiStorage> {
 
     @Query("select * from $apiStorageTableName order by timestamp asc limit 1")
     fun getNextApi(): ApiStorage?
+
+    @Query("update $apiStorageTableName set projectId = :newId where projectId == :oldId")
+    suspend fun updateProjectId(oldId: Int, newId: Int)
+
+    @Query("update $apiStorageTableName set columnId = :newId where columnId == :oldId")
+    suspend fun updateColumnId(oldId: Int, newId: Int)
+
+    @Query("update $apiStorageTableName set taskId = :newId where taskId == :oldId")
+    suspend fun updateTaskId(oldId: Int, newId: Int)
 }
 
 interface KanbanDatabase {

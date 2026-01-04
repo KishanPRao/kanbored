@@ -4,7 +4,7 @@
 
 ### Technical
 
-- [ ] Dependency injection
+- [x] Dependency injection
 - [ ] Home/Projects
 - [ ] Project
   - [ ] create proj

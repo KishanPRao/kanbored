@@ -1,15 +1,35 @@
 package com.kanbored.kanbored.model
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.PrimaryKey
 import com.kanbored.kanbored.persistent.kanbanTaskTableName
 import com.kanbored.kanbored.utils.BooleanAsIntSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Entity(tableName = kanbanTaskTableName, primaryKeys = ["id", "columnId", "projectId"])
+@Entity(
+    tableName = kanbanTaskTableName,
+    foreignKeys = [
+        ForeignKey(
+            entity = KanbanColumn::class,
+            parentColumns = ["id"],
+            childColumns = ["columnId"],
+            onUpdate = ForeignKey.CASCADE,
+            onDelete = ForeignKey.CASCADE,  // TODO: confirm
+        ),
+        ForeignKey(
+            entity = KanbanProject::class,
+            parentColumns = ["id"],
+            childColumns = ["projectId"],
+            onUpdate = ForeignKey.CASCADE,
+            onDelete = ForeignKey.CASCADE,  // TODO: confirm
+        ),
+    ],
+)
 @Serializable
 data class KanbanTask(
-    val id: Int,
+    @PrimaryKey val id: Int,
     val title: String,
     val description: String,
     @SerialName("date_creation") val dateCreation: Int,

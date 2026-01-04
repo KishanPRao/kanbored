@@ -4,11 +4,22 @@ import android.content.Context
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.kanbored.kanbored.model.ApiStorage
+import com.kanbored.kanbored.model.KanbanColumn
 import com.kanbored.kanbored.model.KanbanProject
+import com.kanbored.kanbored.model.KanbanTask
 import com.kanbored.kanbored.persistent.KanbanDatabase
+import com.kanbored.kanbored.utils.ModelUtils.createApiStorage
+import com.kanbored.kanbored.utils.createKanbanColumn
 import com.kanbored.kanbored.utils.createKanbanProject
+import com.kanbored.kanbored.utils.createKanbanTask
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,23 +30,89 @@ import javax.inject.Singleton
 @Singleton
 class ApiWorkManager @Inject constructor(
     private val database: KanbanDatabase,
+    private val connectivityListener: ConnectivityListener,
     @param:ApplicationContext private val context: Context,
 ) {
     private val workManager by lazy {
         WorkManager.getInstance(context)
     }
+    private val scope = CoroutineScope(Dispatchers.IO)
+    private val state = connectivityListener.observeStatus().stateIn(
+        scope = scope,
+        started = SharingStarted.Eagerly,
+        initialValue = NetworkStatus.Unavailable
+    )
+
+    init {
+        state.filter { it == NetworkStatus.Available }
+            .onEach {
+                println("api work mgr start worker")
+                startWorkerIfNotStarted()
+            }
+            .launchIn(scope)
+    }
+
+    /******************* MARK: CREATE ******************/
 
     suspend fun createProject(name: String): KanbanProject {
         val localId = database.apiStorageDao().getNextId()
-        val apiStorage = ApiStorage(
-            KanbanMethod.CreateProject, KanbanParams(name = name), localId,
+        val local = createKanbanProject(name).copy(id = localId)
+        database.projectDao().insertOrUpdate(local)
+        val apiStorage =
+            createApiStorage(KanbanMethod.CreateProject, KanbanParams(name = name), localId)
+        database.apiStorageDao().insertOrUpdate(apiStorage)
+        startWorkerIfNotStarted()
+        return local
+    }
+
+    suspend fun createColumn(projectId: Int, name: String): KanbanColumn {
+        val localId = database.apiStorageDao().getNextId()
+        val local = createKanbanColumn(name).copy(id = localId, projectId = projectId)
+        database.columnDao().insertOrUpdate(local)
+        val apiStorage = createApiStorage(
+            KanbanMethod.AddColumn,
+            KanbanParams(projectId = projectId, title = name),
+            localId
         )
         database.apiStorageDao().insertOrUpdate(apiStorage)
         startWorkerIfNotStarted()
-        return createKanbanProject(name).copy(id = localId)
+        return local
+    }
+
+    suspend fun createTask(projectId: Int, columnId: Int, name: String): KanbanTask {
+        val localId = database.apiStorageDao().getNextId()
+        val local = createKanbanTask(name)
+            .copy(id = localId, projectId = projectId, columnId = columnId)
+        database.taskDao().insertOrUpdate(local)
+        val apiStorage = createApiStorage(
+            KanbanMethod.CreateTask,
+            KanbanParams(projectId = projectId, columnId = columnId, title = name),
+            localId
+        )
+        database.apiStorageDao().insertOrUpdate(apiStorage)
+        startWorkerIfNotStarted()
+        return local
+    }
+
+    /******************* MARK: UPDATE ******************/
+
+    suspend fun updateProject(project: KanbanProject) {
+        database.projectDao().insertOrUpdate(project)
+        val apiStorage = createApiStorage(
+            KanbanMethod.UpdateProject,
+            // TODO: might be a better idea to send the entire object for updates (everything except "project_id")
+            KanbanParams(projectId = project.id, name = project.name),
+            project.id
+        )
+        database.apiStorageDao().insertOrUpdate(apiStorage)
+        startWorkerIfNotStarted()
     }
 
     private fun startWorkerIfNotStarted() {
+        if (state.value == NetworkStatus.Unavailable) {
+            println("Cannot start worker, no network")
+            return
+        }
         val workRequest = OneTimeWorkRequestBuilder<ApiWorker>()
             .addTag(ApiWorker.TAG)
             .build()

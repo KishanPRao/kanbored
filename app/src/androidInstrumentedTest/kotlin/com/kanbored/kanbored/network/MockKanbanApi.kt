@@ -7,6 +7,8 @@ import com.kanbored.kanbored.model.KanbanSubtask
 import com.kanbored.kanbored.model.KanbanTask
 
 class MockKanbanApi : KanbanApi {
+    private var resultId = 1
+
     override suspend fun login(kanbanRequest: KanbanRequest): KanbanLoginResponse {
         TODO("Not yet implemented")
     }
@@ -45,20 +47,19 @@ class MockKanbanApi : KanbanApi {
     }
 
     override suspend fun genericApi(kanbanRequest: KanbanRequest): KanbanResponse<*, KanbanError> {
-        return when (kanbanRequest) {
-            is KanbanArrayRequest -> handleApiRequest(kanbanRequest.method)
-            is KanbanParamsRequest -> handleApiRequest(kanbanRequest.method)
+        return when (kanbanRequest.method) {
+            KanbanMethod.CreateProject.methodName,
+            KanbanMethod.AddColumn.methodName -> {
+                KanbanResponse(jsonrpc, resultId++)
+            }
+
+            KanbanMethod.UpdateProject.methodName -> {
+                KanbanResponse(jsonrpc, true)
+            }
+
+            else -> KanbanResponse(jsonrpc, null, error = KanbanError(0, "API not handled"))
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    private fun handleApiRequest(method: String): KanbanResponse<*, KanbanError> {
-        return when (method) {
-            KanbanMethod.CreateProject.name -> {
-                KanbanResponse("", 1)
-            }
-
-            else -> KanbanResponse("", null, error = "Failed")
-        } as KanbanResponse<*, KanbanError>
-    }
+    private val jsonrpc = "2.0"
 }

@@ -158,6 +158,7 @@ class KanbanViewModel @Inject constructor(
     }
 
     fun createColumn(projectId: Int, name: String) = viewModelScope.launch {
+        repository.createColumn(projectId, name)
 //        val result = repository.createProject(name)
 //        when (result) {
 //            is Result.Error<*> -> {

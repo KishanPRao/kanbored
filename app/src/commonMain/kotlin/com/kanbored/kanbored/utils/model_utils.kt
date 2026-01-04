@@ -1,8 +1,12 @@
 package com.kanbored.kanbored.utils
 
+import com.kanbored.kanbored.model.ApiStorage
+import com.kanbored.kanbored.model.KanbanColumn
 import com.kanbored.kanbored.model.KanbanProject
 import com.kanbored.kanbored.model.KanbanTask
 import com.kanbored.kanbored.model.KanbanUrl
+import com.kanbored.kanbored.network.KanbanMethod
+import com.kanbored.kanbored.network.KanbanParams
 
 fun createKanbanProject(name: String): KanbanProject {
     return KanbanProject(
@@ -28,6 +32,18 @@ fun createKanbanProject(name: String): KanbanProject {
         enableGlobalTags = 1,
         isTrelloImported = false,
         url = KanbanUrl("", "")
+    )
+}
+
+fun createKanbanColumn(name: String): KanbanColumn {
+    return KanbanColumn(
+        id = Int.MIN_VALUE,
+        title = name,
+        position = 0,
+        taskLimit = 0,
+        description = "",
+        hideInDashboard = false,
+        projectId = 0,
     )
 }
 
@@ -64,4 +80,15 @@ fun createKanbanTask(title: String): KanbanTask {
         recurrenceChild = 0,
         priority = 0
     )
+}
+
+object ModelUtils {
+
+    fun createApiStorage(
+        kanbanMethod: KanbanMethod,
+        kanbanParams: KanbanParams,
+        updateId: Int
+    ): ApiStorage {
+        return ApiStorage(kanbanMethod, kanbanParams, updateId)
+    }
 }

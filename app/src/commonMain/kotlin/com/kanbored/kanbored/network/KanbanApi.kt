@@ -32,7 +32,7 @@ interface KanbanApi {
         @Query("projectId") projectId: Int,
         @Body kanbanRequest: KanbanRequest = createKanbanRequest(
             KanbanMethod.GetColumns,
-            KanbanParams(list = listOf(projectId.toString()))
+            KanbanParams(projectId = projectId)
         )
     ): KanbanResponse<List<KanbanColumn>, KanbanError>
 
@@ -78,31 +78,25 @@ interface KanbanApi {
 data class KanbanParams(
     @SerialName("project_id")
     val projectId: Int? = null,
+    @SerialName("column_id")
+    val columnId: Int? = null,
     @SerialName("task_id")
     val taskId: Int? = null,
     val name: String? = null,
+    val title: String? = null,
     val identifier: String? = null,
     val email: String? = null,
     @SerialName("status_id")
     val statusId: Int? = null,
-    val list: List<String>? = null,
 )
 
 internal fun createKanbanRequest(
     kanbanMethod: KanbanMethod,
     params: KanbanParams? = null
 ): KanbanRequest {
-    return if (params?.list != null) {
-        KanbanArrayRequest(
-            method = kanbanMethod.name,
-            id = kanbanMethod.id,
-            params = params.list
-        )
-    } else {
-        KanbanParamsRequest(
-            method = kanbanMethod.name,
-            id = kanbanMethod.id,
-            params = params
-        )
-    }
+    return KanbanRequest(
+        method = kanbanMethod.methodName,
+        id = kanbanMethod.methodId,
+        params = params
+    )
 }

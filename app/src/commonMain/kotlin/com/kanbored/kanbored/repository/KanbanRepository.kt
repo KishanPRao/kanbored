@@ -143,8 +143,13 @@ class KanbanRepository @Inject constructor(
         })
     }
 
-    suspend fun createProject(name: String) {
-        val localProject = apiWorkManager.createProject(name)
-        database.projectDao().insertOrUpdate(localProject)
-    }
+    suspend fun createProject(name: String) = apiWorkManager.createProject(name)
+
+    suspend fun createColumn(projectId: Int, name: String) =
+        apiWorkManager.createColumn(projectId, name)
+
+    suspend fun createTask(projectId: Int, columnId: Int, name: String) =
+        apiWorkManager.createTask(projectId, columnId, name)
+
+    suspend fun updateProject(project: KanbanProject) = apiWorkManager.updateProject(project)
 }

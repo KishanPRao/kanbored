@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "466494ac2046c1a44e3b3f843e940b2c",
+    "identityHash": "82b53020d7f743787ee31b9b25eadb84",
     "entities": [
       {
         "tableName": "kanban_project",
@@ -153,7 +153,7 @@
       },
       {
         "tableName": "kanban_column",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `position` INTEGER NOT NULL, `taskLimit` INTEGER NOT NULL, `description` TEXT NOT NULL, `hideInDashboard` INTEGER NOT NULL, `projectId` INTEGER NOT NULL, PRIMARY KEY(`id`, `projectId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `position` INTEGER NOT NULL, `taskLimit` INTEGER NOT NULL, `description` TEXT NOT NULL, `hideInDashboard` INTEGER NOT NULL, `projectId` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`projectId`) REFERENCES `kanban_project`(`id`) ON UPDATE CASCADE ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -201,14 +201,26 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "id",
-            "projectId"
+            "id"
           ]
-        }
+        },
+        "foreignKeys": [
+          {
+            "table": "kanban_project",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "projectId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       },
       {
         "tableName": "kanban_task",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `dateCreation` INTEGER NOT NULL, `colorId` TEXT NOT NULL, `projectId` INTEGER NOT NULL, `columnId` INTEGER NOT NULL, `ownerId` INTEGER NOT NULL, `position` INTEGER NOT NULL, `isActive` INTEGER NOT NULL, `dateCompleted` INTEGER, `score` INTEGER, `dateDue` INTEGER, `categoryId` INTEGER NOT NULL, `creatorId` INTEGER NOT NULL, `dateModification` INTEGER, `reference` TEXT, `dateStarted` INTEGER, `timeSpent` INTEGER, `timeEstimated` INTEGER, `swimlaneId` INTEGER NOT NULL, `dateMoved` INTEGER NOT NULL, `recurrenceStatus` INTEGER NOT NULL, `recurrenceTrigger` INTEGER NOT NULL, `recurrenceFactor` INTEGER NOT NULL, `recurrenceTimeframe` INTEGER NOT NULL, `recurrenceBasedate` INTEGER NOT NULL, `recurrenceParent` INTEGER, `recurrenceChild` INTEGER, `priority` INTEGER NOT NULL, PRIMARY KEY(`id`, `columnId`, `projectId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `dateCreation` INTEGER NOT NULL, `colorId` TEXT NOT NULL, `projectId` INTEGER NOT NULL, `columnId` INTEGER NOT NULL, `ownerId` INTEGER NOT NULL, `position` INTEGER NOT NULL, `isActive` INTEGER NOT NULL, `dateCompleted` INTEGER, `score` INTEGER, `dateDue` INTEGER, `categoryId` INTEGER NOT NULL, `creatorId` INTEGER NOT NULL, `dateModification` INTEGER, `reference` TEXT, `dateStarted` INTEGER, `timeSpent` INTEGER, `timeEstimated` INTEGER, `swimlaneId` INTEGER NOT NULL, `dateMoved` INTEGER NOT NULL, `recurrenceStatus` INTEGER NOT NULL, `recurrenceTrigger` INTEGER NOT NULL, `recurrenceFactor` INTEGER NOT NULL, `recurrenceTimeframe` INTEGER NOT NULL, `recurrenceBasedate` INTEGER NOT NULL, `recurrenceParent` INTEGER, `recurrenceChild` INTEGER, `priority` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`columnId`) REFERENCES `kanban_column`(`id`) ON UPDATE CASCADE ON DELETE CASCADE , FOREIGN KEY(`projectId`) REFERENCES `kanban_project`(`id`) ON UPDATE CASCADE ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -384,15 +396,37 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "id",
-            "columnId",
-            "projectId"
+            "id"
           ]
-        }
+        },
+        "foreignKeys": [
+          {
+            "table": "kanban_column",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "columnId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "kanban_project",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "projectId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       },
       {
         "tableName": "kanban_subtask",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `status` INTEGER NOT NULL, `timeEstimated` INTEGER NOT NULL, `timeSpent` INTEGER NOT NULL, `taskId` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `position` INTEGER NOT NULL, `username` TEXT, `name` TEXT, `timerStartDate` INTEGER NOT NULL, `statusName` TEXT NOT NULL, `isTimerStarted` INTEGER NOT NULL, PRIMARY KEY(`id`, `taskId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `status` INTEGER NOT NULL, `timeEstimated` INTEGER NOT NULL, `timeSpent` INTEGER NOT NULL, `taskId` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `position` INTEGER NOT NULL, `username` TEXT, `name` TEXT, `timerStartDate` INTEGER NOT NULL, `statusName` TEXT NOT NULL, `isTimerStarted` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`taskId`) REFERENCES `kanban_task`(`id`) ON UPDATE CASCADE ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -474,14 +508,26 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "id",
-            "taskId"
+            "id"
           ]
-        }
+        },
+        "foreignKeys": [
+          {
+            "table": "kanban_task",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "taskId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       },
       {
         "tableName": "kanban_comment",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `dateCreation` INTEGER NOT NULL, `dateModification` INTEGER NOT NULL, `taskId` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `comment` TEXT NOT NULL, `username` TEXT, `name` TEXT, `email` TEXT, `avatarPath` TEXT, PRIMARY KEY(`id`, `taskId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `dateCreation` INTEGER NOT NULL, `dateModification` INTEGER NOT NULL, `taskId` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `comment` TEXT NOT NULL, `username` TEXT, `name` TEXT, `email` TEXT, `avatarPath` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`taskId`) REFERENCES `kanban_task`(`id`) ON UPDATE CASCADE ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -543,27 +589,27 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "id",
-            "taskId"
+            "id"
           ]
-        }
+        },
+        "foreignKeys": [
+          {
+            "table": "kanban_task",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "taskId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       },
       {
         "tableName": "api_storage",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`kanbanMethod` TEXT NOT NULL, `kanbanParams` TEXT NOT NULL, `updateId` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`updateId` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `methodId` INTEGER NOT NULL, `methodName` TEXT NOT NULL, `methodType` INTEGER NOT NULL, `projectId` INTEGER, `columnId` INTEGER, `taskId` INTEGER, `name` TEXT, `title` TEXT, `identifier` TEXT, `email` TEXT, `statusId` INTEGER)",
         "fields": [
-          {
-            "fieldPath": "kanbanMethod",
-            "columnName": "kanbanMethod",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "kanbanParams",
-            "columnName": "kanbanParams",
-            "affinity": "TEXT",
-            "notNull": true
-          },
           {
             "fieldPath": "updateId",
             "columnName": "updateId",
@@ -581,6 +627,64 @@
             "columnName": "id",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "kanbanMethod.methodId",
+            "columnName": "methodId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kanbanMethod.methodName",
+            "columnName": "methodName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kanbanMethod.methodType",
+            "columnName": "methodType",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kanbanParams.projectId",
+            "columnName": "projectId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "kanbanParams.columnId",
+            "columnName": "columnId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "kanbanParams.taskId",
+            "columnName": "taskId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "kanbanParams.name",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "kanbanParams.title",
+            "columnName": "title",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "kanbanParams.identifier",
+            "columnName": "identifier",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "kanbanParams.email",
+            "columnName": "email",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "kanbanParams.statusId",
+            "columnName": "statusId",
+            "affinity": "INTEGER"
           }
         ],
         "primaryKey": {
@@ -593,7 +697,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '466494ac2046c1a44e3b3f843e940b2c')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '82b53020d7f743787ee31b9b25eadb84')"
     ]
   }
 }

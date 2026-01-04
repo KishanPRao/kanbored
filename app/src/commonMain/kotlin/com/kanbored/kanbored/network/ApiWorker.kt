@@ -8,6 +8,7 @@ import androidx.work.WorkerParameters
 import com.kanbored.kanbored.model.ApiStorage
 import com.kanbored.kanbored.persistent.KanbanDatabase
 import com.kanbored.kanbored.utils.ApiFailedException
+import com.kanbored.kanbored.utils.InvalidResponseException
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
@@ -26,14 +27,14 @@ class ApiWorker @AssistedInject constructor(
             processApi()
             Result.success()
         } catch (e: Exception) {
-            print("Failed to execute Api Worker: $e")
-            Result.retry()
+            println("Failed to execute Api Worker: $e")
+            Result.failure()
         }
     }
 
     private suspend fun processApi() {
         var api = database.apiStorageDao().getNextApi()
-        println("processApi: $api")
+        println("processApi [${database.apiStorageDao().getAllSync().size}]: $api")
         while (api != null) {
             val response = apiProvider.kanbanApi.genericApi(
                 createKanbanRequest(
@@ -51,21 +52,40 @@ class ApiWorker @AssistedInject constructor(
             database.apiStorageDao().delete(api)
             api = database.apiStorageDao().getNextApi()
         }
+        println("processApi: fin!")
     }
 
-    private fun handleResponse(apiStorage: ApiStorage, result: Any) {
-        println("handleResponse")
-        // Update internal id: find out if project/col/task.. type, write query that checks type, then parameter, if not null
-        // All creation APIs result in int TODO: bool too??
-        if (result is Int) {
-            when (apiStorage.kanbanMethod) {
-                KanbanMethod.CreateProject -> {
+    private suspend fun handleResponse(apiStorage: ApiStorage, result: Any) {
+        println("handleResponse: $result")
+        when (result) {
+            is Int -> {
+                when (apiStorage.kanbanMethod) {
+                    KanbanMethod.CreateProject -> {
+                        println("create proj: update id: ${apiStorage.updateId} -> $result")
+                        database.projectDao().updateId(apiStorage.updateId, result)
+                        database.apiStorageDao().updateProjectId(apiStorage.updateId, result)
+                    }
 
+                    KanbanMethod.AddColumn -> {
+                        println("add col: update id: ${apiStorage.updateId} -> $result")
+                        database.columnDao().updateId(apiStorage.updateId, result)
+                        database.apiStorageDao().updateColumnId(apiStorage.updateId, result)
+                    }
+
+                    else -> {}
                 }
+            }
 
-                else -> {
-
+            is Boolean -> {
+                if (!result) {
+                    throw ApiFailedException("${apiStorage.kanbanMethod.methodName} failed")
+                } else {
+                    println("Valid!")
                 }
+            }
+
+            else -> {
+                throw InvalidResponseException("Invalid response type: $result, ${result::class}")
             }
         }
     }

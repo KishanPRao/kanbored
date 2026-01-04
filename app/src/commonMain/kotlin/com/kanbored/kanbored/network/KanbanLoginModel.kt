@@ -3,23 +3,12 @@ package com.kanbored.kanbored.network
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class KanbanRequest
-
-@Serializable
-data class KanbanArrayRequest(
-    val method: String,
-    val id: Int,
-    val jsonrpc: String = "2.0",
-    val params: List<String>
-) : KanbanRequest()
-
-@Serializable
-data class KanbanParamsRequest(
+data class KanbanRequest(
     val method: String,
     val id: Int,
     val jsonrpc: String = "2.0",
     val params: KanbanParams?
-) : KanbanRequest()
+)
 
 @Serializable
 data class KanbanLoginResponse(
