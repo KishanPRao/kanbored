@@ -69,6 +69,10 @@ fun MainScreen() {
 
         val hostState = remember { SnackbarHostState() }
         var showLoading by remember { mutableStateOf(false) }
+        val onNavigateBack: () -> Unit = {
+            topBarVM.revertState()
+            navController.popBackStack()
+        }
         Scaffold(
             snackbarHost = {
                 SnackbarHost(hostState = hostState, snackbar = { snackbarData ->
@@ -88,7 +92,11 @@ fun MainScreen() {
                 })
             },
             topBar = {
-                AppTopBar(navController = navController, topBarVM = topBarVM)
+                AppTopBar(
+                    navController = navController,
+                    topBarVM = topBarVM,
+                    onNavigateBack = onNavigateBack
+                )
             },
             modifier = Modifier.fillMaxSize(),
         ) { innerPadding ->
@@ -149,7 +157,7 @@ fun MainScreen() {
                                 taskId = task.id,
                             )
                         )
-                    })
+                    }, onNavigateBack = onNavigateBack)
                 }
                 composable<Route.Task> { entry ->
                     val kanbanGraphEntry = remember(entry) {
@@ -191,6 +199,7 @@ fun MainScreen() {
 private fun AppTopBar(
     navController: NavHostController,
     topBarVM: TopBarViewModel,
+    onNavigateBack: () -> Unit,
 ) {
     val topBarVMState = topBarVM.state.collectAsState()
     var expandedMenu by remember { mutableStateOf(false) }
@@ -202,10 +211,8 @@ private fun AppTopBar(
                 KanbanIconButton(
                     Icons.AutoMirrored.Filled.ArrowBack,
                     Res.string.navigate_back,
-                ) {
-                    topBarVM.revertState()
-                    navController.popBackStack()
-                }
+                    onClick = onNavigateBack
+                )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(

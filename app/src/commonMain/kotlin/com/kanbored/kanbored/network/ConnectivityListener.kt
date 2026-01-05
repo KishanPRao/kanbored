@@ -1,12 +1,7 @@
 package com.kanbored.kanbored.network
 
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface ConnectivityListener {
-    fun observeStatus(): Flow<NetworkStatus>
-
-}
-
-enum class NetworkStatus {
-    Available, Unavailable
+    val isApiReachable: StateFlow<Boolean>
 }

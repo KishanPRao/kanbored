@@ -14,7 +14,6 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.kanbored.kanbored.network.ApiWorker
 import com.kanbored.kanbored.network.ConnectivityListener
 import com.kanbored.kanbored.network.MockConnectivityListener
-import com.kanbored.kanbored.network.NetworkStatus
 import com.kanbored.kanbored.persistent.KanbanDatabase
 import com.kanbored.kanbored.persistent.MockDatabase
 import com.kanbored.kanbored.repository.KanbanRepository
@@ -110,11 +109,11 @@ class ApiWorkerTest {
         val dao = database.projectDao()
         runAndWait {
             val connectivityListener = connectivityListener as MockConnectivityListener
-            connectivityListener.setNetworkStatus(NetworkStatus.Unavailable)
-            connectivityListener.setNetworkStatus(NetworkStatus.Available)
+            connectivityListener.setReachability(false)
+            connectivityListener.setReachability(true)
             repository.createProject("test1")
             repository.createProject("test2")
-//            connectivityListener.setNetworkStatus(NetworkStatus.Available)
+//            connectivityListener.setIsApiReachable(true)
         }
         val projects = dao.getAllSync()
         assertEquals(2, projects.size)
@@ -126,10 +125,10 @@ class ApiWorkerTest {
     fun testCreateProjectsAndColumns() = runTest {
         runAndWait {
             val connectivityListener = connectivityListener as MockConnectivityListener
-            connectivityListener.setNetworkStatus(NetworkStatus.Unavailable)
+            connectivityListener.setReachability(false)
             // TODO: If available from start, cannot work (uses local project id after project actually has real id)
             // TODO: likely shouldn't be an issue with real-time since we have DB foreign key on_update cascade (needs proper testing)
-//            connectivityListener.setNetworkStatus(NetworkStatus.Available)
+//            connectivityListener.setIsApiReachable(true)
             val project1 = repository.createProject("proj1")
             logDatabase()
             val project2 = repository.createProject("proj2")
@@ -139,7 +138,7 @@ class ApiWorkerTest {
             repository.createColumn(project2.id, "col2")
             logDatabase()
             repository.createColumn(project1.id, "col3")
-            connectivityListener.setNetworkStatus(NetworkStatus.Available)
+            connectivityListener.setReachability(true)
             logDatabase()
         }
         logDatabase()
@@ -159,13 +158,13 @@ class ApiWorkerTest {
     fun testCreateProjectsAndUpdate() = runTest {
         runAndWait {
             val connectivityListener = connectivityListener as MockConnectivityListener
-            connectivityListener.setNetworkStatus(NetworkStatus.Unavailable)
+            connectivityListener.setReachability(false)
             val project1 = repository.createProject("proj1")
             val project2 = repository.createProject("proj2")
             repository.updateProject(project1.copy(name = "project 1"))
             repository.updateProject(project1.copy(name = "Project 1"))
             repository.updateProject(project2.copy(name = "project 2"))
-            connectivityListener.setNetworkStatus(NetworkStatus.Available)
+            connectivityListener.setReachability(true)
         }
         logDatabase()
         val projects = database.projectDao().getAllSync()

@@ -15,11 +15,10 @@ import com.kanbored.kanbored.utils.createKanbanTask
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -29,22 +28,19 @@ import javax.inject.Singleton
  */
 @Singleton
 class ApiWorkManager @Inject constructor(
+    connectivityListener: ConnectivityListener,
     private val database: KanbanDatabase,
-    private val connectivityListener: ConnectivityListener,
     @param:ApplicationContext private val context: Context,
 ) {
     private val workManager by lazy {
         WorkManager.getInstance(context)
     }
-    private val scope = CoroutineScope(Dispatchers.IO)
-    private val state = connectivityListener.observeStatus().stateIn(
-        scope = scope,
-        started = SharingStarted.Eagerly,
-        initialValue = NetworkStatus.Unavailable
-    )
+    private val coroutineCtx = Dispatchers.IO
+    private val scope = CoroutineScope(coroutineCtx)
+    private val isApiReachable = connectivityListener.isApiReachable
 
     init {
-        state.filter { it == NetworkStatus.Available }
+        isApiReachable.filter { it }
             .onEach {
                 println("api work mgr start worker")
                 startWorkerIfNotStarted()
@@ -54,7 +50,7 @@ class ApiWorkManager @Inject constructor(
 
     /******************* MARK: CREATE ******************/
 
-    suspend fun createProject(name: String): KanbanProject {
+    suspend fun createProject(name: String): KanbanProject = withContext(coroutineCtx) {
         val localId = database.apiStorageDao().getNextId()
         val local = createKanbanProject(name).copy(id = localId)
         database.projectDao().insertOrUpdate(local)
@@ -62,41 +58,43 @@ class ApiWorkManager @Inject constructor(
             createApiStorage(KanbanMethod.CreateProject, KanbanParams(name = name), localId)
         database.apiStorageDao().insertOrUpdate(apiStorage)
         startWorkerIfNotStarted()
-        return local
+        local
     }
 
-    suspend fun createColumn(projectId: Int, name: String): KanbanColumn {
-        val localId = database.apiStorageDao().getNextId()
-        val local = createKanbanColumn(name).copy(id = localId, projectId = projectId)
-        database.columnDao().insertOrUpdate(local)
-        val apiStorage = createApiStorage(
-            KanbanMethod.AddColumn,
-            KanbanParams(projectId = projectId, title = name),
-            localId
-        )
-        database.apiStorageDao().insertOrUpdate(apiStorage)
-        startWorkerIfNotStarted()
-        return local
-    }
+    suspend fun createColumn(projectId: Int, name: String): KanbanColumn =
+        withContext(coroutineCtx) {
+            val localId = database.apiStorageDao().getNextId()
+            val local = createKanbanColumn(name).copy(id = localId, projectId = projectId)
+            database.columnDao().insertOrUpdate(local)
+            val apiStorage = createApiStorage(
+                KanbanMethod.AddColumn,
+                KanbanParams(projectId = projectId, title = name),
+                localId
+            )
+            database.apiStorageDao().insertOrUpdate(apiStorage)
+            startWorkerIfNotStarted()
+            local
+        }
 
-    suspend fun createTask(projectId: Int, columnId: Int, name: String): KanbanTask {
-        val localId = database.apiStorageDao().getNextId()
-        val local = createKanbanTask(name)
-            .copy(id = localId, projectId = projectId, columnId = columnId)
-        database.taskDao().insertOrUpdate(local)
-        val apiStorage = createApiStorage(
-            KanbanMethod.CreateTask,
-            KanbanParams(projectId = projectId, columnId = columnId, title = name),
-            localId
-        )
-        database.apiStorageDao().insertOrUpdate(apiStorage)
-        startWorkerIfNotStarted()
-        return local
-    }
+    suspend fun createTask(projectId: Int, columnId: Int, name: String): KanbanTask =
+        withContext(coroutineCtx) {
+            val localId = database.apiStorageDao().getNextId()
+            val local = createKanbanTask(name)
+                .copy(id = localId, projectId = projectId, columnId = columnId)
+            database.taskDao().insertOrUpdate(local)
+            val apiStorage = createApiStorage(
+                KanbanMethod.CreateTask,
+                KanbanParams(projectId = projectId, columnId = columnId, title = name),
+                localId
+            )
+            database.apiStorageDao().insertOrUpdate(apiStorage)
+            startWorkerIfNotStarted()
+            local
+        }
 
     /******************* MARK: UPDATE ******************/
 
-    suspend fun updateProject(project: KanbanProject) {
+    suspend fun updateProject(project: KanbanProject) = withContext(coroutineCtx) {
         database.projectDao().insertOrUpdate(project)
         val apiStorage = createApiStorage(
             KanbanMethod.UpdateProject,
@@ -108,8 +106,21 @@ class ApiWorkManager @Inject constructor(
         startWorkerIfNotStarted()
     }
 
+    /******************* MARK: DELETE ******************/
+
+    suspend fun deleteProject(project: KanbanProject) = withContext(coroutineCtx) {
+        database.projectDao().delete(project)
+        val apiStorage = createApiStorage(
+            KanbanMethod.RemoveProject,
+            KanbanParams(projectId = project.id),
+            project.id
+        )
+        database.apiStorageDao().insertOrUpdate(apiStorage)
+        startWorkerIfNotStarted()
+    }
+
     private fun startWorkerIfNotStarted() {
-        if (state.value == NetworkStatus.Unavailable) {
+        if (!isApiReachable.value) {
             println("Cannot start worker, no network")
             return
         }

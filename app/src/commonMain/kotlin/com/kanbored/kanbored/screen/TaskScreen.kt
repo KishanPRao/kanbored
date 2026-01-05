@@ -62,13 +62,13 @@ import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownColor
 import kanbored.app.generated.resources.Res
 import kanbored.app.generated.resources.comments
+import kanbored.app.generated.resources.delete
 import kanbored.app.generated.resources.edit
 import kanbored.app.generated.resources.empty_task_description
 import kanbored.app.generated.resources.reorder
 import kanbored.app.generated.resources.subtasks
 import kanbored.app.generated.resources.topbar_add_checklist
 import kanbored.app.generated.resources.topbar_archive
-import kanbored.app.generated.resources.topbar_delete
 import kanbored.app.generated.resources.topbar_rename
 import kanbored.app.generated.resources.topbar_unarchive
 import org.jetbrains.compose.resources.stringResource
@@ -106,7 +106,7 @@ fun TaskScreen(
                 TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_rename)) {
                     println("Rename")
                 },
-                TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_delete)) {
+                TopBarDropdownItem(PresentableText.DynamicResource(Res.string.delete)) {
                     println("Delete")
                 },
             )

@@ -82,9 +82,10 @@ fun TopbarDropdownMenuItem(text: String, onClick: () -> Unit) {
 }
 
 @Composable
-fun TextInputDialog(
-    title: String,
-    hint: String,
+fun PromptDialog(
+    title: PresentableText,
+    showTextField: Boolean,
+    hint: String? = null,
     onClickOk: (String) -> Unit,
     onClickCancel: () -> Unit,
 ) {
@@ -106,31 +107,37 @@ fun TextInputDialog(
                     .width(IntrinsicSize.Min)
             ) {
                 Text(
-                    text = title,
+                    text = title.asString(),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 20.dp),
                 )
-                OutlinedTextField(
-                    modifier = Modifier.focusRequester(focusRequester),
-                    value = text,
-                    onValueChange = {
-                        text = it
-                        isError = false
-                    },
-                    label = { Text(hint) },
-                    isError = isError,
-                    singleLine = true,
-                )
+                if (showTextField) {
+                    OutlinedTextField(
+                        modifier = Modifier.focusRequester(focusRequester),
+                        value = text,
+                        onValueChange = {
+                            text = it
+                            isError = false
+                        },
+                        label = { hint?.let { Text(it) } },
+                        isError = isError,
+                        singleLine = true,
+                    )
+                }
                 Spacer(modifier = Modifier.height(20.dp))
                 Row(
                     horizontalArrangement = Arrangement.End,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     TextButton(onClick = {
-                        if (text.isNotEmpty()) {
-                            onClickOk(text)
+                        if (showTextField) {
+                            if (text.isNotEmpty()) {
+                                onClickOk(text)
+                            } else {
+                                isError = true
+                            }
                         } else {
-                            isError = true
+                            onClickOk("")
                         }
                     }) { Text(stringResource(Res.string.ok)) }
                     Spacer(modifier = Modifier.height(10.dp))

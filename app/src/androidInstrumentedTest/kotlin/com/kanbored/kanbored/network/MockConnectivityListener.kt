@@ -1,17 +1,18 @@
 package com.kanbored.kanbored.network
 
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class MockConnectivityListener @Inject constructor() : ConnectivityListener {
-    private val networkStatusFlow = MutableStateFlow(NetworkStatus.Unavailable)
+    private val _isApiReachable = MutableStateFlow(false)
 
-    override fun observeStatus(): Flow<NetworkStatus> = networkStatusFlow
-
-    fun setNetworkStatus(status: NetworkStatus) {
-        networkStatusFlow.value = status
+    fun setReachability(reachable: Boolean) {
+        _isApiReachable.value = reachable
     }
+
+    override val isApiReachable: StateFlow<Boolean> = _isApiReachable.asStateFlow()
 }

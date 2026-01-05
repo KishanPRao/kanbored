@@ -4,7 +4,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class MocApiProvider @Inject constructor() : ApiProvider {
+class MockApiProvider @Inject constructor() : ApiProvider {
     override val kanbanApi: KanbanApi = MockKanbanApi()
     override suspend fun isApiReachable(): Boolean = true
 }

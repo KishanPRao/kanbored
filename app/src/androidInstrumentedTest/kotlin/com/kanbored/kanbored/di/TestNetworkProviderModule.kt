@@ -2,7 +2,7 @@ package com.kanbored.kanbored.di
 
 import com.kanbored.kanbored.network.ApiProvider
 import com.kanbored.kanbored.network.ConnectivityListener
-import com.kanbored.kanbored.network.MocApiProvider
+import com.kanbored.kanbored.network.MockApiProvider
 import com.kanbored.kanbored.network.MockConnectivityListener
 import dagger.Binds
 import dagger.Module
@@ -24,6 +24,6 @@ abstract class TestNetworkProviderModule {
     @Binds
     @Singleton
     abstract fun bindsApiProvider(
-        impl: MocApiProvider
+        impl: MockApiProvider
     ): ApiProvider
 }

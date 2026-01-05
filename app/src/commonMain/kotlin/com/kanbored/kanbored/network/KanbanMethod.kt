@@ -4,6 +4,7 @@ open class KanbanMethod(val methodId: Int, val methodName: String, val methodTyp
     object GetMe : KanbanMethod(1718627783, "getMe", Type.AUTHENTICATION)
     object GetAllProjects : KanbanMethod(2134420212, "getAllProjects", Type.PROJECT)
     object CreateProject : KanbanMethod(1797076613, "createProject", Type.PROJECT)
+    object RemoveProject : KanbanMethod(46285125, "removeProject", Type.PROJECT)
     object UpdateProject : KanbanMethod(1853996288, "updateProject", Type.PROJECT)
     object EnableProject : KanbanMethod(1775494839, "enableProject", Type.PROJECT)
     object GetColumns : KanbanMethod(887036325, "getColumns", Type.COLUMN)

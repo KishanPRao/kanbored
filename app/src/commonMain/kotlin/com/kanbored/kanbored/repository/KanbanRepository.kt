@@ -14,17 +14,7 @@ import com.kanbored.kanbored.persistent.KanbanDatabase
 import com.kanbored.kanbored.utils.PresentableText
 import kanbored.app.generated.resources.Res
 import kanbored.app.generated.resources.error_unknown
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.isActive
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -35,30 +25,6 @@ class KanbanRepository @Inject constructor(
     private val apiProvider: ApiProvider,
     private val apiWorkManager: ApiWorkManager,
 ) {
-    companion object {
-        const val API_POLL_INTERVAL_MS = 5_000L
-    }
-
-    private val pollingScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
-
-    fun pollApiReachability(
-        intervalMs: Long = API_POLL_INTERVAL_MS
-    ): StateFlow<Boolean> {
-        return flow {
-            while (currentCoroutineContext().isActive) {
-                val isReachable: Boolean = apiProvider.isApiReachable()
-                emit(isReachable)
-                delay(intervalMs)
-            }
-        }
-            .distinctUntilChanged()
-            .stateIn(
-                scope = pollingScope,
-                started = SharingStarted.Eagerly,
-                initialValue = true
-            )
-    }
-
     fun getAllProjects(): Flow<List<KanbanProject>> = database.projectDao().getAll()
 
     fun getColumns(projectId: Int): Flow<List<KanbanColumn>> = database.columnDao().get(projectId)
@@ -90,6 +56,7 @@ class KanbanRepository @Inject constructor(
                 return Result.Error(PresentableText.DynamicResource(Res.string.error_unknown))
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             println("refreshApi error: ${e.message}")
             return Result.Error(
                 e.message?.let { PresentableText.DynamicString(it) }
@@ -152,4 +119,6 @@ class KanbanRepository @Inject constructor(
         apiWorkManager.createTask(projectId, columnId, name)
 
     suspend fun updateProject(project: KanbanProject) = apiWorkManager.updateProject(project)
+
+    suspend fun deleteProject(project: KanbanProject) = apiWorkManager.deleteProject(project)
 }

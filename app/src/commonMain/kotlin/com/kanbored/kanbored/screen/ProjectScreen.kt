@@ -42,7 +42,7 @@ import com.kanbored.kanbored.model.KanbanTask
 import com.kanbored.kanbored.ui.theme.AppTheme
 import com.kanbored.kanbored.ui.theme.LocalDimensions
 import com.kanbored.kanbored.utils.PresentableText
-import com.kanbored.kanbored.utils.TextInputDialog
+import com.kanbored.kanbored.utils.PromptDialog
 import com.kanbored.kanbored.utils.emptyTask
 import com.kanbored.kanbored.viewmodel.KanbanViewModel
 import com.kanbored.kanbored.viewmodel.TopBarAction
@@ -50,12 +50,12 @@ import com.kanbored.kanbored.viewmodel.TopBarDropdownItem
 import com.kanbored.kanbored.viewmodel.TopBarViewModel
 import kanbored.app.generated.resources.Res
 import kanbored.app.generated.resources.add_new_column
+import kanbored.app.generated.resources.delete
 import kanbored.app.generated.resources.enter_name_new_column
 import kanbored.app.generated.resources.server_unreachable
 import kanbored.app.generated.resources.topbar_add_column
 import kanbored.app.generated.resources.topbar_archive
 import kanbored.app.generated.resources.topbar_change_view
-import kanbored.app.generated.resources.topbar_delete
 import kanbored.app.generated.resources.topbar_rename
 import kanbored.app.generated.resources.topbar_show_archived
 import kotlinx.coroutines.flow.collectLatest
@@ -68,9 +68,12 @@ fun ProjectScreen(
     kanbanVM: KanbanViewModel,
     projectId: Int,
     onTaskOpened: (KanbanTask) -> Unit,
-    modifier: Modifier = Modifier
+    onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    var showDialog by remember { mutableStateOf(false) }
+    var showAddColDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    // TODO: observe the object instead? If project screen open, then project updated from api worker?
     val project = kanbanVM.getProject(projectId = projectId)
     var isGridView by remember { mutableStateOf(false) }
     var isArchived by remember { mutableStateOf(false) }
@@ -78,23 +81,24 @@ fun ProjectScreen(
         topBarVM.saveState()
         topBarVM.updateTitle(project.name)
         topBarVM.showBackButton(true)
-        topBarVM.setDropdownItems(
-            listOf(
-                TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_rename)) {
-                    println("Rename")
-                },
-                TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_show_archived)) {
-                    println("Show archived")
-                },
-                TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_archive)) {
-                    println("Archive")
-                },
-                TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_delete)) {
-                    println("Delete")
-                },
-            )
-        )
     }
+    topBarVM.setDropdownItems(
+        listOf(
+            TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_rename)) {
+                println("Rename")
+            },
+            TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_show_archived)) {
+                println("Show archived")
+            },
+            TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_archive)) {
+                println("Archive")
+            },
+            TopBarDropdownItem(PresentableText.DynamicResource(Res.string.delete)) {
+                println("Delete")
+                showDeleteDialog = true
+            },
+        )
+    )
     topBarVM.setActions(
         listOf(
             TopBarAction(
@@ -102,7 +106,7 @@ fun ProjectScreen(
                 contentDescription = PresentableText.DynamicResource(Res.string.topbar_add_column),
                 onClick = {
                     println("Add column")
-                    showDialog = true
+                    showAddColDialog = true
                 }
             ),
             TopBarAction(
@@ -116,17 +120,35 @@ fun ProjectScreen(
             ),
         )
     )
-    if (showDialog) {
-        TextInputDialog(
-            title = stringResource(Res.string.add_new_column),
+    if (showAddColDialog) {
+        PromptDialog(
+            title = PresentableText.DynamicResource(Res.string.add_new_column),
             hint = stringResource(Res.string.enter_name_new_column),
+            showTextField = true,
             onClickOk = { text ->
-                showDialog = false
+                showAddColDialog = false
                 println("Add new column: $text")
                 kanbanVM.createColumn(projectId, text)
             },
             onClickCancel = {
-                showDialog = false
+                showAddColDialog = false
+            }
+        )
+    }
+    if (showDeleteDialog) {
+        PromptDialog(
+            title = PresentableText.DynamicString(
+                "${stringResource(Res.string.delete)} ${project.name}?"
+            ),
+            showTextField = false,
+            onClickOk = {
+                showDeleteDialog = false
+                println("Delete project: $project")
+                kanbanVM.deleteProject(project)
+                onNavigateBack()
+            },
+            onClickCancel = {
+                showDeleteDialog = false
             }
         )
     }
@@ -151,11 +173,11 @@ fun ProjectScreen(
             isRefreshing = isRefreshing,
             onRefresh = {
                 kanbanVM.viewModelScope.launch {
-                    kanbanVM.refreshColumnsAndTasks(projectId, isArchived)
+                    kanbanVM.refreshColumnsAndTasks(project.id, isArchived)
                 }
             },
             modifier = Modifier.fillMaxSize(),
-        ) { ColumnList(projectId, kanbanVM, onTaskOpened) }
+        ) { ColumnList(project.id, kanbanVM, onTaskOpened) }
     }
 }
 

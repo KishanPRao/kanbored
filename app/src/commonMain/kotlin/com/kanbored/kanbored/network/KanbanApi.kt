@@ -8,6 +8,7 @@ import com.kanbored.kanbored.model.KanbanTask
 import com.kanbored.kanbored.utils.endPoint
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 import retrofit2.http.Body
 import retrofit2.http.POST
 import retrofit2.http.Query
@@ -69,7 +70,7 @@ interface KanbanApi {
     @POST(endPoint)
     suspend fun genericApi(
         @Body kanbanRequest: KanbanRequest
-    ): KanbanResponse<*, KanbanError>
+    ): KanbanResponse<JsonElement, KanbanError>
 
     /***************************** UPDATE ***************************/
 }

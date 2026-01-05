@@ -10,6 +10,7 @@ import com.kanbored.kanbored.model.KanbanComment
 import com.kanbored.kanbored.model.KanbanProject
 import com.kanbored.kanbored.model.KanbanSubtask
 import com.kanbored.kanbored.model.KanbanTask
+import com.kanbored.kanbored.network.ConnectivityListener
 import com.kanbored.kanbored.network.Result
 import com.kanbored.kanbored.repository.KanbanRepository
 import com.kanbored.kanbored.utils.PresentableText
@@ -28,12 +29,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class KanbanViewModel @Inject constructor(
+    connectivityListener: ConnectivityListener,
     private val repository: KanbanRepository,
     private val appEventBus: AppEventBus,
 ) : ViewModel() {
     private val _uiEventFlow = MutableSharedFlow<UiEvent>()
     val uiEventFlow = _uiEventFlow.asSharedFlow()
-    val isApiReachable = repository.pollApiReachability()
+    val isApiReachable = connectivityListener.isApiReachable
     val projects: StateFlow<List<KanbanProject>> = repository.getAllProjects()
         .stateIn(
             scope = viewModelScope,
@@ -51,6 +53,7 @@ class KanbanViewModel @Inject constructor(
         while (true) {
             refreshProjectsSync()
             for (project in projects.value) {
+                println("proj: ${project.id}, ${project.name}")
                 refreshColumnsAndTasks(project.id, false)
                 refreshColumnsAndTasks(project.id, true)
             }
@@ -152,26 +155,6 @@ class KanbanViewModel @Inject constructor(
         refreshSubtasksAndCommentsSync(taskId)
     }
 
-    fun createProject(name: String) = viewModelScope.launch {
-        repository.createProject(name)
-        refreshProjectsSync()
-    }
-
-    fun createColumn(projectId: Int, name: String) = viewModelScope.launch {
-        repository.createColumn(projectId, name)
-//        val result = repository.createProject(name)
-//        when (result) {
-//            is Result.Error<*> -> {
-//                appEventBus.emit(AppUiEvent.ShowError(result.message!!))
-//            }
-//
-//            is Result.Success<*> -> {
-//                println("created")
-//                refreshProjectsSync()
-//            }
-//        }
-    }
-
     fun getColumns(projectId: Int): Flow<List<KanbanColumn>> {
         return repository.getColumns(projectId)
     }
@@ -194,6 +177,30 @@ class KanbanViewModel @Inject constructor(
 
     fun getTask(projectId: Int, columnId: Int, taskId: Int): Flow<KanbanTask?> {
         return repository.getTask(projectId, columnId, taskId)
+    }
+
+    fun createProject(name: String) = viewModelScope.launch {
+        repository.createProject(name)
+        refreshProjectsSync()
+    }
+
+    fun createColumn(projectId: Int, name: String) = viewModelScope.launch {
+        repository.createColumn(projectId, name)
+//        val result = repository.createProject(name)
+//        when (result) {
+//            is Result.Error<*> -> {
+//                appEventBus.emit(AppUiEvent.ShowError(result.message!!))
+//            }
+//
+//            is Result.Success<*> -> {
+//                println("created")
+//                refreshProjectsSync()
+//            }
+//        }
+    }
+
+    fun deleteProject(project: KanbanProject) = viewModelScope.launch {
+        repository.deleteProject(project)
     }
 
     fun showUiMessage(presentableText: PresentableText) {

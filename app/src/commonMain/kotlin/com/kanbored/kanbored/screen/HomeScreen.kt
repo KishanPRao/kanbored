@@ -45,7 +45,7 @@ import androidx.lifecycle.viewModelScope
 import com.kanbored.kanbored.event.UiEvent
 import com.kanbored.kanbored.model.KanbanProject
 import com.kanbored.kanbored.utils.PresentableText
-import com.kanbored.kanbored.utils.TextInputDialog
+import com.kanbored.kanbored.utils.PromptDialog
 import com.kanbored.kanbored.viewmodel.KanbanViewModel
 import com.kanbored.kanbored.viewmodel.TopBarAction
 import com.kanbored.kanbored.viewmodel.TopBarDropdownItem
@@ -104,9 +104,10 @@ fun HomeScreen(
         )
     }
     if (showDialog) {
-        TextInputDialog(
-            title = stringResource(Res.string.add_new_project),
+        PromptDialog(
+            title = PresentableText.DynamicResource(Res.string.add_new_project),
             hint = stringResource(Res.string.enter_name_new_project),
+            showTextField = true,
             onClickOk = { text ->
                 showDialog = false
                 println("Add new project: $text")

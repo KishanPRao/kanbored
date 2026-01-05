@@ -5,6 +5,8 @@ import com.kanbored.kanbored.model.KanbanComment
 import com.kanbored.kanbored.model.KanbanProject
 import com.kanbored.kanbored.model.KanbanSubtask
 import com.kanbored.kanbored.model.KanbanTask
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
 
 class MockKanbanApi : KanbanApi {
     private var resultId = 1
@@ -46,15 +48,15 @@ class MockKanbanApi : KanbanApi {
         TODO("Not yet implemented")
     }
 
-    override suspend fun genericApi(kanbanRequest: KanbanRequest): KanbanResponse<*, KanbanError> {
+    override suspend fun genericApi(kanbanRequest: KanbanRequest): KanbanResponse<JsonElement, KanbanError> {
         return when (kanbanRequest.method) {
             KanbanMethod.CreateProject.methodName,
             KanbanMethod.AddColumn.methodName -> {
-                KanbanResponse(jsonrpc, resultId++)
+                KanbanResponse(jsonrpc, JsonPrimitive(resultId++))
             }
 
             KanbanMethod.UpdateProject.methodName -> {
-                KanbanResponse(jsonrpc, true)
+                KanbanResponse(jsonrpc, JsonPrimitive(true))
             }
 
             else -> KanbanResponse(jsonrpc, null, error = KanbanError(0, "API not handled"))
