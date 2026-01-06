@@ -301,7 +301,6 @@ fun RawMarkdownEditor(
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun TaskDescEmptyPreview(modifier: Modifier = Modifier) {
-    // https://gist.github.com/ww9/44f08d44327a40d2ab309a349bebec57
     AppTheme(darkTheme = true) {
         Surface {
             TaskDescription("")

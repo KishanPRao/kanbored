@@ -35,7 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.kanbored.kanbored.event.UiEvent
 import com.kanbored.kanbored.model.KanbanColumn
 import com.kanbored.kanbored.model.KanbanTask
@@ -59,7 +59,6 @@ import kanbored.app.generated.resources.topbar_change_view
 import kanbored.app.generated.resources.topbar_rename
 import kanbored.app.generated.resources.topbar_show_archived
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -77,7 +76,9 @@ fun ProjectScreen(
     val project = kanbanVM.getProject(projectId = projectId)
     var isGridView by remember { mutableStateOf(false) }
     var isArchived by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(project) {
+        // TODO: This gets re-called after opening and exiting task, causing full refresh; why?
+        kanbanVM.refreshColumnsAndTasks(projectId = project.id, isArchived = isArchived)
         topBarVM.saveState()
         topBarVM.updateTitle(project.name)
         topBarVM.showBackButton(true)
@@ -85,16 +86,16 @@ fun ProjectScreen(
     topBarVM.setDropdownItems(
         listOf(
             TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_rename)) {
-                println("Rename")
+                Logger.d("Rename")
             },
             TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_show_archived)) {
-                println("Show archived")
+                Logger.d("Show archived")
             },
             TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_archive)) {
-                println("Archive")
+                Logger.d("Archive")
             },
             TopBarDropdownItem(PresentableText.DynamicResource(Res.string.delete)) {
-                println("Delete")
+                Logger.d("Delete")
                 showDeleteDialog = true
             },
         )
@@ -105,7 +106,7 @@ fun ProjectScreen(
                 icon = Icons.AutoMirrored.Filled.PlaylistAdd,
                 contentDescription = PresentableText.DynamicResource(Res.string.topbar_add_column),
                 onClick = {
-                    println("Add column")
+                    Logger.d("Add column")
                     showAddColDialog = true
                 }
             ),
@@ -114,7 +115,7 @@ fun ProjectScreen(
                 contentDescription = PresentableText.DynamicResource(Res.string.topbar_change_view),
                 onClick = {
                     // TODO: show grid view or list
-                    println("Change view")
+                    Logger.d("Change view")
                     isGridView = !isGridView
                 }
             ),
@@ -127,7 +128,7 @@ fun ProjectScreen(
             showTextField = true,
             onClickOk = { text ->
                 showAddColDialog = false
-                println("Add new column: $text")
+                Logger.d("Add new column: $text")
                 kanbanVM.createColumn(projectId, text)
             },
             onClickCancel = {
@@ -143,7 +144,7 @@ fun ProjectScreen(
             showTextField = false,
             onClickOk = {
                 showDeleteDialog = false
-                println("Delete project: $project")
+                Logger.d("Delete project: $project")
                 kanbanVM.deleteProject(project)
                 onNavigateBack()
             },
@@ -172,9 +173,11 @@ fun ProjectScreen(
         PullToRefreshBox(
             isRefreshing = isRefreshing,
             onRefresh = {
-                kanbanVM.viewModelScope.launch {
-                    kanbanVM.refreshColumnsAndTasks(project.id, isArchived)
-                }
+                kanbanVM.refreshColumnsAndTasks(
+                    project.id,
+                    isArchived,
+                    showRefresh = false
+                )
             },
             modifier = Modifier.fillMaxSize(),
         ) { ColumnList(project.id, kanbanVM, onTaskOpened) }
@@ -184,7 +187,7 @@ fun ProjectScreen(
 @Composable
 fun ColumnList(projectId: Int, kanbanVM: KanbanViewModel, onTaskOpened: (KanbanTask) -> Unit) {
     val columns by kanbanVM.getColumns(projectId).collectAsStateWithLifecycle(emptyList())
-//    println("columns: $columns")
+//    Logger.d("columns: $columns")
     LazyRow {
         items(items = columns, key = { it.id }) { column ->
             ColumnView(projectId, column, kanbanVM, onTaskOpened)
@@ -201,7 +204,7 @@ fun ColumnView(
 ) {
     val dimensions = LocalDimensions.current
     val tasks by kanbanVM.getTasks(projectId, column.id).collectAsStateWithLifecycle(emptyList())
-//    println("tasks: $tasks")
+//    Logger.d("tasks: $tasks")
     Card(
         modifier = Modifier
             .fillMaxHeight()

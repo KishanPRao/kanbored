@@ -1,5 +1,6 @@
 package com.kanbored.kanbored.repository
 
+import co.touchlab.kermit.Logger
 import com.kanbored.kanbored.model.KanbanColumn
 import com.kanbored.kanbored.model.KanbanComment
 import com.kanbored.kanbored.model.KanbanProject
@@ -57,7 +58,7 @@ class KanbanRepository @Inject constructor(
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            println("refreshApi error: ${e.message}")
+            Logger.e("refreshApi error: ${e.message}")
             return Result.Error(
                 e.message?.let { PresentableText.DynamicString(it) }
                     ?: PresentableText.DynamicResource(Res.string.error_unknown)
@@ -66,46 +67,51 @@ class KanbanRepository @Inject constructor(
     }
 
     suspend fun refreshProjects(): Result<Unit> {
+        Logger.d("refreshProjects")
         return refreshApi({
             apiProvider.kanbanApi.getAllProjects()
         }, { projects ->
-//            println("all projects: $projects")
+//            Logger.d("all projects: $projects")
             database.projectDao().insertAll(projects)
         })
     }
 
     suspend fun refreshColumns(projectId: Int): Result<Unit> {
+        Logger.d("refreshColumns: $projectId")
         return refreshApi({
             apiProvider.kanbanApi.getColumns(projectId)
         }, { columns ->
-//            println("all columns: $columns")
+//            Logger.d("all columns: $columns")
             database.columnDao().insertAll(columns)
         })
     }
 
     suspend fun refreshTasks(projectId: Int, isArchived: Boolean): Result<Unit> {
+        Logger.d("refreshTasks: $projectId: $isArchived")
         return refreshApi({
             apiProvider.kanbanApi.getAllTasks(projectId, isArchived)
         }, { tasks ->
-//            println("all tasks: $tasks")
+//            Logger.d("all tasks: $tasks")
             database.taskDao().insertAll(tasks)
         })
     }
 
     suspend fun refreshSubtasks(taskId: Int): Result<Unit> {
+        Logger.d("refreshSubtasks")
         return refreshApi({
             apiProvider.kanbanApi.getAllSubtasks(taskId)
         }, { subtasks ->
-//            println("all subtasks: $subtasks")
+//            Logger.d("all subtasks: $subtasks")
             database.subtaskDao().insertAll(subtasks)
         })
     }
 
     suspend fun refreshComments(taskId: Int): Result<Unit> {
+        Logger.d("refreshComments")
         return refreshApi({
             apiProvider.kanbanApi.getAllComments(taskId)
         }, { comments ->
-//            println("all comments: $comments")
+//            Logger.d("all comments: $comments")
             database.commentDao().insertAll(comments)
         })
     }

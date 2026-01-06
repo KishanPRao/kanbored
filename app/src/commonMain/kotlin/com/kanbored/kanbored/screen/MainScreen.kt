@@ -14,7 +14,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -43,8 +42,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import co.touchlab.kermit.Logger
+import co.touchlab.kermit.Severity
+import co.touchlab.kermit.platformLogWriter
 import com.kanbored.kanbored.event.AppUiEvent
 import com.kanbored.kanbored.ui.theme.AppTheme
+import com.kanbored.kanbored.utils.DefaultSnackbar
 import com.kanbored.kanbored.utils.KanbanIconButton
 import com.kanbored.kanbored.utils.TopbarDropdownMenuItem
 import com.kanbored.kanbored.viewmodel.KanbanViewModel
@@ -57,6 +60,9 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun MainScreen() {
+    Logger.setLogWriters(platformLogWriter())
+//    Logger.setMinSeverity(Severity.Info)
+    Logger.setMinSeverity(Severity.Debug)
     AppTheme {
         val navController = rememberNavController()
         val mainVM: MainViewModel = hiltViewModel()
@@ -86,7 +92,7 @@ fun MainScreen() {
                         state = dismissState,
                         backgroundContent = {},
                         content = {
-                            Snackbar(snackbarData = snackbarData)
+                            DefaultSnackbar(snackbarData = snackbarData)
                         }
                     )
                 })

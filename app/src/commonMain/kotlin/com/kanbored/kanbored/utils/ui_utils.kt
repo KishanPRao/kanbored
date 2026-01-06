@@ -1,5 +1,7 @@
 package com.kanbored.kanbored.utils
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -15,6 +17,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarData
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -29,9 +36,11 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.kanbored.kanbored.ui.theme.AppTheme
 import kanbored.app.generated.resources.Res
 import kanbored.app.generated.resources.cancel
 import kanbored.app.generated.resources.ok
@@ -157,3 +166,32 @@ fun PromptDialog(
 //
 //@Composable
 //expect fun getContext(): PlatformContext
+
+@Composable
+fun DefaultSnackbar(snackbarData: SnackbarData) {
+    Snackbar(
+        snackbarData = snackbarData,
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        dismissActionContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+    )
+}
+
+@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_NO)
+@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
+@Composable
+fun SnackbarPreview() {
+    AppTheme {
+        val hostState = remember { SnackbarHostState() }
+        SnackbarHost(hostState = hostState, snackbar = { snackbarData ->
+            DefaultSnackbar(snackbarData)
+        })
+        LaunchedEffect(Unit) {
+            hostState.showSnackbar(
+                message = "Something went wrong",
+                withDismissAction = true,
+                duration = SnackbarDuration.Indefinite,
+            )
+        }
+    }
+}

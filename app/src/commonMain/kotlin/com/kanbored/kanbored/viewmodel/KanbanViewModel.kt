@@ -2,6 +2,7 @@ package com.kanbored.kanbored.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.kanbored.kanbored.event.AppEventBus
 import com.kanbored.kanbored.event.AppUiEvent
 import com.kanbored.kanbored.event.UiEvent
@@ -145,11 +146,14 @@ class KanbanViewModel @Inject constructor(
         _uiEventFlow.emit(UiEvent.HideLoading)
     }
 
-    fun refreshColumnsAndTasks(projectId: Int, isArchived: Boolean) = viewModelScope.launch {
-        _uiEventFlow.emit(UiEvent.ShowLoading)
-        refreshColumnsAndTasksSync(projectId, isArchived)
-        _uiEventFlow.emit(UiEvent.HideLoading)
-    }
+    fun refreshColumnsAndTasks(projectId: Int, isArchived: Boolean, showRefresh: Boolean = true) =
+        viewModelScope.launch {
+//            Exception().printStackTrace()
+            Logger.d("refreshColumnsAndTasks: $projectId")
+            if (showRefresh) _uiEventFlow.emit(UiEvent.ShowLoading)
+            refreshColumnsAndTasksSync(projectId, isArchived)
+            if (showRefresh) _uiEventFlow.emit(UiEvent.HideLoading)
+        }
 
     fun refreshSubtasksAndComments(taskId: Int) = viewModelScope.launch {
         refreshSubtasksAndCommentsSync(taskId)

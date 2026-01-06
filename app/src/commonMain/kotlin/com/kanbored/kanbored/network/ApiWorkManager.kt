@@ -119,6 +119,8 @@ class ApiWorkManager @Inject constructor(
         startWorkerIfNotStarted()
     }
 
+    /******************* MARK: UTILS ******************/
+
     private fun startWorkerIfNotStarted() {
         if (!isApiReachable.value) {
             println("Cannot start worker, no network")

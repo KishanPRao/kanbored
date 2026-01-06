@@ -21,6 +21,7 @@ kotest = "6.0.7"
 #richeditor-compose = "1.0.0-rc13"
 multiplatformMarkdownRenderer = "0.39.0"
 reorderable = "3.0.0"
+kermit = "2.0.4"
 
 # Deprecated:
 securityCrypto = "1.1.0"
@@ -61,6 +62,7 @@ androidx-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycl
 multiplatform-markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "multiplatformMarkdownRenderer" }
 multiplatform-markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "multiplatformMarkdownRenderer" }
 reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
+kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
 ## non-KMP
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "daggerHilt" }

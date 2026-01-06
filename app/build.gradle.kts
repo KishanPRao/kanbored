@@ -65,6 +65,7 @@ kotlin {
             implementation(libs.multiplatform.markdown.renderer)
             implementation(libs.multiplatform.markdown.renderer.m3)
             implementation(libs.reorderable)
+            implementation(libs.kermit)
 
             implementation(libs.androidx.navigation.compose)
 
