@@ -14,12 +14,12 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
 abstract class MockBaseDao<T> : BaseDao<T> {
     val items = mutableListOf<T>()
 
-    override suspend fun insertAll(items: List<T>) {
+    override suspend fun upsertAll(items: List<T>) {
         this.items.addAll(items)
     }
 
     override suspend fun update(item: T) {
-        insertOrUpdate(item)
+        upsert(item)
     }
 
     override suspend fun delete(item: T) {
@@ -45,23 +45,27 @@ abstract class MockBaseDao<T> : BaseDao<T> {
 }
 
 object MockKanbanProjectDao : KanbanProjectDao, MockBaseDao<KanbanProject>() {
-    override suspend fun insertOrUpdate(item: KanbanProject) {
+    override suspend fun upsert(item: KanbanProject) {
         items.firstOrNull { it.id == item.id }?.let { delete(it) }
         items.add(item)
+    }
+
+    override fun getSingle(id: Int): Flow<KanbanProject> {
+        TODO("Not yet implemented")
     }
 
     override suspend fun updateId(oldId: Int, newId: Int) {
         super.updateId(oldId, newId)
         items.filter { it.id == oldId }
             .onEach { delete(it) }
-            .onEach { insertOrUpdate(it.copy(id = newId)) }
+            .onEach { upsert(it.copy(id = newId)) }
         MockKanbanColumnDao.updateAllProjectId(oldId, newId)
         MockKanbanTaskDao.updateAllProjectId(oldId, newId)
     }
 }
 
 object MockKanbanColumnDao : KanbanColumnDao, MockBaseDao<KanbanColumn>() {
-    override suspend fun insertOrUpdate(item: KanbanColumn) {
+    override suspend fun upsert(item: KanbanColumn) {
         items.firstOrNull { it.id == item.id }?.let { delete(it) }
         items.add(item)
     }
@@ -74,19 +78,19 @@ object MockKanbanColumnDao : KanbanColumnDao, MockBaseDao<KanbanColumn>() {
         super.updateId(oldId, newId)
         items.filter { it.id == oldId }
             .onEach { delete(it) }
-            .onEach { insertOrUpdate(it.copy(id = newId)) }
+            .onEach { upsert(it.copy(id = newId)) }
         MockKanbanTaskDao.updateAllColumnId(oldId, newId)
     }
 
     suspend fun updateAllProjectId(oldId: Int, newId: Int) {
         items.filter { it.projectId == oldId }
             .onEach { delete(it) }
-            .onEach { insertOrUpdate(it.copy(projectId = newId)) }
+            .onEach { upsert(it.copy(projectId = newId)) }
     }
 }
 
 object MockKanbanTaskDao : KanbanTaskDao, MockBaseDao<KanbanTask>() {
-    override suspend fun insertOrUpdate(item: KanbanTask) {
+    override suspend fun upsert(item: KanbanTask) {
         items.firstOrNull { it.id == item.id }?.let { delete(it) }
         items.add(item)
     }
@@ -110,7 +114,7 @@ object MockKanbanTaskDao : KanbanTaskDao, MockBaseDao<KanbanTask>() {
         super.updateId(oldId, newId)
         items.filter { it.id == oldId }
             .onEach { delete(it) }
-            .onEach { insertOrUpdate(it.copy(id = newId)) }
+            .onEach { upsert(it.copy(id = newId)) }
         MockKanbanSubtaskDao.updateAllTaskId(oldId, newId)
         MockKanbanCommentDao.updateAllTaskId(oldId, newId)
     }
@@ -118,18 +122,18 @@ object MockKanbanTaskDao : KanbanTaskDao, MockBaseDao<KanbanTask>() {
     suspend fun updateAllProjectId(oldId: Int, newId: Int) {
         items.filter { it.projectId == oldId }
             .onEach { delete(it) }
-            .onEach { insertOrUpdate(it.copy(projectId = newId)) }
+            .onEach { upsert(it.copy(projectId = newId)) }
     }
 
     suspend fun updateAllColumnId(oldId: Int, newId: Int) {
         items.filter { it.columnId == oldId }
             .onEach { delete(it) }
-            .onEach { insertOrUpdate(it.copy(columnId = newId)) }
+            .onEach { upsert(it.copy(columnId = newId)) }
     }
 }
 
 object MockKanbanSubtaskDao : KanbanSubtaskDao, MockBaseDao<KanbanSubtask>() {
-    override suspend fun insertOrUpdate(item: KanbanSubtask) {
+    override suspend fun upsert(item: KanbanSubtask) {
         items.firstOrNull { it.id == item.id }?.let { delete(it) }
         items.add(item)
     }
@@ -142,18 +146,18 @@ object MockKanbanSubtaskDao : KanbanSubtaskDao, MockBaseDao<KanbanSubtask>() {
         super.updateId(oldId, newId)
         items.filter { it.id == oldId }
             .onEach { delete(it) }
-            .onEach { insertOrUpdate(it.copy(id = newId)) }
+            .onEach { upsert(it.copy(id = newId)) }
     }
 
     suspend fun updateAllTaskId(oldId: Int, newId: Int) {
         items.filter { it.taskId == oldId }
             .onEach { delete(it) }
-            .onEach { insertOrUpdate(it.copy(taskId = newId)) }
+            .onEach { upsert(it.copy(taskId = newId)) }
     }
 }
 
 object MockKanbanCommentDao : KanbanCommentDao, MockBaseDao<KanbanComment>() {
-    override suspend fun insertOrUpdate(item: KanbanComment) {
+    override suspend fun upsert(item: KanbanComment) {
         items.firstOrNull { it.id == item.id }?.let { delete(it) }
         items.add(item)
     }
@@ -166,19 +170,19 @@ object MockKanbanCommentDao : KanbanCommentDao, MockBaseDao<KanbanComment>() {
         super.updateId(oldId, newId)
         items.filter { it.id == oldId }
             .onEach { delete(it) }
-            .onEach { insertOrUpdate(it.copy(id = newId)) }
+            .onEach { upsert(it.copy(id = newId)) }
     }
 
     suspend fun updateAllTaskId(oldId: Int, newId: Int) {
         items.filter { it.taskId == oldId }
             .onEach { delete(it) }
-            .onEach { insertOrUpdate(it.copy(taskId = newId)) }
+            .onEach { upsert(it.copy(taskId = newId)) }
     }
 }
 
 @OptIn(ExperimentalAtomicApi::class)
 object MockApiStorageDao : ApiStorageDao, MockBaseDao<ApiStorage>() {
-    override suspend fun insertOrUpdate(item: ApiStorage) {
+    override suspend fun upsert(item: ApiStorage) {
         items.firstOrNull { it.id == item.id }?.let { delete(it) }
         items.add(item)
     }
@@ -196,18 +200,18 @@ object MockApiStorageDao : ApiStorageDao, MockBaseDao<ApiStorage>() {
     override suspend fun updateProjectId(oldId: Int, newId: Int) {
         items.filter { it.kanbanParams.projectId == oldId }
             .onEach { delete(it) }
-            .onEach { insertOrUpdate(it.copy(kanbanParams = it.kanbanParams.copy(projectId = newId))) }
+            .onEach { upsert(it.copy(kanbanParams = it.kanbanParams.copy(projectId = newId))) }
     }
 
     override suspend fun updateColumnId(oldId: Int, newId: Int) {
         items.filter { it.kanbanParams.columnId == oldId }
             .onEach { delete(it) }
-            .onEach { insertOrUpdate(it.copy(kanbanParams = it.kanbanParams.copy(columnId = newId))) }
+            .onEach { upsert(it.copy(kanbanParams = it.kanbanParams.copy(columnId = newId))) }
     }
 
     override suspend fun updateTaskId(oldId: Int, newId: Int) {
         items.filter { it.kanbanParams.taskId == oldId }
             .onEach { delete(it) }
-            .onEach { insertOrUpdate(it.copy(kanbanParams = it.kanbanParams.copy(taskId = newId))) }
+            .onEach { upsert(it.copy(kanbanParams = it.kanbanParams.copy(taskId = newId))) }
     }
 }

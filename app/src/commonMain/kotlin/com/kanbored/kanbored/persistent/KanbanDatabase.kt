@@ -2,10 +2,9 @@ package com.kanbored.kanbored.persistent
 
 import androidx.room.Dao
 import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Upsert
 import com.kanbored.kanbored.model.ApiStorage
 import com.kanbored.kanbored.model.KanbanColumn
 import com.kanbored.kanbored.model.KanbanComment
@@ -23,11 +22,11 @@ const val apiStorageTableName = "api_storage"
 
 @Dao
 interface BaseDao<T> {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrUpdate(item: T)
+    @Upsert
+    suspend fun upsert(item: T)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(items: List<T>)
+    @Upsert
+    suspend fun upsertAll(items: List<T>)
 
     @Update
     suspend fun update(item: T)
@@ -45,6 +44,9 @@ interface KanbanProjectDao : BaseDao<KanbanProject> {
 
     @Query("select * from $kanbanProjectTableName")
     suspend fun getAllSync(): List<KanbanProject>
+
+    @Query("select * from $kanbanProjectTableName where id == :id")
+    fun getSingle(id: Int): Flow<KanbanProject>
 
     @Query("update $kanbanProjectTableName set id = :newId where id == :oldId")
     suspend fun updateId(oldId: Int, newId: Int)

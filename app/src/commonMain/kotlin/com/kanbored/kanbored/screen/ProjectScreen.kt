@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -43,6 +44,7 @@ import com.kanbored.kanbored.ui.theme.AppTheme
 import com.kanbored.kanbored.ui.theme.LocalDimensions
 import com.kanbored.kanbored.utils.PresentableText
 import com.kanbored.kanbored.utils.PromptDialog
+import com.kanbored.kanbored.utils.emptyProject
 import com.kanbored.kanbored.utils.emptyTask
 import com.kanbored.kanbored.viewmodel.KanbanViewModel
 import com.kanbored.kanbored.viewmodel.TopBarAction
@@ -50,13 +52,14 @@ import com.kanbored.kanbored.viewmodel.TopBarDropdownItem
 import com.kanbored.kanbored.viewmodel.TopBarViewModel
 import kanbored.app.generated.resources.Res
 import kanbored.app.generated.resources.add_new_column
+import kanbored.app.generated.resources.archive
 import kanbored.app.generated.resources.delete
 import kanbored.app.generated.resources.enter_name_new_column
+import kanbored.app.generated.resources.enter_name_update_project
+import kanbored.app.generated.resources.rename
 import kanbored.app.generated.resources.server_unreachable
 import kanbored.app.generated.resources.topbar_add_column
-import kanbored.app.generated.resources.topbar_archive
 import kanbored.app.generated.resources.topbar_change_view
-import kanbored.app.generated.resources.topbar_rename
 import kanbored.app.generated.resources.topbar_show_archived
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.stringResource
@@ -71,27 +74,37 @@ fun ProjectScreen(
     modifier: Modifier = Modifier,
 ) {
     var showAddColDialog by remember { mutableStateOf(false) }
+    var showRenameDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     // TODO: observe the object instead? If project screen open, then project updated from api worker?
-    val project = kanbanVM.getProject(projectId = projectId)
+    val project by kanbanVM.getProject(projectId = projectId)
+        .collectAsStateWithLifecycle(emptyProject)
     var isGridView by remember { mutableStateOf(false) }
     var isArchived by remember { mutableStateOf(false) }
+    Logger.i("Project name: ${project.name}")
     LaunchedEffect(project) {
         // TODO: This gets re-called after opening and exiting task, causing full refresh; why?
-        kanbanVM.refreshColumnsAndTasks(projectId = project.id, isArchived = isArchived)
+        if (project.isValid()) {
+            kanbanVM.refreshColumnsAndTasks(
+                projectId = project.id,
+                isArchived = isArchived,
+                showRefresh = false
+            )
+        }
         topBarVM.saveState()
         topBarVM.updateTitle(project.name)
         topBarVM.showBackButton(true)
     }
     topBarVM.setDropdownItems(
         listOf(
-            TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_rename)) {
+            TopBarDropdownItem(PresentableText.DynamicResource(Res.string.rename)) {
                 Logger.d("Rename")
+                showRenameDialog = true
             },
             TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_show_archived)) {
                 Logger.d("Show archived")
             },
-            TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_archive)) {
+            TopBarDropdownItem(PresentableText.DynamicResource(Res.string.archive)) {
                 Logger.d("Archive")
             },
             TopBarDropdownItem(PresentableText.DynamicResource(Res.string.delete)) {
@@ -121,6 +134,7 @@ fun ProjectScreen(
             ),
         )
     )
+    if (!project.isValid()) return
     if (showAddColDialog) {
         PromptDialog(
             title = PresentableText.DynamicResource(Res.string.add_new_column),
@@ -153,6 +167,24 @@ fun ProjectScreen(
             }
         )
     }
+    if (showRenameDialog) {
+        PromptDialog(
+            title = PresentableText.DynamicString(
+                "${stringResource(Res.string.rename)} ${project.name}?"
+            ),
+            hint = stringResource(Res.string.enter_name_update_project),
+            showTextField = true,
+            initText = project.name,
+            onClickOk = { text ->
+                showRenameDialog = false
+                Logger.d("Rename project: $project")
+                kanbanVM.updateProject(project.copy(name = text))
+            },
+            onClickCancel = {
+                showRenameDialog = false
+            }
+        )
+    }
 
     var isRefreshing by remember { mutableStateOf(false) }
     val isApiReachable by kanbanVM.isApiReachable.collectAsState()
@@ -172,13 +204,7 @@ fun ProjectScreen(
         )
         PullToRefreshBox(
             isRefreshing = isRefreshing,
-            onRefresh = {
-                kanbanVM.refreshColumnsAndTasks(
-                    project.id,
-                    isArchived,
-                    showRefresh = false
-                )
-            },
+            onRefresh = { kanbanVM.refreshColumnsAndTasks(project.id, isArchived) },
             modifier = Modifier.fillMaxSize(),
         ) { ColumnList(project.id, kanbanVM, onTaskOpened) }
     }
@@ -222,7 +248,9 @@ fun ColumnView(
             Text(column.title)
         }
         LazyColumn(
-            modifier = Modifier.padding(10.dp),
+            modifier = Modifier
+                .padding(10.dp)
+                .requiredWidth(dimensions.columnTaskWidth),
             verticalArrangement = Arrangement.spacedBy(dimensions.columnItemsPadding)
         ) {
             items(items = tasks, key = { it.id }) { task ->

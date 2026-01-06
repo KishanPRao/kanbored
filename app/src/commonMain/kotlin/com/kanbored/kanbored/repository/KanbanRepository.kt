@@ -28,6 +28,9 @@ class KanbanRepository @Inject constructor(
 ) {
     fun getAllProjects(): Flow<List<KanbanProject>> = database.projectDao().getAll()
 
+    fun getProject(id: Int): Flow<KanbanProject?> =
+        database.projectDao().getSingle(id)
+
     fun getColumns(projectId: Int): Flow<List<KanbanColumn>> = database.columnDao().get(projectId)
 
     fun getTasks(projectId: Int, columnId: Int): Flow<List<KanbanTask>> =
@@ -72,7 +75,7 @@ class KanbanRepository @Inject constructor(
             apiProvider.kanbanApi.getAllProjects()
         }, { projects ->
 //            Logger.d("all projects: $projects")
-            database.projectDao().insertAll(projects)
+            database.projectDao().upsertAll(projects)
         })
     }
 
@@ -82,7 +85,7 @@ class KanbanRepository @Inject constructor(
             apiProvider.kanbanApi.getColumns(projectId)
         }, { columns ->
 //            Logger.d("all columns: $columns")
-            database.columnDao().insertAll(columns)
+            database.columnDao().upsertAll(columns)
         })
     }
 
@@ -92,7 +95,7 @@ class KanbanRepository @Inject constructor(
             apiProvider.kanbanApi.getAllTasks(projectId, isArchived)
         }, { tasks ->
 //            Logger.d("all tasks: $tasks")
-            database.taskDao().insertAll(tasks)
+            database.taskDao().upsertAll(tasks)
         })
     }
 
@@ -102,7 +105,7 @@ class KanbanRepository @Inject constructor(
             apiProvider.kanbanApi.getAllSubtasks(taskId)
         }, { subtasks ->
 //            Logger.d("all subtasks: $subtasks")
-            database.subtaskDao().insertAll(subtasks)
+            database.subtaskDao().upsertAll(subtasks)
         })
     }
 
@@ -112,7 +115,7 @@ class KanbanRepository @Inject constructor(
             apiProvider.kanbanApi.getAllComments(taskId)
         }, { comments ->
 //            Logger.d("all comments: $comments")
-            database.commentDao().insertAll(comments)
+            database.commentDao().upsertAll(comments)
         })
     }
 

@@ -8,6 +8,7 @@ import com.kanbored.kanbored.utils.BooleanAsIntSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+// TODO: foreign key constraint causes crash; investigate further!
 @Entity(
     tableName = kanbanColumnTableName,
     foreignKeys = [ForeignKey(

@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -54,7 +55,7 @@ class KanbanViewModel @Inject constructor(
         while (true) {
             refreshProjectsSync()
             for (project in projects.value) {
-                println("proj: ${project.id}, ${project.name}")
+                Logger.d("proj: ${project.id}, ${project.name}")
                 refreshColumnsAndTasks(project.id, false)
                 refreshColumnsAndTasks(project.id, true)
             }
@@ -175,8 +176,8 @@ class KanbanViewModel @Inject constructor(
         return repository.getComments(taskId)
     }
 
-    fun getProject(projectId: Int): KanbanProject {
-        return projects.value.find { project -> project.id == projectId } ?: emptyProject
+    fun getProject(projectId: Int): Flow<KanbanProject> {
+        return repository.getProject(projectId).map { it ?: emptyProject }
     }
 
     fun getTask(projectId: Int, columnId: Int, taskId: Int): Flow<KanbanTask?> {
@@ -185,22 +186,14 @@ class KanbanViewModel @Inject constructor(
 
     fun createProject(name: String) = viewModelScope.launch {
         repository.createProject(name)
-        refreshProjectsSync()
     }
 
     fun createColumn(projectId: Int, name: String) = viewModelScope.launch {
         repository.createColumn(projectId, name)
-//        val result = repository.createProject(name)
-//        when (result) {
-//            is Result.Error<*> -> {
-//                appEventBus.emit(AppUiEvent.ShowError(result.message!!))
-//            }
-//
-//            is Result.Success<*> -> {
-//                println("created")
-//                refreshProjectsSync()
-//            }
-//        }
+    }
+
+    fun updateProject(project: KanbanProject) = viewModelScope.launch {
+        repository.updateProject(project)
     }
 
     fun deleteProject(project: KanbanProject) = viewModelScope.launch {

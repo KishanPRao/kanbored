@@ -95,10 +95,11 @@ fun PromptDialog(
     title: PresentableText,
     showTextField: Boolean,
     hint: String? = null,
+    initText: String = "",
     onClickOk: (String) -> Unit,
     onClickCancel: () -> Unit,
 ) {
-    var text by remember { mutableStateOf("") }
+    var text by remember { mutableStateOf(initText) }
     var isError by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
     Dialog(

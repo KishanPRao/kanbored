@@ -56,8 +56,8 @@ import kanbored.app.generated.resources.enter_name_new_project
 import kanbored.app.generated.resources.online
 import kanbored.app.generated.resources.projects
 import kanbored.app.generated.resources.server_unreachable
+import kanbored.app.generated.resources.settings
 import kanbored.app.generated.resources.topbar_add_project
-import kanbored.app.generated.resources.topbar_settings
 import kanbored.app.generated.resources.topbar_show_archived
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -97,7 +97,7 @@ fun HomeScreen(
             ))
         topBarVM.setDropdownItems(
             listOf(
-                TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_settings)) {
+                TopBarDropdownItem(PresentableText.DynamicResource(Res.string.settings)) {
                     println("Settings")
                 },
             )

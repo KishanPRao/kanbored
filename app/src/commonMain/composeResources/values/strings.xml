@@ -18,10 +18,9 @@
     <string name="topbar_more_options">More Options</string>
     <string name="topbar_show_archived">Show Archived</string>
     <string name="topbar_add_checklist">Add a new checklist</string>
-    <string name="topbar_unarchive">Unarchive</string>
-    <string name="topbar_settings">Settings</string>
-    <string name="topbar_rename">Rename</string>
-    <string name="topbar_archive">Archive</string>
+    <string name="unarchive">Unarchive</string>
+    <string name="rename">Rename</string>
+    <string name="archive">Archive</string>
     <string name="delete">Delete</string>
     <string name="settings">Settings</string>
     <string name="hide_password">Hide password</string>
@@ -31,6 +30,7 @@
     <string name="add_new_project">Add a new project</string>
     <string name="enter_name_new_project">Enter the new project name</string>
     <string name="enter_name_new_column">Enter the new column name</string>
+    <string name="enter_name_update_project">Enter the project name</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
 

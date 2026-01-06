@@ -53,10 +53,10 @@ class ApiWorkManager @Inject constructor(
     suspend fun createProject(name: String): KanbanProject = withContext(coroutineCtx) {
         val localId = database.apiStorageDao().getNextId()
         val local = createKanbanProject(name).copy(id = localId)
-        database.projectDao().insertOrUpdate(local)
+        database.projectDao().upsert(local)
         val apiStorage =
             createApiStorage(KanbanMethod.CreateProject, KanbanParams(name = name), localId)
-        database.apiStorageDao().insertOrUpdate(apiStorage)
+        database.apiStorageDao().upsert(apiStorage)
         startWorkerIfNotStarted()
         local
     }
@@ -65,13 +65,13 @@ class ApiWorkManager @Inject constructor(
         withContext(coroutineCtx) {
             val localId = database.apiStorageDao().getNextId()
             val local = createKanbanColumn(name).copy(id = localId, projectId = projectId)
-            database.columnDao().insertOrUpdate(local)
+            database.columnDao().upsert(local)
             val apiStorage = createApiStorage(
                 KanbanMethod.AddColumn,
                 KanbanParams(projectId = projectId, title = name),
                 localId
             )
-            database.apiStorageDao().insertOrUpdate(apiStorage)
+            database.apiStorageDao().upsert(apiStorage)
             startWorkerIfNotStarted()
             local
         }
@@ -81,13 +81,13 @@ class ApiWorkManager @Inject constructor(
             val localId = database.apiStorageDao().getNextId()
             val local = createKanbanTask(name)
                 .copy(id = localId, projectId = projectId, columnId = columnId)
-            database.taskDao().insertOrUpdate(local)
+            database.taskDao().upsert(local)
             val apiStorage = createApiStorage(
                 KanbanMethod.CreateTask,
                 KanbanParams(projectId = projectId, columnId = columnId, title = name),
                 localId
             )
-            database.apiStorageDao().insertOrUpdate(apiStorage)
+            database.apiStorageDao().upsert(apiStorage)
             startWorkerIfNotStarted()
             local
         }
@@ -95,14 +95,14 @@ class ApiWorkManager @Inject constructor(
     /******************* MARK: UPDATE ******************/
 
     suspend fun updateProject(project: KanbanProject) = withContext(coroutineCtx) {
-        database.projectDao().insertOrUpdate(project)
+        database.projectDao().upsert(project)
         val apiStorage = createApiStorage(
             KanbanMethod.UpdateProject,
             // TODO: might be a better idea to send the entire object for updates (everything except "project_id")
             KanbanParams(projectId = project.id, name = project.name),
             project.id
         )
-        database.apiStorageDao().insertOrUpdate(apiStorage)
+        database.apiStorageDao().upsert(apiStorage)
         startWorkerIfNotStarted()
     }
 
@@ -115,7 +115,7 @@ class ApiWorkManager @Inject constructor(
             KanbanParams(projectId = project.id),
             project.id
         )
-        database.apiStorageDao().insertOrUpdate(apiStorage)
+        database.apiStorageDao().upsert(apiStorage)
         startWorkerIfNotStarted()
     }
 

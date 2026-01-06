@@ -61,16 +61,16 @@ import com.kanbored.kanbored.viewmodel.TopBarViewModel
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownColor
 import kanbored.app.generated.resources.Res
+import kanbored.app.generated.resources.archive
 import kanbored.app.generated.resources.comments
 import kanbored.app.generated.resources.delete
 import kanbored.app.generated.resources.edit
 import kanbored.app.generated.resources.empty_task_description
+import kanbored.app.generated.resources.rename
 import kanbored.app.generated.resources.reorder
 import kanbored.app.generated.resources.subtasks
 import kanbored.app.generated.resources.topbar_add_checklist
-import kanbored.app.generated.resources.topbar_archive
-import kanbored.app.generated.resources.topbar_rename
-import kanbored.app.generated.resources.topbar_unarchive
+import kanbored.app.generated.resources.unarchive
 import org.jetbrains.compose.resources.stringResource
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -103,7 +103,7 @@ fun TaskScreen(
         topBarVM.showBackButton(true)
         topBarVM.setDropdownItems(
             listOf(
-                TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_rename)) {
+                TopBarDropdownItem(PresentableText.DynamicResource(Res.string.rename)) {
                     println("Rename")
                 },
                 TopBarDropdownItem(PresentableText.DynamicResource(Res.string.delete)) {
@@ -125,7 +125,7 @@ fun TaskScreen(
             TopBarAction(
                 icon = if (isArchived) Icons.Filled.Unarchive else Icons.Filled.Archive,
                 contentDescription = PresentableText.DynamicResource(
-                    if (isArchived) Res.string.topbar_unarchive else Res.string.topbar_archive
+                    if (isArchived) Res.string.unarchive else Res.string.archive
                 ),
                 onClick = {
                     println("Un/Archive task")

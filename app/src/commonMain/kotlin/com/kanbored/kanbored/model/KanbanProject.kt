@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.kanbored.kanbored.persistent.kanbanProjectTableName
 import com.kanbored.kanbored.utils.BooleanAsIntSerializer
+import com.kanbored.kanbored.utils.emptyProject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -36,7 +37,11 @@ data class KanbanProject(
     @SerialName("is_trello_imported") val isTrelloImported: Boolean,
     @Embedded(prefix = "url_")
     val url: KanbanUrl,
-)
+) {
+    fun isValid(): Boolean {
+        return this != emptyProject
+    }
+}
 
 @Serializable
 data class KanbanUrl(
