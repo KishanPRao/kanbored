@@ -76,7 +76,7 @@ fun MainScreen() {
         val hostState = remember { SnackbarHostState() }
         var showLoading by remember { mutableStateOf(false) }
         val onNavigateBack: () -> Unit = {
-            topBarVM.revertState()
+            topBarVM.popState()
             navController.popBackStack()
         }
         Scaffold(

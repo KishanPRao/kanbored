@@ -2,6 +2,7 @@ package com.kanbored.kanbored.viewmodel
 
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
+import co.touchlab.kermit.Logger
 import com.kanbored.kanbored.utils.PresentableText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TopBarViewModel @Inject constructor() : ViewModel() {
     private val _state = MutableStateFlow(TopBarState())
-    private var _backupState: TopBarState? = null
+    private var backupStateStack = ArrayDeque<TopBarState>()
 
     val state: StateFlow<TopBarState> = _state.asStateFlow()
 
@@ -33,14 +34,16 @@ class TopBarViewModel @Inject constructor() : ViewModel() {
         _state.update { it.copy(dropdownItems = items) }
     }
 
-    fun saveState() {
-        _backupState = _state.value
+    fun pushState() {
+        Logger.d("top bar: push state: ${_state.value}")
+        backupStateStack.addLast(_state.value)
     }
 
-    fun revertState() {
-        _backupState?.let { state ->
+    fun popState() {
+        val backupState = backupStateStack.removeLastOrNull()
+        Logger.d("top bar: pop state: $backupState")
+        backupState?.let { state ->
             _state.update { state }
-            _backupState = null
         }
     }
 }

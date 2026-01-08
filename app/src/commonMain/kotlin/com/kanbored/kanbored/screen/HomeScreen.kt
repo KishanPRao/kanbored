@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.kanbored.kanbored.event.UiEvent
 import com.kanbored.kanbored.model.KanbanProject
 import com.kanbored.kanbored.utils.PresentableText
@@ -129,7 +130,7 @@ fun HomeScreen(
             }
         }
     }
-    println("isApiReachable: $isApiReachable")
+    Logger.d("isApiReachable: $isApiReachable")
     Column(modifier = modifier.fillMaxSize()) {
         ConnectionStatusStrip(
             stringResource(Res.string.server_unreachable),

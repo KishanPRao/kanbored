@@ -55,7 +55,7 @@ class KanbanViewModel @Inject constructor(
         while (true) {
             refreshProjectsSync()
             for (project in projects.value) {
-                Logger.d("proj: ${project.id}, ${project.name}")
+                Logger.v("proj: ${project.id}, ${project.name}")
                 refreshColumnsAndTasks(project.id, false)
                 refreshColumnsAndTasks(project.id, true)
             }
@@ -150,7 +150,7 @@ class KanbanViewModel @Inject constructor(
     fun refreshColumnsAndTasks(projectId: Int, isArchived: Boolean, showRefresh: Boolean = true) =
         viewModelScope.launch {
 //            Exception().printStackTrace()
-            Logger.d("refreshColumnsAndTasks: $projectId")
+            Logger.v("refreshColumnsAndTasks: $projectId")
             if (showRefresh) _uiEventFlow.emit(UiEvent.ShowLoading)
             refreshColumnsAndTasksSync(projectId, isArchived)
             if (showRefresh) _uiEventFlow.emit(UiEvent.HideLoading)

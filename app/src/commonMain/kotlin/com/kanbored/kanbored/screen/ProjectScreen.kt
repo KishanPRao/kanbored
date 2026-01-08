@@ -17,10 +17,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
 import androidx.compose.material.icons.automirrored.filled.ViewList
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -32,6 +35,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,8 +48,10 @@ import com.kanbored.kanbored.model.KanbanColumn
 import com.kanbored.kanbored.model.KanbanTask
 import com.kanbored.kanbored.ui.theme.AppTheme
 import com.kanbored.kanbored.ui.theme.LocalDimensions
+import com.kanbored.kanbored.utils.EditMode
 import com.kanbored.kanbored.utils.PresentableText
 import com.kanbored.kanbored.utils.PromptDialog
+import com.kanbored.kanbored.utils.emptyColumn
 import com.kanbored.kanbored.utils.emptyProject
 import com.kanbored.kanbored.utils.emptyTask
 import com.kanbored.kanbored.viewmodel.KanbanViewModel
@@ -52,10 +60,14 @@ import com.kanbored.kanbored.viewmodel.TopBarDropdownItem
 import com.kanbored.kanbored.viewmodel.TopBarViewModel
 import kanbored.app.generated.resources.Res
 import kanbored.app.generated.resources.add_new_column
+import kanbored.app.generated.resources.add_task
 import kanbored.app.generated.resources.archive
+import kanbored.app.generated.resources.cancel
 import kanbored.app.generated.resources.delete
+import kanbored.app.generated.resources.done
 import kanbored.app.generated.resources.enter_name_new_column
 import kanbored.app.generated.resources.enter_name_update_project
+import kanbored.app.generated.resources.new_task_name
 import kanbored.app.generated.resources.rename
 import kanbored.app.generated.resources.server_unreachable
 import kanbored.app.generated.resources.topbar_add_column
@@ -91,7 +103,7 @@ fun ProjectScreen(
                 showRefresh = false
             )
         }
-        topBarVM.saveState()
+        topBarVM.pushState()
         topBarVM.updateTitle(project.name)
         topBarVM.showBackButton(true)
     }
@@ -206,30 +218,104 @@ fun ProjectScreen(
             isRefreshing = isRefreshing,
             onRefresh = { kanbanVM.refreshColumnsAndTasks(project.id, isArchived) },
             modifier = Modifier.fillMaxSize(),
-        ) { ColumnList(project.id, kanbanVM, onTaskOpened) }
+        ) {
+            var cancelEditing by remember { mutableStateOf(false) }
+            if (cancelEditing) {
+            }
+            ColumnList(project.id, topBarVM, kanbanVM, onTaskOpened)
+        }
     }
 }
 
 @Composable
-fun ColumnList(projectId: Int, kanbanVM: KanbanViewModel, onTaskOpened: (KanbanTask) -> Unit) {
+fun ColumnList(
+    projectId: Int,
+    topBarVM: TopBarViewModel,
+    kanbanVM: KanbanViewModel,
+    onTaskOpened: (KanbanTask) -> Unit,
+) {
     val columns by kanbanVM.getColumns(projectId).collectAsStateWithLifecycle(emptyList())
 //    Logger.d("columns: $columns")
     LazyRow {
         items(items = columns, key = { it.id }) { column ->
-            ColumnView(projectId, column, kanbanVM, onTaskOpened)
+            val tasks by kanbanVM.getTasks(projectId, column.id)
+                .collectAsStateWithLifecycle(emptyList())
+            var editMode by remember { mutableStateOf(EditMode.Idle) }
+            var newTaskName by remember { mutableStateOf("") }
+            var isValidTaskName by remember { mutableStateOf(true) }
+            println("edit mode: $editMode")
+            if (editMode == EditMode.Cancel || editMode == EditMode.Finish) {
+                val focusManager = LocalFocusManager.current
+                focusManager.clearFocus()
+                isValidTaskName = true
+                newTaskName = ""
+            }
+            val addTaskStr = stringResource(Res.string.add_task)
+            LaunchedEffect(editMode) {
+                if (editMode == EditMode.Start) {
+                    topBarVM.pushState()
+                    topBarVM.updateTitle(addTaskStr)
+                    topBarVM.setActions(
+                        listOf(
+                            TopBarAction(
+                                icon = Icons.Filled.Cancel,
+                                contentDescription = PresentableText.DynamicResource(Res.string.cancel),
+                                onClick = {
+                                    Logger.d("Cancel")
+                                    editMode = EditMode.Cancel
+                                    topBarVM.popState()
+                                }
+                            ),
+                            TopBarAction(
+                                icon = Icons.Filled.Done,
+                                contentDescription = PresentableText.DynamicResource(Res.string.done),
+                                onClick = {
+                                    if (newTaskName.isEmpty()) {
+                                        isValidTaskName = false
+                                    } else {
+                                        editMode = EditMode.Finish
+                                        topBarVM.popState()
+                                    }
+                                }
+                            ),
+                        )
+                    )
+                } else if (editMode == EditMode.Finish) {
+                    // TODO: actually add
+                    Logger.d("Add $newTaskName task into $column")
+                }
+            }
+            ColumnView(
+                column,
+                tasks,
+                newTaskName,
+                isValidTaskName,
+                onTaskOpened,
+                onNewTaskNameFocusChanged = { state ->
+                    if (state.isFocused) {
+                        editMode = EditMode.Start
+                    } else {
+                        Logger.w("focus lost! undo?")
+                    }
+                },
+                onNewTaskNameUpdated = {
+                    newTaskName = it
+                })
         }
     }
 }
 
 @Composable
 fun ColumnView(
-    projectId: Int,
     column: KanbanColumn,
-    kanbanVM: KanbanViewModel,
-    onTaskOpened: (KanbanTask) -> Unit
+    tasks: List<KanbanTask>,
+    newTaskName: String,
+    isValidTaskName: Boolean,
+    onTaskOpened: (KanbanTask) -> Unit,
+    onNewTaskNameFocusChanged: (FocusState) -> Unit,
+    onNewTaskNameUpdated: (String) -> Unit,
 ) {
     val dimensions = LocalDimensions.current
-    val tasks by kanbanVM.getTasks(projectId, column.id).collectAsStateWithLifecycle(emptyList())
 //    Logger.d("tasks: $tasks")
     Card(
         modifier = Modifier
@@ -250,6 +336,7 @@ fun ColumnView(
         LazyColumn(
             modifier = Modifier
                 .padding(10.dp)
+                .weight(1f)
                 .requiredWidth(dimensions.columnTaskWidth),
             verticalArrangement = Arrangement.spacedBy(dimensions.columnItemsPadding)
         ) {
@@ -257,6 +344,15 @@ fun ColumnView(
                 TaskView(task, onTaskOpened)
             }
         }
+        OutlinedTextField(
+            modifier = Modifier.onFocusChanged(onNewTaskNameFocusChanged),
+            value = newTaskName,
+            label = { Text(stringResource(Res.string.add_task)) },
+            singleLine = true,
+            isError = !isValidTaskName,
+            placeholder = { Text(stringResource(Res.string.new_task_name)) },
+            onValueChange = onNewTaskNameUpdated
+        )
     }
 }
 
@@ -294,6 +390,38 @@ fun TaskViewPreview() {
         TaskView(
             emptyTask.copy(title = "Elden Ring"),
             { }
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ColumnViewPreview() {
+    var id = 0
+    val tasks = listOf(
+        emptyTask.copy(id = ++id, title = "Task 1"),
+        emptyTask.copy(id = ++id, title = "Task 2"),
+        emptyTask.copy(id = ++id, title = "Task 3"),
+        emptyTask.copy(id = ++id, title = "Task 4"),
+        emptyTask.copy(id = ++id, title = "Task 5"),
+        emptyTask.copy(id = ++id, title = "Task 6"),
+        emptyTask.copy(id = ++id, title = "Task 7"),
+        emptyTask.copy(id = ++id, title = "Task 8"),
+        emptyTask.copy(id = ++id, title = "Task 9"),
+        emptyTask.copy(id = ++id, title = "Task 10"),
+        emptyTask.copy(id = ++id, title = "Task 11"),
+        emptyTask.copy(id = ++id, title = "Task 12"),
+        emptyTask.copy(id = ++id, title = "Task 13"),
+    )
+    AppTheme(darkTheme = false) {
+        ColumnView(
+            column = emptyColumn.copy(title = "Todo"),
+            tasks = tasks,
+            newTaskName = "",
+            onNewTaskNameUpdated = {},
+            onNewTaskNameFocusChanged = {},
+            onTaskOpened = {},
+            isValidTaskName = true,
         )
     }
 }

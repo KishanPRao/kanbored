@@ -14,6 +14,7 @@
     <string name="navigate_back">Back</string>
     <string name="topbar_add_project">Add Project</string>
     <string name="topbar_add_column">Add Column</string>
+    <string name="done">Done</string>
     <string name="topbar_change_view">Change View</string>
     <string name="topbar_more_options">More Options</string>
     <string name="topbar_show_archived">Show Archived</string>
@@ -34,6 +35,8 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
 
+    <string name="add_task">Add task</string>
+    <string name="new_task_name">New task name</string>
     <string name="empty_task_description">Enter task description</string>
     <string name="edit">Edit</string>
     <string name="subtasks">Subtasks</string>

@@ -80,7 +80,7 @@ class KanbanRepository @Inject constructor(
     }
 
     suspend fun refreshColumns(projectId: Int): Result<Unit> {
-        Logger.d("refreshColumns: $projectId")
+        Logger.v("refreshColumns: $projectId")
         return refreshApi({
             apiProvider.kanbanApi.getColumns(projectId)
         }, { columns ->

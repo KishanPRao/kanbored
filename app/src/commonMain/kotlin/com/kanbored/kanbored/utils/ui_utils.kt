@@ -47,6 +47,14 @@ import kanbored.app.generated.resources.ok
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
+// TODO: if not re-used, move into Project Screen
+enum class EditMode {
+    Idle,
+    Start,
+    Cancel,
+    Finish,
+}
+
 @Composable
 fun KanbanIconButton(
     imageVector: ImageVector,

@@ -98,7 +98,7 @@ fun TaskScreen(
     val task = kanbanTask ?: emptyTask
     var rawMarkdown by remember { mutableStateOf("") }
     LaunchedEffect(task) {
-        topBarVM.saveState()
+        topBarVM.pushState()
         topBarVM.updateTitle(task.title)
         topBarVM.showBackButton(true)
         topBarVM.setDropdownItems(
