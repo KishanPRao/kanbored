@@ -52,7 +52,6 @@ enum class EditMode {
     Idle,
     Start,
     Cancel,
-    Finish,
 }
 
 @Composable

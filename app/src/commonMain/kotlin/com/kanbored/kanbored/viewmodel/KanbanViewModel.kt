@@ -16,6 +16,7 @@ import com.kanbored.kanbored.network.Result
 import com.kanbored.kanbored.repository.KanbanRepository
 import com.kanbored.kanbored.utils.PresentableText
 import com.kanbored.kanbored.utils.emptyProject
+import com.kanbored.kanbored.utils.emptyTask
 import com.kanbored.kanbored.utils.refreshStateDelay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -65,7 +66,7 @@ class KanbanViewModel @Inject constructor(
 
     private suspend fun refreshProjectsSync() {
         val result = repository.refreshProjects()
-        println("finish refresh project")
+        Logger.v("finish refresh project")
         when (result) {
             is Result.Error<*> -> {
                 appEventBus.emit(AppUiEvent.ShowError(result.message!!))
@@ -77,7 +78,7 @@ class KanbanViewModel @Inject constructor(
 
     private suspend fun refreshColumnsSync(projectId: Int) {
         val result = repository.refreshColumns(projectId)
-        println("finish refresh columns")
+        Logger.v("finish refresh columns")
         when (result) {
             is Result.Error<*> -> {
                 appEventBus.emit(AppUiEvent.ShowError(result.message!!))
@@ -180,8 +181,8 @@ class KanbanViewModel @Inject constructor(
         return repository.getProject(projectId).map { it ?: emptyProject }
     }
 
-    fun getTask(projectId: Int, columnId: Int, taskId: Int): Flow<KanbanTask?> {
-        return repository.getTask(projectId, columnId, taskId)
+    fun getTask(projectId: Int, columnId: Int, taskId: Int): Flow<KanbanTask> {
+        return repository.getTask(projectId, columnId, taskId).map { it ?: emptyTask }
     }
 
     fun createProject(name: String) = viewModelScope.launch {
@@ -192,12 +193,24 @@ class KanbanViewModel @Inject constructor(
         repository.createColumn(projectId, name)
     }
 
+    fun createTask(projectId: Int, columnId: Int, name: String) = viewModelScope.launch {
+        repository.createTask(projectId, columnId, name)
+    }
+
     fun updateProject(project: KanbanProject) = viewModelScope.launch {
         repository.updateProject(project)
     }
 
+    fun updateTask(task: KanbanTask) = viewModelScope.launch {
+        repository.updateTask(task)
+    }
+
     fun deleteProject(project: KanbanProject) = viewModelScope.launch {
         repository.deleteProject(project)
+    }
+
+    fun deleteTask(task: KanbanTask) = viewModelScope.launch {
+        repository.deleteTask(task)
     }
 
     fun showUiMessage(presentableText: PresentableText) {

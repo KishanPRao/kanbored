@@ -2,8 +2,10 @@ package com.kanbored.kanbored.repository
 
 import co.touchlab.kermit.Logger
 import com.kanbored.kanbored.model.KanbanColumn
+import com.kanbored.kanbored.model.KanbanCommandOperations
 import com.kanbored.kanbored.model.KanbanComment
 import com.kanbored.kanbored.model.KanbanProject
+import com.kanbored.kanbored.model.KanbanQueryOperations
 import com.kanbored.kanbored.model.KanbanSubtask
 import com.kanbored.kanbored.model.KanbanTask
 import com.kanbored.kanbored.network.ApiProvider
@@ -25,24 +27,25 @@ class KanbanRepository @Inject constructor(
     private val database: KanbanDatabase,
     private val apiProvider: ApiProvider,
     private val apiWorkManager: ApiWorkManager,
-) {
-    fun getAllProjects(): Flow<List<KanbanProject>> = database.projectDao().getAll()
+) : KanbanQueryOperations, KanbanCommandOperations {
+    override fun getAllProjects(): Flow<List<KanbanProject>> = database.projectDao().getAll()
 
-    fun getProject(id: Int): Flow<KanbanProject?> =
+    override fun getProject(id: Int): Flow<KanbanProject?> =
         database.projectDao().getSingle(id)
 
-    fun getColumns(projectId: Int): Flow<List<KanbanColumn>> = database.columnDao().get(projectId)
+    override fun getColumns(projectId: Int): Flow<List<KanbanColumn>> =
+        database.columnDao().get(projectId)
 
-    fun getTasks(projectId: Int, columnId: Int): Flow<List<KanbanTask>> =
+    override fun getTasks(projectId: Int, columnId: Int): Flow<List<KanbanTask>> =
         database.taskDao().get(projectId, columnId)
 
-    fun getTask(projectId: Int, columnId: Int, taskId: Int): Flow<KanbanTask?> =
+    override fun getTask(projectId: Int, columnId: Int, taskId: Int): Flow<KanbanTask?> =
         database.taskDao().getSingle(projectId, columnId, taskId)
 
-    fun getSubtasks(taskId: Int): Flow<List<KanbanSubtask>> =
+    override fun getSubtasks(taskId: Int): Flow<List<KanbanSubtask>> =
         database.subtaskDao().get(taskId)
 
-    fun getComments(taskId: Int): Flow<List<KanbanComment>> =
+    override fun getComments(taskId: Int): Flow<List<KanbanComment>> =
         database.commentDao().get(taskId)
 
     suspend fun <T> refreshApi(
@@ -69,8 +72,8 @@ class KanbanRepository @Inject constructor(
         }
     }
 
-    suspend fun refreshProjects(): Result<Unit> {
-        Logger.d("refreshProjects")
+    override suspend fun refreshProjects(): Result<Unit> {
+        Logger.v("refreshProjects")
         return refreshApi({
             apiProvider.kanbanApi.getAllProjects()
         }, { projects ->
@@ -79,7 +82,7 @@ class KanbanRepository @Inject constructor(
         })
     }
 
-    suspend fun refreshColumns(projectId: Int): Result<Unit> {
+    override suspend fun refreshColumns(projectId: Int): Result<Unit> {
         Logger.v("refreshColumns: $projectId")
         return refreshApi({
             apiProvider.kanbanApi.getColumns(projectId)
@@ -89,18 +92,18 @@ class KanbanRepository @Inject constructor(
         })
     }
 
-    suspend fun refreshTasks(projectId: Int, isArchived: Boolean): Result<Unit> {
-        Logger.d("refreshTasks: $projectId: $isArchived")
+    override suspend fun refreshTasks(projectId: Int, isArchived: Boolean): Result<Unit> {
+        Logger.v("refreshTasks: $projectId: $isArchived")
         return refreshApi({
             apiProvider.kanbanApi.getAllTasks(projectId, isArchived)
         }, { tasks ->
-//            Logger.d("all tasks: $tasks")
+            Logger.v("all tasks: $tasks")
             database.taskDao().upsertAll(tasks)
         })
     }
 
-    suspend fun refreshSubtasks(taskId: Int): Result<Unit> {
-        Logger.d("refreshSubtasks")
+    override suspend fun refreshSubtasks(taskId: Int): Result<Unit> {
+        Logger.v("refreshSubtasks: $taskId")
         return refreshApi({
             apiProvider.kanbanApi.getAllSubtasks(taskId)
         }, { subtasks ->
@@ -109,8 +112,8 @@ class KanbanRepository @Inject constructor(
         })
     }
 
-    suspend fun refreshComments(taskId: Int): Result<Unit> {
-        Logger.d("refreshComments")
+    override suspend fun refreshComments(taskId: Int): Result<Unit> {
+        Logger.v("refreshComments: $taskId")
         return refreshApi({
             apiProvider.kanbanApi.getAllComments(taskId)
         }, { comments ->
@@ -119,15 +122,23 @@ class KanbanRepository @Inject constructor(
         })
     }
 
-    suspend fun createProject(name: String) = apiWorkManager.createProject(name)
+    override suspend fun createProject(name: String) = apiWorkManager.createProject(name)
 
-    suspend fun createColumn(projectId: Int, name: String) =
+    override suspend fun createColumn(projectId: Int, name: String) =
         apiWorkManager.createColumn(projectId, name)
 
-    suspend fun createTask(projectId: Int, columnId: Int, name: String) =
+    override suspend fun createTask(projectId: Int, columnId: Int, name: String) =
         apiWorkManager.createTask(projectId, columnId, name)
 
-    suspend fun updateProject(project: KanbanProject) = apiWorkManager.updateProject(project)
+    override suspend fun updateProject(project: KanbanProject) =
+        apiWorkManager.updateProject(project)
 
-    suspend fun deleteProject(project: KanbanProject) = apiWorkManager.deleteProject(project)
+    override suspend fun updateTask(task: KanbanTask) {
+        apiWorkManager.updateTask(task)
+    }
+
+    override suspend fun deleteProject(project: KanbanProject) =
+        apiWorkManager.deleteProject(project)
+
+    override suspend fun deleteTask(task: KanbanTask) = apiWorkManager.deleteTask(task)
 }

@@ -54,11 +54,14 @@ interface KanbanProjectDao : BaseDao<KanbanProject> {
 
 @Dao
 interface KanbanColumnDao : BaseDao<KanbanColumn> {
-    @Query("select * from $kanbanColumnTableName where projectId == :projectId")
+    @Query("select * from $kanbanColumnTableName where projectId == :projectId order by position")
     fun get(projectId: Int): Flow<List<KanbanColumn>>
 
     @Query("select * from $kanbanColumnTableName")
     fun getAll(): Flow<List<KanbanColumn>>
+
+    @Query("select max(position) from $kanbanColumnTableName where projectId == :projectId")
+    suspend fun getLargestPositionSync(projectId: Int): Int?
 
     @Query("select * from $kanbanColumnTableName")
     suspend fun getAllSync(): List<KanbanColumn>
@@ -69,11 +72,14 @@ interface KanbanColumnDao : BaseDao<KanbanColumn> {
 
 @Dao
 interface KanbanTaskDao : BaseDao<KanbanTask> {
-    @Query("select * from $kanbanTaskTableName where columnId == :columnId and projectId == :projectId")
+    @Query("select * from $kanbanTaskTableName where columnId == :columnId and projectId == :projectId order by position")
     fun get(projectId: Int, columnId: Int): Flow<List<KanbanTask>>
 
     @Query("select * from $kanbanTaskTableName where columnId == :columnId and projectId == :projectId and id == :taskId")
     fun getSingle(projectId: Int, columnId: Int, taskId: Int): Flow<KanbanTask?>
+
+    @Query("select max(position) from $kanbanTaskTableName where columnId == :columnId and projectId == :projectId")
+    suspend fun getLargestPositionSync(projectId: Int, columnId: Int): Int?
 
     @Query("select * from $kanbanTaskTableName")
     suspend fun getAllSync(): List<KanbanTask>
@@ -84,7 +90,7 @@ interface KanbanTaskDao : BaseDao<KanbanTask> {
 
 @Dao
 interface KanbanSubtaskDao : BaseDao<KanbanSubtask> {
-    @Query("select * from $kanbanSubtaskTableName where taskId == :taskId")
+    @Query("select * from $kanbanSubtaskTableName where taskId == :taskId order by position")
     fun get(taskId: Int): Flow<List<KanbanSubtask>>
 
     @Query("select * from $kanbanSubtaskTableName")
@@ -96,7 +102,7 @@ interface KanbanSubtaskDao : BaseDao<KanbanSubtask> {
 
 @Dao
 interface KanbanCommentDao : BaseDao<KanbanComment> {
-    @Query("select * from $kanbanCommentTableName where taskId == :taskId")
+    @Query("select * from $kanbanCommentTableName where taskId == :taskId order by dateCreation")
     fun get(taskId: Int): Flow<List<KanbanComment>>
 
     @Query("select * from $kanbanCommentTableName")
@@ -128,6 +134,10 @@ interface ApiStorageDao : BaseDao<ApiStorage> {
 
     @Query("update $apiStorageTableName set taskId = :newId where taskId == :oldId")
     suspend fun updateTaskId(oldId: Int, newId: Int)
+
+    // TODO: better name
+    @Query("update $apiStorageTableName set updateId = :newId where updateId == :oldId")
+    suspend fun updateUpdateId(oldId: Int, newId: Int)
 }
 
 interface KanbanDatabase {

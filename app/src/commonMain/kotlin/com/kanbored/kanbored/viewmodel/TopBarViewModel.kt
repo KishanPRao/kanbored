@@ -35,13 +35,13 @@ class TopBarViewModel @Inject constructor() : ViewModel() {
     }
 
     fun pushState() {
-        Logger.d("top bar: push state: ${_state.value}")
+        Logger.v("top bar: push state: ${_state.value}")
         backupStateStack.addLast(_state.value)
     }
 
     fun popState() {
         val backupState = backupStateStack.removeLastOrNull()
-        Logger.d("top bar: pop state: $backupState")
+        Logger.v("top bar: pop state: $backupState")
         backupState?.let { state ->
             _state.update { state }
         }

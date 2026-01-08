@@ -191,6 +191,7 @@ fun ProjectScreen(
                 showRenameDialog = false
                 Logger.d("Rename project: $project")
                 kanbanVM.updateProject(project.copy(name = text))
+                topBarVM.popState() // The project gets updated, and we pushState again
             },
             onClickCancel = {
                 showRenameDialog = false
@@ -218,12 +219,7 @@ fun ProjectScreen(
             isRefreshing = isRefreshing,
             onRefresh = { kanbanVM.refreshColumnsAndTasks(project.id, isArchived) },
             modifier = Modifier.fillMaxSize(),
-        ) {
-            var cancelEditing by remember { mutableStateOf(false) }
-            if (cancelEditing) {
-            }
-            ColumnList(project.id, topBarVM, kanbanVM, onTaskOpened)
-        }
+        ) { ColumnList(project.id, topBarVM, kanbanVM, onTaskOpened) }
     }
 }
 
@@ -243,8 +239,8 @@ fun ColumnList(
             var editMode by remember { mutableStateOf(EditMode.Idle) }
             var newTaskName by remember { mutableStateOf("") }
             var isValidTaskName by remember { mutableStateOf(true) }
-            println("edit mode: $editMode")
-            if (editMode == EditMode.Cancel || editMode == EditMode.Finish) {
+            Logger.v("edit mode: $editMode")
+            if (editMode == EditMode.Cancel || editMode == EditMode.Idle) {
                 val focusManager = LocalFocusManager.current
                 focusManager.clearFocus()
                 isValidTaskName = true
@@ -264,6 +260,7 @@ fun ColumnList(
                                     Logger.d("Cancel")
                                     editMode = EditMode.Cancel
                                     topBarVM.popState()
+                                    newTaskName = ""
                                 }
                             ),
                             TopBarAction(
@@ -273,16 +270,15 @@ fun ColumnList(
                                     if (newTaskName.isEmpty()) {
                                         isValidTaskName = false
                                     } else {
-                                        editMode = EditMode.Finish
                                         topBarVM.popState()
+                                        Logger.i("Add $newTaskName task into $column")
+                                        kanbanVM.createTask(projectId, column.id, newTaskName)
+                                        editMode = EditMode.Idle
                                     }
                                 }
                             ),
                         )
                     )
-                } else if (editMode == EditMode.Finish) {
-                    // TODO: actually add
-                    Logger.d("Add $newTaskName task into $column")
                 }
             }
             ColumnView(
@@ -299,6 +295,7 @@ fun ColumnList(
                     }
                 },
                 onNewTaskNameUpdated = {
+                    Logger.v("onNewTaskNameUpdated: $newTaskName")
                     newTaskName = it
                 })
         }

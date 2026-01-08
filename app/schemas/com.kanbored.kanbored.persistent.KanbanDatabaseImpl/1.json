@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "82b53020d7f743787ee31b9b25eadb84",
+    "identityHash": "e47c18b7b4058e6586aeded8cca63618",
     "entities": [
       {
         "tableName": "kanban_project",
@@ -608,7 +608,7 @@
       },
       {
         "tableName": "api_storage",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`updateId` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `methodId` INTEGER NOT NULL, `methodName` TEXT NOT NULL, `methodType` INTEGER NOT NULL, `projectId` INTEGER, `columnId` INTEGER, `taskId` INTEGER, `name` TEXT, `title` TEXT, `identifier` TEXT, `email` TEXT, `statusId` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`updateId` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `apiStorageId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `methodId` INTEGER NOT NULL, `methodName` TEXT NOT NULL, `methodType` INTEGER NOT NULL, `id` INTEGER, `projectId` INTEGER, `columnId` INTEGER, `taskId` INTEGER, `name` TEXT, `title` TEXT, `identifier` TEXT, `email` TEXT, `statusId` INTEGER)",
         "fields": [
           {
             "fieldPath": "updateId",
@@ -623,8 +623,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "id",
-            "columnName": "id",
+            "fieldPath": "apiStorageId",
+            "columnName": "apiStorageId",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -645,6 +645,11 @@
             "columnName": "methodType",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "kanbanParams.id",
+            "columnName": "id",
+            "affinity": "INTEGER"
           },
           {
             "fieldPath": "kanbanParams.projectId",
@@ -690,14 +695,14 @@
         "primaryKey": {
           "autoGenerate": true,
           "columnNames": [
-            "id"
+            "apiStorageId"
           ]
         }
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '82b53020d7f743787ee31b9b25eadb84')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e47c18b7b4058e6586aeded8cca63618')"
     ]
   }
 }

@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import co.touchlab.kermit.Logger
 import com.kanbored.kanbored.model.KanbanColumn
+import com.kanbored.kanbored.model.KanbanCommandOperations
 import com.kanbored.kanbored.model.KanbanProject
 import com.kanbored.kanbored.model.KanbanTask
 import com.kanbored.kanbored.persistent.KanbanDatabase
@@ -31,7 +33,7 @@ class ApiWorkManager @Inject constructor(
     connectivityListener: ConnectivityListener,
     private val database: KanbanDatabase,
     @param:ApplicationContext private val context: Context,
-) {
+) : KanbanCommandOperations {
     private val workManager by lazy {
         WorkManager.getInstance(context)
     }
@@ -50,21 +52,26 @@ class ApiWorkManager @Inject constructor(
 
     /******************* MARK: CREATE ******************/
 
-    suspend fun createProject(name: String): KanbanProject = withContext(coroutineCtx) {
+    override suspend fun createProject(name: String): KanbanProject = withContext(coroutineCtx) {
         val localId = database.apiStorageDao().getNextId()
         val local = createKanbanProject(name).copy(id = localId)
+        Logger.d("createProject: $local")
         database.projectDao().upsert(local)
-        val apiStorage =
-            createApiStorage(KanbanMethod.CreateProject, KanbanParams(name = name), localId)
+        val apiStorage = createApiStorage(
+            KanbanMethod.CreateProject, KanbanParams(name = name), localId
+        )
         database.apiStorageDao().upsert(apiStorage)
         startWorkerIfNotStarted()
         local
     }
 
-    suspend fun createColumn(projectId: Int, name: String): KanbanColumn =
+    override suspend fun createColumn(projectId: Int, name: String): KanbanColumn =
         withContext(coroutineCtx) {
             val localId = database.apiStorageDao().getNextId()
-            val local = createKanbanColumn(name).copy(id = localId, projectId = projectId)
+            val position = (database.columnDao().getLargestPositionSync(projectId) ?: 0) + 1
+            val local = createKanbanColumn(name)
+                .copy(id = localId, projectId = projectId, position = position)
+            Logger.d("createColumn: $local")
             database.columnDao().upsert(local)
             val apiStorage = createApiStorage(
                 KanbanMethod.AddColumn,
@@ -76,11 +83,13 @@ class ApiWorkManager @Inject constructor(
             local
         }
 
-    suspend fun createTask(projectId: Int, columnId: Int, name: String): KanbanTask =
+    override suspend fun createTask(projectId: Int, columnId: Int, name: String): KanbanTask =
         withContext(coroutineCtx) {
             val localId = database.apiStorageDao().getNextId()
+            val position = (database.taskDao().getLargestPositionSync(projectId, columnId) ?: 0) + 1
             val local = createKanbanTask(name)
-                .copy(id = localId, projectId = projectId, columnId = columnId)
+                .copy(id = localId, projectId = projectId, columnId = columnId, position = position)
+            Logger.d("createTask: $local")
             database.taskDao().upsert(local)
             val apiStorage = createApiStorage(
                 KanbanMethod.CreateTask,
@@ -94,7 +103,8 @@ class ApiWorkManager @Inject constructor(
 
     /******************* MARK: UPDATE ******************/
 
-    suspend fun updateProject(project: KanbanProject) = withContext(coroutineCtx) {
+    override suspend fun updateProject(project: KanbanProject) = withContext(coroutineCtx) {
+        Logger.d("updateProject: $project")
         database.projectDao().upsert(project)
         val apiStorage = createApiStorage(
             KanbanMethod.UpdateProject,
@@ -106,14 +116,37 @@ class ApiWorkManager @Inject constructor(
         startWorkerIfNotStarted()
     }
 
+    override suspend fun updateTask(task: KanbanTask) = withContext(coroutineCtx) {
+        Logger.d("updateTask: $task")
+        database.taskDao().upsert(task)
+        val apiStorage = createApiStorage(
+            KanbanMethod.UpdateTask,
+            KanbanParams(id = task.id, title = task.title),
+            task.id
+        )
+        database.apiStorageDao().upsert(apiStorage)
+        startWorkerIfNotStarted()
+    }
+
     /******************* MARK: DELETE ******************/
 
-    suspend fun deleteProject(project: KanbanProject) = withContext(coroutineCtx) {
+    override suspend fun deleteProject(project: KanbanProject) = withContext(coroutineCtx) {
         database.projectDao().delete(project)
         val apiStorage = createApiStorage(
             KanbanMethod.RemoveProject,
             KanbanParams(projectId = project.id),
             project.id
+        )
+        database.apiStorageDao().upsert(apiStorage)
+        startWorkerIfNotStarted()
+    }
+
+    override suspend fun deleteTask(task: KanbanTask) = withContext(coroutineCtx) {
+        database.taskDao().delete(task)
+        val apiStorage = createApiStorage(
+            KanbanMethod.RemoveTask,
+            KanbanParams(taskId = task.id),
+            task.id
         )
         database.apiStorageDao().upsert(apiStorage)
         startWorkerIfNotStarted()

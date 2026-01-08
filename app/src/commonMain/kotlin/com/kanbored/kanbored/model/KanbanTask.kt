@@ -5,6 +5,7 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.kanbored.kanbored.persistent.kanbanTaskTableName
 import com.kanbored.kanbored.utils.BooleanAsIntSerializer
+import com.kanbored.kanbored.utils.emptyTask
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -66,4 +67,8 @@ data class KanbanTask(
 //    val nbExternalLinks: Int,
 //    val nbSubtasks: Int,
 //    val nbCompletedSubtasks: Int,
-)
+) {
+    fun isValid(): Boolean {
+        return this != emptyTask
+    }
+}

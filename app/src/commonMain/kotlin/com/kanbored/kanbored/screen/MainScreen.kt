@@ -177,6 +177,7 @@ fun MainScreen() {
                         projectId = args.projectId,
                         columnId = args.columnId,
                         taskId = args.taskId,
+                        onNavigateBack = onNavigateBack,
                     )
                 }
             }

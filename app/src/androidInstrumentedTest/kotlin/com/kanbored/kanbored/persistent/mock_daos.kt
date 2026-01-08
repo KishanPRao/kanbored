@@ -74,6 +74,10 @@ object MockKanbanColumnDao : KanbanColumnDao, MockBaseDao<KanbanColumn>() {
         TODO("Not yet implemented")
     }
 
+    override suspend fun getLargestPositionSync(projectId: Int): Int? {
+        return items.maxOfOrNull { it.position }
+    }
+
     override suspend fun updateId(oldId: Int, newId: Int) {
         super.updateId(oldId, newId)
         items.filter { it.id == oldId }
@@ -108,6 +112,13 @@ object MockKanbanTaskDao : KanbanTaskDao, MockBaseDao<KanbanTask>() {
         taskId: Int
     ): Flow<KanbanTask?> {
         TODO("Not yet implemented")
+    }
+
+    override suspend fun getLargestPositionSync(
+        projectId: Int,
+        columnId: Int
+    ): Int? {
+        return items.maxOfOrNull { it.position }
     }
 
     override suspend fun updateId(oldId: Int, newId: Int) {
@@ -183,7 +194,7 @@ object MockKanbanCommentDao : KanbanCommentDao, MockBaseDao<KanbanComment>() {
 @OptIn(ExperimentalAtomicApi::class)
 object MockApiStorageDao : ApiStorageDao, MockBaseDao<ApiStorage>() {
     override suspend fun upsert(item: ApiStorage) {
-        items.firstOrNull { it.id == item.id }?.let { delete(it) }
+        items.firstOrNull { it.apiStorageId == item.apiStorageId }?.let { delete(it) }
         items.add(item)
     }
 
@@ -213,5 +224,11 @@ object MockApiStorageDao : ApiStorageDao, MockBaseDao<ApiStorage>() {
         items.filter { it.kanbanParams.taskId == oldId }
             .onEach { delete(it) }
             .onEach { upsert(it.copy(kanbanParams = it.kanbanParams.copy(taskId = newId))) }
+    }
+
+    override suspend fun updateUpdateId(oldId: Int, newId: Int) {
+        items.filter { it.updateId == oldId }
+            .onEach { delete(it) }
+            .onEach { upsert(it.copy(updateId = newId)) }
     }
 }

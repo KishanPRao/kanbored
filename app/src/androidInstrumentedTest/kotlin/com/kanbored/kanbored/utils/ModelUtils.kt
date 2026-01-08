@@ -15,6 +15,6 @@ object ModelUtils {
         kanbanParams: KanbanParams,
         updateId: Int
     ): ApiStorage {
-        return ApiStorage(kanbanMethod, kanbanParams, updateId, id = ++mockApiStorageId)
+        return ApiStorage(kanbanMethod, kanbanParams, updateId, apiStorageId = ++mockApiStorageId)
     }
 }

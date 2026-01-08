@@ -77,6 +77,7 @@ interface KanbanApi {
 
 @Serializable
 data class KanbanParams(
+    val id: Int? = null,
     @SerialName("project_id")
     val projectId: Int? = null,
     @SerialName("column_id")

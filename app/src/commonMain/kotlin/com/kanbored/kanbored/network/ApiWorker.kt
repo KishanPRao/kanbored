@@ -5,6 +5,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
+import co.touchlab.kermit.Logger
 import com.kanbored.kanbored.model.ApiStorage
 import com.kanbored.kanbored.persistent.KanbanDatabase
 import com.kanbored.kanbored.utils.ApiFailedException
@@ -51,6 +52,7 @@ class ApiWorker @AssistedInject constructor(
         var apiStorage = database.apiStorageDao().getNextApi()
         println("processApi [${database.apiStorageDao().getAllSync().size}]: $apiStorage")
         while (apiStorage != null) {
+            Logger.d("genericApi: ${apiStorage.kanbanMethod.methodName}, ${apiStorage.kanbanParams}; ${apiStorage.updateId}")
             val response = genericApi(apiStorage)
             if (response.result != null) {
                 val result = response.result.toPrimitiveOrNull()
@@ -71,16 +73,26 @@ class ApiWorker @AssistedInject constructor(
         when (result) {
             is Int -> {
                 when (apiStorage.kanbanMethod.methodName) {
+                    KanbanMethod.CreateProject.methodName, KanbanMethod.AddColumn.methodName, KanbanMethod.CreateTask.methodName -> {
+                        database.apiStorageDao().updateUpdateId(apiStorage.updateId, result)
+                    }
+                }
+                when (apiStorage.kanbanMethod.methodName) {
                     KanbanMethod.CreateProject.methodName -> {
-                        println("create proj: update id: ${apiStorage.updateId} -> $result")
+                        Logger.i("create proj: update id: ${apiStorage.updateId} -> $result")
                         database.projectDao().updateId(apiStorage.updateId, result)
                         database.apiStorageDao().updateProjectId(apiStorage.updateId, result)
                     }
 
                     KanbanMethod.AddColumn.methodName -> {
-                        println("add col: update id: ${apiStorage.updateId} -> $result")
+                        Logger.i("add col: update id: ${apiStorage.updateId} -> $result")
                         database.columnDao().updateId(apiStorage.updateId, result)
                         database.apiStorageDao().updateColumnId(apiStorage.updateId, result)
+                    }
+
+                    KanbanMethod.CreateTask.methodName -> {
+                        Logger.i("add task: update id: ${apiStorage.updateId} -> $result")
+                        database.taskDao().updateId(apiStorage.updateId, result)
                     }
 
                     else -> {
@@ -93,7 +105,7 @@ class ApiWorker @AssistedInject constructor(
                 if (!result) {
                     throw ApiFailedException("${apiStorage.kanbanMethod.methodName} failed")
                 } else {
-                    println("Valid!")
+                    Logger.i("Successful api request!")
                 }
             }
 

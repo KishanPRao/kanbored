@@ -11,6 +11,8 @@ open class KanbanMethod(val methodId: Int, val methodName: String, val methodTyp
     object AddColumn : KanbanMethod(638544704, "addColumn", Type.COLUMN)
     object GetAllTasks : KanbanMethod(887036325, "getAllTasks", Type.TASK)
     object CreateTask : KanbanMethod(1176509098, "createTask", Type.TASK)
+    object UpdateTask : KanbanMethod(1406803059, "updateTask", Type.TASK)
+    object RemoveTask : KanbanMethod(1423501287, "removeTask", Type.TASK)
     object GetAllSubtasks : KanbanMethod(2087700490, "getAllSubtasks", Type.SUBTASK)
     object GetAllComments : KanbanMethod(148484683, "getAllComments", Type.COMMENT)
 

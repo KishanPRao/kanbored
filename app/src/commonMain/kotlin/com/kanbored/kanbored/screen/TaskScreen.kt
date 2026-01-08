@@ -44,6 +44,7 @@ import androidx.compose.ui.tooling.preview.AndroidUiModes.UI_MODE_NIGHT_YES
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import co.touchlab.kermit.Logger
 import com.kanbored.kanbored.model.KanbanComment
 import com.kanbored.kanbored.model.KanbanSubtask
 import com.kanbored.kanbored.model.KanbanSubtaskFinished
@@ -53,6 +54,7 @@ import com.kanbored.kanbored.ui.theme.AppTheme
 import com.kanbored.kanbored.ui.theme.LocalDimensions
 import com.kanbored.kanbored.utils.KanbanIconButton
 import com.kanbored.kanbored.utils.PresentableText
+import com.kanbored.kanbored.utils.PromptDialog
 import com.kanbored.kanbored.utils.emptyTask
 import com.kanbored.kanbored.viewmodel.KanbanViewModel
 import com.kanbored.kanbored.viewmodel.TopBarAction
@@ -66,6 +68,7 @@ import kanbored.app.generated.resources.comments
 import kanbored.app.generated.resources.delete
 import kanbored.app.generated.resources.edit
 import kanbored.app.generated.resources.empty_task_description
+import kanbored.app.generated.resources.enter_name_update_task
 import kanbored.app.generated.resources.rename
 import kanbored.app.generated.resources.reorder
 import kanbored.app.generated.resources.subtasks
@@ -82,32 +85,39 @@ fun TaskScreen(
     projectId: Int,
     columnId: Int,
     taskId: Int,
+    onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    kanbanVM.refreshSubtasksAndComments(taskId)
     var isArchived by remember { mutableStateOf(false) }
-    val kanbanTask: KanbanTask? by kanbanVM.getTask(
+    val task: KanbanTask by kanbanVM.getTask(
         projectId = projectId,
         columnId = columnId,
         taskId = taskId
-    ).collectAsStateWithLifecycle(null)
+    ).collectAsStateWithLifecycle(emptyTask)
+    Logger.i("task: $task")
     val subtasks: List<KanbanSubtask> by kanbanVM.getSubtasks(taskId)
         .collectAsStateWithLifecycle(emptyList())
     val comments: List<KanbanComment> by kanbanVM.getComments(taskId)
         .collectAsStateWithLifecycle(emptyList())
-    val task = kanbanTask ?: emptyTask
     var rawMarkdown by remember { mutableStateOf("") }
+    var showRenameDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
     LaunchedEffect(task) {
+        if (task.isValid()) {
+            kanbanVM.refreshSubtasksAndComments(task.id)
+        }
         topBarVM.pushState()
         topBarVM.updateTitle(task.title)
         topBarVM.showBackButton(true)
         topBarVM.setDropdownItems(
             listOf(
                 TopBarDropdownItem(PresentableText.DynamicResource(Res.string.rename)) {
-                    println("Rename")
+                    Logger.i("Rename")
+                    showRenameDialog = true
                 },
                 TopBarDropdownItem(PresentableText.DynamicResource(Res.string.delete)) {
-                    println("Delete")
+                    Logger.i("Delete")
+                    showDeleteDialog = true
                 },
             )
         )
@@ -132,6 +142,43 @@ fun TaskScreen(
                 }
             ),
         ))
+    if (showRenameDialog) {
+        PromptDialog(
+            title = PresentableText.DynamicString(
+                "${stringResource(Res.string.rename)} ${task.title}?"
+            ),
+            hint = stringResource(Res.string.enter_name_update_task),
+            showTextField = true,
+            initText = task.title,
+            onClickOk = { text ->
+                showRenameDialog = false
+                Logger.d("Rename task: $task")
+                kanbanVM.updateTask(task.copy(title = text))
+                topBarVM.popState() // The task gets updated, and we pushState again
+            },
+            onClickCancel = {
+                showRenameDialog = false
+            }
+        )
+    }
+    if (showDeleteDialog) {
+        PromptDialog(
+            title = PresentableText.DynamicString(
+                "${stringResource(Res.string.delete)} ${task.title}?"
+            ),
+            showTextField = false,
+            onClickOk = {
+                showDeleteDialog = false
+                Logger.d("Delete task: $task")
+                kanbanVM.deleteTask(task)
+                onNavigateBack()
+            },
+            onClickCancel = {
+                showDeleteDialog = false
+            }
+        )
+    }
+    if (!task.isValid()) return
     // TODO: Use single LazyColumn, avoid nesting, item/items(..) multiple times instead
     Column(modifier = modifier) {
         TaskDescription(rawMarkdown)

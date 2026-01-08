@@ -5,46 +5,47 @@
 ### Technical
 
 - [x] Dependency injection
+- [ ] CI/CD
 - [ ] Home/Projects
 - [ ] Project
-  - [ ] create proj
-  - [ ] show arch
-  - [ ] settings
+    - [x] create proj
+    - [ ] show arch
+    - [ ] settings
 - [ ] Settings
 - [ ] Column
-  - [ ] actions 
-    - [ ] add column
-    - [ ] rename proj
-    - [ ] show arch (col/task)
-    - [ ] archive proj
-    - [ ] delete proj
-  - [ ] add task
-    - [ ] on back button, deselect before exit
-  - [ ] rename col
-  - [ ] archive col
-  - [ ] delete col
-  - [ ] search proj
+    - [ ] actions
+        - [x] add column
+        - [x] rename proj
+        - [ ] show arch (col/task)
+        - [ ] archive proj
+        - [x] delete proj
+    - [x] add task
+        - [ ] on back button, deselect before exit
+    - [ ] rename col
+    - [ ] archive col
+    - [ ] delete col
+    - [ ] search proj
 - [ ] Task
-  - [ ] actions 
-    - [ ] add clist
-    - [ ] archive task
-    - [ ] rename task
-    - [ ] delete task
-  - [ ] edit - discard changes: description
-  - [ ] edit - discard changes: clist
-  - [ ] delete clist
-  - [ ] add subtask
-  - [ ] edit - discard changes: subtask
-  - [ ] delete subtask
-  - [ ] add comment
-  - [ ] edit - discard changes: comment
-  - [ ] delete comment
+    - [ ] actions
+        - [ ] add clist
+        - [ ] archive task
+        - [x] rename task
+        - [x] delete task
+    - [ ] edit - discard changes: description
+    - [ ] edit - discard changes: clist
+    - [ ] delete clist
+    - [ ] add subtask
+    - [ ] edit - discard changes: subtask
+    - [ ] delete subtask
+    - [ ] add comment
+    - [ ] edit - discard changes: comment
+    - [ ] delete comment
 - [ ] Search
 - [ ] Theming
-  - [ ] dynamic
-  - [ ] dark
-  - [ ] light
-  - [ ] amolded
+    - [ ] dynamic
+    - [ ] dark
+    - [ ] light
+    - [ ] amolded
 - [ ] Change auth encryption approach
 
 ### Functionalities
@@ -59,7 +60,7 @@
 - [ ] Due date: task & subtask
 - [ ] Activity list
 
-### Validation 
+### Validation
 
 - [ ] Normal trello imported vs kanboard data (no metadata)
 
@@ -70,6 +71,13 @@
 - [ ] Re-enable JVM/Compose MP
 - [ ] Link tasks, reference
 - [ ] Drag & drop (re-order)
+
+## 0.2
+
+### Technical
+
+- [ ] Offline mode (skip server setup)
+    - [ ] Backup & restore
 
 ## Backlog
 

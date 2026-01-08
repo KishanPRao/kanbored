@@ -14,5 +14,6 @@ data class ApiStorage(
     @Embedded val kanbanParams: KanbanParams,
     val updateId: Int,
     val timestamp: Long = getTimestampInMs(),
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    // non-standard id name, since we want to embed KanbanParams' id property
+    @PrimaryKey(autoGenerate = true) val apiStorageId: Int = 0,
 )
