@@ -34,7 +34,7 @@ data class KanbanProject(
     @SerialName("task_limit") val taskLimit: Int,
     @SerialName("enable_global_tags") val enableGlobalTags: Int,
     @Serializable(with = BooleanAsIntSerializer::class)
-    @SerialName("is_trello_imported") val isTrelloImported: Boolean,
+    @SerialName("is_trello_imported") val isTrelloImported: Boolean?,
     @Embedded(prefix = "url_")
     val url: KanbanUrl,
 ) {

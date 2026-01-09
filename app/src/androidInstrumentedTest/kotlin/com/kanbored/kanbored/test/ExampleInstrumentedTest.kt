@@ -1,4 +1,4 @@
-package com.kanbored.kanbored
+package com.kanbored.kanbored.test
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry

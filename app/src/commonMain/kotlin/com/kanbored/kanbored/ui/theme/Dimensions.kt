@@ -9,7 +9,8 @@ data class Dimensions(
     val columnTaskHeight: Dp = 80.dp,
     val columnTaskPadding: Dp = 15.dp,
     val columnPadding: Dp = 12.dp,
-    val columnItemsPadding: Dp = 8.dp,
+    val columnItemsVertPadding: Dp = 8.dp,
+    val columnItemsHorizPadding: Dp = 10.dp,
 //    val minTaskDescHeight: Dp = 70.dp,
 )
 

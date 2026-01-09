@@ -12,7 +12,7 @@ class MockKanbanApi : KanbanApi {
     private var resultId = 1
 
     override suspend fun login(kanbanRequest: KanbanRequest): KanbanLoginResponse {
-        TODO("Not yet implemented")
+        return KanbanLoginResponse(jsonrpc = "", result = KanbanLoginUserInfo(1, ""))
     }
 
     override suspend fun getAllProjects(kanbanRequest: KanbanRequest): KanbanResponse<List<KanbanProject>, KanbanError> {

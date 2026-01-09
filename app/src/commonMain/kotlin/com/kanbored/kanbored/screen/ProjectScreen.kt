@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -40,7 +41,6 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.touchlab.kermit.Logger
 import com.kanbored.kanbored.event.UiEvent
@@ -325,24 +325,27 @@ fun ColumnView(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp)
+                .padding(dimensions.columnItemsHorizPadding)
                 .clickable {
                 }) {
             Text(column.title)
         }
         LazyColumn(
             modifier = Modifier
-                .padding(10.dp)
+                .padding(dimensions.columnItemsHorizPadding)
                 .weight(1f)
                 .requiredWidth(dimensions.columnTaskWidth),
-            verticalArrangement = Arrangement.spacedBy(dimensions.columnItemsPadding)
+            verticalArrangement = Arrangement.spacedBy(dimensions.columnItemsVertPadding)
         ) {
             items(items = tasks, key = { it.id }) { task ->
                 TaskView(task, onTaskOpened)
             }
         }
         OutlinedTextField(
-            modifier = Modifier.onFocusChanged(onNewTaskNameFocusChanged),
+            modifier = Modifier
+                .onFocusChanged(onNewTaskNameFocusChanged)
+                .padding(dimensions.columnItemsHorizPadding)
+                .widthIn(max = dimensions.columnTaskWidth),
             value = newTaskName,
             label = { Text(stringResource(Res.string.add_task)) },
             singleLine = true,

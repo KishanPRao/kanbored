@@ -1,5 +1,6 @@
 package com.kanbored.kanbored.network
 
+import co.touchlab.kermit.Logger
 import com.kanbored.kanbored.model.AuthConfig
 import com.kanbored.kanbored.utils.InvalidCredentialsException
 import kotlinx.coroutines.Dispatchers
@@ -43,7 +44,8 @@ class ApiProviderImpl @Inject constructor(
 
                 val response = okHttpClient.newCall(request).execute()
                 response.isSuccessful
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                Logger.v("Couldn't reach api: $e")
                 false
             }
         }

@@ -1,4 +1,4 @@
-package com.kanbored.kanbored
+package com.kanbored.kanbored.test
 
 import android.content.Context
 import android.util.Log
@@ -56,7 +56,6 @@ class ApiWorkerTest {
 
     @BeforeTest
     fun setup() {
-        println("setup")
         hiltRule.inject()
         context = ApplicationProvider.getApplicationContext()
         val config = Configuration.Builder()

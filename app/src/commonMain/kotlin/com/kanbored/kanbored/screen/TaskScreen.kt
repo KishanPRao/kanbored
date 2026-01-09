@@ -224,7 +224,7 @@ fun TaskDescription(description: String, modifier: Modifier = Modifier) {
             tint = if (isRawText) Color.Yellow else LocalContentColor.current,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(10.dp),
+                .padding(5.dp),
         ) {
             isRawText = !isRawText
         }
