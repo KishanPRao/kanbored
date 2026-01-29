@@ -53,6 +53,7 @@
 - [ ] Archive/Unarchive
 - [ ] Add tasks to default checklist
 - [ ] Checklist-bridge
+    - [ ] explore if creating a kanboard plugin for this is better
 - [ ] Add, remove, update
 - [ ] Offline cache (queued tasks)
 - [ ] Attachments (if/only basic)
@@ -81,4 +82,5 @@
 
 ## Backlog
 
-- [ ] Allow importing custom theme 
+- [ ] Allow importing custom theme
+- [ ] Add undo/redo options while editing task description
