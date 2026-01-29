@@ -6,7 +6,6 @@ import com.kanbored.kanbored.repository.ConfigRepository
 import com.kanbored.kanbored.utils.PresentableText
 import kanbored.app.generated.resources.Res
 import kanbored.app.generated.resources.error_unknown
-import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -27,10 +26,8 @@ class LoginUseCase @Inject constructor(
                 password = password,
             )
 
-            val response = with(Dispatchers.IO) {
-                println("api provider login")
-                apiProvider.kanbanApi.login()
-            }
+            println("api provider login")
+            val response = apiProvider.kanbanApi.login()
             if (response.result != null) {
                 // TODO: store user info? AuthConfig stores more info (user id, etc), sends it as result?
                 configRepository.authenticateConfig()

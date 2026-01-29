@@ -62,8 +62,10 @@ class ApiWorker @AssistedInject constructor(
             } else {
                 throw ApiFailedException("Unknown failure")
             }
-            database.apiStorageDao().delete(apiStorage)
+            Logger.d(TAG) { "processApi, delete $apiStorage" }
+            database.apiStorageDao().delete(apiStorage.apiStorageId)
             apiStorage = database.apiStorageDao().getNextApi()
+            Logger.d(TAG) { "processApi, next $apiStorage" }
         }
         println("processApi: fin!")
     }

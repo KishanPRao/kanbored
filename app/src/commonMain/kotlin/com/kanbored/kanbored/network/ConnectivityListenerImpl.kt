@@ -38,7 +38,7 @@ class ConnectivityListenerImpl @Inject constructor(
             .distinctUntilChanged()
             .stateIn(
                 scope = scope,
-                started = SharingStarted.Eagerly,
+                started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
                 initialValue = true
             )
     }

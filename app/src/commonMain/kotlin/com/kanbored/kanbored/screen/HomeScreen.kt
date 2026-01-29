@@ -1,14 +1,5 @@
 package com.kanbored.kanbored.screen
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,7 +8,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -34,17 +24,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import com.kanbored.kanbored.event.UiEvent
 import com.kanbored.kanbored.model.KanbanProject
+import com.kanbored.kanbored.utils.ConnectionStatusStrip
 import com.kanbored.kanbored.utils.PresentableText
 import com.kanbored.kanbored.utils.PromptDialog
 import com.kanbored.kanbored.viewmodel.KanbanViewModel
@@ -54,13 +44,11 @@ import com.kanbored.kanbored.viewmodel.TopBarViewModel
 import kanbored.app.generated.resources.Res
 import kanbored.app.generated.resources.add_new_project
 import kanbored.app.generated.resources.enter_name_new_project
-import kanbored.app.generated.resources.online
 import kanbored.app.generated.resources.projects
 import kanbored.app.generated.resources.server_unreachable
 import kanbored.app.generated.resources.settings
 import kanbored.app.generated.resources.topbar_add_project
 import kanbored.app.generated.resources.topbar_show_archived
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -72,7 +60,7 @@ fun HomeScreen(
     onProjectOpened: (KanbanProject) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var showDialog by remember { mutableStateOf(false) }
+    var showNewProjectDialog by rememberSaveable { mutableStateOf(false) }
     val title = stringResource(Res.string.projects)
     LaunchedEffect(Unit) {
         topBarVM.updateTitle(title)
@@ -84,7 +72,7 @@ fun HomeScreen(
                     contentDescription = PresentableText.DynamicResource(Res.string.topbar_add_project),
                     onClick = {
                         println("Add project")
-                        showDialog = true
+                        showNewProjectDialog = true
                     }
                 ),
                 // TODO: Or find a different, more useful operation
@@ -104,22 +92,22 @@ fun HomeScreen(
             )
         )
     }
-    if (showDialog) {
+    if (showNewProjectDialog) {
         PromptDialog(
             title = PresentableText.DynamicResource(Res.string.add_new_project),
             hint = stringResource(Res.string.enter_name_new_project),
             showTextField = true,
             onClickOk = { text ->
-                showDialog = false
+                showNewProjectDialog = false
                 println("Add new project: $text")
                 kanbanVM.createProject(text)
             },
             onClickCancel = {
-                showDialog = false
+                showNewProjectDialog = false
             }
         )
     }
-    var isRefreshing by remember { mutableStateOf(false) }
+    var isRefreshing by rememberSaveable { mutableStateOf(false) }
     val isApiReachable by kanbanVM.isApiReachable.collectAsState()
     LaunchedEffect(Unit) {
         kanbanVM.uiEventFlow.collectLatest { event ->
@@ -175,63 +163,6 @@ fun ProjectGrid(kanbanVM: KanbanViewModel, onProjectOpened: (KanbanProject) -> U
                     Text(project.name)
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun ConnectionStatusStrip(
-    errorText: String,
-    isVisible: Boolean,
-) {
-    var showStrip by remember { mutableStateOf(false) }
-    var isOnline by remember { mutableStateOf(true) }
-    var text = errorText
-    var bgColor = MaterialTheme.colorScheme.onError
-    var textColor = MaterialTheme.colorScheme.error
-    if (isOnline) {
-        // TODO: green for online?
-        bgColor = MaterialTheme.colorScheme.onPrimary
-        textColor = MaterialTheme.colorScheme.primary
-        text = stringResource(Res.string.online)
-    }
-
-    LaunchedEffect(isVisible, errorText) {
-        if (!isVisible && showStrip) {
-            isOnline = true
-            delay(1000)
-            showStrip = false
-        } else if (isVisible) {
-            isOnline = false
-            showStrip = true
-        }
-    }
-
-    AnimatedVisibility(
-        visible = showStrip,
-        enter = slideInVertically() + fadeIn(),
-        exit = slideOutVertically() + fadeOut(
-            animationSpec = tween(300)
-        )
-    ) {
-        AnimatedContent(
-            targetState = text,
-            transitionSpec = {
-                fadeIn(animationSpec = tween(500)) togetherWith
-                        fadeOut(animationSpec = tween(500))
-            },
-            label = "conn_strip_anim"
-        ) { text ->
-            Text(
-                text = text,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(bgColor)
-                    .padding(5.dp),
-                color = textColor,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-            )
         }
     }
 }

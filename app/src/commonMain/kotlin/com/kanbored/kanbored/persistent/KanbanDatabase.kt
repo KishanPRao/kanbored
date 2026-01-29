@@ -138,6 +138,9 @@ interface ApiStorageDao : BaseDao<ApiStorage> {
     // TODO: better name
     @Query("update $apiStorageTableName set updateId = :newId where updateId == :oldId")
     suspend fun updateUpdateId(oldId: Int, newId: Int)
+
+    @Query("delete from $apiStorageTableName where apiStorageId == :apiStorageId")
+    suspend fun delete(apiStorageId: Int)
 }
 
 interface KanbanDatabase {

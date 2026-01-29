@@ -93,16 +93,14 @@ class KanbanApiTest {
         testKanbanMethod(
             KanbanMethod.EnableProject,
             KanbanParams(
-                list = listOf("1")
+                projectId = 1
             ),
             """
 {
     "jsonrpc": "2.0",
     "method": "enableProject",
     "id": 1775494839,
-    "params": [
-        "1"
-    ]
+    "params": {"project_id": 1}
 }
         """
         )

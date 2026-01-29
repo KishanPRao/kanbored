@@ -2,6 +2,15 @@ package com.kanbored.kanbored.utils
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -30,12 +39,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -44,6 +55,8 @@ import com.kanbored.kanbored.ui.theme.AppTheme
 import kanbored.app.generated.resources.Res
 import kanbored.app.generated.resources.cancel
 import kanbored.app.generated.resources.ok
+import kanbored.app.generated.resources.online
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -97,6 +110,64 @@ fun TopbarDropdownMenuItem(text: String, onClick: () -> Unit) {
     )
 }
 
+// TODO: move to ui_utils
+@Composable
+fun ConnectionStatusStrip(
+    errorText: String,
+    isVisible: Boolean,
+) {
+    var showStrip by rememberSaveable { mutableStateOf(false) }
+    var isOnline by rememberSaveable { mutableStateOf(true) }
+    var text = errorText
+    var bgColor = MaterialTheme.colorScheme.onError
+    var textColor = MaterialTheme.colorScheme.error
+    if (isOnline) {
+        // TODO: green for online?
+        bgColor = MaterialTheme.colorScheme.onPrimary
+        textColor = MaterialTheme.colorScheme.primary
+        text = stringResource(Res.string.online)
+    }
+
+    LaunchedEffect(isVisible, errorText) {
+        if (!isVisible && showStrip) {
+            isOnline = true
+            delay(1000)
+            showStrip = false
+        } else if (isVisible) {
+            isOnline = false
+            showStrip = true
+        }
+    }
+
+    AnimatedVisibility(
+        visible = showStrip,
+        enter = slideInVertically() + fadeIn(),
+        exit = slideOutVertically() + fadeOut(
+            animationSpec = tween(300)
+        )
+    ) {
+        AnimatedContent(
+            targetState = text,
+            transitionSpec = {
+                fadeIn(animationSpec = tween(500)) togetherWith
+                        fadeOut(animationSpec = tween(500))
+            },
+            label = "conn_strip_anim"
+        ) { text ->
+            Text(
+                text = text,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(bgColor)
+                    .padding(5.dp),
+                color = textColor,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+            )
+        }
+    }
+}
+
 @Composable
 fun PromptDialog(
     title: PresentableText,
@@ -106,8 +177,8 @@ fun PromptDialog(
     onClickOk: (String) -> Unit,
     onClickCancel: () -> Unit,
 ) {
-    var text by remember { mutableStateOf(initText) }
-    var isError by remember { mutableStateOf(false) }
+    var text by rememberSaveable { mutableStateOf(initText) }
+    var isError by rememberSaveable { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
     Dialog(
         onDismissRequest = {},

@@ -32,7 +32,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +48,7 @@ import com.kanbored.kanbored.model.KanbanColumn
 import com.kanbored.kanbored.model.KanbanTask
 import com.kanbored.kanbored.ui.theme.AppTheme
 import com.kanbored.kanbored.ui.theme.LocalDimensions
+import com.kanbored.kanbored.utils.ConnectionStatusStrip
 import com.kanbored.kanbored.utils.EditMode
 import com.kanbored.kanbored.utils.PresentableText
 import com.kanbored.kanbored.utils.PromptDialog
@@ -85,14 +86,14 @@ fun ProjectScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var showAddColDialog by remember { mutableStateOf(false) }
-    var showRenameDialog by remember { mutableStateOf(false) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
+    var showAddColDialog by rememberSaveable { mutableStateOf(false) }
+    var showRenameDialog by rememberSaveable { mutableStateOf(false) }
+    var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
     // TODO: observe the object instead? If project screen open, then project updated from api worker?
     val project by kanbanVM.getProject(projectId = projectId)
         .collectAsStateWithLifecycle(emptyProject)
-    var isGridView by remember { mutableStateOf(false) }
-    var isArchived by remember { mutableStateOf(false) }
+    var isGridView by rememberSaveable { mutableStateOf(false) }
+    var isArchived by rememberSaveable { mutableStateOf(false) }
     Logger.i("Project name: ${project.name}")
     LaunchedEffect(project) {
         // TODO: This gets re-called after opening and exiting task, causing full refresh; why?
@@ -199,7 +200,7 @@ fun ProjectScreen(
         )
     }
 
-    var isRefreshing by remember { mutableStateOf(false) }
+    var isRefreshing by rememberSaveable { mutableStateOf(false) }
     val isApiReachable by kanbanVM.isApiReachable.collectAsState()
     LaunchedEffect(Unit) {
         kanbanVM.uiEventFlow.collectLatest { event ->
@@ -236,9 +237,9 @@ fun ColumnList(
         items(items = columns, key = { it.id }) { column ->
             val tasks by kanbanVM.getTasks(projectId, column.id)
                 .collectAsStateWithLifecycle(emptyList())
-            var editMode by remember { mutableStateOf(EditMode.Idle) }
-            var newTaskName by remember { mutableStateOf("") }
-            var isValidTaskName by remember { mutableStateOf(true) }
+            var editMode by rememberSaveable { mutableStateOf(EditMode.Idle) }
+            var newTaskName by rememberSaveable { mutableStateOf("") }
+            var isValidTaskName by rememberSaveable { mutableStateOf(true) }
             Logger.v("edit mode: $editMode")
             if (editMode == EditMode.Cancel || editMode == EditMode.Idle) {
                 val focusManager = LocalFocusManager.current

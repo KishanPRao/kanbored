@@ -231,4 +231,8 @@ object MockApiStorageDao : ApiStorageDao, MockBaseDao<ApiStorage>() {
             .onEach { delete(it) }
             .onEach { upsert(it.copy(updateId = newId)) }
     }
+
+    override suspend fun delete(apiStorageId: Int) {
+        items.removeIf { it.apiStorageId == apiStorageId }
+    }
 }

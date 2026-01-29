@@ -29,6 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,8 +74,9 @@ fun MainScreen() {
         val authConfig = mainVM.authConfig.collectAsState().value
         val isAuthenticated = authConfig.authenticated
 
+        // TODO: loss of snackbar info if not saveable?
         val hostState = remember { SnackbarHostState() }
-        var showLoading by remember { mutableStateOf(false) }
+        var showLoading by rememberSaveable { mutableStateOf(false) }
         val onNavigateBack: () -> Unit = {
             topBarVM.popState()
             navController.popBackStack()
@@ -209,7 +211,7 @@ private fun AppTopBar(
     onNavigateBack: () -> Unit,
 ) {
     val topBarVMState = topBarVM.state.collectAsState()
-    var expandedMenu by remember { mutableStateOf(false) }
+    var expandedMenu by rememberSaveable { mutableStateOf(false) }
     val topBarState = topBarVMState.value
     TopAppBar(
         title = { Text(topBarState.title) },

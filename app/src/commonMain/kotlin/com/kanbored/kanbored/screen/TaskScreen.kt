@@ -32,6 +32,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -88,7 +89,7 @@ fun TaskScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isArchived by remember { mutableStateOf(false) }
+    var isArchived by rememberSaveable { mutableStateOf(false) }
     val task: KanbanTask by kanbanVM.getTask(
         projectId = projectId,
         columnId = columnId,
@@ -100,8 +101,8 @@ fun TaskScreen(
     val comments: List<KanbanComment> by kanbanVM.getComments(taskId)
         .collectAsStateWithLifecycle(emptyList())
     var rawMarkdown by remember { mutableStateOf("") }
-    var showRenameDialog by remember { mutableStateOf(false) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
+    var showRenameDialog by rememberSaveable { mutableStateOf(false) }
+    var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(task) {
         if (task.isValid()) {
             kanbanVM.refreshSubtasksAndComments(task.id)
@@ -191,7 +192,7 @@ fun TaskScreen(
 fun TaskDescription(description: String, modifier: Modifier = Modifier) {
     // TODO: is this the best way?
     var rawMarkdown = description
-    var isRawText by remember { mutableStateOf(false) }
+    var isRawText by rememberSaveable { mutableStateOf(false) }
     LocalDimensions.current
     Box(modifier = modifier) {
         if (isRawText) {
