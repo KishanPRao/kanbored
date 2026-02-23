@@ -75,9 +75,16 @@ fun AppTheme(
         darkTheme -> darkColorScheme
         else -> lightColorScheme
     }
+    val kanbanColors = when {
+        darkTheme -> darkKanbanColors
+        else -> lightKanbanColors
+    }
 
     val dimensions = Dimensions()
-    CompositionLocalProvider(LocalDimensions provides dimensions) {
+    CompositionLocalProvider(
+        LocalDimensions provides dimensions,
+        LocalColors provides kanbanColors,
+    ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = Typography,

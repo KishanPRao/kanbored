@@ -88,15 +88,15 @@ fun KanbanIconButton(
 fun KanbanIconButton(
     imageVector: ImageVector,
     contentDescription: String,
-    tint: Color = LocalContentColor.current,
     modifier: Modifier = Modifier,
+    tint: Color? = null,
     onClick: () -> Unit
 ) {
     IconButton(modifier = modifier, onClick = onClick) {
         Icon(
             imageVector = imageVector,
             contentDescription = contentDescription,
-            tint = tint,
+            tint = tint ?: LocalContentColor.current,
         )
     }
 }

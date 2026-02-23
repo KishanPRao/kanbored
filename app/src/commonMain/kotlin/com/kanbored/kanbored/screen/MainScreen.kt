@@ -4,24 +4,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,10 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -48,15 +35,11 @@ import co.touchlab.kermit.Severity
 import co.touchlab.kermit.platformLogWriter
 import com.kanbored.kanbored.event.AppUiEvent
 import com.kanbored.kanbored.ui.theme.AppTheme
+import com.kanbored.kanbored.ui.utils.AppTopBar
 import com.kanbored.kanbored.utils.DefaultSnackbar
-import com.kanbored.kanbored.utils.KanbanIconButton
-import com.kanbored.kanbored.utils.TopbarDropdownMenuItem
 import com.kanbored.kanbored.viewmodel.KanbanViewModel
 import com.kanbored.kanbored.viewmodel.MainViewModel
 import com.kanbored.kanbored.viewmodel.TopBarViewModel
-import kanbored.app.generated.resources.Res
-import kanbored.app.generated.resources.navigate_back
-import kanbored.app.generated.resources.topbar_more_options
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -197,66 +180,6 @@ fun MainScreen() {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center)
                     )
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun AppTopBar(
-    navController: NavHostController,
-    topBarVM: TopBarViewModel,
-    onNavigateBack: () -> Unit,
-) {
-    val topBarVMState = topBarVM.state.collectAsState()
-    var expandedMenu by rememberSaveable { mutableStateOf(false) }
-    val topBarState = topBarVMState.value
-    TopAppBar(
-        title = { Text(topBarState.title) },
-        navigationIcon = {
-            if (topBarState.showBackButton) {
-                KanbanIconButton(
-                    Icons.AutoMirrored.Filled.ArrowBack,
-                    Res.string.navigate_back,
-                    onClick = onNavigateBack
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        ),
-        actions = {
-            topBarState.actions.forEach { action ->
-                KanbanIconButton(
-                    action.icon,
-                    action.contentDescription.asString(),
-                    onClick = action.onClick,
-                )
-            }
-            if (topBarState.dropdownItems.isNotEmpty()) {
-                KanbanIconButton(
-                    imageVector = Icons.Default.MoreVert,
-                    contentDescription = Res.string.topbar_more_options,
-                    onClick = { expandedMenu = true },
-                )
-            }
-        }
-    )
-    if (topBarState.dropdownItems.isNotEmpty()) {
-        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
-            DropdownMenu(
-                offset = DpOffset(x = (-4).dp, y = 0.dp),
-                expanded = expandedMenu,
-                onDismissRequest = { expandedMenu = false }
-            ) {
-                topBarState.dropdownItems.forEach { action ->
-                    TopbarDropdownMenuItem(action.contentDescription.asString()) {
-                        expandedMenu = false
-                        action.onClick()
-                    }
                 }
             }
         }

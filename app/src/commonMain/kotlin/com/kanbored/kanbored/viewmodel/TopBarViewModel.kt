@@ -1,5 +1,6 @@
 package com.kanbored.kanbored.viewmodel
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import co.touchlab.kermit.Logger
@@ -34,6 +35,22 @@ class TopBarViewModel @Inject constructor() : ViewModel() {
         _state.update { it.copy(dropdownItems = items) }
     }
 
+    fun updateAll(
+        title: String,
+        showBackButton: Boolean,
+        topbarActions: List<TopBarAction>,
+        dropdownItems: List<TopBarDropdownItem>
+    ) {
+        _state.update {
+            it.copy(
+                title = title,
+                showBackButton = showBackButton,
+                actions = topbarActions,
+                dropdownItems = dropdownItems
+            )
+        }
+    }
+
     fun pushState() {
         Logger.v("top bar: push state: ${_state.value}")
         backupStateStack.addLast(_state.value)
@@ -58,6 +75,7 @@ data class TopBarState(
 data class TopBarAction(
     val icon: ImageVector,
     val contentDescription: PresentableText,
+    val tint: Color? = null,
     val onClick: () -> Unit
 )
 

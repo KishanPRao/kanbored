@@ -1,5 +1,6 @@
 package com.kanbored.kanbored.ui.theme
 
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 val Primary = Color(0xFF4A58B4)
@@ -49,3 +50,18 @@ val OnSurfaceDark = Color(0xFFe3e4e6)
 val SurfaceVariantDark = Color(0xFF5a5c66)
 val OnSurfaceVariantDark = Color(0xFFd9dbe6)
 val OutlineDark = Color(0xFFa5a7b3)
+
+data class KanbanColors(
+    val showArchived: Color = Color.Unspecified,
+)
+
+val lightKanbanColors = KanbanColors(
+    showArchived = Color(0xFFD2C41E)
+)
+
+val darkKanbanColors = KanbanColors(
+    showArchived = Color(0xFFFFEB3B)
+)
+
+
+val LocalColors = compositionLocalOf { KanbanColors() }

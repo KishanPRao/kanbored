@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Archive
+import androidx.compose.material.icons.filled.Unarchive
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -30,10 +31,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import com.kanbored.kanbored.event.UiEvent
 import com.kanbored.kanbored.model.KanbanProject
+import com.kanbored.kanbored.ui.theme.LocalColors
 import com.kanbored.kanbored.utils.ConnectionStatusStrip
 import com.kanbored.kanbored.utils.PresentableText
 import com.kanbored.kanbored.utils.PromptDialog
@@ -50,7 +51,6 @@ import kanbored.app.generated.resources.settings
 import kanbored.app.generated.resources.topbar_add_project
 import kanbored.app.generated.resources.topbar_show_archived
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -60,34 +60,38 @@ fun HomeScreen(
     onProjectOpened: (KanbanProject) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var showArchived by rememberSaveable { mutableStateOf(false) }
     var showNewProjectDialog by rememberSaveable { mutableStateOf(false) }
     val title = stringResource(Res.string.projects)
-    LaunchedEffect(Unit) {
-        topBarVM.updateTitle(title)
-        topBarVM.showBackButton(false)
-        topBarVM.setActions(
-            listOf(
+    val tint = LocalColors.current.showArchived
+    LaunchedEffect(showArchived) {
+        println("show archived update")
+        topBarVM.updateAll(
+            title = title,
+            showBackButton = false,
+            topbarActions = listOf(
                 TopBarAction(
                     icon = Icons.Filled.Add,
                     contentDescription = PresentableText.DynamicResource(Res.string.topbar_add_project),
                     onClick = {
-                        println("Add project")
+                        Logger.i("Add project")
                         showNewProjectDialog = true
                     }
                 ),
                 // TODO: Or find a different, more useful operation
                 TopBarAction(
-                    icon = Icons.Filled.Archive,
+                    icon = if (showArchived) Icons.Filled.Unarchive else Icons.Filled.Archive,
                     contentDescription = PresentableText.DynamicResource(Res.string.topbar_show_archived),
+                    tint = if (showArchived) tint else null,
                     onClick = {
-                        println("Show archived")
+                        Logger.i("Show archived: $showArchived")
+                        showArchived = !showArchived
                     }
                 ),
-            ))
-        topBarVM.setDropdownItems(
-            listOf(
+            ),
+            dropdownItems = listOf(
                 TopBarDropdownItem(PresentableText.DynamicResource(Res.string.settings)) {
-                    println("Settings")
+                    Logger.i("Settings")
                 },
             )
         )
@@ -127,9 +131,7 @@ fun HomeScreen(
         PullToRefreshBox(
             isRefreshing = isRefreshing,
             onRefresh = {
-                kanbanVM.viewModelScope.launch {
-                    kanbanVM.refreshProjects()
-                }
+                kanbanVM.refreshProjects()
             },
             modifier = Modifier.fillMaxSize(),
         ) { ProjectGrid(kanbanVM, onProjectOpened) }

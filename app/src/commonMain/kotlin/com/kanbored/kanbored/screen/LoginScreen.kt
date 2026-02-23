@@ -60,10 +60,12 @@ fun LoginScreen(
 ) {
     val title = stringResource(Res.string.login)
     LaunchedEffect(Unit) {
-        topBarVM.updateTitle(title)
-        topBarVM.showBackButton(false)
-        topBarVM.setActions(emptyList())
-        topBarVM.setDropdownItems(emptyList())
+        topBarVM.updateAll(
+            title = title,
+            showBackButton = false,
+            topbarActions = emptyList(),
+            dropdownItems = emptyList(),
+        )
     }
     val loginVM: LoginViewModel = hiltViewModel()
     Column(
