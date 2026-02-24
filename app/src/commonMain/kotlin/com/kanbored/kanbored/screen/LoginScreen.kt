@@ -36,6 +36,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.kanbored.kanbored.BuildConfig
 import com.kanbored.kanbored.utils.PresentableText
 import com.kanbored.kanbored.viewmodel.LoginViewModel
 import com.kanbored.kanbored.viewmodel.TopBarViewModel
@@ -74,9 +75,10 @@ fun LoginScreen(
         modifier = modifier.fillMaxSize()
     ) {
         val spacing = 30.dp
-        var url by rememberSaveable { mutableStateOf("http://192.168.0.50:6080") }
-        var userName by rememberSaveable { mutableStateOf("admin") }
-        var password by rememberSaveable { mutableStateOf("admin") }
+        // TODO: only during debug mode!
+        var url by rememberSaveable { mutableStateOf(BuildConfig.API_BASE_URL) }
+        var userName by rememberSaveable { mutableStateOf(BuildConfig.API_USERNAME) }
+        var password by rememberSaveable { mutableStateOf(BuildConfig.API_PASSWORD) }
         var isValidUrl by rememberSaveable { mutableStateOf(true) }
         var isValidUserName by rememberSaveable { mutableStateOf(true) }
         var isValidPassword by rememberSaveable { mutableStateOf(true) }

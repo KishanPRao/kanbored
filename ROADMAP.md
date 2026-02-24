@@ -9,9 +9,13 @@
 - [ ] Home/Projects
 - [ ] Project
     - [x] create proj
-    - [ ] show arch
-    - [ ] settings
+    - [x] show arch
+    - [x] settings
 - [ ] Settings
+    - [ ] Change theme
+    - [ ] (opt) View database
+    - [ ] (opt) Clear local data
+    - [ ] Logout
 - [ ] Column
     - [ ] actions
         - [x] add column

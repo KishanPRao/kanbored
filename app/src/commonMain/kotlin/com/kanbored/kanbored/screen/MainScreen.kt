@@ -130,9 +130,15 @@ fun MainScreen() {
                         navController.getBackStackEntry(Route.Home)
                     }
                     val kanbanVM: KanbanViewModel = hiltViewModel(kanbanGraphEntry)
-                    HomeScreen(topBarVM, kanbanVM, onProjectOpened = { project ->
-                        navController.navigate(Route.Project(projectId = project.id))
-                    })
+                    HomeScreen(
+                        topBarVM,
+                        kanbanVM,
+                        onProjectOpened = { project ->
+                            navController.navigate(Route.Project(projectId = project.id))
+                        }, onSettingsOpened = {
+                            navController.navigate(Route.Settings)
+                        }
+                    )
                 }
                 composable<Route.Project> { entry ->
                     val kanbanGraphEntry = remember(entry) {
@@ -163,6 +169,11 @@ fun MainScreen() {
                         columnId = args.columnId,
                         taskId = args.taskId,
                         onNavigateBack = onNavigateBack,
+                    )
+                }
+                composable<Route.Settings> { entry ->
+                    SettingsScreen(
+                        topBarVM = topBarVM,
                     )
                 }
             }

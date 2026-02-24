@@ -1,6 +1,9 @@
+import org.jetbrains.compose.internal.utils.localPropertiesFile
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import org.jetbrains.kotlin.konan.properties.Properties
+import org.jetbrains.kotlin.konan.properties.hasProperty
 
 plugins {
     alias(libs.plugins.android.application)
@@ -8,11 +11,14 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.buildConfig)
     alias(libs.plugins.room)
     alias(libs.plugins.compose.hot.reload)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.hilt.android)
 }
+
+val appPackageName = "com.kanbored.kanbored"
 
 kotlin {
     compilerOptions {
@@ -127,11 +133,11 @@ kotlin {
 }
 
 android {
-    namespace = "com.kanbored.kanbored"
+    namespace = appPackageName
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.kanbored.kanbored"
+        applicationId = appPackageName
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
@@ -155,7 +161,6 @@ android {
     }
     buildFeatures {
         compose = true
-        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.composeMultiplatform.get()
@@ -164,6 +169,35 @@ android {
 
 room {
     schemaDirectory("$projectDir/schemas")
+}
+
+buildConfig {
+    packageName(appPackageName)
+    // TODO: Use only during debug mode; for release, embed empty values
+    if (!localPropertiesFile.exists()) {
+        error(
+            """
+            local.properties file doesn't exist!
+        """.trimIndent()
+        )
+    }
+    val properties = Properties()
+    localPropertiesFile.inputStream().use { properties.load(it) }
+    val propertiesKeys = listOf("API_BASE_URL", "API_USERNAME", "API_PASSWORD")
+    propertiesKeys.forEach { key ->
+        if (!properties.hasProperty(key)) {
+            error(
+                """
+            local.properties doesn't contain `${key}` property!
+        """.trimIndent()
+            )
+        }
+        buildConfigField(
+            "String",
+            key,
+            "\"${properties.getProperty(key)}\""
+        )
+    }
 }
 
 dependencies {

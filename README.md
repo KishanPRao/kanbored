@@ -10,13 +10,13 @@ The [ROADMAP](ROADMAP.md) file shows some of the features that are supported, an
 
 ## Screenshots
 
-| Login                                                                                                    | Projects                                                                                                    |
-|----------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|
-| <div style="text-align: center;"><img src="screenshots/login.png" alt="Description" width="400" /></div> | <div style="text-align: center;"><img src="screenshots/projects.png" alt="Description" width="400" /></div> |
+| Login                                                                                              | Projects                                                                                                 |
+|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
+| <div style="text-align: center;"><img src="screenshots/login.png" alt="Login" width="400" /></div> | <div style="text-align: center;"><img src="screenshots/projects.png" alt="Projects" width="400" /></div> |
 
-| Project Information                                                                                               | Task Information                                                                                        |
-|-------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
-| <div style="text-align: center;"><img src="screenshots/project_screen.png" alt="Description" width="400" /></div> | <div style="text-align: center;"><img src="screenshots/task.png" alt="Description" width="400" /></div> |
+| Project Information                                                                                                 | Task Information                                                                                 |
+|---------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
+| <div style="text-align: center;"><img src="screenshots/project_screen.png" alt="ProjectScreen" width="400" /></div> | <div style="text-align: center;"><img src="screenshots/task.png" alt="Task" width="400" /></div> |
 
 | Kanboard server                                     |
 |-----------------------------------------------------|

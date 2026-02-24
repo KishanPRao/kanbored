@@ -3,7 +3,6 @@ package com.kanbored.kanbored.di
 import com.kanbored.kanbored.model.AuthConfig
 import com.kanbored.kanbored.network.AuthInterceptorFactory
 import com.kanbored.kanbored.repository.ConfigRepository
-import com.kanbored.kanbored.utils.BuildConfiguration
 import com.kanbored.kanbored.utils.createJson
 import dagger.Module
 import dagger.Provides
@@ -45,7 +44,8 @@ object NetworkModule {
     @Singleton
     fun providesHttpLoggingInterceptor(): HttpLoggingInterceptor? {
         return null
-        return if (BuildConfiguration.isDebug) {
+        // TODO: only during debug mode
+        return if (true) {
             HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BODY
             }

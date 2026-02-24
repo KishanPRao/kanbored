@@ -58,6 +58,7 @@ fun HomeScreen(
     topBarVM: TopBarViewModel,
     kanbanVM: KanbanViewModel,
     onProjectOpened: (KanbanProject) -> Unit,
+    onSettingsOpened: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showArchived by rememberSaveable { mutableStateOf(false) }
@@ -86,12 +87,14 @@ fun HomeScreen(
                     onClick = {
                         Logger.i("Show archived: $showArchived")
                         showArchived = !showArchived
+                        kanbanVM.showArchivedProjects(showArchived)
                     }
                 ),
             ),
             dropdownItems = listOf(
                 TopBarDropdownItem(PresentableText.DynamicResource(Res.string.settings)) {
                     Logger.i("Settings")
+                    onSettingsOpened()
                 },
             )
         )
