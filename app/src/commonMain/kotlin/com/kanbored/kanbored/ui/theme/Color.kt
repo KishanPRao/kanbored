@@ -53,14 +53,17 @@ val OutlineDark = Color(0xFFa5a7b3)
 
 data class KanbanColors(
     val showArchived: Color = Color.Unspecified,
+    val onShowArchived: Color = Color.Unspecified,
 )
 
 val lightKanbanColors = KanbanColors(
-    showArchived = Color(0xFFD2C41E)
+    showArchived = Color(0xFFD2C41E),
+    onShowArchived = Color(0xFF000000),
 )
 
 val darkKanbanColors = KanbanColors(
-    showArchived = Color(0xFFFFEB3B)
+    showArchived = Color(0xFFFFC91B),
+    onShowArchived = Color(0xFF131212),
 )
 
 

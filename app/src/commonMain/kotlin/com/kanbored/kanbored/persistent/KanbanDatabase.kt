@@ -55,7 +55,7 @@ interface KanbanProjectDao : BaseDao<KanbanProject> {
 @Dao
 interface KanbanColumnDao : BaseDao<KanbanColumn> {
     @Query("select * from $kanbanColumnTableName where projectId == :projectId order by position")
-    fun get(projectId: Int): Flow<List<KanbanColumn>>
+    fun get(projectId: Int/*, isActive: Boolean*/): Flow<List<KanbanColumn>>
 
     @Query("select * from $kanbanColumnTableName")
     fun getAll(): Flow<List<KanbanColumn>>
@@ -72,8 +72,14 @@ interface KanbanColumnDao : BaseDao<KanbanColumn> {
 
 @Dao
 interface KanbanTaskDao : BaseDao<KanbanTask> {
-    @Query("select * from $kanbanTaskTableName where columnId == :columnId and projectId == :projectId order by position")
-    fun get(projectId: Int, columnId: Int): Flow<List<KanbanTask>>
+    @Query(
+        "select * from $kanbanTaskTableName where " +
+                "columnId == :columnId and " +
+                "projectId == :projectId and " +
+                "isActive == :isActive " +
+                "order by position"
+    )
+    fun get(projectId: Int, columnId: Int, isActive: Boolean): Flow<List<KanbanTask>>
 
     @Query("select * from $kanbanTaskTableName where columnId == :columnId and projectId == :projectId and id == :taskId")
     fun getSingle(projectId: Int, columnId: Int, taskId: Int): Flow<KanbanTask?>

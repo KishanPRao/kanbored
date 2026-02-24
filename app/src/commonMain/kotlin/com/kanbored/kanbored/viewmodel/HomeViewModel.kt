@@ -1,47 +1,32 @@
 package com.kanbored.kanbored.viewmodel
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import com.kanbored.kanbored.event.AppEventBus
 import com.kanbored.kanbored.event.AppUiEvent
 import com.kanbored.kanbored.event.UiEvent
-import com.kanbored.kanbored.model.KanbanColumn
-import com.kanbored.kanbored.model.KanbanComment
 import com.kanbored.kanbored.model.KanbanProject
-import com.kanbored.kanbored.model.KanbanSubtask
-import com.kanbored.kanbored.model.KanbanTask
 import com.kanbored.kanbored.network.ConnectivityListener
 import com.kanbored.kanbored.network.Result
 import com.kanbored.kanbored.repository.KanbanRepository
-import com.kanbored.kanbored.utils.PresentableText
-import com.kanbored.kanbored.utils.emptyProject
-import com.kanbored.kanbored.utils.emptyTask
 import com.kanbored.kanbored.utils.refreshStateDelay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class KanbanViewModel @Inject constructor(
+class HomeViewModel @Inject constructor(
     connectivityListener: ConnectivityListener,
     private val repository: KanbanRepository,
     private val appEventBus: AppEventBus,
-) : ViewModel() {
-    private val _uiEventFlow = MutableSharedFlow<UiEvent>()
+) : BaseViewModel(connectivityListener) {
     private val _showArchived = MutableStateFlow(false)
-    val uiEventFlow = _uiEventFlow.asSharedFlow()
-    val isApiReachable = connectivityListener.isApiReachable
     val projects: StateFlow<List<KanbanProject>> = repository.getAllProjects()
         .combine(_showArchived) { list, archived ->
             list.filter { archived != it.isActive }
@@ -114,37 +99,9 @@ class KanbanViewModel @Inject constructor(
 //        println("finish refresh columns and tasks")
     }
 
-    private suspend fun refreshSubtasksAndCommentsSync(taskId: Int) {
-        val result = repository.refreshSubtasks(taskId)
-        when (result) {
-            is Result.Error<*> -> {
-                appEventBus.emit(AppUiEvent.ShowError(result.message!!))
-            }
-
-            is Result.Success<*> -> {}
-        }
-        val resultTasks = repository.refreshComments(taskId)
-        when (resultTasks) {
-            is Result.Error<*> -> {
-                appEventBus.emit(AppUiEvent.ShowError(result.message!!))
-            }
-
-            is Result.Success<*> -> {}
-        }
-        println("finish refresh subtasks and comments")
-    }
-
     fun refreshProjects() = viewModelScope.launch {
         _uiEventFlow.emit(UiEvent.ShowLoading)
         refreshProjectsSync()
-        _uiEventFlow.emit(UiEvent.HideLoading)
-    }
-
-    fun refreshAllColumns() = viewModelScope.launch {
-        _uiEventFlow.emit(UiEvent.ShowLoading)
-        for (project in projects.value) {
-            refreshColumnsSync(project.id)
-        }
         _uiEventFlow.emit(UiEvent.HideLoading)
     }
 
@@ -154,6 +111,7 @@ class KanbanViewModel @Inject constructor(
         _uiEventFlow.emit(UiEvent.HideLoading)
     }
 
+    // TODO: duplicated code across Home & Project VM
     fun refreshColumnsAndTasks(projectId: Int, isArchived: Boolean, showRefresh: Boolean = true) =
         viewModelScope.launch {
 //            Exception().printStackTrace()
@@ -163,69 +121,11 @@ class KanbanViewModel @Inject constructor(
             if (showRefresh) _uiEventFlow.emit(UiEvent.HideLoading)
         }
 
-    fun refreshSubtasksAndComments(taskId: Int) = viewModelScope.launch {
-        refreshSubtasksAndCommentsSync(taskId)
-    }
-
     fun showArchivedProjects(showArchived: Boolean) {
         _showArchived.value = showArchived
     }
 
-    fun getColumns(projectId: Int): Flow<List<KanbanColumn>> {
-        return repository.getColumns(projectId)
-    }
-
-    fun getTasks(projectId: Int, columnId: Int): Flow<List<KanbanTask>> {
-        return repository.getTasks(projectId, columnId)
-    }
-
-    fun getSubtasks(taskId: Int): Flow<List<KanbanSubtask>> {
-        return repository.getSubtasks(taskId)
-    }
-
-    fun getComments(taskId: Int): Flow<List<KanbanComment>> {
-        return repository.getComments(taskId)
-    }
-
-    fun getProject(projectId: Int): Flow<KanbanProject> {
-        return repository.getProject(projectId).map { it ?: emptyProject }
-    }
-
-    fun getTask(projectId: Int, columnId: Int, taskId: Int): Flow<KanbanTask> {
-        return repository.getTask(projectId, columnId, taskId).map { it ?: emptyTask }
-    }
-
     fun createProject(name: String) = viewModelScope.launch {
         repository.createProject(name)
-    }
-
-    fun createColumn(projectId: Int, name: String) = viewModelScope.launch {
-        repository.createColumn(projectId, name)
-    }
-
-    fun createTask(projectId: Int, columnId: Int, name: String) = viewModelScope.launch {
-        repository.createTask(projectId, columnId, name)
-    }
-
-    fun updateProject(project: KanbanProject) = viewModelScope.launch {
-        repository.updateProject(project)
-    }
-
-    fun updateTask(task: KanbanTask) = viewModelScope.launch {
-        repository.updateTask(task)
-    }
-
-    fun deleteProject(project: KanbanProject) = viewModelScope.launch {
-        repository.deleteProject(project)
-    }
-
-    fun deleteTask(task: KanbanTask) = viewModelScope.launch {
-        repository.deleteTask(task)
-    }
-
-    fun showUiMessage(presentableText: PresentableText) {
-        viewModelScope.launch {
-            _uiEventFlow.emit(UiEvent.ShowMessage(presentableText))
-        }
     }
 }

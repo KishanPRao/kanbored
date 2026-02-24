@@ -76,7 +76,7 @@ class ApiWorkManager @Inject constructor(
             val apiStorage = createApiStorage(
                 KanbanMethod.AddColumn,
                 KanbanParams(projectId = projectId, title = name),
-                localId
+                updateId = localId
             )
             database.apiStorageDao().upsert(apiStorage)
             startWorkerIfNotStarted()
@@ -94,7 +94,7 @@ class ApiWorkManager @Inject constructor(
             val apiStorage = createApiStorage(
                 KanbanMethod.CreateTask,
                 KanbanParams(projectId = projectId, columnId = columnId, title = name),
-                localId
+                updateId = localId
             )
             database.apiStorageDao().upsert(apiStorage)
             startWorkerIfNotStarted()
@@ -110,10 +110,14 @@ class ApiWorkManager @Inject constructor(
             KanbanMethod.UpdateProject,
             // TODO: might be a better idea to send the entire object for updates (everything except "project_id")
             KanbanParams(projectId = project.id, name = project.name),
-            project.id
+            updateId = project.id
         )
         database.apiStorageDao().upsert(apiStorage)
         startWorkerIfNotStarted()
+    }
+
+    override suspend fun updateColumn(column: KanbanColumn) {
+        TODO("Not yet implemented")
     }
 
     override suspend fun updateTask(task: KanbanTask) = withContext(coroutineCtx) {
@@ -122,7 +126,33 @@ class ApiWorkManager @Inject constructor(
         val apiStorage = createApiStorage(
             KanbanMethod.UpdateTask,
             KanbanParams(id = task.id, title = task.title),
-            task.id
+            updateId = task.id
+        )
+        database.apiStorageDao().upsert(apiStorage)
+        startWorkerIfNotStarted()
+    }
+
+    /******************* MARK: ENABLE/DISABLE ******************/
+
+    override suspend fun enableProject(project: KanbanProject) = withContext(coroutineCtx) {
+        Logger.d("enableProject: $project")
+        database.projectDao().upsert(project.copy(isActive = true))
+        val apiStorage = createApiStorage(
+            KanbanMethod.EnableProject,
+            KanbanParams(projectId = project.id),
+            updateId = project.id
+        )
+        database.apiStorageDao().upsert(apiStorage)
+        startWorkerIfNotStarted()
+    }
+
+    override suspend fun disableProject(project: KanbanProject) = withContext(coroutineCtx) {
+        Logger.d("disableProject: $project")
+        database.projectDao().upsert(project.copy(isActive = false))
+        val apiStorage = createApiStorage(
+            KanbanMethod.DisableProject,
+            KanbanParams(projectId = project.id),
+            updateId = project.id
         )
         database.apiStorageDao().upsert(apiStorage)
         startWorkerIfNotStarted()

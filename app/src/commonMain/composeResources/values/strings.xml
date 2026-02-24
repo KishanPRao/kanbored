@@ -18,8 +18,10 @@
     <string name="topbar_change_view">Change View</string>
     <string name="topbar_more_options">More Options</string>
     <string name="topbar_show_archived">Show Archived</string>
+    <string name="topbar_hide_archived">Hide Archived</string>
     <string name="topbar_add_checklist">Add a new checklist</string>
     <string name="unarchive">Unarchive</string>
+    <string name="archived">Archived</string>
     <string name="rename">Rename</string>
     <string name="archive">Archive</string>
     <string name="delete">Delete</string>

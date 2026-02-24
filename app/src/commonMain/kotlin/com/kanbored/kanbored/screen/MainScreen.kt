@@ -37,8 +37,10 @@ import com.kanbored.kanbored.event.AppUiEvent
 import com.kanbored.kanbored.ui.theme.AppTheme
 import com.kanbored.kanbored.ui.utils.AppTopBar
 import com.kanbored.kanbored.utils.DefaultSnackbar
-import com.kanbored.kanbored.viewmodel.KanbanViewModel
+import com.kanbored.kanbored.viewmodel.HomeViewModel
 import com.kanbored.kanbored.viewmodel.MainViewModel
+import com.kanbored.kanbored.viewmodel.ProjectViewModel
+import com.kanbored.kanbored.viewmodel.TaskViewModel
 import com.kanbored.kanbored.viewmodel.TopBarViewModel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -129,7 +131,7 @@ fun MainScreen() {
                     val kanbanGraphEntry = remember(entry) {
                         navController.getBackStackEntry(Route.Home)
                     }
-                    val kanbanVM: KanbanViewModel = hiltViewModel(kanbanGraphEntry)
+                    val kanbanVM: HomeViewModel = hiltViewModel(kanbanGraphEntry)
                     HomeScreen(
                         topBarVM,
                         kanbanVM,
@@ -144,9 +146,9 @@ fun MainScreen() {
                     val kanbanGraphEntry = remember(entry) {
                         navController.getBackStackEntry(Route.Home)
                     }
-                    val kanbanVM: KanbanViewModel = hiltViewModel(kanbanGraphEntry)
+                    val projectVM: ProjectViewModel = hiltViewModel(kanbanGraphEntry)
                     val args = entry.toRoute<Route.Project>()
-                    ProjectScreen(topBarVM, kanbanVM, args.projectId, onTaskOpened = { task ->
+                    ProjectScreen(topBarVM, projectVM, args.projectId, onTaskOpened = { task ->
                         navController.navigate(
                             Route.Task(
                                 projectId = task.projectId,
@@ -160,11 +162,11 @@ fun MainScreen() {
                     val kanbanGraphEntry = remember(entry) {
                         navController.getBackStackEntry(Route.Home)
                     }
-                    val kanbanVM: KanbanViewModel = hiltViewModel(kanbanGraphEntry)
+                    val taskVM: TaskViewModel = hiltViewModel(kanbanGraphEntry)
                     val args = entry.toRoute<Route.Task>()
                     TaskScreen(
                         topBarVM,
-                        kanbanVM,
+                        taskVM,
                         projectId = args.projectId,
                         columnId = args.columnId,
                         taskId = args.taskId,

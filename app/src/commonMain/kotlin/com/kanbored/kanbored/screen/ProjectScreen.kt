@@ -55,7 +55,7 @@ import com.kanbored.kanbored.utils.PromptDialog
 import com.kanbored.kanbored.utils.emptyColumn
 import com.kanbored.kanbored.utils.emptyProject
 import com.kanbored.kanbored.utils.emptyTask
-import com.kanbored.kanbored.viewmodel.KanbanViewModel
+import com.kanbored.kanbored.viewmodel.ProjectViewModel
 import com.kanbored.kanbored.viewmodel.TopBarAction
 import com.kanbored.kanbored.viewmodel.TopBarDropdownItem
 import com.kanbored.kanbored.viewmodel.TopBarViewModel
@@ -73,14 +73,16 @@ import kanbored.app.generated.resources.rename
 import kanbored.app.generated.resources.server_unreachable
 import kanbored.app.generated.resources.topbar_add_column
 import kanbored.app.generated.resources.topbar_change_view
+import kanbored.app.generated.resources.topbar_hide_archived
 import kanbored.app.generated.resources.topbar_show_archived
+import kanbored.app.generated.resources.unarchive
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ProjectScreen(
     topBarVM: TopBarViewModel,
-    kanbanVM: KanbanViewModel,
+    projectVM: ProjectViewModel,
     projectId: Int,
     onTaskOpened: (KanbanTask) -> Unit,
     onNavigateBack: () -> Unit,
@@ -90,7 +92,7 @@ fun ProjectScreen(
     var showRenameDialog by rememberSaveable { mutableStateOf(false) }
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
     // TODO: observe the object instead? If project screen open, then project updated from api worker?
-    val project by kanbanVM.getProject(projectId = projectId)
+    val project by projectVM.getProject(projectId = projectId)
         .collectAsStateWithLifecycle(emptyProject)
     var isGridView by rememberSaveable { mutableStateOf(false) }
     var isArchived by rememberSaveable { mutableStateOf(false) }
@@ -98,27 +100,43 @@ fun ProjectScreen(
     LaunchedEffect(project) {
         // TODO: This gets re-called after opening and exiting task, causing full refresh; why?
         if (project.isValid()) {
-            kanbanVM.refreshColumnsAndTasks(
+            // Load all tasks initially
+            projectVM.refreshColumnsAndTasks(
                 projectId = project.id,
-                isArchived = isArchived,
-                showRefresh = false
+                isArchived = false,
+                showRefresh = false,
+            )
+            projectVM.refreshColumnsAndTasks(
+                projectId = project.id,
+                isArchived = true,
+                showRefresh = false,
             )
         }
         topBarVM.pushState()
         topBarVM.updateTitle(project.name)
         topBarVM.showBackButton(true)
     }
+    val archivedString =
+        if (isArchived) Res.string.topbar_hide_archived else Res.string.topbar_show_archived
+    val archiveString =
+        if (project.isActive) Res.string.archive else Res.string.unarchive
     topBarVM.setDropdownItems(
         listOf(
             TopBarDropdownItem(PresentableText.DynamicResource(Res.string.rename)) {
                 Logger.d("Rename")
                 showRenameDialog = true
             },
-            TopBarDropdownItem(PresentableText.DynamicResource(Res.string.topbar_show_archived)) {
-                Logger.d("Show archived")
+            TopBarDropdownItem(PresentableText.DynamicResource(archivedString)) {
+                isArchived = !isArchived
+                Logger.d("Toggle archived: $isArchived")
             },
-            TopBarDropdownItem(PresentableText.DynamicResource(Res.string.archive)) {
-                Logger.d("Archive")
+            TopBarDropdownItem(PresentableText.DynamicResource(archiveString)) {
+                Logger.d("Archive, currently: ${project.isActive}")
+                if (project.isActive) {
+                    projectVM.disableProject(project)
+                } else {
+                    projectVM.enableProject(project)
+                }
             },
             TopBarDropdownItem(PresentableText.DynamicResource(Res.string.delete)) {
                 Logger.d("Delete")
@@ -156,7 +174,7 @@ fun ProjectScreen(
             onClickOk = { text ->
                 showAddColDialog = false
                 Logger.d("Add new column: $text")
-                kanbanVM.createColumn(projectId, text)
+                projectVM.createColumn(projectId, text)
             },
             onClickCancel = {
                 showAddColDialog = false
@@ -172,7 +190,7 @@ fun ProjectScreen(
             onClickOk = {
                 showDeleteDialog = false
                 Logger.d("Delete project: $project")
-                kanbanVM.deleteProject(project)
+                projectVM.deleteProject(project)
                 onNavigateBack()
             },
             onClickCancel = {
@@ -191,7 +209,7 @@ fun ProjectScreen(
             onClickOk = { text ->
                 showRenameDialog = false
                 Logger.d("Rename project: $project")
-                kanbanVM.updateProject(project.copy(name = text))
+                projectVM.updateProject(project.copy(name = text))
                 topBarVM.popState() // The project gets updated, and we pushState again
             },
             onClickCancel = {
@@ -201,9 +219,9 @@ fun ProjectScreen(
     }
 
     var isRefreshing by rememberSaveable { mutableStateOf(false) }
-    val isApiReachable by kanbanVM.isApiReachable.collectAsState()
+    val isApiReachable by projectVM.isApiReachable.collectAsState()
     LaunchedEffect(Unit) {
-        kanbanVM.uiEventFlow.collectLatest { event ->
+        projectVM.uiEventFlow.collectLatest { event ->
             when (event) {
                 UiEvent.HideLoading -> isRefreshing = false
                 UiEvent.ShowLoading -> isRefreshing = true
@@ -218,25 +236,36 @@ fun ProjectScreen(
         )
         PullToRefreshBox(
             isRefreshing = isRefreshing,
-            onRefresh = { kanbanVM.refreshColumnsAndTasks(project.id, isArchived) },
+            onRefresh = { projectVM.refreshColumnsAndTasks(project.id, isArchived) },
             modifier = Modifier.fillMaxSize(),
-        ) { ColumnList(project.id, topBarVM, kanbanVM, onTaskOpened) }
+        ) {
+            ColumnList(
+                projectId = project.id,
+                isArchived = isArchived,
+                topBarVM = topBarVM,
+                projectVM = projectVM,
+                onTaskOpened = onTaskOpened
+            )
+        }
     }
 }
 
 @Composable
 fun ColumnList(
     projectId: Int,
+    isArchived: Boolean,
     topBarVM: TopBarViewModel,
-    kanbanVM: KanbanViewModel,
+    projectVM: ProjectViewModel,
     onTaskOpened: (KanbanTask) -> Unit,
 ) {
-    val columns by kanbanVM.getColumns(projectId).collectAsStateWithLifecycle(emptyList())
+    val columns by projectVM.getColumns(projectId, isArchived)
+        .collectAsStateWithLifecycle(emptyList())
 //    Logger.d("columns: $columns")
     LazyRow {
         items(items = columns, key = { it.id }) { column ->
-            val tasks by kanbanVM.getTasks(projectId, column.id)
+            val tasks by projectVM.getTasks(projectId, column.id, isArchived)
                 .collectAsStateWithLifecycle(emptyList())
+            println("column tasks: $tasks")
             var editMode by rememberSaveable { mutableStateOf(EditMode.Idle) }
             var newTaskName by rememberSaveable { mutableStateOf("") }
             var isValidTaskName by rememberSaveable { mutableStateOf(true) }
@@ -273,7 +302,7 @@ fun ColumnList(
                                     } else {
                                         topBarVM.popState()
                                         Logger.i("Add $newTaskName task into $column")
-                                        kanbanVM.createTask(projectId, column.id, newTaskName)
+                                        projectVM.createTask(projectId, column.id, newTaskName)
                                         editMode = EditMode.Idle
                                     }
                                 }

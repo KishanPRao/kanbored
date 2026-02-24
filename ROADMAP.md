@@ -7,7 +7,7 @@
 - [x] Dependency injection
 - [ ] CI/CD
 - [ ] Home/Projects
-- [ ] Project
+- [ ] Home
     - [x] create proj
     - [x] show arch
     - [x] settings
@@ -20,9 +20,12 @@
     - [ ] actions
         - [x] add column
         - [x] rename proj
-        - [ ] show arch (col/task)
+        - [x] show arch
+            - [x] task
+            - [ ] column (needs php plugin change)
         - [ ] archive proj
         - [x] delete proj
+        - [ ] show grid
     - [x] add task
         - [ ] on back button, deselect before exit
     - [ ] rename col

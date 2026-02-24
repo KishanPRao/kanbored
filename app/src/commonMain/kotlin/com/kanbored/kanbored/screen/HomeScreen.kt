@@ -35,15 +35,17 @@ import co.touchlab.kermit.Logger
 import com.kanbored.kanbored.event.UiEvent
 import com.kanbored.kanbored.model.KanbanProject
 import com.kanbored.kanbored.ui.theme.LocalColors
+import com.kanbored.kanbored.ui.utils.ArchiveStatusStrip
 import com.kanbored.kanbored.utils.ConnectionStatusStrip
 import com.kanbored.kanbored.utils.PresentableText
 import com.kanbored.kanbored.utils.PromptDialog
-import com.kanbored.kanbored.viewmodel.KanbanViewModel
+import com.kanbored.kanbored.viewmodel.HomeViewModel
 import com.kanbored.kanbored.viewmodel.TopBarAction
 import com.kanbored.kanbored.viewmodel.TopBarDropdownItem
 import com.kanbored.kanbored.viewmodel.TopBarViewModel
 import kanbored.app.generated.resources.Res
 import kanbored.app.generated.resources.add_new_project
+import kanbored.app.generated.resources.archived
 import kanbored.app.generated.resources.enter_name_new_project
 import kanbored.app.generated.resources.projects
 import kanbored.app.generated.resources.server_unreachable
@@ -56,7 +58,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun HomeScreen(
     topBarVM: TopBarViewModel,
-    kanbanVM: KanbanViewModel,
+    homeVM: HomeViewModel,
     onProjectOpened: (KanbanProject) -> Unit,
     onSettingsOpened: () -> Unit,
     modifier: Modifier = Modifier
@@ -85,9 +87,9 @@ fun HomeScreen(
                     contentDescription = PresentableText.DynamicResource(Res.string.topbar_show_archived),
                     tint = if (showArchived) tint else null,
                     onClick = {
-                        Logger.i("Show archived: $showArchived")
                         showArchived = !showArchived
-                        kanbanVM.showArchivedProjects(showArchived)
+                        Logger.i("Show archived: $showArchived")
+                        homeVM.showArchivedProjects(showArchived)
                     }
                 ),
             ),
@@ -107,7 +109,7 @@ fun HomeScreen(
             onClickOk = { text ->
                 showNewProjectDialog = false
                 println("Add new project: $text")
-                kanbanVM.createProject(text)
+                homeVM.createProject(text)
             },
             onClickCancel = {
                 showNewProjectDialog = false
@@ -115,9 +117,9 @@ fun HomeScreen(
         )
     }
     var isRefreshing by rememberSaveable { mutableStateOf(false) }
-    val isApiReachable by kanbanVM.isApiReachable.collectAsState()
+    val isApiReachable by homeVM.isApiReachable.collectAsState()
     LaunchedEffect(Unit) {
-        kanbanVM.uiEventFlow.collectLatest { event ->
+        homeVM.uiEventFlow.collectLatest { event ->
             when (event) {
                 UiEvent.HideLoading -> isRefreshing = false
                 UiEvent.ShowLoading -> isRefreshing = true
@@ -131,19 +133,20 @@ fun HomeScreen(
             stringResource(Res.string.server_unreachable),
             !isApiReachable,
         )
+        ArchiveStatusStrip(stringResource(Res.string.archived), showArchived)
         PullToRefreshBox(
             isRefreshing = isRefreshing,
             onRefresh = {
-                kanbanVM.refreshProjects()
+                homeVM.refreshProjects()
             },
             modifier = Modifier.fillMaxSize(),
-        ) { ProjectGrid(kanbanVM, onProjectOpened) }
+        ) { ProjectGrid(homeVM, onProjectOpened) }
     }
 }
 
 @Composable
-fun ProjectGrid(kanbanVM: KanbanViewModel, onProjectOpened: (KanbanProject) -> Unit) {
-    val projects by kanbanVM.projects.collectAsStateWithLifecycle()
+fun ProjectGrid(homeVM: HomeViewModel, onProjectOpened: (KanbanProject) -> Unit) {
+    val projects by homeVM.projects.collectAsStateWithLifecycle()
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(4.dp, 12.dp, 4.dp, 4.dp),

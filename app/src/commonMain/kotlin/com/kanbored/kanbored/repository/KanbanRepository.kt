@@ -33,11 +33,15 @@ class KanbanRepository @Inject constructor(
     override fun getProject(id: Int): Flow<KanbanProject?> =
         database.projectDao().getSingle(id)
 
-    override fun getColumns(projectId: Int): Flow<List<KanbanColumn>> =
+    override fun getColumns(projectId: Int, isArchived: Boolean): Flow<List<KanbanColumn>> =
         database.columnDao().get(projectId)
 
-    override fun getTasks(projectId: Int, columnId: Int): Flow<List<KanbanTask>> =
-        database.taskDao().get(projectId, columnId)
+    override fun getTasks(
+        projectId: Int,
+        columnId: Int,
+        isArchived: Boolean
+    ): Flow<List<KanbanTask>> =
+        database.taskDao().get(projectId, columnId, isActive = !isArchived)
 
     override fun getTask(projectId: Int, columnId: Int, taskId: Int): Flow<KanbanTask?> =
         database.taskDao().getSingle(projectId, columnId, taskId)
@@ -133,9 +137,18 @@ class KanbanRepository @Inject constructor(
     override suspend fun updateProject(project: KanbanProject) =
         apiWorkManager.updateProject(project)
 
+    override suspend fun updateColumn(column: KanbanColumn) =
+        apiWorkManager.updateColumn(column)
+
     override suspend fun updateTask(task: KanbanTask) {
         apiWorkManager.updateTask(task)
     }
+
+    override suspend fun enableProject(project: KanbanProject) =
+        apiWorkManager.enableProject(project)
+
+    override suspend fun disableProject(project: KanbanProject) =
+        apiWorkManager.disableProject(project)
 
     override suspend fun deleteProject(project: KanbanProject) =
         apiWorkManager.deleteProject(project)

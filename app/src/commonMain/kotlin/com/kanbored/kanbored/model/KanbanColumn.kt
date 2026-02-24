@@ -29,6 +29,7 @@ data class KanbanColumn(
     @Serializable(with = BooleanAsIntSerializer::class)
     @SerialName("hide_in_dashboard") val hideInDashboard: Boolean,
     @SerialName("project_id") val projectId: Int,
+//    val isActive: Boolean? = null,
 //    val nbOpenTasks: Int,
 //    val nbClosedTasks: Int,
 //    val nbTasks: Int,
@@ -38,7 +39,6 @@ data class KanbanColumn(
 //    val columnScore: Int,
 //    val columnNbScore: Int,
 //    val columnNbOpenTasks: Int,
-//    val isActive: Boolean,
 )
 /*
 TODO: projectId column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column

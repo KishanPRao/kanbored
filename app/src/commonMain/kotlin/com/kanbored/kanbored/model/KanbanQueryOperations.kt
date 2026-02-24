@@ -8,9 +8,9 @@ interface KanbanQueryOperations {
 
     fun getProject(id: Int): Flow<KanbanProject?>
 
-    fun getColumns(projectId: Int): Flow<List<KanbanColumn>>
+    fun getColumns(projectId: Int, isArchived: Boolean): Flow<List<KanbanColumn>>
 
-    fun getTasks(projectId: Int, columnId: Int): Flow<List<KanbanTask>>
+    fun getTasks(projectId: Int, columnId: Int, isArchived: Boolean): Flow<List<KanbanTask>>
 
     fun getTask(projectId: Int, columnId: Int, taskId: Int): Flow<KanbanTask?>
 
@@ -38,7 +38,13 @@ interface KanbanCommandOperations {
 
     suspend fun updateProject(project: KanbanProject)
 
+    suspend fun updateColumn(column: KanbanColumn)
+
     suspend fun updateTask(task: KanbanTask)
+
+    suspend fun enableProject(project: KanbanProject)
+
+    suspend fun disableProject(project: KanbanProject)
 
     suspend fun deleteProject(project: KanbanProject)
 
